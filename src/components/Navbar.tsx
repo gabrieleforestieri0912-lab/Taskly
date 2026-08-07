@@ -129,7 +129,11 @@ export default function Navbar({
   ];
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    // Reveal the navbar only once the user scrolls past the hero
+    // (hero is min-h-[115vh]), so it slides in instead of being
+    // stuck at the very top.
+    const handleScroll = () =>
+      setIsScrolled(window.scrollY > window.innerHeight * 0.85);
     handleScroll();
     window.addEventListener("scroll", handleScroll);
 
@@ -180,10 +184,13 @@ export default function Navbar({
 
     return (
       <>
-        <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6">
+        <header
+          className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6"
+          style={{ pointerEvents: isScrolled ? "auto" : "none" }}
+        >
           <motion.nav
-            initial={{ y: -24, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            initial={false}
+            animate={{ y: isScrolled ? 0 : -96, opacity: isScrolled ? 1 : 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className={`mx-auto flex h-16 max-w-5xl items-center justify-between rounded-2xl border px-3 backdrop-blur-2xl transition-all duration-500 sm:px-5 ${barSurface}`}
           >
