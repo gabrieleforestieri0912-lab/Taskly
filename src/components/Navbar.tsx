@@ -225,7 +225,7 @@ export default function Navbar({
             </Link>
 
             {/* Desktop nav links */}
-            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
+            <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
               {landingNavLinks.map((link) => (
                 <div
                   key={link.key}
