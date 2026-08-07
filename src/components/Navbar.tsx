@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
+import ThemeToggle from "./ThemeToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
@@ -286,6 +287,7 @@ export default function Navbar({
 
             {/* Desktop actions */}
             <div className="hidden items-center gap-2 lg:flex">
+              <ThemeToggle className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white" />
               {user ? (
                 <Link
                   href="/dashboard"
@@ -417,6 +419,11 @@ export default function Navbar({
                   </div>
                 ))}
               </nav>
+
+              <div className="mt-6 flex items-center justify-between">
+                <span className="text-sm font-medium text-white/60">Tema</span>
+                <ThemeToggle className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:bg-white/10" />
+              </div>
 
               {!user && (
                 <div className="mt-auto flex flex-col gap-3 pb-8">

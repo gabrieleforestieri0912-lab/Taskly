@@ -108,11 +108,11 @@
 
   /* Landing design system */
   .landing-section-light {
-    @apply px-6 py-20 bg-white dark:bg-[#151020];
+    @apply px-6 py-20 bg-white dark:bg-[#0e0e0e];
   }
 
   .landing-section-alt {
-    @apply px-6 py-20 bg-[#f6f7f9] dark:bg-[#1a1528];
+    @apply px-6 py-20 bg-[#f6f7f9] dark:bg-[#0a0a0a];
   }
 
   .landing-eyebrow {

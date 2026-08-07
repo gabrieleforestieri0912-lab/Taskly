@@ -40,7 +40,7 @@ export default function Home() {
   };
 
   return (
-    <div className="landing-shell min-h-screen bg-white dark:bg-[#0a0a0a]">
+    <div className="landing-shell min-h-screen bg-white dark:bg-black">
       <Navbar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}

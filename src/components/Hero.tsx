@@ -32,16 +32,13 @@ function Hero({ onStart, onDiscover }) {
       </motion.video>
 
       {/* Blend overlays: tint the video and fade it into the page */}
+      <div className="absolute inset-0 bg-black/45 dark:bg-black/55" aria-hidden="true" />
       <div
-        className="absolute inset-0 bg-[#0f0b1f]/45 dark:bg-[#0a0716]/55"
+        className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-transparent"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-b from-[#7b39fc]/20 via-[#7b39fc]/5 to-transparent"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0a0716]/90 to-transparent"
+        className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/90 to-transparent"
         aria-hidden="true"
       />
       {/* Bottom fade that blends the video into the next section */}
