@@ -1,20 +1,13 @@
-import { Space_Grotesk, Instrument_Serif } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeSync from "../components/ThemeSync";
 import GoogleAuthProvider from "../components/GoogleAuthProvider";
 import { LanguageProvider } from "../lib/LanguageContext";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
 
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
 });
 
 export const metadata = {
@@ -30,7 +23,7 @@ export default function RootLayout({ children }) {
     <html
       lang="it"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-inter">
         <GoogleAuthProvider>
