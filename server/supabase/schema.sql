@@ -217,6 +217,30 @@ create table if not exists public.analytics (
 );
 create index if not exists analytics_ts_idx on public.analytics (ts desc);
 
+create table if not exists public.meetings (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references auth.users(id) on delete cascade,
+  title      text not null default '',
+  transcript text,
+  summary    text,
+  category   text default 'Generale',
+  duration   text,
+  date       timestamptz default now(),
+  created_at timestamptz not null default now()
+);
+create index if not exists meetings_user_idx on public.meetings (user_id, created_at desc);
+
+create table if not exists public.integrations (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references auth.users(id) on delete cascade,
+  provider   text not null,
+  config     jsonb not null default '{}'::jsonb,
+  connected  boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, provider)
+);
+
 create table if not exists public.analytics_events (
   id           uuid primary key default gen_random_uuid(),
   workspace_id text,

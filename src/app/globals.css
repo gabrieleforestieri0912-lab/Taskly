@@ -2,10 +2,8 @@
 
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-manrope: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-cabin: var(--font-cabin), ui-sans-serif, system-ui, sans-serif;
-  --font-instrument-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-inter: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-instrument-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
 
   --color-primary: #7b39fc;
   --color-primary-dark: #2b2344;
@@ -100,20 +98,12 @@
     overflow-x: clip;
   }
 
-  .font-manrope {
-    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  }
-
-  .font-cabin {
-    font-family: var(--font-cabin), ui-sans-serif, system-ui, sans-serif;
+  .font-inter {
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   }
 
   .font-instrument-serif {
     font-family: var(--font-instrument-serif), ui-serif, Georgia, serif;
-  }
-
-  .font-inter {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   }
 
   /* Landing design system */
@@ -126,7 +116,7 @@
   }
 
   .landing-eyebrow {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-xs font-medium font-cabin mb-5 uppercase tracking-wider;
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-xs font-semibold font-inter mb-5 uppercase tracking-[0.18em];
     background: rgba(123, 57, 252, 0.08);
     border: 1px solid rgba(123, 57, 252, 0.22);
     color: #7b39fc;
@@ -140,11 +130,11 @@
   }
 
   .landing-heading {
-    @apply font-instrument-serif text-3xl md:text-4xl leading-[1.12] tracking-[-0.01em] text-gray-900 dark:text-white;
+    @apply font-instrument-serif text-3xl md:text-4xl leading-[1.15] tracking-[-0.02em] text-gray-900 dark:text-white;
   }
 
   .landing-heading-lg {
-    @apply font-instrument-serif text-4xl md:text-5xl leading-[1.08] tracking-[-0.015em] text-gray-900 dark:text-white;
+    @apply font-instrument-serif text-4xl md:text-5xl leading-[1.08] tracking-[-0.025em] text-gray-900 dark:text-white;
   }
 
   .landing-display-accent {
@@ -152,7 +142,7 @@
   }
 
   .landing-body {
-    @apply font-inter text-gray-600 dark:text-gray-400;
+    @apply font-inter leading-[1.7] tracking-[-0.011em] text-gray-600 dark:text-gray-400;
   }
 
   .landing-card {
@@ -164,11 +154,11 @@
   }
 
   .landing-btn-primary {
-    @apply font-cabin inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#7b39fc] px-8 text-base font-medium text-white transition-colors hover:bg-[#8b4dff];
+    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#7b39fc] px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-[#8b4dff];
   }
 
   .landing-btn-secondary {
-    @apply font-cabin inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#2b2344] px-8 text-base font-medium text-[#f6f7f9] transition-colors hover:bg-[#3a3058];
+    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#2b2344] px-8 text-base font-semibold tracking-[-0.01em] text-[#f6f7f9] transition-colors hover:bg-[#3a3058];
   }
 
   .landing-stat-card {
