@@ -185,14 +185,19 @@ export default function Navbar({
     return (
       <>
         <header
-          className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6"
-          style={{ pointerEvents: isScrolled ? "auto" : "none" }}
+          className={`fixed inset-x-0 top-0 z-50 px-4 transition-all duration-500 sm:px-6 ${
+            isScrolled ? "pt-2.5" : "pt-6 sm:pt-8"
+          }`}
         >
           <motion.nav
-            initial={false}
-            animate={{ y: isScrolled ? 0 : -96, opacity: isScrolled ? 1 : 0 }}
+            initial={{ y: -24, opacity: 0 }}
+            animate={{ y: isScrolled ? 10 : 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className={`mx-auto flex h-16 max-w-5xl items-center justify-between rounded-2xl border px-3 backdrop-blur-2xl transition-all duration-500 sm:px-5 ${barSurface}`}
+            className={`mx-auto flex items-center justify-between rounded-2xl border px-3 backdrop-blur-2xl transition-all duration-500 sm:px-5 ${
+              isScrolled
+                ? "h-14 max-w-3xl"
+                : "h-16 max-w-6xl sm:h-20"
+            } ${barSurface}`}
           >
             {/* Logo */}
             <Link

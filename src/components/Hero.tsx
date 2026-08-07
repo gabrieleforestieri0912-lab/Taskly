@@ -75,9 +75,11 @@ function Hero({ onStart, onDiscover }) {
           </div>
 
           {/* Headline */}
-          <h1 className="font-instrument-serif text-5xl leading-[1.05] tracking-[-0.02em] text-white md:text-7xl lg:text-[96px]">
-            Organizza il tuo lavoro istantaneamente{" "}
-            <em className="mx-1 font-instrument-serif italic">e</em> senza stress
+          <h1 className="font-inter text-5xl font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-6xl lg:text-[64px]">
+            Organizza il tuo lavoro{" "}
+            <span className="bg-gradient-to-r from-[#a67cff] to-[#7b39fc] bg-clip-text text-transparent">
+              senza stress
+            </span>
           </h1>
 
           {/* Subtext */}
