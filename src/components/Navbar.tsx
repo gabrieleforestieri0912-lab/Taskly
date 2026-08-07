@@ -173,6 +173,19 @@ export default function Navbar({
     router.push("/login");
   };
 
+  // Smooth-scroll to an in-page section for landing hash links
+  const scrollToHash = (href) => (e) => {
+    e.preventDefault();
+    const id = href?.replace(/^#/, "").trim();
+    if (id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    setOpenMenu(null);
+    setMobileMenuOpen(false);
+  };
+
   /* ── Landing floating navbar ─────────────────────────────────── */
   if (isLanding && !isDashboard) {
     const barSurface =
@@ -222,23 +235,31 @@ export default function Navbar({
                   }
                   onMouseLeave={() => setOpenMenu((k) => (k === link.key ? null : k))}
                 >
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOpenMenu((k) => (k === link.key ? null : link.key))
-                    }
-                    className={menuItem}
-                  >
-                    {link.name}
-                    {link.hasDropdown && (
+                  {link.hasDropdown ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMenu((k) => (k === link.key ? null : link.key))
+                      }
+                      className={menuItem}
+                    >
+                      {link.name}
                       <ChevronDown
                         size={14}
                         className={`transition-transform duration-300 ${
                           openMenu === link.key ? "rotate-180" : ""
                         }`}
                       />
-                    )}
-                  </button>
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      onClick={scrollToHash(link.href)}
+                      className={menuItem}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
 
                   <AnimatePresence>
                     {link.hasDropdown && openMenu === link.key && (
@@ -249,19 +270,13 @@ export default function Navbar({
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                         className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-white/12 bg-[#120d20]/95 p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
                       >
-                        {link.children.map((child, i) => {
+                        {link.children.map((child) => {
                           const Icon = child.icon;
                           return (
-                            <motion.a
+                            <Link
                               key={child.name}
                               href={child.href}
-                              initial={{ opacity: 0, x: -8 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{
-                                delay: 0.03 * i,
-                                duration: 0.2,
-                              }}
-                              onClick={() => setOpenMenu(null)}
+                              onClick={scrollToHash(child.href)}
                               className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 hover:bg-[#7b39fc]/15"
                             >
                               <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#7b39fc]/15 text-[#a67cff]">
@@ -275,7 +290,7 @@ export default function Navbar({
                                   {child.desc}
                                 </span>
                               </span>
-                            </motion.a>
+                            </Link>
                           );
                         })}
                       </motion.div>
@@ -391,15 +406,15 @@ export default function Navbar({
                             >
                               <div className="mt-1 flex flex-col gap-1 rounded-2xl bg-white/5 p-2">
                                 {link.children.map((child) => (
-                                  <a
+                                  <Link
                                     key={child.name}
                                     href={child.href}
-                                    onClick={() => setMobileMenuOpen(false)}
+                                    onClick={scrollToHash(child.href)}
                                     className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80"
                                   >
                                     <child.icon size={16} className="text-[#a67cff]" />
                                     {child.name}
-                                  </a>
+                                  </Link>
                                 ))}
                               </div>
                             </motion.div>
@@ -407,14 +422,14 @@ export default function Navbar({
                         </AnimatePresence>
                       </>
                     ) : (
-                      <a
+                      <Link
                         key={link.key}
                         href={link.href}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={scrollToHash(link.href)}
                         className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
                       >
                         {link.name}
-                      </a>
+                      </Link>
                     )}
                   </div>
                 ))}
