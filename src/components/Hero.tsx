@@ -48,7 +48,13 @@ function Hero({ onStart, onDiscover }) {
       />
 
       {/* Hero content */}
-      <div className="relative z-10 mx-auto mt-32 flex w-full max-w-[900px] flex-col items-center px-6 text-center">
+      <div className="relative z-10 mx-auto mt-16 flex w-full max-w-[900px] flex-col items-center px-6 text-center">
+        {/* Soft dark scrim behind text: keeps white text legible on the
+            always-dark video without harsh edges, whatever the app theme. */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.35),transparent_75%)]"
+          aria-hidden="true"
+        />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
