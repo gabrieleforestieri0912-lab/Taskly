@@ -8,8 +8,6 @@ import {
   Instagram,
   Linkedin,
   Mail,
-  MapPin,
-  Phone,
   Twitter,
   Youtube,
 } from "lucide-react";
@@ -100,17 +98,6 @@ export default function Footer() {
                 <Mail size={15} className="shrink-0 text-[#7b39fc]/70" />
                 info@taskly.com
               </a>
-              <a
-                href="tel:+390234567890"
-                className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:text-[#7b39fc] dark:hover:text-[#a67cff]"
-              >
-                <Phone size={15} className="shrink-0 text-[#7b39fc]/70" />
-                +39 02 3456 7890
-              </a>
-              <span className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300">
-                <MapPin size={15} className="shrink-0 text-[#7b39fc]/70" />
-                Milano, Italia
-              </span>
             </div>
 
             <div className="mt-6 flex items-center gap-2" aria-label="Social links">
