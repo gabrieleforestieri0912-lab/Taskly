@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, Zap, Star, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -76,12 +77,13 @@ const PricingCard = ({
 };
 
 function Pricing() {
+  const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(true);
   const [loadingPlan, setLoadingPlan] = useState(null);
 
   const handleCheckout = async (plan) => {
     if (plan.checkoutType === "free") {
-      window.location.href = "/register";
+      router.push("/register");
       return;
     }
 

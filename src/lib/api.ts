@@ -1,15 +1,6 @@
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "/api";
 
-// The frontend (Next.js) and the API (Express) run as separate processes.
-// Socket.IO lives on the API server, so the client connects to
-// NEXT_PUBLIC_SOCKET_URL; it falls back to the current origin for setups that
-// serve both from one process.
-const DEFAULT_SOCKET_URL =
-  typeof window !== "undefined" ? window.location.origin : "";
-export const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || DEFAULT_SOCKET_URL;
-
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("token");

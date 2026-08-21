@@ -413,15 +413,16 @@ const SlashCommand = Extension.create({
             },
           };
           function renderItems(props) {
-            if (!listEl) return;
+            const el = listEl;
+            if (!el) return;
             const items = props.items || [];
             const selected = props.selectedIndex != null ? props.selectedIndex : -1;
-            listEl.innerHTML = "";
+            el.innerHTML = "";
             if (items.length === 0) {
               const empty = document.createElement("div");
               empty.className = "tl-suggestion-empty";
               empty.textContent = "Nessun risultato";
-              listEl.appendChild(empty);
+              el.appendChild(empty);
               return;
             }
             items.slice(0, 12).forEach((item, idx) => {
@@ -439,7 +440,7 @@ const SlashCommand = Extension.create({
               row.onmouseenter = () => {
                 // keep highlight in sync when hovering
               };
-              listEl.appendChild(row);
+              el.appendChild(row);
             });
             position(props);
           }
@@ -796,14 +797,15 @@ export default function TiptapEditor({ workspaceId, slug }) {
               },
             };
             function renderItems(props) {
-              if (!listEl) return;
+              const el = listEl;
+              if (!el) return;
               const items = props.items || [];
-              listEl.innerHTML = "";
+              el.innerHTML = "";
               if (items.length === 0) {
                 const empty = document.createElement("div");
                 empty.className = "tl-suggestion-empty";
                 empty.textContent = "Nessun documento trovato";
-                listEl.appendChild(empty);
+                el.appendChild(empty);
                 return;
               }
               items.slice(0, 8).forEach((item) => {
@@ -817,7 +819,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
                   e.preventDefault();
                   props.command({ id: item.id, label: item.label, slug: item.slug });
                 };
-                listEl.appendChild(row);
+                el.appendChild(row);
               });
               const rect = typeof props.clientRect === "function" ? props.clientRect() : null;
               if (rect && popup) {
@@ -1002,12 +1004,14 @@ export default function TiptapEditor({ workspaceId, slug }) {
   }
 
   function openLinkEditor() {
+    if (!editor) return;
     const current = editor.getAttributes("link").href || "";
     setLinkHref(current);
     setLinkMode(true);
   }
 
   function applyLink() {
+    if (!editor) return;
     const href = linkHref.trim();
     const chain = editor.chain().focus();
     if (href) {
@@ -1019,6 +1023,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
   }
 
   function removeLink() {
+    if (!editor) return;
     editor.chain().focus().extendMarkRange("link").unsetLink().run();
     setLinkMode(false);
   }

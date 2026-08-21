@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { getSocket } from "../lib/socket";
 import { apiFetch } from "../lib/api";
 
 export default function NotificationBell({ pollInterval = 10000 }) {
@@ -20,14 +19,6 @@ export default function NotificationBell({ pollInterval = 10000 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-
-  const socket = React.useMemo(() => {
-    try {
-      return getSocket();
-    } catch {
-      return null;
-    }
-  }, []);
 
   async function fetchRecent() {
     try {
@@ -44,24 +35,6 @@ export default function NotificationBell({ pollInterval = 10000 }) {
     fetchRecent();
     const id = setInterval(fetchRecent, pollInterval);
 
-    if (socket) {
-      try {
-        const savedUser = localStorage.getItem("user");
-        if (savedUser) {
-          const u = JSON.parse(savedUser);
-          if (u && u.email) {
-            socket.emit("join-room", String(u.email));
-          }
-        }
-      } catch (err) {
-        console.error("Socket notification room join error:", err);
-      }
-
-      socket.on("new-notification", (noti) => {
-        setItems((prev) => [noti, ...prev]);
-      });
-    }
-
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
@@ -71,12 +44,9 @@ export default function NotificationBell({ pollInterval = 10000 }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       clearInterval(id);
-      if (socket) {
-        socket.off("new-notification");
-      }
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [pollInterval, socket]);
+  }, [pollInterval]);
 
   const unreadCount = items.filter((i) => !i.read).length;
 

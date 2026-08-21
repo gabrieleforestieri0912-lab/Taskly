@@ -1,40 +1,40 @@
 # Taskly — Personal Productivity Hub
 
 Taskly is a productivity hub (tasks, goals, ideas, notes, docs with backlinks,
-workspaces and AI assistance) built with **Next.js 16** (App Router, React 19)
-on the frontend and an **Express** API server on the backend.
+workspaces and AI assistance) built with **Next.js 16** (App Router, React 19).
+The backend is implemented entirely with **Next.js API routes**
+(`src/app/api/**/route.ts`) — there is no separate API server anymore.
 
 The database layer is **Supabase** (Postgres + Auth), replacing the original
 MongoDB/Mongoose implementation.
 
 ## Architecture
 
-Two separate processes, as in a standard Next.js project:
+A single Next.js process serves both the frontend and the API:
 
 ```
-Next.js frontend  (npm run dev)     → http://localhost:3000
-Express API       (npm run server)  → http://localhost:3001
-  ├─ REST API (/api/* — auth, user, tasks, doc, workspaces, ...)
-  ├─ Socket.IO (collaboration/realtime)
+Next.js (npm run dev / npm start)  → http://localhost:3000
+  ├─ Pages & components
+  ├─ API routes (/api/* — auth, user, tasks, doc, workspaces, ...)
+  ├─ proxy.ts (rate limiting + audit logging on /api/*)
   ├─ Supabase Auth (email/password + Google)
   ├─ Supabase Postgres (via @supabase/supabase-js)
   ├─ Stripe (billing + webhooks)
   └─ Ollama (AI chat + embeddings, optional)
 ```
 
-The Next.js dev server proxies every `/api/*` request to the API server via the
-rewrites in `next.config.mjs`, so the frontend only ever talks to its own
-origin. Socket.IO connects directly to `NEXT_PUBLIC_SOCKET_URL` (WebSocket
-upgrades are not proxied by Next.js rewrites).
-
 The API contract the frontend already uses is preserved:
 `/api/auth/*`, `/api/user/data`, `/api/tasks`, `/api/doc/*`, `/api/workspaces`,
 `/api/notifications`, `/api/activity`, `/api/analytics`, `/api/billing`, `/api/ai`.
 
+> Note: realtime collaboration (Socket.IO — remote cursors, live page updates)
+> was removed together with the standalone Express server; notifications and
+> dashboards now use polling only.
+
 ## 1. Create the Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open the **SQL Editor** and run the whole file `server/supabase/schema.sql`.
+2. Open the **SQL Editor** and run the whole file `supabase/schema.sql`.
    It creates all tables, indexes, the pgvector extension, the RLS policies and
    a trigger that auto-creates a `profiles` row for every new auth user.
 3. Enable the **Google** provider under **Authentication → Providers → Google**
@@ -56,40 +56,34 @@ Copy `.env.example` into `.env` and fill in:
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard |
 | `OLLAMA_URL` / `OLLAMA_MODEL` | Local Ollama instance (defaults `http://localhost:11434`, `llama3`) |
 | `ENABLE_VECTOR` | `true` to enable semantic search via pgvector (requires Ollama embeddings) |
+| `RESEND_API_KEY` / `SUPPORT_EMAIL` | Resend (support form emails) — without a key `/api/support` returns 500 |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Optional — accurate global rate limiting on serverless (falls back to in-memory) |
+| `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | Optional — defaults `200` requests / `900000` ms (15 min). `RATE_LIMIT_DISABLED=1` disables it |
 
 ## 3. Run
 
-Two terminals:
-
 ```bash
-npm run server       # Express API + Socket.IO on http://localhost:3001
-npm run dev          # Next.js frontend on http://localhost:3000
+npm install
+npm run dev     # Next.js frontend + API routes on http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000). `/api/*` requests on the
-frontend are proxied to the API server (see the rewrites in `next.config.mjs`).
-The API server binds to the `PORT` env var (default `3001`). Note that if your
-shell/environment already exports `PORT`, that value wins over `.env` (dotenv
-never overrides existing environment variables).
+Open [http://localhost:3000](http://localhost:3000). `/api/*` requests are
+handled directly by the Next.js API routes.
 
 ### Production
 
 ```bash
 npm run build
-npm start            # serves the built Next.js app on http://localhost:3000
-npm run server       # Express API server (set NODE_ENV=production as needed)
+npm start       # serves the built Next.js app on http://localhost:3000
 ```
 
-The API server listens on `API_PORT` (default `3001`, `PORT` as fallback). When
-Next.js and the API run on different hosts, set `API_URL` (or
-`NEXT_PUBLIC_API_URL`) to the API origin. The Stripe webhook URL must point
-directly at the API server (e.g. `https://api.example.com/api/billing/webhook`),
-not through the Next.js proxy.
+The Stripe webhook URL must point at the same origin
+(e.g. `https://app.example.com/api/billing/webhook`).
 
 ## Auth notes
 
 - Access tokens issued by Supabase expire (default 1h). The frontend stores the
-  `refreshToken` and `src/lib/api.js` automatically exchanges it on a 401.
+  `refreshToken` and `src/lib/api.ts` automatically exchanges it on a 401.
   You can raise the expiry under Authentication → Settings → JWT expiry.
 - Password hashing is handled by Supabase Auth — no bcrypt on the server.
 

@@ -65,6 +65,11 @@ export default function BrainDumpView({
   onConvertToTask,
   loading = false,
 }) {
+  // Hooks must be called unconditionally (before any early return) so the
+  // hook order stays stable across renders with different `loading` values.
+  const [input, setInput] = useState("");
+  const [category, setCategory] = useState("Personale");
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto space-y-8 pb-20">
@@ -80,8 +85,6 @@ export default function BrainDumpView({
       </div>
     );
   }
-  const [input, setInput] = useState("");
-  const [category, setCategory] = useState("Personale");
 
   const addIdea = () => {
     if (!input.trim()) return;

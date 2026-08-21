@@ -209,14 +209,14 @@ export default function Navbar({
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className={`mx-auto flex items-center justify-between rounded-2xl border px-3 backdrop-blur-2xl transition-all duration-500 sm:px-5 ${
               isScrolled
-                ? "h-14 max-w-3xl"
+                ? "h-14 max-w-5xl"
                 : "h-16 max-w-6xl sm:h-20"
             } ${barSurface}`}
           >
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 rounded-full px-2 transition-opacity hover:opacity-85"
+              className="flex shrink-0 items-center gap-2.5 rounded-full px-2 transition-opacity hover:opacity-85"
             >
               <FutureLogo />
               <span className="font-inter text-lg font-semibold text-white">
@@ -225,7 +225,7 @@ export default function Navbar({
             </Link>
 
             {/* Desktop nav links */}
-            <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+            <div className="hidden flex-1 items-center justify-center gap-1 lg:flex min-w-0">
               {landingNavLinks.map((link) => (
                 <div
                   key={link.key}
@@ -301,7 +301,7 @@ export default function Navbar({
             </div>
 
             {/* Desktop actions */}
-            <div className="hidden items-center gap-2 lg:flex">
+            <div className="hidden shrink-0 items-center gap-2 lg:flex">
               <ThemeToggle className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white" />
               {user ? (
                 <Link

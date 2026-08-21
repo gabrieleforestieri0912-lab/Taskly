@@ -166,13 +166,27 @@ export default function Dashboard({
         variants={item}
         className="flex flex-col md:flex-row md:items-center justify-between gap-4"
       >
-        <div>
-          <h2 className="landing-heading-lg">
-            {t("dashboardTitle")}
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-            {t("dashboardSubtitle")}
-          </p>
+        <div className="flex items-start gap-4">
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: -3 }}
+            className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center shrink-0 shadow-lg shadow-[#7b39fc]/25"
+          >
+            <Sparkles size={22} className="text-white/90" />
+          </motion.div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
+                Dashboard
+              </span>
+            </div>
+            <h2 className="landing-heading-lg">
+              {t("dashboardTitle")}
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+              {t("dashboardSubtitle")}
+            </p>
+          </div>
         </div>
         <div className="w-full md:w-1/2 flex items-center justify-end gap-3" />
       </motion.div>

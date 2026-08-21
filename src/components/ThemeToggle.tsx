@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle({ className = "" }) {
-  const [dark, setDark] = useState(true);
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
+  // Read the theme straight from the DOM instead of syncing it in an effect.
+  // The inline script in layout.tsx sets the `dark` class before first paint,
+  // so this is accurate at hydration time. On the server we keep the previous
+  // default (dark) so the SSR output is unchanged.
+  const [dark, setDark] = useState(() =>
+    typeof document !== "undefined"
+      ? document.documentElement.classList.contains("dark")
+      : true,
+  );
 
   const toggle = () => {
     const next = !document.documentElement.classList.contains("dark");

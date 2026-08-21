@@ -16,6 +16,7 @@ import {
   Sparkles,
   Lock,
 } from "lucide-react";
+import AIPanel from "./AIPanel";
 
 const NAV = [
   { icon: LayoutDashboard, label: "Dashboard", active: true },
@@ -132,11 +133,22 @@ export default function DemoDashboard() {
         {/* Main */}
         <main className="flex-1 p-6 md:p-8 space-y-6 max-w-5xl">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">Il tuo centro di comando</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Tutto sotto controllo. Demo dimostrativa.
-              </p>
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center shrink-0 shadow-lg shadow-[#7b39fc]/25">
+                <Sparkles size={22} className="text-white/90" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
+                    Dashboard
+                  </span>
+                </div>
+                <h1 className="text-2xl font-bold">Il tuo centro di comando</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Tutto sotto controllo. Demo dimostrativa.
+                </p>
+              </div>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-300 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest">
               <Lock size={11} /> Read-only
@@ -239,6 +251,9 @@ export default function DemoDashboard() {
           </p>
         </main>
       </div>
+
+      {/* Floating minichat AI */}
+      <AIPanel />
     </div>
   );
 }
