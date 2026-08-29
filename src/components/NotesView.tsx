@@ -146,17 +146,52 @@ function migrateOldData(data) {
     };
   }
   if (data.text && !data.blocks) {
-    const lines = (data.text || "").split("\n").filter((l) => l.trim() !== "");
-    const blocks =
-      lines.length > 0
-        ? lines.map((line) => ({
-            id: generateId(),
-            type: "text",
-            content: line,
-            color: "default",
-          }))
-        : [createBlock("text")];
-    return { blocks, tags: data.tags || [] };
+    const lines = (data.text || "").split("\n");
+    const blocks: any[] = [];
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const heading = /^(#{1,6})\s+(.*)$/.exec(line);
+      if (heading) {
+        blocks.push({
+          id: generateId(),
+          type: "heading",
+          content: heading[2],
+          color: "default",
+        });
+        continue;
+      }
+      const checkbox = /^\s*-\s*\[([ xX])\]\s+(.*)$/.exec(line);
+      if (checkbox) {
+        blocks.push({
+          id: generateId(),
+          type: "checkbox",
+          content: checkbox[2],
+          checked: checkbox[1].toLowerCase() === "x",
+          color: "default",
+        });
+        continue;
+      }
+      const bullet = /^\s*[-*]\s+(.*)$/.exec(line);
+      if (bullet) {
+        blocks.push({
+          id: generateId(),
+          type: "text",
+          content: "• " + bullet[1],
+          color: "default",
+        });
+        continue;
+      }
+      blocks.push({
+        id: generateId(),
+        type: "text",
+        content: line,
+        color: "default",
+      });
+    }
+    return {
+      blocks: blocks.length > 0 ? blocks : [createBlock("text")],
+      tags: data.tags || [],
+    };
   }
   if (data.blocks) {
     return { blocks: data.blocks, tags: data.tags || [] };

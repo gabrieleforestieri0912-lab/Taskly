@@ -298,27 +298,86 @@ export default function Navbar({
                   </AnimatePresence>
                 </div>
               ))}
+
+              <Link
+                href="/docs"
+                className={menuItem}
+              >
+                Documentazione
+              </Link>
             </div>
 
             {/* Desktop actions */}
             <div className="hidden shrink-0 items-center gap-2 lg:flex">
               <ThemeToggle className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white" />
               {user ? (
-                <Link
-                  href="/dashboard"
-                  className="font-inter inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(123,57,252,0.35)] transition-all duration-300 hover:bg-[#8b4dff] hover:shadow-[0_10px_32px_rgba(123,57,252,0.5)]"
-                >
-                  <LayoutDashboard size={15} />
-                  {t("dashboard")}
-                </Link>
-              ) : (
-                <>
+                <div className="flex items-center gap-2">
                   <Link
                     href="/dashboard"
-                    className="font-inter inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-[#7b39fc]/60 hover:bg-[#7b39fc]/15"
+                    className="font-inter inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(123,57,252,0.35)] transition-all duration-300 hover:bg-[#8b4dff] hover:shadow-[0_10px_32px_rgba(123,57,252,0.5)]"
                   >
                     <LayoutDashboard size={15} />
                     {t("dashboard")}
+                  </Link>
+
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setDropdownOpen((open) => !open)}
+                      className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#7b39fc] text-white shadow-sm ring-2 ring-white/20 transition-colors hover:bg-[#8b4dff]"
+                      aria-label="Account"
+                    >
+                      {user.picture ? (
+                        <img
+                          src={user.picture}
+                          alt={user.name}
+                          className="h-9 w-9 object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <User size={16} />
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {dropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-white/12 bg-[#120d20]/95 p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                        >
+                          <div className="border-b border-white/10 p-4">
+                            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/50">
+                              {t("account")}
+                            </div>
+                            <div className="mt-1.5 truncate text-sm font-bold text-white">
+                              {user.email}
+                            </div>
+                          </div>
+                          <div className="p-1.5">
+                            <button
+                              type="button"
+                              onClick={handleLogout}
+                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-white/10"
+                            >
+                              <LogOut size={17} />
+                              {t("logout")}
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-[#7b39fc]/60 hover:bg-[#7b39fc]/15"
+                  >
+                    {t("login")}
                   </Link>
                   <Link
                     href="/register"
@@ -433,6 +492,14 @@ export default function Navbar({
                     )}
                   </div>
                 ))}
+
+                <Link
+                  href="/docs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
+                >
+                  Documentazione
+                </Link>
               </nav>
 
               <div className="mt-6 flex items-center justify-between">
@@ -443,12 +510,11 @@ export default function Navbar({
               {!user && (
                 <div className="mt-auto flex flex-col gap-3 pb-8">
                   <Link
-                    href="/dashboard"
+                    href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full border border-[#7b39fc]/40 bg-[#7b39fc]/10 text-sm font-semibold text-[#a67cff]"
+                    className="font-inter inline-flex h-12 items-center justify-center rounded-full border border-[#7b39fc]/40 bg-[#7b39fc]/10 text-sm font-semibold text-[#a67cff]"
                   >
-                    <LayoutDashboard size={16} />
-                    {t("dashboard")}
+                    {t("login")}
                   </Link>
                   <Link
                     href="/register"
@@ -457,6 +523,30 @@ export default function Navbar({
                   >
                     {t("start")}
                   </Link>
+                </div>
+              )}
+
+              {user && (
+                <div className="mt-auto flex flex-col gap-3 pb-8">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#7b39fc] text-sm font-semibold text-[#fafafa]"
+                  >
+                    <LayoutDashboard size={16} />
+                    {t("dashboard")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 text-sm font-semibold text-white"
+                  >
+                    <LogOut size={16} />
+                    {t("logout")}
+                  </button>
                 </div>
               )}
             </motion.div>
@@ -503,31 +593,6 @@ export default function Navbar({
             </button>
           )}
 
-          <Link href="/" className="group flex min-w-0 items-center gap-3">
-            <FutureLogo className="text-[#7b39fc]" />
-            <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">
-              Taskly
-            </span>
-          </Link>
-        </div>
-
-        {!isDashboard && (
-          <div className="hidden items-center gap-1 lg:flex">
-            {navLinks.map((link) => (
-              <a key={link.name} href={link.href} className={linkBtn}>
-                {link.name}
-              </a>
-            ))}
-          </div>
-        )}
-
-        <div className="flex items-center gap-1.5">
-          {isDashboard && (
-            <div className="shrink-0">
-              <NotificationBell />
-            </div>
-          )}
-
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -562,7 +627,7 @@ export default function Navbar({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.97 }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-gray-200/30 bg-white shadow-2xl dark:border-white/10 dark:bg-[#111414e6]"
+                    className="absolute left-0 mt-2 w-64 overflow-hidden rounded-2xl border border-gray-200/30 bg-white shadow-2xl dark:border-white/10 dark:bg-[#111414e6]"
                   >
                     <div className="border-b border-gray-200/30 p-4 dark:border-white/10">
                       <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
@@ -602,6 +667,33 @@ export default function Navbar({
               </AnimatePresence>
             </div>
           ) : (
+            <Link href="/" className="group flex min-w-0 items-center gap-3">
+              <FutureLogo className="text-[#7b39fc]" />
+              <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">
+                Taskly
+              </span>
+            </Link>
+          )}
+        </div>
+
+        {!isDashboard && (
+          <div className="hidden items-center gap-1 lg:flex">
+            {navLinks.map((link) => (
+              <a key={link.name} href={link.href} className={linkBtn}>
+                {link.name}
+              </a>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center gap-1.5">
+          {isDashboard && (
+            <div className="shrink-0">
+              <NotificationBell />
+            </div>
+          )}
+
+          {!user && (
             <div className="hidden items-center gap-1.5 sm:flex">
               <Link
                 href="/login"

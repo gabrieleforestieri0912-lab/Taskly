@@ -33,7 +33,6 @@ import {
   Rocket,
   Search,
   Clock,
-  Home,
   Sparkles,
   Mic,
 } from "lucide-react";
@@ -218,6 +217,10 @@ export default function Sidebar({
       );
     }
   }, [pathname]);
+
+  useEffect(() => {
+    setIsAIActive(pathname === "/dashboard" && !!searchParams?.get("ai"));
+  }, [pathname, searchParams]);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -700,18 +703,8 @@ export default function Sidebar({
   return (
     <>
       <aside className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50 shadow-2xl overflow-y-auto">
-        <div className="flex items-center mb-3 px-4 pt-4 justify-between">
-          <Link
-            href="/"
-            title="Home"
-            className="group/tip flex items-center gap-2"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-black/10 bg-white/70 shadow-sm transition-all group-hover:scale-[1.03] dark:border-white/10 dark:bg-white/10">
-              <Home size={17} className="text-gray-900 dark:text-white" />
-            </span>
-          </Link>
-
-          <div className="ml-2" ref={profileRef}>
+        <div className="flex items-center mb-3 px-4 pt-4">
+          <div className="flex items-center gap-2" ref={profileRef}>
             <button
               onClick={(e) => {
                 const rect = profileRef.current?.getBoundingClientRect();
@@ -729,14 +722,14 @@ export default function Sidebar({
                 <img
                   src={user.picture}
                   alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover shrink-0 border border-cyan-500/10"
+                  className="w-8 h-8 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-8 h-8 bg-cyan-100 dark:bg-cyan-900/30 rounded-full flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
                   <User
                     size={16}
-                    className="text-cyan-600 dark:text-cyan-400"
+                    className="text-[#7b39fc] dark:text-[#a67cff]"
                   />
                 </div>
               )}

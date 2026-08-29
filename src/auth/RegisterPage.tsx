@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock, User } from "lucide-react";
@@ -75,7 +74,7 @@ export default function RegisterPage() {
       <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#a67cff]/10 dark:bg-[#a67cff]/15 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="fixed top-8 left-8 z-100">
-        <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors group">
+            <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Torna alla home</span>
         </Link>
@@ -84,17 +83,7 @@ export default function RegisterPage() {
       <div className="flex-1 flex items-center justify-center p-6 relative z-10">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <Image
-                src="/taskly.png"
-                alt="Taskly"
-                width={48}
-                height={48}
-                className="rounded-2xl object-cover shadow-lg shadow-cyan-500/20"
-                style={{ width: "48px", height: "48px" }}
-              />
-            </Link>
-            <h2 className="font-instrument-serif text-4xl md:text-5xl leading-[1.1] tracking-[-0.02em] dark:text-white">
+            <h2 className="font-inter text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-[-0.03em] dark:text-white">
               Crea un account
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-2">
@@ -169,7 +158,7 @@ export default function RegisterPage() {
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-4 text-lg mt-4 shadow-xl shadow-cyan-500/20"
+                  className="w-full py-4 text-lg mt-4 shadow-xl shadow-[#7b39fc]/30"
                 >
                   {loading ? "Registrazione in corso..." : "Registrati"}
                 </Button>
@@ -203,7 +192,7 @@ export default function RegisterPage() {
                   Hai già un account?{" "}
                   <Link
                     href="/login"
-                    className="font-bold text-cyan-600 hover:text-cyan-500 dark:text-cyan-400 transition-colors"
+                    className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
                   >
                     Accedi
                   </Link>

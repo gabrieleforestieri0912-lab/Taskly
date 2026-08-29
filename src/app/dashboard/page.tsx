@@ -90,8 +90,6 @@ function DashboardContent() {
   const [isIconMenuOpen, setIsIconMenuOpen] = useState(false);
   const [iconSearch, setIconSearch] = useState("");
   const [iconCategory, setIconCategory] = useState("All");
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
-  const settingsMenuRef = React.useRef<HTMLDivElement | null>(null);
   const syncedPageIdsRef = React.useRef<Record<string, { deleted?: boolean }>>({});
   const pagesSyncedRef = React.useRef(false);
   const [isNestModalOpen, setIsNestModalOpen] = useState(false);
@@ -282,20 +280,6 @@ function DashboardContent() {
     return () => clearTimeout(id);
   }, [focusTitleParam, activePageId, router]);
 
-  // Close settings menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        settingsMenuRef.current &&
-        !settingsMenuRef.current.contains(e.target)
-      ) {
-        setIsSettingsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   // Auto-delete trash items after 30 days
   useEffect(() => {
     if (!hasLoadedUserData) return;
@@ -343,7 +327,13 @@ function DashboardContent() {
     const pageType = pageConfig.type || "tasks";
     const curPages = Array.isArray(pages) ? pages : [];
     const maxPages = plan && plan.maxPages;
-    if (maxPages !== null && maxPages !== undefined && curPages.length >= maxPages) {
+    // Only count non-deleted (active) pages against the plan quota.
+    const activePageCount = curPages.filter((p) => !p.deleted).length;
+    if (
+      maxPages !== null &&
+      maxPages !== undefined &&
+      activePageCount >= maxPages
+    ) {
       setPlanNotice(
         `Hai raggiunto il limite di ${maxPages} pagine del piano ${plan?.name || "Starter"}.`,
       );
@@ -353,7 +343,10 @@ function DashboardContent() {
     // and we can enter edit mode immediately.
     const pageLabel =
       pageType === "empty" ? "" : pageConfig.label || "Nuova Pagina";
-    const newPageId = Date.now();
+    const newPageId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `pg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     const newPage = {
       id: newPageId,
@@ -474,7 +467,10 @@ function DashboardContent() {
   const duplicatePage = (id) => {
     const source = pages.find((p) => String(p.id) === String(id));
     if (!source) return;
-    const newId = Date.now() + Math.floor(Math.random() * 1000);
+    const newId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `pg_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
     const newPage = {
       ...source,
       id: newId,
@@ -495,7 +491,6 @@ function DashboardContent() {
       ),
     );
     setIsNestModalOpen(false);
-    setIsSettingsMenuOpen(false);
   };
 
   const exportPageAsPDF = (page) => {
@@ -705,7 +700,10 @@ function DashboardContent() {
         return { ...notesData, blocks: [...blocks, newBlock] };
       };
 
-      updatePageData(targetPage.id, updateNotesWithBlock);
+      updatePageData(
+        targetPage.id,
+        updateNotesWithBlock(targetPage.data || { blocks: [] }),
+      );
       return {
         ok: true,
         message: `Blocco "${blockType || "testo"}" aggiunto alla pagina "${targetPage.label}".`,
@@ -735,7 +733,7 @@ function DashboardContent() {
         };
         return { ...notesData, blocks: [...blocks, newBlock] };
       };
-      updatePageData(id, updateContent);
+      updatePageData(id, updateContent(targetPage.data || { blocks: [] }));
       return { ok: true, message: `Contenuto aggiunto alla pagina.` };
     }
 
@@ -761,7 +759,7 @@ function DashboardContent() {
         };
         return { ...notesData, blocks: [...blocks, newBlock] };
       };
-      updatePageData(id, insertText);
+      updatePageData(id, insertText(targetPage.data || { blocks: [] }));
       return { ok: true, message: `Testo aggiunto alla pagina.` };
     }
 
@@ -1296,163 +1294,6 @@ function DashboardContent() {
             <NotificationBell />
           </div>
 
-          <div className="relative shrink-0" ref={settingsMenuRef}>
-            <button
-              onClick={() => setIsSettingsMenuOpen((o) => !o)}
-              className="p-2 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Impostazioni"
-            >
-              <MoreVertical size={18} />
-            </button>
-
-            <AnimatePresence>
-              {isSettingsMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 6, scale: 0.96 }}
-                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl shadow-black/10 dark:shadow-black/40 z-200 overflow-hidden"
-                >
-                  {/* Header */}
-                  <div className="px-4 pt-3 pb-2 border-b border-gray-100 dark:border-gray-800">
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
-                      {t("settings")}
-                    </p>
-                  </div>
-
-                  <div className="p-1.5 space-y-0.5">
-                    {/* Tema */}
-                    <button
-                      onClick={() => {
-                        toggleTheme();
-                        setIsSettingsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors"
-                    >
-                      {theme === "dark" ? (
-                        <Sun size={16} className="text-amber-400" />
-                      ) : (
-                        <Moon size={16} className="text-gray-500 dark:text-gray-300" />
-                      )}
-                      {theme === "dark" ? t("lightMode") : t("darkMode")}
-                    </button>
-
-                    {/* Impostazioni account */}
-                    <button
-                      onClick={() => {
-                        router.push("/settings");
-                        setIsSettingsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <Settings size={16} className="text-gray-400 dark:text-gray-500" />
-                      {t("accountSettings")}
-                    </button>
-
-                    {/* Quick language selector */}
-                    <div className="pt-2 px-1">
-                      <div className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                        {t("language")}
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {[
-                          { code: "it", label: "IT" },
-                          { code: "en", label: "EN" },
-                        ].map((lng) => (
-                          <button
-                            key={lng.code}
-                            onClick={() => {
-                              setLanguage(lng.code);
-                              setIsSettingsMenuOpen(false);
-                            }}
-                            className={`px-2 py-1 text-xs rounded-md font-semibold transition-colors ${language === lng.code ? "bg-cyan-600 text-white" : "bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-cyan-50"}`}
-                          >
-                            {lng.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* ÔöÇÔöÇ Page settings (solo se c'├¿ una pagina attiva) ÔöÇÔöÇ */}
-                    {activePage && (
-                      <>
-                        <div className="border-t border-gray-100 dark:border-gray-800 my-2" />
-
-                        <div className="px-4 pt-1 pb-2">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
-                            Pagina
-                          </p>
-                        </div>
-
-                        {/* Esporta */}
-                        <div className="pt-1 px-1">
-                          <div className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 px-2">
-                            Esporta
-                          </div>
-                          <div className="flex flex-wrap gap-1 px-2">
-                            <button onClick={() => { exportPageAsPDF(activePage); setIsSettingsMenuOpen(false); }} className="px-2.5 py-1.5 text-xs rounded-lg font-semibold bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 transition-colors">PDF</button>
-                            <button onClick={() => { exportPageAsHTML(activePage); setIsSettingsMenuOpen(false); }} className="px-2.5 py-1.5 text-xs rounded-lg font-semibold bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 transition-colors">HTML</button>
-                            <button onClick={() => { exportPageAsCSV(activePage); setIsSettingsMenuOpen(false); }} className="px-2.5 py-1.5 text-xs rounded-lg font-semibold bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 transition-colors">CSV</button>
-                            <button onClick={() => { exportPageAsMarkdown(activePage); setIsSettingsMenuOpen(false); }} className="px-2.5 py-1.5 text-xs rounded-lg font-semibold bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 transition-colors">MD</button>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => { updatePage(activePage.id, { locked: !activePage.locked }); setIsSettingsMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          {activePage.locked ? <Unlock size={16} className="text-amber-500" /> : <Lock size={16} className="text-gray-400" />}
-                          {activePage.locked ? "Sblocca pagina" : "Blocca pagina"}
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            const fonts = ["system-ui", "serif", "monospace", "cursive"];
-                            const current = activePage.font || "system-ui";
-                            const next = fonts[(fonts.indexOf(current) + 1) % fonts.length];
-                            updatePage(activePage.id, { font: next });
-                            setIsSettingsMenuOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          <Type size={16} className="text-gray-400" />
-                          Font: {activePage.font || "System UI"}
-                        </button>
-
-                        <button
-                          onClick={() => { duplicatePage(activePage.id); setIsSettingsMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          <Copy size={16} className="text-gray-400" />
-                          Duplica pagina
-                        </button>
-
-                        <button
-                          onClick={() => { setIsNestModalOpen(true); setIsSettingsMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          <Move size={16} className="text-gray-400" />
-                          Sposta sotto...
-                        </button>
-
-                        <div className="border-t border-gray-100 dark:border-gray-800 my-1" />
-                        <button
-                          onClick={() => { deletePage(activePage.id); setIsSettingsMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                          Elimina pagina
-                        </button>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Footer logout removed - logout moved to dedicated places */}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
         <div className={`p-3 md:p-6 ${activePage?.font && activePage.font !== "system-ui" ? activePage.font === "serif" ? "font-serif" : activePage.font === "monospace" ? "font-mono" : "font-serif" : ""}`}>
           {activePageId && activePage && !loading && (

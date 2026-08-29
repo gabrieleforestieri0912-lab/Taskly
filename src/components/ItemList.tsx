@@ -41,9 +41,10 @@ import { nextDeadline } from "../lib/recurrence";
 
 // --- Sotto-Componenti per le Viste ---
 
-const KanbanView = ({ items, updateTask, priorities, statuses }) => {
+const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
   const [dragCol, setDragCol] = useState(statuses[0].id);
   const [overCol, setOverCol] = useState(null);
+  const [draft, setDraft] = useState({});
 
   return (
     <div className="flex gap-6 overflow-x-auto pb-6 custom-scrollbar min-h-[500px]">
@@ -174,9 +175,32 @@ const KanbanView = ({ items, updateTask, priorities, statuses }) => {
                   </motion.div>
                 );
               })}
-              <button className="w-full py-3 rounded-2xl border-2 border-dashed border-gray-100 dark:border-gray-800 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300 dark:hover:border-gray-700 transition-all flex items-center justify-center gap-2 text-xs font-bold">
-                <Plus size={14} /> Aggiungi
-              </button>
+              <div className="flex gap-2">
+                <input
+                  value={draft[status.id] || ""}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, [status.id]: e.target.value }))
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onAddTask(status.id, e.currentTarget.value);
+                      setDraft((d) => ({ ...d, [status.id]: "" }));
+                    }
+                  }}
+                  placeholder="Aggiungi task..."
+                  className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl px-3 py-2 text-xs font-bold focus:ring-cyan-500 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    onAddTask(status.id, draft[status.id] || "");
+                    setDraft((d) => ({ ...d, [status.id]: "" }));
+                  }}
+                  className="px-3 py-2 rounded-xl bg-cyan-600 text-white text-xs font-bold hover:bg-cyan-500 transition-all shrink-0"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -384,13 +408,12 @@ export default function ItemList({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const addItem = () => {
-    if (!input.trim()) return;
+  const createTask = (title, status = "todo") => {
     const newItem = {
       id: Math.random().toString(36).substring(2, 9),
-      title: input,
+      title,
       priority: priority,
-      status: "todo",
+      status,
       deadline: "",
       assignee: assignee,
       recurrence: recurrence,
@@ -399,13 +422,23 @@ export default function ItemList({
       createdAt: new Date().toISOString(),
     };
     setItems([newItem, ...items]);
-    setInput("");
     track({
       type: "task_created",
       title: "Nuovo task",
       body: `"${newItem.title}" aggiunto alla lista.`,
       payload: { event: "task" },
     });
+  };
+
+  const addItem = () => {
+    if (!input.trim()) return;
+    createTask(input, "todo");
+    setInput("");
+  };
+
+  // Quick add used by the Kanban board (one input per column).
+  const quickAddTask = (status, title) => {
+    createTask((title || "").trim() || "Nuovo task", status);
   };
 
   const updateTask = (id, updates) => {
@@ -1165,6 +1198,7 @@ export default function ItemList({
             updateTask={updateTask}
             priorities={priorities}
             statuses={statuses}
+            onAddTask={quickAddTask}
           />
         )}
 

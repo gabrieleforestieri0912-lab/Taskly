@@ -180,7 +180,7 @@ export default function Dashboard({
                 Dashboard
               </span>
             </div>
-            <h2 className="landing-heading-lg">
+            <h2 className="font-inter font-extrabold text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-[-0.025em] text-gray-900 dark:text-white drop-shadow-[0_2px_20px_rgba(123,57,252,0.18)]">
               {t("dashboardTitle")}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">

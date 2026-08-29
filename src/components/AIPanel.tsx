@@ -18,7 +18,7 @@ import {
   Maximize2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useAIChat, createAIChatController } from "../lib/aiChatStore";
 import type { OnAction } from "../lib/aiChatStore";
 
@@ -48,8 +48,8 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
       <div className="relative max-w-[85%]">
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1 ml-1">
-            <div className="w-4 h-4 rounded bg-violet-500/10 flex items-center justify-center">
-              <Sparkles size={9} className="text-violet-500" />
+            <div className="w-4 h-4 rounded               bg-[#7b39fc]/10 flex items-center justify-center">
+              <Sparkles size={9} className="              text-[#7b39fc]" />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
               AI Assistant
@@ -59,13 +59,13 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
         <div
           className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl rounded-br-md"
-              : "text-gray-700 dark:text-gray-300"
+              ? "bg-[#7b39fc] text-white rounded-2xl rounded-br-md"
+              : "bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl rounded-bl-md"
           }`}
         >
           {msg.content || "…"}
           {msg.streaming && (
-            <span className="inline-block w-1.5 h-4 bg-violet-500 ml-0.5 animate-pulse rounded-full align-middle" />
+            <span className="inline-block w-1.5 h-4               bg-[#7b39fc] ml-0.5 animate-pulse rounded-full align-middle" />
           )}
         </div>
         {!isUser && !msg.streaming && (
@@ -107,6 +107,7 @@ export default function AIPanel({
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Open full-page chat when ?ai=1 is in the URL (sidebar AI button).
   useEffect(() => {
@@ -157,18 +158,16 @@ export default function AIPanel({
     setIsOpen(false);
     setForcedFull(false);
     try {
-      if (typeof window !== "undefined") {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("ai");
-        window.history.replaceState({}, "", url.toString());
-      }
+      const url = new URL(window.location.href);
+      url.searchParams.delete("ai");
+      router.replace(url.pathname + url.search, { scroll: false });
     } catch {}
     window.dispatchEvent(new Event("close-ai-panel-page"));
   };
 
   const panelClasses = isPageVariant
-    ? `fixed top-0 bottom-0 right-0 ${isSidebarOpen ? "left-64" : "left-0"} z-[51] bg-white dark:bg-gray-950 rounded-none border-0 shadow-none flex flex-col overflow-hidden`
-    : "fixed bottom-6 right-6 z-[120] w-[420px] max-w-[calc(100vw-48px)] h-[640px] max-h-[calc(100vh-48px)] bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden";
+    ? `font-inter fixed top-0 bottom-0 right-0 ${isSidebarOpen ? "left-64" : "left-0"} z-[51] bg-white dark:bg-gray-950 rounded-none border-0 shadow-none flex flex-col overflow-hidden`
+    : "font-inter fixed bottom-6 right-6 z-[120] w-[420px] max-w-[calc(100vw-48px)] h-[640px] max-h-[calc(100vh-48px)] bg-white dark:bg-gray-950 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl flex flex-col overflow-hidden";
 
   return (
     <>
@@ -189,7 +188,7 @@ export default function AIPanel({
                 }}
                 className="flex items-center gap-2 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-xl hover:scale-105 transition-transform"
               >
-                <Maximize2 size={15} className="text-violet-500" />
+                <Maximize2 size={15} className="              text-[#7b39fc]" />
                 Apri chat a schermo intero
               </motion.button>
             )}
@@ -203,16 +202,16 @@ export default function AIPanel({
             whileTap={{ scale: 0.9 }}
             animate={{
               boxShadow: isOpen
-                ? "0 0 0 0 rgba(139,92,246,0.5)"
-                : "0 0 24px 4px rgba(139,92,246,0.35)",
+                ? "0 0 0 0 rgba(                123,57,252,0.5)"
+                : "0 0 24px 4px rgba(                123,57,252,0.35)",
             }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-xl"
+            className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/30"
             aria-label="Apri chat AI"
           >
             {/* pulsing ring when unread replies exist */}
             {messages.length > 0 && !isOpen && (
-              <span className="absolute inset-0 rounded-full bg-violet-500 opacity-60 animate-ping" />
+              <span className="absolute inset-0 rounded-full               bg-[#7b39fc] opacity-60 animate-ping" />
             )}
             {isStreaming && !isOpen && (
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 animate-pulse" />
@@ -250,11 +249,11 @@ export default function AIPanel({
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                    <Sparkles size={14} className="text-violet-500" />
+                  <div className="w-7 h-7 rounded-lg               bg-[#7b39fc]/10 flex items-center justify-center">
+                    <Sparkles size={14} className="              text-[#7b39fc]" />
                   </div>
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-none">
-                    AI
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">
+                    Assistente AI
                   </h3>
                 </div>
                 <div className="flex items-center gap-1">
@@ -291,8 +290,8 @@ export default function AIPanel({
               >
                 {isEmptyState && (
                   <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-4">
-                    <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4">
-                      <Sparkles size={20} className="text-violet-500" />
+                    <div className="w-12 h-12 rounded-2xl               bg-[#7b39fc]/10 flex items-center justify-center mb-4">
+                      <Sparkles size={20} className="              text-[#7b39fc]" />
                     </div>
                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
                       Come posso aiutarti?
@@ -324,7 +323,7 @@ export default function AIPanel({
                       <button
                         key={a.id}
                         onClick={() => handleSend(a.label)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-100 dark:border-gray-800 text-[11px] font-semibold hover:border-violet-300 dark:hover:border-violet-700 hover:text-violet-600 dark:hover:text-violet-400 transition-all"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-100 dark:border-gray-800 text-[11px] font-semibold hover:border-[#a67cff]/60 dark:hover:border-[#7b39fc]/60 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-all"
                       >
                         <a.icon size={12} />
                         {a.label}
@@ -341,7 +340,7 @@ export default function AIPanel({
                     onKeyDown={handleKeyDown}
                     placeholder="Scrivi un messaggio..."
                     rows={1}
-                    className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 leading-relaxed"
+                    className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/50 focus:border-[#7b39fc] leading-relaxed"
                     style={{ maxHeight: 120 }}
                   />
                   {isStreaming ? (
@@ -355,7 +354,7 @@ export default function AIPanel({
                     <button
                       onClick={() => handleSend()}
                       disabled={!input.trim()}
-                      className="shrink-0 w-9 h-9 rounded-xl bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 flex items-center justify-center hover:opacity-80 transition-opacity disabled:opacity-30"
+                      className="shrink-0 w-9 h-9 rounded-xl bg-[#7b39fc] text-white flex items-center justify-center hover:bg-[#8b4dff] transition-colors disabled:opacity-30 shadow-lg shadow-[#7b39fc]/20"
                     >
                       <Send size={15} />
                     </button>

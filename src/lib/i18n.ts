@@ -51,6 +51,10 @@ export const translations: Translations = {
     active: "Attivo",
     inactive: "Non attivo",
     loading: "Caricamento...",
+    confirmLogoutTitle: "Sei sicuro di voler uscire?",
+    confirmLogoutDesc: "La sessione verrà terminata e verrai riportato alla home.",
+    cancel: "Annulla",
+    confirmLogout: "Conferma logout",
 
     // Dashboard
     dashboardTitle: "Il tuo centro di comando",
@@ -130,6 +134,10 @@ export const translations: Translations = {
     active: "Active",
     inactive: "Inactive",
     loading: "Loading...",
+    confirmLogoutTitle: "Are you sure you want to log out?",
+    confirmLogoutDesc: "Your session will end and you will be returned to the home page.",
+    cancel: "Cancel",
+    confirmLogout: "Confirm logout",
 
     // Dashboard
     dashboardTitle: "Your command center",

@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "taskly": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "C:\\Users\\Utente\\Documents\\Progetti\\Web\\taskly\\mcp\\server.ts"
+      ],
+      "env": {
+        "SUPABASE_URL": "https://xxxxxxxxxxxx.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "service-role-key",
+        "TASKLY_USER_EMAIL": "you@example.com",
+        "TASKLY_WORKSPACE": "personal"
+      }
+    }
+  }
+}

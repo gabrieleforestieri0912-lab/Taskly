@@ -876,7 +876,11 @@ async function updatePageRow(userId: string, id: string, patch: any) {
       is_template: current.is_template,
       data: current.data,
       meta: current.meta,
-      ...(patch.sortOrder !== undefined ? { sort_order: patch.sortOrder } : {}),
+      ...(patch.sortOrder !== undefined
+        ? { sort_order: patch.sortOrder }
+        : patch.order !== undefined
+          ? { sort_order: patch.order }
+          : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", userId)

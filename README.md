@@ -102,3 +102,53 @@ The migration preserves the exact shapes the frontend consumes:
 - `pages`, `goals`, `ideas` keep the client-generated `id` strings.
 - Page client-only flags (`locked`, `font`, `deleted`, `deletedAt`) are now
   persisted in the `meta` column (previously lost on reload).
+
+## MCP server
+
+Taskly ships a standalone **MCP (Model Context Protocol) server** that exposes
+the data layer as tools, so an AI client (Claude Desktop, Cursor, VS Code, the
+MCP Inspector, …) can read and mutate a Taskly account over stdio.
+
+The server reuses `src/lib/server/db.ts` (Supabase), so it operates on the same
+database as the web app. It runs as a single pre-configured account — the
+"connected user" — resolved at startup from the environment:
+
+| Variable | Meaning |
+| --- | --- |
+| `TASKLY_USER_ID` | Auth user id to scope every operation |
+| `TASKLY_USER_EMAIL` | Fallback: resolve the profile by email |
+| `TASKLY_WORKSPACE` | slug / name / id of the workspace selected at startup |
+
+### Run
+
+```bash
+# from the project root (loads .env automatically)
+npm run mcp
+
+# or open it in the official inspector UI
+npm run mcp:inspect
+```
+
+### Tools exposed
+
+`taskly_whoami`, `taskly_list_workspaces`, `taskly_set_workspace`,
+`taskly_create_workspace`, `taskly_list_tasks`, `taskly_get_task`,
+`taskly_create_task`, `taskly_update_task`, `taskly_delete_task`,
+`taskly_search_docs`, `taskly_get_doc`, `taskly_save_doc`,
+`taskly_list_doc_versions`, `taskly_list_pages`, `taskly_create_page`,
+`taskly_update_page`, `taskly_delete_page`, `taskly_list_goals`,
+`taskly_create_goal`, `taskly_update_goal`, `taskly_delete_goal`,
+`taskly_list_ideas`, `taskly_create_idea`, `taskly_delete_idea`,
+`taskly_list_templates`, `taskly_create_template`, `taskly_delete_template`,
+`taskly_list_notifications`, `taskly_create_notification`,
+`taskly_mark_notification_read`, `taskly_list_activity`,
+`taskly_create_activity`, `taskly_mark_activity_read`, `taskly_list_meetings`,
+`taskly_create_meeting`, `taskly_delete_meeting`, `taskly_list_integrations`,
+`taskly_set_integration`, `taskly_delete_integration`.
+
+### Connect from Claude Desktop
+
+Copy `mcp/claude_desktop_config.json`, replace the absolute path and the
+`env` values (`SUPABASE_*`, `TASKLY_USER_EMAIL`, `TASKLY_WORKSPACE`), and drop
+it into your `claude_desktop_config.json` `mcpServers` block. Restart Claude
+Desktop — the Taskly tools then appear in the tool picker.

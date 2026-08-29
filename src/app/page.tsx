@@ -16,7 +16,6 @@ import Pricing from "../components/Pricing";
 import FAQ from "../components/FAQ";
 import CtaBanner from "../components/CtaBanner";
 import Footer from "../components/Footer";
-import Stats from "../components/Stats";
 import { ScrollReveal } from "../components/UIComponents";
 
 export default function Home() {
@@ -55,8 +54,6 @@ export default function Home() {
           <ValueProposition />
         </section>
       </ScrollReveal>
-
-      <Stats />
 
       <ScrollReveal delay={0.1}>
         <section id="getting-started" className="landing-section">
