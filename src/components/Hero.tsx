@@ -10,63 +10,15 @@ const HERO_VIDEO_URL =
 function Hero({ onStart, onDiscover }) {
   return (
     <section className="relative flex min-h-[115vh] flex-col items-center justify-start overflow-hidden pt-28">
-      {/* Video background */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-        aria-hidden="true"
-      >
-        <source src={HERO_VIDEO_URL} type="video/mp4" />
-      </video>
-
-      {/* Blend overlays: tint the video and fade it into the page */}
-      <div className="absolute inset-0 bg-black/45 dark:bg-black/55" aria-hidden="true" />
-      <div
-        className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/5 to-transparent"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/90 to-transparent"
-        aria-hidden="true"
-      />
-      {/* Bottom fade that blends the video into the next section */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-white via-white/40 to-transparent dark:from-[#0a0a0a] dark:via-[#0a0a0a]/50"
-        aria-hidden="true"
-      />
-
       {/* Hero content */}
       <div className="relative z-10 mx-auto mt-0 flex w-full max-w-[900px] flex-col items-center px-6 text-center">
-        {/* Soft dark scrim behind text: keeps white text legible on the
-            always-dark video without harsh edges, whatever the app theme. */}
-        <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.35),transparent_75%)]"
-          aria-hidden="true"
-        />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center"
         >
-          {/* Tagline pill */}
-            <div
-              className="mb-8 inline-flex h-[38px] items-center gap-2.5 rounded-[10px] border px-3 font-inter text-sm font-medium text-white shadow-[0_0_22px_rgba(123,57,252,0.28)]"
-              style={{
-                background: "rgba(85, 80, 110, 0.4)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                borderColor: "rgba(164, 132, 215, 0.5)",
-              }}
-            >
-              <Sparkles className="h-4 w-4 text-[#a67cff]" />
-              <span>Taskly v3.2 è disponibile</span>
-            </div>
-
-            {/* Headline */}
+          {/* Headline */}
             <h1 className="font-inter text-5xl font-extrabold leading-[1.05] tracking-[-0.035em] text-white drop-shadow-[0_2px_24px_rgba(123,57,252,0.25)] sm:text-7xl lg:text-[72px]">
               Organizza il tuo lavoro,{" "}
               <span className="bg-gradient-to-r from-[#a67cff] to-[#7b39fc] bg-clip-text text-transparent">
