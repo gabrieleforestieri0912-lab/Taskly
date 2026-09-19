@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 
 export const metadata = {
   title: "Privacy Policy - Taskly",
@@ -9,11 +8,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <main className="max-w-4xl mx-auto py-16 px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div>
         <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">
           Informativa sulla Privacy
         </h1>
@@ -149,7 +144,7 @@ export default function PrivacyPage() {
             </p>
           </section>
         </div>
-      </motion.div>
+      </div>
     </main>
   );
 }
