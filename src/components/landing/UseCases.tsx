@@ -1,5 +1,6 @@
 import { Container } from "./Container";
 import { Section } from "./Section";
+import { Reveal, Stagger, StaggerItem } from "./Reveal";
 import { landingContent } from "@/content/landing";
 import { Briefcase, Users, GraduationCap, Rocket } from "lucide-react";
 
@@ -12,18 +13,18 @@ const personaIcons: Record<string, typeof Briefcase> = {
 
 export function UseCases() {
   const { eyebrow, title, cases } = landingContent.useCases;
-  return (
+    return (
     <Section id="casi-uso">
       <Container>
-        <div className="mx-auto max-w-2xl text-center">
+        <Reveal className="mx-auto max-w-2xl text-center">
           <span className="landing-eyebrow">{eyebrow}</span>
           <h2 className="landing-heading-lg">{title}</h2>
-        </div>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        </Reveal>
+        <Stagger className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {cases.map((c) => {
             const Icon = personaIcons[c.persona] ?? Briefcase;
             return (
-              <div key={c.persona} className="landing-card flex flex-col">
+              <StaggerItem key={c.persona} className="landing-card flex flex-col hover:-translate-y-1 transition-transform">
                 <div className="landing-icon-wrap">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -32,10 +33,10 @@ export function UseCases() {
                 <div className="mt-4 rounded-full bg-[#f4f0fd] dark:bg-[#7b39fc]/20 px-3 py-1.5 text-xs font-medium text-[#7b39fc] dark:text-[#a67cff] text-center">
                   {c.flow}
                 </div>
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </Stagger>
       </Container>
     </Section>
   );

@@ -1,6 +1,7 @@
 import { CheckSquare, Target, MessageCircle, Bell, Zap, Search, LucideIcon } from "lucide-react";
 import { Container } from "./Container";
 import { Section } from "./Section";
+import { Reveal, Stagger, StaggerItem } from "./Reveal";
 import { landingContent } from "@/content/landing";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -18,17 +19,17 @@ export function BentoGrid() {
   return (
     <Section>
       <Container>
-        <h2 className="landing-heading text-center max-w-2xl mx-auto">{title}</h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-12">
+        <Reveal>
+          <h2 className="landing-heading text-center max-w-2xl mx-auto">{title}</h2>
+        </Reveal>
+        <Stagger className="mt-10 grid gap-6 md:grid-cols-12">
           {items.map((item, idx) => {
             const Icon = iconMap[item.icon] ?? CheckSquare;
-            // Variabili dimensioni: prime due più grandi, resto standard
             const span = idx === 0 ? "md:col-span-7" : idx === 1 ? "md:col-span-5" : idx === 2 ? "md:col-span-5" : idx === 3 ? "md:col-span-7" : "md:col-span-6";
-            // Alternative per 6 items: 7/5 / 5/7 / 6/6
             return (
-              <div
+              <StaggerItem
                 key={item.title}
-                className={`landing-card flex flex-col ${span} ${idx % 2 === 0 ? "min-h-[180px]" : "min-h-[180px]"}`}
+                className={`landing-card flex flex-col ${span} min-h-[180px] hover:-translate-y-1 hover:shadow-xl transition-transform`}
               >
                 <div className="landing-icon-wrap">
                   <Icon className="h-5 w-5" />
@@ -47,10 +48,10 @@ export function BentoGrid() {
                     <span className="h-2 w-2 rounded-full bg-emerald-500" /> Promemoria attivo
                   </div>
                 )}
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </Stagger>
       </Container>
     </Section>
   );

@@ -1,5 +1,6 @@
 import { Container } from "./Container";
 import { Section } from "./Section";
+import { Reveal, Stagger, StaggerItem } from "./Reveal";
 import { landingContent } from "@/content/landing";
 import { ArrowRight } from "lucide-react";
 
@@ -8,10 +9,12 @@ export function HowItWorks() {
   return (
     <Section variant="alt">
       <Container>
-        <h2 className="landing-heading text-center">{title}</h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <Reveal>
+          <h2 className="landing-heading text-center">{title}</h2>
+        </Reveal>
+        <Stagger className="mt-10 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
-            <div key={step.n} className="relative flex flex-col items-center text-center">
+            <StaggerItem key={step.n} className="relative flex flex-col items-center text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#7b39fc] text-white font-bold text-lg shadow-lg shadow-[#7b39fc]/20">
                 {step.n}
               </div>
@@ -20,9 +23,9 @@ export function HowItWorks() {
               {i < steps.length - 1 && (
                 <ArrowRight className="hidden md:block absolute top-8 -right-3 h-6 w-6 text-[#7b39fc]/30" aria-hidden="true" />
               )}
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </Container>
     </Section>
   );
