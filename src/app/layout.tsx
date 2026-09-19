@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import ThemeSync from "../components/ThemeSync";
 import GoogleAuthProvider from "../components/GoogleAuthProvider";
@@ -6,6 +6,9 @@ import { LanguageProvider } from "../lib/LanguageContext";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { FAQ_ITEMS } from "../lib/faq";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -106,7 +109,7 @@ export default function RootLayout({ children }) {
     <html
       lang="it"
       suppressHydrationWarning
-      className={`${inter.variable} h-full antialiased`}
+      className={cn("h-full", "antialiased", inter.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col font-inter">
         <GoogleAuthProvider>
