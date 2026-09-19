@@ -56,7 +56,7 @@ export const landingContent = {
     title: "Tutto ciò che ti serve per fare progressi",
     items: [
       { icon: "CheckSquare", title: "Task e sotto-task", desc: "Scomponi il lavoro in passi chiari." },
-      { icon: "Target", title: "Progetti e obiettivi", desc: "Collega任务 a obiettivi misurabili." },
+      { icon: "Target", title: "Progetti e obiettivi", desc: "Collega progetti a obiettivi misurabili." },
       { icon: "MessageCircle", title: "Collaborazione", desc: "Commenti, menzioni e attività in tempo reale." },
       { icon: "Bell", title: "Promemoria e scadenze", desc: "Non perdere mai una consegna." },
       { icon: "Zap", title: "Automazioni semplici", desc: "Regole leggere per risparmiare tempo." },
