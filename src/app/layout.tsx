@@ -1,4 +1,4 @@
-import { Inter, Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeSync from "../components/ThemeSync";
 import GoogleAuthProvider from "../components/GoogleAuthProvider";
@@ -7,8 +7,6 @@ import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -109,9 +107,9 @@ export default function RootLayout({ children }) {
     <html
       lang="it"
       suppressHydrationWarning
-      className={cn("h-full", "antialiased", inter.variable, "font-sans", geist.variable)}
+      className={cn("h-full", "antialiased", inter.variable)}
     >
-      <body className="min-h-full flex flex-col font-inter">
+      <body className="min-h-full flex flex-col" style={{ fontFamily: 'var(--font-inter)' }}>
         <GoogleAuthProvider>
           <LanguageProvider>
             <script
@@ -119,15 +117,15 @@ export default function RootLayout({ children }) {
                 __html: `
               (function(){
                 try{
-                  // Dark by default: apply .dark unless the user explicitly
-                  // chose light. Runs before hydration to avoid a flash.
+                  // Light by default: apply .dark only if the user explicitly
+                  // chose dark. Runs before hydration to avoid a flash.
                   var theme = localStorage.getItem('theme');
-                  if (theme !== 'light') {
+                  if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                   } else {
                     document.documentElement.classList.remove('dark');
                   }
-                }catch(e){ document.documentElement.classList.add('dark'); }
+                }catch(e){ document.documentElement.classList.remove('dark'); }
               })();
             `,
               }}
