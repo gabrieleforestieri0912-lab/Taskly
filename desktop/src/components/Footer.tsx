@@ -1,5 +1,6 @@
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Github, Twitter } from "lucide-react";
 
@@ -16,8 +17,15 @@ export default function Footer() {
         <div className="flex flex-col items-start">
           <Link
             href="/"
-            className="text-2xl font-extrabold tracking-tight text-gradient-purple mb-2"
+            className="inline-flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-gradient-purple mb-2"
           >
+            <Image
+              src="/taskly.png"
+              alt="Taskly"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg object-cover"
+            />
             Taskly
           </Link>
           <p className="text-gray-500 dark:text-gray-400 text-sm max-w-xs leading-relaxed">

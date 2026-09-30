@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -28,16 +29,16 @@ import ThemeToggle from "./ThemeToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
-function FutureLogo({ className = "text-white" }) {
+function SiteLogo({ size = 28 }: { size?: number }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={`h-7 w-7 shrink-0 ${className}`}
-      aria-hidden="true"
-    >
-      <path d="M1.04356 6.35771L13.6437 0.666504L23.3335 6.35771V17.6423L13.6437 23.3335L1.04356 17.6423V6.35771ZM12.5 4.2L4.5 8.5V15.5L12.5 19.8L20.5 15.5V8.5L12.5 4.2Z" />
-    </svg>
+    <Image
+      src="/taskly.png"
+      alt="Taskly"
+      width={size}
+      height={size}
+      className="shrink-0 rounded-lg object-cover"
+      priority
+    />
   );
 }
 
@@ -218,7 +219,7 @@ export default function Navbar({
               href="/"
               className="flex shrink-0 items-center gap-2.5 rounded-full px-2 transition-opacity hover:opacity-85"
             >
-              <FutureLogo />
+              <SiteLogo />
               <span className="font-inter text-lg font-semibold text-white">
                 Taskly
               </span>
@@ -417,7 +418,7 @@ export default function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2.5"
                 >
-                  <FutureLogo />
+                  <SiteLogo />
                   <span className="font-inter text-lg font-semibold text-white">
                     Taskly
                   </span>
@@ -668,7 +669,7 @@ export default function Navbar({
             </div>
           ) : (
             <Link href="/" className="group flex min-w-0 items-center gap-3">
-              <FutureLogo className="text-[#7b39fc]" />
+              <SiteLogo />
               <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">
                 Taskly
               </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -71,14 +72,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col items-start">
             <Link href="/" className="group inline-flex items-center gap-2.5">
-              <svg
-                viewBox="0 0 24 24"
-                fill="#7b39fc"
-                className="h-8 w-8 transition-transform duration-300 group-hover:scale-110"
-                aria-hidden="true"
-              >
-                <path d="M1.04356 6.35771L13.6437 0.666504L23.3335 6.35771V17.6423L13.6437 23.3335L1.04356 17.6423V6.35771ZM12.5 4.2L4.5 8.5V15.5L12.5 19.8L20.5 15.5V8.5L12.5 4.2Z" />
-              </svg>
+              <Image
+                src="/taskly.png"
+                alt="Taskly"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110"
+              />
               <span className="text-2xl font-extrabold tracking-tight text-gradient-brand">
                 Taskly
               </span>
