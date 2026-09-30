@@ -2,6 +2,7 @@
 
 /* eslint-disable react-hooks/set-state-in-effect */
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useRef } from "react";
 import {
   Sparkles,
@@ -29,6 +30,7 @@ const QUICK_ACTIONS = [
 ];
 
 function MessageBubble({ msg }: { msg: { role: string; content: string; streaming?: boolean } }) {
+  const { t } = useLanguage();
   const [copied, setCopied] = React.useState(false);
   const isUser = msg.role === "user";
 
@@ -92,6 +94,7 @@ export default function AIPanel({
   variant?: "floating" | "page";
   isSidebarOpen?: boolean;
 }) {
+  const { t, tWith } = useLanguage();
   const [isOpen, setIsOpen] = React.useState(variant === "page");
   const [forcedFull, setForcedFull] = React.useState(false);
   const [input, setInput] = React.useState("");
@@ -188,9 +191,7 @@ export default function AIPanel({
                 }}
                 className="flex items-center gap-2 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-xl hover:scale-105 transition-transform"
               >
-                <Maximize2 size={15} className="              text-[#7b39fc]" />
-                Apri chat a schermo intero
-              </motion.button>
+                <Maximize2 size={15} className="              text-[#7b39fc]" />{t("views.aiOpenFull")}</motion.button>
             )}
           </AnimatePresence>
 
@@ -207,7 +208,7 @@ export default function AIPanel({
             }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
             className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/30"
-            aria-label="Apri chat AI"
+            aria-label={t("views.aiOpenChat")}
           >
             {/* pulsing ring when unread replies exist */}
             {messages.length > 0 && !isOpen && (
@@ -252,16 +253,14 @@ export default function AIPanel({
                   <div className="w-7 h-7 rounded-lg               bg-[#7b39fc]/10 flex items-center justify-center">
                     <Sparkles size={14} className="              text-[#7b39fc]" />
                   </div>
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">
-                    Assistente AI
-                  </h3>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{t("views.aiTitle")}</h3>
                 </div>
                 <div className="flex items-center gap-1">
                   {!isPageVariant && (
                     <button
                       onClick={() => setForcedFull(true)}
                       className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors"
-                      title="Apri a schermo intero"
+                      title={t("views.aiOpenFullscreen")}
                     >
                       <Maximize2 size={14} />
                     </button>
@@ -270,7 +269,7 @@ export default function AIPanel({
                     <button
                       onClick={controller.clear}
                       className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors"
-                      title="Pulisci chat"
+                      title={t("views.aiClear")}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -293,12 +292,8 @@ export default function AIPanel({
                     <div className="w-12 h-12 rounded-2xl               bg-[#7b39fc]/10 flex items-center justify-center mb-4">
                       <Sparkles size={20} className="              text-[#7b39fc]" />
                     </div>
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Come posso aiutarti?
-                    </p>
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                      Chiedimi di riassumere note, creare task o piani.
-                    </p>
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">{t("views.aiHelp")}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{t("views.aiHelpDesc")}</p>
                   </div>
                 )}
 
@@ -338,7 +333,7 @@ export default function AIPanel({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Scrivi un messaggio..."
+                    placeholder={t("views.aiInputPh")}
                     rows={1}
                     className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/50 focus:border-[#7b39fc] leading-relaxed"
                     style={{ maxHeight: 120 }}

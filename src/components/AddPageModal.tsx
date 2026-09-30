@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -243,6 +244,7 @@ const TEMPLATES = [
 ];
 
 export default function AddPageModal({ isOpen, onClose, onAdd }) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("types");
 
   // Blocca lo scroll della pagina quando il modale è aperto
@@ -281,22 +283,16 @@ export default function AddPageModal({ isOpen, onClose, onAdd }) {
       >
         <div className="px-5 pt-5 pb-3 flex items-center justify-between bg-white dark:bg-gray-900">
           <div>
-            <h3 className="text-xl font-black text-gray-900 dark:text-white">
-              Nuova Pagina
-            </h3>
+            <h3 className="text-xl font-black text-gray-900 dark:text-white">{t("views.blockEmpty")}</h3>
             <div className="flex gap-4 mt-2">
               <button
                 onClick={() => setActiveTab("types")}
                 className={`text-[10px] font-black uppercase tracking-[0.15em] transition-all ${activeTab === "types" ? "text-cyan-600 border-b-2 border-cyan-600 pb-0.5" : "text-gray-400 hover:text-gray-600"}`}
-              >
-                Blocchi Base
-              </button>
+              >{t("views.addPageBase")}</button>
               <button
                 onClick={() => setActiveTab("templates")}
                 className={`text-[10px] font-black uppercase tracking-[0.15em] transition-all ${activeTab === "templates" ? "text-cyan-600 border-b-2 border-cyan-600 pb-0.5" : "text-gray-400 hover:text-gray-600"}`}
-              >
-                Template Pronti
-              </button>
+              >{t("views.addPageReady")}</button>
             </div>
           </div>
           <button
@@ -363,9 +359,7 @@ export default function AddPageModal({ isOpen, onClose, onAdd }) {
                         <p className="font-bold text-sm text-gray-900 dark:text-white">
                           {tpl.label}
                         </p>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-cyan-500 transition-colors">
-                          Usa template
-                        </span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-cyan-500 transition-colors">{t("views.addPageUse")}</span>
                       </div>
                       <Sparkles
                         size={14}
@@ -384,9 +378,7 @@ export default function AddPageModal({ isOpen, onClose, onAdd }) {
             variant="ghost"
             onClick={onClose}
             className="font-bold text-[10px] uppercase tracking-[0.15em] px-5 py-2 rounded-lg"
-          >
-            Annulla
-          </Button>
+          >{t("views.habitCancel")}</Button>
         </div>
       </motion.div>
     </div>

@@ -589,7 +589,7 @@ function DashboardContent() {
         })
         .join("");
     }
-    return "<p>Nessun contenuto</p>";
+    return `<p>${escapeHtml(t("pg.noContent"))}</p>`;
   }
 
   function escapeHtml(str) {
@@ -794,13 +794,11 @@ function DashboardContent() {
       return (
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold">Cestino</h2>
+            <h2 className="text-lg font-bold">{t("land.sideTrash")}</h2>
           </div>
 
           {deletedPages.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 dark:text-gray-500">
-              Nessun elemento nel cestino.
-            </div>
+            <div className="p-6 text-center text-gray-400 dark:text-gray-500">{t("pg.trashEmpty")}</div>
           ) : (
             <div className="space-y-3">
               {deletedPages.map((p) => (
@@ -822,19 +820,19 @@ function DashboardContent() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => restorePage(p.id)}
-                      title="Ripristina"
+                      title={t("views.notesRestore")}
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-100 transition-colors"
                     >
                       <RotateCw size={14} />
-                      <span>Ripristina</span>
+                      <span>{t("views.notesRestore")}</span>
                     </button>
                     <button
                       onClick={() => permanentlyDelete(p.id)}
-                      title="Elimina definitivamente"
+                      title={t("pg.deletePermanently")}
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 font-semibold hover:bg-red-100 transition-colors"
                     >
                       <Trash2 size={14} />
-                      <span>Elimina definitivamente</span>
+                      <span>{t("pg.deletePermanently")}</span>
                     </button>
                   </div>
                 </div>
@@ -860,9 +858,7 @@ function DashboardContent() {
         <>
           {childPages && childPages.length > 0 && (
             <div className="mb-4">
-              <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                Sottopagine
-              </div>
+              <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{t("pg.subpages")}</div>
               <div className="flex flex-wrap gap-2">
                 {childPages.map((c) => (
                   <Link
@@ -1048,9 +1044,7 @@ function DashboardContent() {
               <Link
                 href="/#pricing"
                 className="px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
-              >
-                Aggiorna piano
-              </Link>
+              >{t("pg.upgradePlan")}</Link>
               <button
                 onClick={() => setPlanNotice(null)}
                 className="text-gray-500 hover:text-white transition-colors"
@@ -1238,7 +1232,7 @@ function DashboardContent() {
           <button
             onClick={toggleSidebar}
             className="shrink-0 p-2 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Toggle sidebar"
+            aria-label={t("misc.toggleSidebar")}
           >
             {isSidebarOpen ? (
               <PanelLeftClose size={18} />
@@ -1338,15 +1332,13 @@ function DashboardContent() {
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       className="absolute top-full mt-3 left-0 z-110 w-72 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-[2.5rem] shadow-2xl p-4"
                     >
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">
-                        Seleziona Icona
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">{t("pg.selectIcon")}</p>
                       <div className="mb-4 flex items-center gap-2">
                         <input
                           type="text"
                           value={iconSearch}
                           onChange={(e) => setIconSearch(e.target.value)}
-                          placeholder="Cerca icone..."
+                          placeholder={t("pg.searchIcons")}
                           className="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none"
                         />
                         <button
@@ -1356,9 +1348,7 @@ function DashboardContent() {
                             setIsIconMenuOpen(false);
                           }}
                           className="px-3 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 text-sm font-bold"
-                        >
-                          Rimuovi icona
-                        </button>
+                        >{t("pg.removeIcon")}</button>
                       </div>
 
                       {/* Category tabs */}
@@ -1504,9 +1494,7 @@ function DashboardContent() {
                         </div>
                       )}
 
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">
-                        Seleziona Colore
-                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 px-2">{t("pg.selectColor")}</p>
                       <div className="flex flex-wrap gap-2 px-2">
                         {COLOR_OPTIONS.map((c) => (
                           <button
@@ -1586,16 +1574,14 @@ function DashboardContent() {
                   className="bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-[2.5rem] shadow-2xl w-80 max-h-96 overflow-hidden"
                 >
                   <div className="px-5 pt-4 pb-3 border-b border-gray-100 dark:border-gray-800">
-                    <p className="text-sm font-black">Sposta pagina sotto</p>
+                    <p className="text-sm font-black">{t("pg.movePageUnder")}</p>
                   </div>
                   <div className="p-2 overflow-y-auto max-h-72">
                     <button
                       onClick={() => nestPage(activePage.id, null)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
-                      <span className="text-gray-400">ÔÇö</span>
-                      Nessuna (radice)
-                    </button>
+                      <span className="text-gray-400">ÔÇö</span>{t("pg.noParentRoot")}</button>
                     {(pages || [])
                       .filter((p) => !p.deleted && String(p.id) !== String(activePageId))
                       .map((p) => (

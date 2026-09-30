@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import {
   Card,
@@ -65,6 +66,7 @@ export default function BrainDumpView({
   onConvertToTask,
   loading = false,
 }) {
+  const { t } = useLanguage();
   // Hooks must be called unconditionally (before any early return) so the
   // hook order stays stable across renders with different `loading` values.
   const [input, setInput] = useState("");
@@ -124,7 +126,7 @@ export default function BrainDumpView({
               <Lightbulb size={18} className="text-gray-400 ml-2" />
               <input
                 type="text"
-                placeholder="Qual è la tua prossima grande idea?"
+                placeholder={t("views.brainIdeaPh")}
                 className="flex-1 text-sm font-bold bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-400 dark:placeholder-gray-600"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -137,8 +139,7 @@ export default function BrainDumpView({
                 onClick={addIdea}
                 className="h-10 px-6 gap-2 text-[10px] font-black uppercase tracking-widest bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200"
               >
-                <Plus size={16} /> Cattura Idea
-              </Button>
+                <Plus size={16} />{t("views.brainCapture")}</Button>
             </div>
           </div>
 
@@ -208,9 +209,7 @@ export default function BrainDumpView({
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                          Converti in Task
-                        </p>
+                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest ml-1">{t("views.brainConvert")}</p>
                         <select
                           className="w-full text-[9px] font-black uppercase tracking-widest bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 p-2.5 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-600 dark:text-gray-300"
                           onChange={(e) => {
@@ -219,9 +218,7 @@ export default function BrainDumpView({
                           }}
                           value=""
                         >
-                          <option value="" disabled>
-                            Scegli destinazione...
-                          </option>
+                          <option value="" disabled>{t("views.brainChooseDest")}</option>
                           {allPages
                             .filter((p) => p.type === "tasks")
                             .map((p) => (
@@ -245,12 +242,8 @@ export default function BrainDumpView({
           <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-cyan-500/5">
             <Sparkles className="text-cyan-400" size={32} />
           </div>
-          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">
-            Libera la tua mente
-          </p>
-          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-            Le migliori idee iniziano da qui.
-          </p>
+          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">{t("views.brainEmpty")}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">{t("views.brainEmptyDesc")}</p>
         </div>
       )}
     </div>

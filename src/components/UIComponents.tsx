@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef } from "react";
 import { Edit2, Check, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,6 +13,7 @@ export const EditableTitle = ({
   locked = false,
   placeholder = "Nuova pagina",
 }) => {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(() => Boolean(autoEdit));
   const ref = useRef<HTMLDivElement | null>(null);
   const initialTitleRef = useRef(title);
@@ -73,7 +75,7 @@ export const EditableTitle = ({
         contentEditable={isEditing}
         suppressContentEditableWarning
         role="textbox"
-        aria-label="Titolo pagina"
+        aria-label={t("views.uiPageTitle")}
         onBlur={() => handleSave()}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

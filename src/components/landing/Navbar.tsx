@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../../lib/LanguageContext";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
@@ -9,6 +10,7 @@ import { Container } from "./Container";
 import { landingContent } from "@/content/landing";
 
 export function Navbar() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const { logo, links, ctaLogin, ctaPrimary } = landingContent.nav;
 
@@ -20,7 +22,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Navigazione principale">
+        <nav className="hidden items-center gap-8 md:flex" aria-label={t("misc.mainNavLabel")}>
           {links.map((link) => (
             <Link
               key={link.href}
@@ -51,7 +53,7 @@ export function Navbar() {
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger
             className="md:hidden inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
-            aria-label="Apri menu"
+            aria-label={t("misc.openMenu")}
           >
             <Menu className="h-5 w-5" />
           </SheetTrigger>
@@ -59,7 +61,7 @@ export function Navbar() {
             <SheetHeader>
               <SheetTitle>{logo}</SheetTitle>
             </SheetHeader>
-            <nav className="mt-8 flex flex-col gap-4" aria-label="Menu mobile">
+            <nav className="mt-8 flex flex-col gap-4" aria-label={t("misc.mobileMenu")}>
               {links.map((link) => (
                 <Link
                   key={link.href}

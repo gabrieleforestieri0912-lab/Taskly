@@ -1,6 +1,9 @@
+"use client";
+
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import {
   Card,
@@ -236,6 +239,7 @@ export default function GoalsView({
   onRename,
   loading = false,
 }) {
+  const { t, tWith } = useLanguage();
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto space-y-8 pb-20">
@@ -345,9 +349,7 @@ export default function GoalsView({
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-20">
       <div className="flex justify-end">
-        <Badge variant="default" className="py-1 px-3">
-          Visione Annuale
-        </Badge>
+        <Badge variant="default" className="py-1 px-3">{t("views.goalsAnnualVision")}</Badge>
       </div>
 
       <Card className="border-none bg-white dark:bg-gray-800/40 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-visible">
@@ -357,7 +359,7 @@ export default function GoalsView({
               <Target size={18} className="text-gray-400 ml-2" />
               <input
                 type="text"
-                placeholder="Qual è il tuo grande obiettivo annuale?"
+                placeholder={t("views.goalsAnnualPh")}
                 className="flex-1 text-sm font-bold bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-400 dark:placeholder-gray-600"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -370,8 +372,7 @@ export default function GoalsView({
                 onClick={addAnnualGoal}
                 className="h-10 px-6 gap-2 text-[10px] font-black uppercase tracking-widest bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200"
               >
-                <Plus size={16} /> Crea Visione
-              </Button>
+                <Plus size={16} />{t("views.goalsCreateVision")}</Button>
             </div>
           </div>
 
@@ -379,7 +380,7 @@ export default function GoalsView({
             <Hash size={12} className="text-gray-400" />
             <input
               type="text"
-              placeholder="Tag (es: Carriera, Salute)..."
+              placeholder={t("views.goalsTagPh")}
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="text-[10px] font-bold bg-transparent border-none focus:outline-none focus:ring-0 p-0 placeholder-gray-400 w-full"
@@ -391,12 +392,8 @@ export default function GoalsView({
       <div className="flex flex-col gap-4">
         {data.length === 0 ? (
           <div className="text-center py-20 bg-gray-50/50 dark:bg-gray-900/20 rounded-[3rem] border-2 border-dashed border-gray-100 dark:border-gray-800">
-            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">
-              Nessun obiettivo strategico
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 font-medium">
-              Scomponi i tuoi sogni in azioni concrete.
-            </p>
+            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">{t("views.goalsEmpty")}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 font-medium">{t("views.goalsEmptyDesc")}</p>
           </div>
         ) : (
           data.map((goal) => (

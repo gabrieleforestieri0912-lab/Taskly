@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import { Layout, Copy, Sparkles, Plus } from "lucide-react";
 import { Badge } from "./UIComponents";
@@ -34,19 +35,21 @@ const TEMPLATES = [
   },
 ];
 
-export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void }) {
-  const handleUse = (t) => {
-    navigator.clipboard?.writeText(t.content);
-    if (onUse) onUse(t);
+export default function TemplateGallery({ onUse }: { onUse?: (tpl: any) => void }) {
+  const { t } = useLanguage();
+
+  // Il parametro si chiama `tpl` e non `t`: è il template selezionato
+  // e non deve collidere con la funzione di traduzione `t`.
+  const handleUse = (tpl) => {
+    navigator.clipboard?.writeText(tpl.content);
+    if (onUse) onUse(tpl);
   };
 
   return (
     <div className="flex flex-col h-full min-h-80">
       <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
         <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 dark:text-gray-100 flex items-center gap-2">
-          <Layout size={16} className="text-gray-400" />
-          Template
-        </h3>
+          <Layout size={16} className="text-gray-400" />{t("land.footerLinkTemplates")}</h3>
         <Badge
           variant="default"
           className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-none"
@@ -56,11 +59,11 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
       </div>
 
       <div className="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-4">
-        {TEMPLATES.map((t) => (
+        {TEMPLATES.map((tpl) => (
           <div
-            key={t.id}
+            key={tpl.id}
             className="group p-4 bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl hover:border-gray-400/30 transition-all cursor-pointer relative overflow-hidden"
-            onClick={() => handleUse(t)}
+            onClick={() => handleUse(tpl)}
           >
             <div
               className={`absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity`}
@@ -72,21 +75,19 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
               <span
                 className={`text-[8px] font-black uppercase tracking-[0.2em] text-gray-500 opacity-60`}
               >
-                {t.tag}
+                {tpl.tag}
               </span>
               <div className="font-bold text-sm text-gray-800 dark:text-gray-100">
-                {t.title}
+                {tpl.title}
               </div>
               <div className="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">
-                {t.content.substring(0, 60)}...
+                {tpl.content.substring(0, 60)}...
               </div>
             </div>
 
             <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">
-                <Plus size={12} />
-                Usa Template
-              </div>
+                <Plus size={12} />{t("views.tplUse")}</div>
               <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 <Copy size={12} />
               </div>
@@ -96,11 +97,7 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
       </div>
 
       <div className="p-4 bg-gray-50/50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800">
-        <p className="text-[9px] font-bold text-center text-gray-400 uppercase tracking-widest leading-relaxed">
-          Scegli un template per iniziare
-          <br />
-          velocemente il tuo lavoro.
-        </p>
+        <p className="text-[9px] font-bold text-center text-gray-400 uppercase tracking-widest leading-relaxed">{t("views.tplChoose")}<br />{t("views.tplChoose2")}</p>
       </div>
     </div>
   );

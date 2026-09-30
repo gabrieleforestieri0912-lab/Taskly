@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Zap, Star, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
@@ -15,6 +18,7 @@ const PricingCard = ({
   onCheckout,
   loading
 }) => {
+  const { t, tWith } = useLanguage();
   return (
     <motion.div
       whileHover={{ y: -10 }}
@@ -25,9 +29,7 @@ const PricingCard = ({
       }`}
     >
       {isPopular && (
-        <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-linear-to-r from-[#7b39fc] to-[#a67cff] rounded-full text-white text-xs font-black uppercase tracking-widest shadow-lg">
-          Più Scelto
-        </div>
+        <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-linear-to-r from-[#7b39fc] to-[#a67cff] rounded-full text-white text-xs font-black uppercase tracking-widest shadow-lg">{t("land.prMostChosen")}</div>
       )}
 
       <div className="flex items-start justify-between mb-5">
@@ -77,6 +79,7 @@ const PricingCard = ({
 };
 
 function Pricing() {
+  const { t, tWith } = useLanguage();
   const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(true);
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -223,9 +226,7 @@ function Pricing() {
           viewport={{ once: true }}
           className="landing-eyebrow"
         >
-          <Star size={12} fill="currentColor" />
-          Prezzi Chiari
-        </motion.div>
+          <Star size={12} fill="currentColor" />{t("land.prEyebrow")}</motion.div>
         
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
@@ -233,14 +234,12 @@ function Pricing() {
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
            className="landing-heading-lg leading-tight mb-5"
-        >
-          Scegli il piano giusto <br />
-          per il tuo <span className="landing-display-accent">focus.</span>
+        >{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
         </motion.h2>
 
         {/* Toggle Switch */}
         <div className="flex items-center justify-center gap-4 mt-12">
-          <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>Mensile</span>
+          <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("views.tasksMonthly")}</span>
           <button 
             onClick={() => setIsAnnual(!isAnnual)}
             className="w-16 h-9 rounded-full bg-gray-200 dark:bg-gray-800 p-1 relative transition-colors border border-gray-100 dark:border-gray-700"
@@ -251,8 +250,8 @@ function Pricing() {
             />
           </button>
           <div className="flex flex-col items-start leading-none">
-            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>Annuale</span>
-            <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">Risparmia 20%</span>
+            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("views.goalsAnnual")}</span>
+            <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">{t("land.prSave20")}</span>
           </div>
         </div>
       </div>
@@ -281,8 +280,7 @@ function Pricing() {
         viewport={{ once: true }}
         transition={{ delay: 0.6 }}
         className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium"
-      >
-        Hai bisogno di un piano personalizzato? <button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">Parla con noi</button>
+      >{t("land.prCustomPrefix")}<button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">{t("land.prCustomLink")}</button>
       </motion.p>
     </section>
   );

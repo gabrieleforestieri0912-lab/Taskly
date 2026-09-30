@@ -1,8 +1,10 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 
 export default function HabitCard({ dayObj, onClick }) {
+  const { t } = useLanguage();
   const d = dayObj || { day: 1, habits: [] };
   const total = d.habits ? d.habits.length : 0;
   const done = d.habits ? d.habits.filter((h) => h.done).length : 0;
@@ -33,7 +35,7 @@ export default function HabitCard({ dayObj, onClick }) {
             </li>
           ))
         ) : (
-          <li className="text-gray-300 italic">Nessuna abitudine</li>
+          <li className="text-gray-300 italic">{t("views.habitNone")}</li>
         )}
       </ul>
     </button>

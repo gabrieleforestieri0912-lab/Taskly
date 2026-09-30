@@ -1,9 +1,13 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FAQ_ITEMS } from "../lib/faq";
 
 function FAQItem({ item, isOpen, onToggle }) {
+  const { t } = useLanguage();
   return (
     <div className="rounded-2xl border border-[#7b39fc]/10 dark:border-[#a484d7]/15 bg-white/70 dark:bg-[#2b2344]/30 backdrop-blur-sm shadow-sm">
       <button
@@ -39,6 +43,7 @@ function FAQItem({ item, isOpen, onToggle }) {
 }
 
 export default function FAQ() {
+  const { t, tWith } = useLanguage();
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -49,15 +54,9 @@ export default function FAQ() {
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-10">
           <div className="landing-eyebrow">
-            <HelpCircle size={13} />
-            FAQ
-          </div>
-          <h2 className="landing-heading-lg tracking-tight">
-            Domande frequenti
-          </h2>
-          <p className="landing-body mt-3 text-sm md:text-base">
-            Le risposte rapide alle domande piu comuni su piani, pagamenti e sicurezza.
-          </p>
+            <HelpCircle size={13} />{t("land.faqEyebrow")}</div>
+          <h2 className="landing-heading-lg tracking-tight">{t("land.faqTitle")}</h2>
+          <p className="landing-body mt-3 text-sm md:text-base">{t("land.faqSubtitle")}</p>
         </div>
 
         <div className="space-y-3">

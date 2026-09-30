@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -16,6 +17,7 @@ import { apiFetch } from "../lib/api";
 const ROLES = ["owner", "admin", "member", "viewer"];
 
 export default function WorkspacesPanel() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [workspaces, setWorkspaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,33 +133,29 @@ export default function WorkspacesPanel() {
       : null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-100">
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-black/40 backdrop-blur-xl">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-[#0a0a0a] dark:text-gray-100">
+      <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-black/40">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-bold"
+              className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-bold dark:text-gray-400 dark:hover:text-white"
             >
-              <ArrowLeft size={16} /> Dashboard
-            </button>
+              <ArrowLeft size={16} />{t("land.mockNavDashboard")}</button>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowCreate((v) => !v)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-[#7b39fc] to-[#a67cff] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-[#7b39fc]/25 hover:brightness-110 transition-all"
             >
-              <Plus size={14} /> Nuovo Workspace
-            </button>
+              <Plus size={14} />{t("views.wsNew")}</button>
           </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
         <h1 className="landing-heading-lg mb-1">Team &amp; Workspaces</h1>
-        <p className="text-gray-400 text-sm font-medium mb-8">
-          Gestisci i workspace condivisi, i membri e i loro ruoli.
-        </p>
+        <p className="text-gray-400 text-sm font-medium mb-8">{t("views.wsDesc")}</p>
 
         {showCreate && (
           <div className="mb-8 p-5 rounded-3xl border border-[#7b39fc]/20 bg-white/5 dark:bg-white/5 backdrop-blur-xl flex flex-col sm:flex-row gap-3 items-center">
@@ -165,22 +163,18 @@ export default function WorkspacesPanel() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createWorkspace()}
-              placeholder="Nome del workspace..."
+              placeholder={t("views.wsNamePh")}
               className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
             />
             <div className="flex gap-2">
               <button
                 onClick={createWorkspace}
                 className="px-5 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/25 hover:brightness-110 transition-all"
-              >
-                Crea
-              </button>
+              >{t("views.wsCreate")}</button>
               <button
                 onClick={() => setShowCreate(false)}
-                className="px-4 py-2.5 rounded-xl bg-white/5 text-gray-400 text-xs font-black uppercase tracking-widest hover:text-white transition-all"
-              >
-                Annulla
-              </button>
+                className="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-500 text-xs font-black uppercase tracking-widest hover:text-gray-900 dark:bg-white/5 dark:text-gray-400 dark:hover:text-white transition-all"
+              >{t("views.habitCancel")}</button>
             </div>
           </div>
         )}
@@ -217,12 +211,8 @@ export default function WorkspacesPanel() {
         {!loading && !error && workspaces.length === 0 && (
           <div className="py-20 text-center rounded-[2rem] border-2 border-dashed border-white/10">
             <Building2 size={40} className="mx-auto mb-4 text-[#7b39fc]" />
-            <p className="text-sm font-black uppercase tracking-widest text-gray-400">
-              Nessun workspace
-            </p>
-            <p className="text-xs text-gray-500 mt-2 font-medium">
-              Crea il primo e invita i tuoi collaboratori.
-            </p>
+            <p className="text-sm font-black uppercase tracking-widest text-gray-400">{t("views.wsEmpty")}</p>
+            <p className="text-xs text-gray-500 mt-2 font-medium">{t("views.wsEmptyDesc")}</p>
           </div>
         )}
 
@@ -272,24 +262,21 @@ export default function WorkspacesPanel() {
                         onChange={(e) => setInviteRole(e.target.value)}
                         className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-300 focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
                       >
-                        <option value="member">Membro</option>
-                        <option value="admin">Admin</option>
-                        <option value="viewer">Visualizzatore</option>
+                        <option value="member">{t("views.wsMember")}</option>
+                        <option value="admin">{t("views.wsRoleAdmin")}</option>
+                        <option value="viewer">{t("views.wsRoleViewer")}</option>
                       </select>
                       <button
                         onClick={() => inviteMember(ws._id)}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-[#7b39fc]/25 hover:brightness-110 transition-all"
                       >
-                        <UserPlus size={14} /> Invita
-                      </button>
+                        <UserPlus size={14} />{t("views.wsInvite")}</button>
                     </div>
 
                     {/* Members list */}
                     <div className="space-y-2">
                       {members.length === 0 && (
-                        <p className="text-xs text-gray-500 italic">
-                          Nessun membro. Invita qualcuno per iniziare a collaborare.
-                        </p>
+                        <p className="text-xs text-gray-500 italic">{t("views.wsNoMembers")}</p>
                       )}
                       {members.map((m: any) => {
                         const isSelf =
@@ -319,8 +306,7 @@ export default function WorkspacesPanel() {
                             </div>
                             {m.role === "owner" ? (
                               <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                                <Shield size={12} /> Proprietario
-                              </span>
+                                <Shield size={12} />{t("views.wsOwner")}</span>
                             ) : (
                               <select
                                 value={memberRole[String(m.userId)] || m.role || "member"}

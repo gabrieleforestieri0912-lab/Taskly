@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import MeetingImportPanel from "../../components/meetings/MeetingImportPanel";
+import { useLanguage } from "../../lib/LanguageContext";
 
 declare global {
   interface Window {
@@ -23,6 +24,7 @@ declare global {
 
 export default function TranscriptionPage() {
   const router = useRouter();
+  const { t, tWith, language } = useLanguage();
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -110,7 +112,7 @@ export default function TranscriptionPage() {
       }, 1000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      alert("Microfono non accessibile. Verifica i permessi.");
+      alert(t("pg.trMicNoAccess"));
     }
   };
 
@@ -186,17 +188,15 @@ export default function TranscriptionPage() {
       id: `meet-${savedAt.getTime()}`,
       title:
         title.trim() ||
-        "Registrazione Vocale " + savedAt.toLocaleDateString("it-IT"),
+        t("pg.trDefaultTitlePrefix") + savedAt.toLocaleDateString(language === "en" ? "en-US" : "it-IT"),
       date: savedAt.toISOString(),
       duration: formatTime(recordingTime),
-      category: "Generale",
+      category: t("pg.catGeneral"),
       preview:
-        (text || "Trascrizione audio completata.").slice(0, 120) ||
-        "Trascrizione audio completata.",
-      text: text || "Nessun testo riconosciuto.",
-      summary:
-        summary ||
-        "• **Obiettivo**: Registrazione vocale salvata dall'utente.\n• **Prossimi passi**: Rivedere il testo trascritto.",
+        (text || t("pg.trDefaultPreview")).slice(0, 120) ||
+        t("pg.trDefaultPreview"),
+      text: text || t("pg.trNoText"),
+      summary: summary || t("pg.trDefaultSummary"),
       source: "manual",
     };
 
@@ -266,10 +266,10 @@ export default function TranscriptionPage() {
             className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
           >
             <ArrowLeft size={20} />
-            <span className="text-sm font-medium">Torna alla dashboard</span>
+            <span className="text-sm font-medium">{t("backToDashboard")}</span>
           </button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 ml-auto mr-0">
-            Nuova Trascrizione
+            {t("newTranscription")}
           </h1>
         </div>
 
@@ -285,7 +285,7 @@ export default function TranscriptionPage() {
                   : "text-gray-500"
               }`}
             >
-              Microfono
+              {t("pg.trMic")}
             </button>
             <button
               onClick={() => setSourceTab("import")}
@@ -295,7 +295,7 @@ export default function TranscriptionPage() {
                   : "text-gray-500"
               }`}
             >
-              Zoom / Meet / File
+              {t("pg.trSourceImport")}
             </button>
           </div>
 
@@ -320,19 +320,13 @@ export default function TranscriptionPage() {
               </div>
             )}
             {!isRecording && !audioURL && (
-              <span className="text-gray-400 text-base">
-                Premi il pulsante per iniziare la registrazione
-              </span>
+              <span className="text-gray-400 text-base">{t("pg.trPressToStart")}</span>
             )}
             {isPaused && (
-              <span className="text-yellow-500 text-base">
-                Registrazione in pausa
-              </span>
+              <span className="text-yellow-500 text-base">{t("pg.trPaused")}</span>
             )}
             {audioURL && (
-              <span className="text-green-500 text-base">
-                Registrazione completata
-              </span>
+              <span className="text-green-500 text-base">{t("pg.trCompleted")}</span>
             )}
           </div>
 
@@ -349,7 +343,7 @@ export default function TranscriptionPage() {
                 className="flex items-center gap-3 px-8 py-4 bg-cyan-600 hover:bg-cyan-700 text-white text-lg font-bold rounded-full shadow-lg transition-all"
               >
                 <Play size={24} />
-                Inizia registrazione
+                {t("pg.trStartRecording")}
               </button>
             )}
             {isRecording && !isPaused && (
@@ -359,7 +353,7 @@ export default function TranscriptionPage() {
                   className="flex items-center gap-3 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white text-base font-semibold rounded transition-all"
                 >
                   <Pause size={20} />
-                  Pausa
+                  {t("pg.trPause")}
                 </button>
                 <button
                   onClick={stopRecording}
@@ -377,7 +371,7 @@ export default function TranscriptionPage() {
                   className="flex items-center gap-3 px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white text-base font-semibold rounded transition-all"
                 >
                   <Play size={20} />
-                  Riprendi
+                  {t("pg.trResume")}
                 </button>
                 <button
                   onClick={stopRecording}
@@ -396,11 +390,11 @@ export default function TranscriptionPage() {
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Mic size={13} className="text-cyan-500" />
-                  Trascrizione in tempo reale
+                  {t("pg.trLiveTranscript")}
                 </p>
                 {!sttSupported && (
                   <span className="text-[10px] font-semibold text-amber-500">
-                    STT non disponibile: usa un browser Chrome/Edge
+                    {t("pg.trSttUnavailable")}
                   </span>
                 )}
               </div>
@@ -415,8 +409,8 @@ export default function TranscriptionPage() {
                 ) : (
                   <span className="text-gray-400">
                     {isRecording && isPaused
-                      ? "Registrazione in pausa"
-                      : "Stai parlando... il testo apparirà qui in tempo reale."}
+                      ? t("pg.trPaused")
+                      : t("pg.trSpeakingHint")}
                   </span>
                 )}
               </div>
@@ -436,7 +430,7 @@ export default function TranscriptionPage() {
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Titolo della riunione (opzionale)"
+                placeholder={t("pg.trTitlePlaceholder")}
                 className="w-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
               />
               {transcript.trim() && (
@@ -444,9 +438,7 @@ export default function TranscriptionPage() {
                   {summary ? (
                     <div>
                       <p className="text-xs font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <Sparkles size={13} />
-                        Riassunto AI
-                      </p>
+                        <Sparkles size={13} />{t("pg.trSummaryAi")}</p>
                       <div
                         className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
                         dangerouslySetInnerHTML={{
@@ -467,7 +459,7 @@ export default function TranscriptionPage() {
                       ) : (
                         <Sparkles size={15} />
                       )}
-                      {isSummarizing ? "Genero il riassunto..." : "Genera riassunto con AI"}
+                      {isSummarizing ? t("pg.trGeneratingSummary") : t("pg.trGenerateSummary")}
                     </button>
                   )}
                 </div>
@@ -486,7 +478,7 @@ export default function TranscriptionPage() {
                   }}
                   className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium"
                 >
-                  Registra di nuovo
+                  {t("pg.trRecordAgain")}
                 </button>
                 <button
                   onClick={handleSave}
@@ -498,7 +490,7 @@ export default function TranscriptionPage() {
                   ) : (
                     <Save size={16} />
                   )}
-                  {isSaving ? "Salvataggio..." : "Salva trascrizione"}
+                  {isSaving ? t("pg.trSaving") : t("pg.trSaveTranscript")}
                 </button>
               </div>
             </div>
@@ -507,9 +499,7 @@ export default function TranscriptionPage() {
           )}
         </div>
         <p className="mt-6 text-xs text-gray-400 text-center max-w-md">
-          Assicurati di aver concesso i permessi per il microfono. La
-          trascrizione avviene in tempo reale via riconoscimento vocale del
-          browser.
+          {t("pg.trMicNote")}
         </p>
       </div>
     </div>

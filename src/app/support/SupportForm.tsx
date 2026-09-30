@@ -1,7 +1,9 @@
 "use client";
+import { useLanguage } from "../../lib/LanguageContext";
 import React, { useState } from "react";
 
 export default function SupportForm() {
+  const { t } = useLanguage();
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -39,18 +41,12 @@ export default function SupportForm() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Messaggio inviato!
-        </h3>
-        <p className="text-gray-500 mb-6">
-          Grazie per averci contattato. Risponderemo entro 24 ore.
-        </p>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t("auth.supportSentTitle")}</h3>
+        <p className="text-gray-500 mb-6">{t("auth.supportSentBody")}</p>
         <button
           onClick={() => setStatus("idle")}
           className="text-sm font-semibold text-cyan-600 hover:text-cyan-700"
-        >
-          Invia un altro messaggio
-        </button>
+        >{t("auth.supportSendAnother")}</button>
       </div>
     );
   }
@@ -59,39 +55,39 @@ export default function SupportForm() {
     <form onSubmit={handleSend} className="space-y-4">
       <div>
         <label className="block">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Nome (opzionale)</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("auth.supportNameLabel")}</span>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
-            placeholder="Il tuo nome"
+            placeholder={t("auth.supportNamePlaceholder")}
           />
         </label>
       </div>
 
       <div>
         <label className="block">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Email (opzionale)</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("auth.supportEmailLabel")}</span>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
-            placeholder="tua@email.it"
+            placeholder={t("auth.supportEmailPlaceholder")}
           />
         </label>
       </div>
 
       <div>
         <label className="block">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Messaggio</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("auth.supportMessageLabel")}</span>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-sm bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100"
             rows={6}
-            placeholder="Descrivi il problema o il feedback..."
+            placeholder={t("auth.supportMessagePlaceholder")}
             required
           />
         </label>
@@ -113,16 +109,12 @@ export default function SupportForm() {
             <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Invio in corso...
-          </>
+            </svg>{t("auth.supportSending")}</>
         ) : (
           <>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-            Invia messaggio
-          </>
+            </svg>{t("auth.supportSend")}</>
         )}
       </button>
     </form>

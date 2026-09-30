@@ -229,7 +229,7 @@ function MeetingsContent() {
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition-colors"
-              aria-label="Toggle sidebar"
+              aria-label={t("misc.toggleSidebar")}
             >
               <Mic
                 size={18}
@@ -284,9 +284,7 @@ function MeetingsContent() {
                 <Mic size={22} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Totale Riunioni
-                </p>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("pg.meetingsTotal")}</p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {meetings.length}
                 </h3>
@@ -298,9 +296,7 @@ function MeetingsContent() {
                 <Clock size={22} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Minuti Registrati
-                </p>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("pg.meetingsMinutes")}</p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {Math.round(totalDurationMinutes * 10) / 10} m
                 </h3>
@@ -312,9 +308,7 @@ function MeetingsContent() {
                 <Sparkles size={22} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Riassunti Generati
-                </p>
+                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t("pg.meetingsSummaries")}</p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {meetings.filter((m) => m.summary).length}
                 </h3>
@@ -332,7 +326,7 @@ function MeetingsContent() {
               />
               <input
                 type="text"
-                placeholder="Cerca tra le trascrizioni..."
+                placeholder={t("pg.meetingsSearchPh")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-gray-850 border border-gray-100 dark:border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500"
@@ -443,9 +437,7 @@ function MeetingsContent() {
                                 rel="noreferrer"
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
-                              >
-                                Apri link
-                              </a>
+                              >{t("pg.meetingsOpenLink")}</a>
                             )}
                           </div>
                         </div>
@@ -456,7 +448,7 @@ function MeetingsContent() {
                         <button
                           onClick={(e) => handleDeleteMeeting(meet.id, e)}
                           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 md:opacity-100"
-                          title="Elimina"
+                          title={t("views.habitDelete")}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -477,9 +469,7 @@ function MeetingsContent() {
                           size={12}
                           className="text-cyan-500 shrink-0 mr-1"
                         />
-                        <span className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest animate-pulse mr-2">
-                          Riproduzione in corso
-                        </span>
+                        <span className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest animate-pulse mr-2">{t("pg.meetingsPlaying")}</span>
                         {Array.from({ length: 30 }).map((_, i) => (
                           <div
                             key={i}
@@ -508,9 +498,7 @@ function MeetingsContent() {
                             {/* Transcription text */}
                             <div className="space-y-3">
                               <h4 className="font-extrabold text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                                <FileText size={13} className="text-gray-400" />
-                                Trascrizione
-                              </h4>
+                                <FileText size={13} className="text-gray-400" />{t("pg.meetingsTranscript")}</h4>
                               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-4 h-60 overflow-y-auto leading-relaxed text-gray-600 dark:text-gray-300 custom-scrollbar text-xs">
                                 {meet.text}
                               </div>
@@ -519,9 +507,7 @@ function MeetingsContent() {
                             {/* AI Summary and key insights */}
                             <div className="space-y-3">
                               <h4 className="font-extrabold text-xs text-cyan-500 dark:text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                                <Sparkles size={13} />
-                                Riassunto ed Insight AI
-                              </h4>
+                                <Sparkles size={13} />{t("pg.meetingsSummaryInsights")}</h4>
                               <div className="bg-cyan-50/30 dark:bg-cyan-950/15 border border-cyan-100/50 dark:border-cyan-900/30 rounded-2xl p-4 h-60 overflow-y-auto custom-scrollbar text-xs leading-relaxed text-gray-700 dark:text-gray-300">
                                 {meet.summary ? (
                                   <>
@@ -552,9 +538,7 @@ function MeetingsContent() {
                                 ) : (
                                   <div className="h-full flex flex-col items-center justify-center text-center">
                                     <BrainCircuit className="text-cyan-300 dark:text-cyan-800 w-10 h-10 mb-2" />
-                                    <p className="font-bold text-gray-500">
-                                      Nessun riassunto disponibile
-                                    </p>
+                                    <p className="font-bold text-gray-500">{t("pg.meetingsNoSummary")}</p>
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();

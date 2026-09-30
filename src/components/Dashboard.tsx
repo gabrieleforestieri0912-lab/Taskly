@@ -176,9 +176,7 @@ export default function Dashboard({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
-                Dashboard
-              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">{t("land.mockNavDashboard")}</span>
             </div>
             <h2 className="font-inter font-extrabold text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-[-0.025em] text-gray-900 dark:text-white drop-shadow-[0_2px_20px_rgba(123,57,252,0.18)]">
               {t("dashboardTitle")}
@@ -202,18 +200,18 @@ export default function Dashboard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                Piano <span className="font-black uppercase tracking-widest text-[#7b39fc]">{plan.name}</span> · {pages.length} / {plan.maxPages} pagine
+                {t("pg.planLabel")} <span className="font-black uppercase tracking-widest text-[#7b39fc]">{plan.name}</span> · {pages.length} / {plan.maxPages} {t("pg.pagesWord")}
               </p>
               {pages.length >= plan.maxPages ? (
                 <Link
                   href="/#pricing"
                   className="shrink-0 px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
                 >
-                  Aggiorna piano
+                  {t("pg.upgradePlan")}
                 </Link>
               ) : (
                 <span className="shrink-0 text-[9px] font-black uppercase tracking-widest text-emerald-500">
-                  Prossimo: {plan.maxPages - pages.length}
+                  {t("pg.nextUp")} {plan.maxPages - pages.length}
                 </span>
               )}
             </div>

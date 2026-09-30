@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import HabitCard from "./HabitCard";
@@ -15,6 +16,7 @@ function monthLabel(month, year) {
 }
 
 export default function HabitTracker({ initialMonth, initialYear }) {
+  const { t } = useLanguage();
   const now = new Date();
   const [month, setMonth] = useState(
     typeof initialMonth === "number" ? initialMonth : now.getMonth(),
@@ -118,7 +120,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
               setYear(prev.getFullYear());
             }}
             className="p-2 rounded-lg hover:bg-gray-100"
-            title="Mese precedente"
+            title={t("views.habitPrevMonth")}
           >
             <ChevronLeft size={16} />
           </button>
@@ -132,7 +134,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
               setYear(next.getFullYear());
             }}
             className="p-2 rounded-lg hover:bg-gray-100"
-            title="Mese successivo"
+            title={t("views.habitNextMonth")}
           >
             <ChevronRight size={16} />
           </button>
@@ -165,15 +167,13 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                 <input
                   value={newHabitText}
                   onChange={(e) => setNewHabitText(e.target.value)}
-                  placeholder="Aggiungi nuova abitudine"
+                  placeholder={t("views.habitAddPh")}
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
                 />
                 <button
                   onClick={addHabit}
                   className="px-4 py-2 bg-cyan-600 text-white rounded-lg"
-                >
-                  Aggiungi
-                </button>
+                >{t("views.calAddShort")}</button>
               </div>
 
               <ul className="space-y-2 max-h-48 overflow-y-auto pr-2">
@@ -204,9 +204,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                       <button
                         onClick={() => removeHabit(i)}
                         className="text-red-500 px-2 py-1 rounded hover:bg-red-50"
-                      >
-                        Elimina
-                      </button>
+                      >{t("views.habitDelete")}</button>
                     </div>
                   </li>
                 ))}
@@ -216,15 +214,11 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                 <button
                   onClick={closeEditor}
                   className="px-4 py-2 rounded-lg border"
-                >
-                  Annulla
-                </button>
+                >{t("views.habitCancel")}</button>
                 <button
                   onClick={saveEditor}
                   className="px-4 py-2 bg-cyan-600 text-white rounded-lg"
-                >
-                  Salva
-                </button>
+                >{t("views.tiptapSave")}</button>
               </div>
             </div>
           </div>

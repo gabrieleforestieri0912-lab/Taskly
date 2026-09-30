@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
@@ -699,6 +700,7 @@ const ToolButton = ({ onClick, active = false, title, children }) => (
 );
 
 export default function TiptapEditor({ workspaceId, slug }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const [bracketItems, setBracketItems] = useState<any[]>([]);
   const [bracketVisible, setBracketVisible] = useState(false);
@@ -1030,9 +1032,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
 
   if (!editor) {
     return (
-      <div className="max-w-3xl mx-auto p-8 text-center text-gray-400 text-sm font-medium">
-        Caricamento editor…
-      </div>
+      <div className="max-w-3xl mx-auto p-8 text-center text-gray-400 text-sm font-medium">{t("views.tiptapLoading")}</div>
     );
   }
 
@@ -1047,42 +1047,42 @@ export default function TiptapEditor({ workspaceId, slug }) {
     <div className="tl-editor-shell">
       {/* ── Toolbar ─────────────────────────────────────────────── */}
       <div className="tl-toolbar">
-        <ToolButton title="Titolo 1" active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
+        <ToolButton title={t("views.blockH1")} active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
           <Heading1 size={16} />
         </ToolButton>
-        <ToolButton title="Titolo 2" active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <ToolButton title={t("views.blockH2")} active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
           <Heading2 size={16} />
         </ToolButton>
-        <ToolButton title="Titolo 3" active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <ToolButton title={t("views.blockH3")} active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
           <Heading3 size={16} />
         </ToolButton>
         <span className="tl-toolbar-sep" />
-        <ToolButton title="Elenco puntato" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <ToolButton title={t("views.tiptapSlashBullet")} active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
           <List size={16} />
         </ToolButton>
-        <ToolButton title="Elenco numerato" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ToolButton title={t("views.tiptapSlashOrdered")} active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           <ListOrdered size={16} />
         </ToolButton>
-        <ToolButton title="Citazione" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <ToolButton title={t("views.tiptapSlashQuote")} active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
           <Quote size={16} />
         </ToolButton>
-        <ToolButton title="Codice" active={editor.isActive("codeBlock")} onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
+        <ToolButton title={t("views.blockCode")} active={editor.isActive("codeBlock")} onClick={() => editor.chain().focus().toggleCodeBlock().run()}>
           <Code2 size={16} />
         </ToolButton>
-        <ToolButton title="Divisore" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <ToolButton title={t("views.blockDivider")} onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           <Minus size={16} />
         </ToolButton>
         <span className="tl-toolbar-sep" />
-        <ToolButton title="Toggle" active={editor.isActive("toggle")} onClick={() => (editor.chain().focus() as any).setToggle().run()}>
+        <ToolButton title={t("views.tiptapSlashToggle")} active={editor.isActive("toggle")} onClick={() => (editor.chain().focus() as any).setToggle().run()}>
           <ChevronDown size={16} />
         </ToolButton>
-        <ToolButton title="Spoiler (testo nascosto)" active={editor.isActive("inlineToggle")} onClick={() => (editor.chain().focus() as any).setInlineToggle().run()}>
+        <ToolButton title={t("views.tiptapTitleSpoiler")} active={editor.isActive("inlineToggle")} onClick={() => (editor.chain().focus() as any).setInlineToggle().run()}>
           <Eye size={16} />
         </ToolButton>
-        <ToolButton title="Callout" active={editor.isActive("callout")} onClick={() => (editor.chain().focus() as any).setCallout().run()}>
+        <ToolButton title={t("views.tiptapSlashCallout")} active={editor.isActive("callout")} onClick={() => (editor.chain().focus() as any).setCallout().run()}>
           <Lightbulb size={16} />
         </ToolButton>
-        <ToolButton title="To-do list" active={editor.isActive("taskList")} onClick={() => editor.chain().focus().toggleTaskList().run()}>
+        <ToolButton title={t("views.tiptapSlashTodo")} active={editor.isActive("taskList")} onClick={() => editor.chain().focus().toggleTaskList().run()}>
           <ListChecks size={16} />
         </ToolButton>
         <span className="tl-toolbar-sep" />
@@ -1091,7 +1091,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
           className="tl-save-btn"
           onClick={save}
           disabled={saveState === "saving"}
-          title="Salva (Ctrl/Cmd+S)"
+          title={t("views.tiptapSaveShortcut")}
         >
           <Save size={14} />
           <span>{saveLabel}</span>
@@ -1128,13 +1128,13 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 className="tl-link-input"
                 autoFocus
               />
-              <button type="button" onClick={applyLink} title="Applica link">
+              <button type="button" onClick={applyLink} title={t("views.tiptapApplyLink")}>
                 <Check size={15} />
               </button>
-              <button type="button" onClick={removeLink} title="Rimuovi link">
+              <button type="button" onClick={removeLink} title={t("views.tiptapRemoveLink")}>
                 <Unlink size={15} />
               </button>
-              <button type="button" onClick={() => setLinkMode(false)} title="Chiudi">
+              <button type="button" onClick={() => setLinkMode(false)} title={t("views.tiptapClose")}>
                 <X size={15} />
               </button>
             </div>
@@ -1144,7 +1144,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 type="button"
                 className={editor.isActive("bold") ? "is-active" : ""}
                 onClick={() => editor.chain().focus().toggleBold().run()}
-                title="Grassetto"
+                title={t("views.tiptapBold")}
               >
                 <Bold size={15} />
               </button>
@@ -1152,7 +1152,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 type="button"
                 className={editor.isActive("italic") ? "is-active" : ""}
                 onClick={() => editor.chain().focus().toggleItalic().run()}
-                title="Corsivo"
+                title={t("views.tiptapItalic")}
               >
                 <Italic size={15} />
               </button>
@@ -1160,7 +1160,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 type="button"
                 className={editor.isActive("strike") ? "is-active" : ""}
                 onClick={() => editor.chain().focus().toggleStrike().run()}
-                title="Barrato"
+                title={t("views.tiptapStrike")}
               >
                 <Strikethrough size={15} />
               </button>
@@ -1169,7 +1169,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 type="button"
                 className={editor.isActive("link") ? "is-active" : ""}
                 onClick={openLinkEditor}
-                title="Link"
+                title={t("views.tiptapLink")}
               >
                 <LinkIcon size={15} />
               </button>
@@ -1192,7 +1192,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
           style={{ position: "absolute", left: bracketPos.left, top: bracketPos.top, zIndex: 3000 }}
         >
           {bracketItems.length === 0 ? (
-            <div className="tl-suggestion-empty">Nessun risultato</div>
+            <div className="tl-suggestion-empty">{t("views.tiptapNoResult")}</div>
           ) : (
             bracketItems.map((it, idx) => (
               <button

@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../../lib/LanguageContext";
 import { Container } from "./Container";
 import { Section } from "./Section";
 import { Reveal, Stagger, StaggerItem } from "./Reveal";
@@ -14,6 +17,7 @@ const integrationIcons: Record<string, typeof HardDrive> = {
 };
 
 export function Integrations() {
+  const { t } = useLanguage();
   const { title, description, items } = landingContent.integrations;
   return (
     <Section>
@@ -35,7 +39,7 @@ export function Integrations() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <span className="text-sm font-medium text-gray-900 dark:text-white text-center">{name}</span>
-                <span className="text-xs text-muted-foreground">Integrazione</span>
+                <span className="text-xs text-muted-foreground">{t("misc.integration")}</span>
               </StaggerItem>
             );
           })}

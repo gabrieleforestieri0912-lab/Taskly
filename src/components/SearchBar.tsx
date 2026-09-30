@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { buildIndex, searchIndex } from "../lib/searchIndex";
 import SearchResults from "./SearchResults";
@@ -6,6 +7,7 @@ import { Search, Command, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SearchBar({ pages = [] as any[] }) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isFocused, setIsFocused] = useState(false);
@@ -60,8 +62,8 @@ export default function SearchBar({ pages = [] as any[] }) {
         
         <input
           ref={inputRef}
-          aria-label="Cerca nel workspace"
-          placeholder="Cerca pagine, note, task... (⌘K)"
+          aria-label={t("views.searchAria")}
+          placeholder={t("views.searchPh")}
           value={query}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}

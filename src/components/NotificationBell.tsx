@@ -13,8 +13,10 @@ import {
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiFetch } from "../lib/api";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function NotificationBell({ pollInterval = 10000 }) {
+  const { t, language } = useLanguage();
   const [items, setItems] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -106,17 +108,17 @@ export default function NotificationBell({ pollInterval = 10000 }) {
             <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">
-                  Notifiche
+                  {t("views.notifTitle")}
                 </h3>
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
-                  Hai {unreadCount} nuovi messaggi
+                  {t("views.notifNew").replace("{n}", String(unreadCount))}
                 </p>
               </div>
               {items.length > 0 && (
                 <button
                   onClick={clearAll}
                   className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-xl transition-all"
-                  title="Segna tutto come letto"
+                  title={t("views.notifMarkAll")}
                 >
                   <Check size={16} />
                 </button>
@@ -130,10 +132,10 @@ export default function NotificationBell({ pollInterval = 10000 }) {
                     <BellOff size={24} className="text-gray-300" />
                   </div>
                   <p className="text-sm font-bold text-gray-700 dark:text-gray-200">
-                    Tutto tranquillo
+                    {t("views.notifEmpty")}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    Non hai ancora nessuna notifica.
+                    {t("views.notifEmptyDesc")}
                   </p>
                 </div>
               ) : (
@@ -195,9 +197,7 @@ export default function NotificationBell({ pollInterval = 10000 }) {
                 }}
                 className="w-full py-3 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl text-xs font-black uppercase tracking-widest text-gray-600 dark:text-gray-300 hover:text-cyan-600 hover:border-cyan-200 transition-all shadow-sm flex items-center justify-center gap-2"
               >
-                <Sparkles size={14} />
-                Centro Attività
-              </button>
+                <Sparkles size={14} />{t("views.notifCenter")}</button>
             </div>
           </motion.div>
         )}

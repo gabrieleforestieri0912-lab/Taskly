@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 import { TimerReset, Wrench, LayoutTemplate } from "lucide-react";
@@ -21,20 +24,17 @@ const steps = [
 ];
 
 export default function GettingStarted() {
+  const { t } = useLanguage();
   return (
     <section className="px-6 py-20 bg-white dark:bg-[#151020]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="landing-eyebrow">
-            Getting started
-          </div>
+          <div className="landing-eyebrow">{t("land.gsEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
             Parti subito{" "}
-            <span className="landing-display-accent">senza attrito</span>
+            <span className="landing-display-accent">{t("land.gsTitleAccent")}</span>
           </h2>
-          <p className="landing-body mt-3">
-            Meno tempo a capire lo strumento, più tempo a portare risultati.
-          </p>
+          <p className="landing-body mt-3">{t("land.gsSubtitle")}</p>
         </div>
 
         <div className="mt-10 grid md:grid-cols-3 gap-5">
@@ -50,9 +50,7 @@ export default function GettingStarted() {
         </div>
 
         <div className="mt-10 text-center">
-          <Link href="/register" className="landing-btn-primary">
-            Crea account e prova i template
-          </Link>
+          <Link href="/register" className="landing-btn-primary">{t("land.gsCta")}</Link>
         </div>
       </div>
     </section>

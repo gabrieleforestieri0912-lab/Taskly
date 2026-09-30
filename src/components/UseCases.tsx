@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 import { GraduationCap, BriefcaseBusiness, Users } from "lucide-react";
@@ -38,16 +41,15 @@ const cardVariants = {
 };
 
 export default function UseCases() {
+  const { t } = useLanguage();
   return (
     <section className="px-6 py-20 bg-[#f6f7f9] dark:bg-[#1a1528]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="landing-eyebrow">
-            Use cases
-          </div>
+          <div className="landing-eyebrow">{t("land.ucEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
             Trova il modo giusto{" "}
-            <span className="landing-display-accent">per il tuo lavoro</span>
+            <span className="landing-display-accent">{t("land.ucTitleAccent")}</span>
           </h2>
         </div>
 
@@ -81,9 +83,7 @@ export default function UseCases() {
         </motion.div>
 
         <div className="mt-10 text-center">
-          <Link href="/register" className="landing-btn-primary">
-            Crea workspace in 2 minuti
-          </Link>
+          <Link href="/register" className="landing-btn-primary">{t("land.ucCta")}</Link>
         </div>
       </div>
     </section>

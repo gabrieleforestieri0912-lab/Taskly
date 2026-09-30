@@ -29,10 +29,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
 function SiteLogo({ size = 28 }: { size?: number }) {
+  const { t, tWith } = useLanguage();
   return (
     <Image
       src="/taskly.png"
-      alt="Taskly"
+      alt={t("land.cmpHeaderTaskly")}
       width={size}
       height={size}
       className="shrink-0 rounded-lg object-cover"
@@ -49,7 +50,6 @@ export default function Navbar({
   const router = useRouter();
   const pathname = usePathname() || "";
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -188,14 +188,6 @@ export default function Navbar({
   ];
 
   useEffect(() => {
-    // Reveal the navbar only once the user scrolls past the hero
-    // (hero is min-h-[115vh]), so it slides in instead of being
-    // stuck at the very top.
-    const handleScroll = () =>
-      setIsScrolled(window.scrollY > window.innerHeight * 0.85);
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-
     try {
       const savedUser = localStorage.getItem("user");
       if (savedUser) setTimeout(() => setUser(JSON.parse(savedUser)), 0);
@@ -211,7 +203,6 @@ export default function Navbar({
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [pathname]);
@@ -246,30 +237,19 @@ export default function Navbar({
 
   /* ── Landing floating navbar ─────────────────────────────────── */
   if (isLanding && !isDashboard) {
+    // Barra fissa a tutta larghezza: niente effetto "floating" ne' animazione
+    // allo scroll, la superficie e' sempre la stessa.
     const barSurface =
-      isScrolled
-        ? "bg-black/70 shadow-[0_18px_50px_rgba(0,0,0,0.45)] border-white/15"
-        : "bg-black/35 border-white/10";
+      "h-16 border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#120d20]/90";
 
     const menuItem =
-      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-white/80 transition-colors duration-200 hover:bg-white/10 hover:text-white";
+      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-[#7b39fc]/10 hover:text-gray-900 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white";
 
     return (
       <>
-        <header
-          className={`fixed inset-x-0 top-0 z-50 px-4 transition-all duration-500 sm:px-6 ${
-            isScrolled ? "pt-2.5" : "pt-6 sm:pt-8"
-          }`}
-        >
-          <motion.nav
-            initial={{ y: -24, opacity: 0 }}
-            animate={{ y: isScrolled ? 10 : 0, opacity: 1 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className={`mx-auto flex items-center justify-between rounded-2xl border px-3 backdrop-blur-2xl transition-all duration-500 sm:px-5 ${
-              isScrolled
-                ? "h-14 max-w-5xl"
-                : "h-16 max-w-6xl sm:h-20"
-            } ${barSurface}`}
+        <header className="sticky top-0 z-50">
+          <nav
+            className={`mx-auto flex w-full items-center justify-between px-4 sm:px-6 ${barSurface}`}
           >
             {/* Logo */}
             <Link
@@ -277,9 +257,7 @@ export default function Navbar({
               className="flex shrink-0 items-center gap-2.5 rounded-full px-2 transition-opacity hover:opacity-85"
             >
               <SiteLogo />
-              <span className="font-inter text-lg font-semibold text-white">
-                Taskly
-              </span>
+              <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
             </Link>
 
             {/* Desktop nav links */}
@@ -326,7 +304,7 @@ export default function Navbar({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-white/12 bg-[#120d20]/95 p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/12 dark:bg-[#120d20]/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
                       >
                         {link.children.map((child) => {
                           const Icon = child.icon;
@@ -341,10 +319,10 @@ export default function Navbar({
                                 <Icon size={17} />
                               </span>
                               <span className="min-w-0">
-                                <span className="block text-sm font-semibold text-white">
+                                <span className="block text-sm font-semibold text-gray-900 dark:text-white">
                                   {child.name}
                                 </span>
-                                <span className="mt-0.5 block text-xs leading-snug text-white/55">
+                                <span className="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-white/55">
                                   {child.desc}
                                 </span>
                               </span>
@@ -360,9 +338,7 @@ export default function Navbar({
               <Link
                 href="/docs"
                 className={menuItem}
-              >
-                Documentazione
-              </Link>
+              >{t("auth.docsTitle")}</Link>
             </div>
 
             {/* Desktop actions */}
@@ -382,7 +358,7 @@ export default function Navbar({
                       type="button"
                       onClick={() => setDropdownOpen((open) => !open)}
                       className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#7b39fc] text-white shadow-sm ring-2 ring-white/20 transition-colors hover:bg-[#8b4dff]"
-                      aria-label="Account"
+                      aria-label={t("land.navAccountLabel")}
                     >
                       {user.picture ? (
                         <img
@@ -403,13 +379,13 @@ export default function Navbar({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.97 }}
                           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-white/12 bg-[#120d20]/95 p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/12 dark:bg-[#120d20]/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
                         >
-                          <div className="border-b border-white/10 p-4">
-                            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-white/50">
+                          <div className="border-b border-gray-200/70 p-4 dark:border-white/10">
+                            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:text-white/50">
                               {t("account")}
                             </div>
-                            <div className="mt-1.5 truncate text-sm font-bold text-white">
+                            <div className="mt-1.5 truncate text-sm font-bold text-gray-900 dark:text-white">
                               {user.email}
                             </div>
                           </div>
@@ -417,7 +393,7 @@ export default function Navbar({
                             <button
                               type="button"
                               onClick={handleLogout}
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-white/10"
+                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
                             >
                               <LogOut size={17} />
                               {t("logout")}
@@ -432,7 +408,7 @@ export default function Navbar({
                 <>
                   <Link
                     href="/login"
-                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white backdrop-blur-md transition-all duration-300 hover:border-[#7b39fc]/60 hover:bg-[#7b39fc]/15"
+                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-[#7b39fc]/25 bg-[#7b39fc]/5 px-5 text-sm font-semibold text-gray-800 dark:border-white/20 dark:bg-white/5 dark:text-white backdrop-blur-md transition-all duration-300 hover:border-[#7b39fc]/60 hover:bg-[#7b39fc]/15"
                   >
                     {t("login")}
                   </Link>
@@ -450,12 +426,12 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 lg:hidden"
-              aria-label="Menu"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition-colors hover:bg-[#7b39fc]/10 lg:hidden dark:text-white dark:hover:bg-white/10"
+              aria-label={t("land.demoMenu")}
             >
               <Menu size={22} />
             </button>
-          </motion.nav>
+          </nav>
         </header>
 
         {/* Full-screen mobile menu */}
@@ -475,15 +451,13 @@ export default function Navbar({
                   className="flex items-center gap-2.5"
                 >
                   <SiteLogo />
-                  <span className="font-inter text-lg font-semibold text-white">
-                    Taskly
-                  </span>
+                  <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-10 w-10 items-center justify-center text-white"
-                  aria-label="Chiudi menu"
+                  aria-label={t("land.navCloseMenu")}
                 >
                   <X size={24} />
                 </button>
@@ -554,9 +528,7 @@ export default function Navbar({
                   href="/docs"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
-                >
-                  Documentazione
-                </Link>
+                >{t("auth.docsTitle")}</Link>
               </nav>
 
               {!user && (
@@ -610,24 +582,22 @@ export default function Navbar({
 
   /* ── Dashboard / scrolled landing navbar (legacy) ────────────── */
   const surfaceClass =
-    isScrolled || isDashboard
-      ? "bg-white/90 shadow-[0_12px_44px_rgba(15,23,42,0.10)] backdrop-blur-xl border-[#dfdbea] dark:bg-[#0f1212]/90 dark:shadow-[0_12px_44px_rgba(0,0,0,0.30)] dark:border-white/[0.07]"
-      : "border-[#d6d4de]/60 bg-white/55 backdrop-blur-md dark:border-white/[0.06] dark:bg-black/18";
+    "border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#120d20]/90";
 
   const iconBtn =
     "inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-3 py-3 sm:px-5 pointer-events-none">
+    <header className="sticky top-0 z-50">
       <nav
-        className={`mx-auto flex h-16 max-w-7xl items-center justify-between rounded-xl border px-5 transition-all duration-300 pointer-events-auto sm:px-6 ${surfaceClass}`}
+        className={`flex h-16 w-full items-center justify-between px-4 sm:px-6 ${surfaceClass}`}
       >
         <div className="flex min-w-0 items-center gap-3">
           {isDashboard && !isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
-              aria-label="Apri menu laterale"
+              aria-label={t("land.navOpenSidebar")}
             >
               <PanelLeftOpen size={18} />
             </button>
@@ -636,7 +606,7 @@ export default function Navbar({
             <button
               onClick={() => setIsSidebarOpen(false)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
-              aria-label="Chiudi menu laterale"
+              aria-label={t("land.navCloseSidebar")}
             >
               <PanelLeftClose size={18} />
             </button>
@@ -718,9 +688,7 @@ export default function Navbar({
           ) : (
             <Link href="/" className="group flex min-w-0 items-center gap-3">
               <SiteLogo />
-              <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">
-                Taskly
-              </span>
+              <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
             </Link>
           )}
         </div>
@@ -820,7 +788,7 @@ export default function Navbar({
             <button
               onClick={() => setMobileMenuOpen((open) => !open)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 md:hidden"
-              aria-label="Menu"
+              aria-label={t("land.demoMenu")}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -853,9 +821,7 @@ export default function Navbar({
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-11 items-center justify-center rounded-lg border border-[#d4d4d4] text-sm font-semibold text-[#171717]"
-                >
-                  Accedi
-                </Link>
+                >{t("auth.signIn")}</Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}

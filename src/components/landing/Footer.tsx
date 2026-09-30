@@ -1,8 +1,12 @@
+"use client";
+
+import { useLanguage } from "../../lib/LanguageContext";
 import Link from "next/link";
 import { Container } from "./Container";
 import { landingContent } from "@/content/landing";
 
 export function Footer() {
+  const { t } = useLanguage();
   const { product, resources, company, legal, copyright } = landingContent.footer;
 
   const columns = [
@@ -35,7 +39,7 @@ export function Footer() {
           ))}
         </div>
         <div className="mt-12 pt-8 border-t border-black/5 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-sm font-bold">Taskly</span>
+          <span className="text-sm font-bold">{t("land.cmpHeaderTaskly")}</span>
           <span className="text-sm text-gray-500 dark:text-gray-400">{copyright}</span>
         </div>
       </Container>

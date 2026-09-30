@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../../lib/LanguageContext";
 import { useState, useRef, KeyboardEvent } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Container } from "./Container";
@@ -8,6 +9,7 @@ import { BoardMockup } from "./BoardMockup";
 import { landingContent } from "@/content/landing";
 
 function ListMockup() {
+  const { t } = useLanguage();
   const tasks = [
     { title: "Brief cliente Q4", status: "In corso", assignee: "MR", due: "Oggi" },
     { title: "Wireframe homepage", status: "Da fare", assignee: "AL", due: "Domani" },
@@ -72,6 +74,7 @@ function CalendarMockup() {
 }
 
 function TimelineMockup() {
+  const { t, tWith } = useLanguage();
   return (
     <div className="rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-[#1a1528] overflow-hidden">
       <div className="flex items-center justify-between border-b px-4 py-3 bg-[#f6f7f9] dark:bg-white/[0.04]">
@@ -94,7 +97,7 @@ function TimelineMockup() {
         <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t mt-4">
           <span>Gen</span>
           <span>Feb</span>
-          <span>Mar</span>
+          <span>{t("land.mockDayTue")}</span>
         </div>
       </div>
     </div>
@@ -102,6 +105,7 @@ function TimelineMockup() {
 }
 
 export function ViewsTabs() {
+  const { t } = useLanguage();
   const [active, setActive] = useState("board");
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const shouldReduceMotion = useReducedMotion();
@@ -155,7 +159,7 @@ export function ViewsTabs() {
 
         <div
           role="tablist"
-          aria-label="Viste di Taskly"
+          aria-label={t("misc.tasklyViews")}
           onKeyDown={onKeyDown}
           className="mx-auto mt-8 flex w-fit rounded-xl bg-white p-1 shadow-sm border dark:bg-white/5 dark:border-white/10"
         >

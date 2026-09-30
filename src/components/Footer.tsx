@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -55,12 +56,13 @@ const SOCIALS = [
 ];
 
 export default function Footer() {
+  const { t } = useLanguage();
   return (
     <footer
       id="contact"
       className="relative bg-[#f6f7f9] dark:bg-black text-gray-900 dark:text-gray-100 mt-auto overflow-hidden transition-colors duration-300 border-t border-[#7b39fc]/10 dark:border-white/5"
       role="contentinfo"
-      aria-label="Footer"
+      aria-label={t("land.footerAria")}
     >
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
@@ -74,14 +76,12 @@ export default function Footer() {
             <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/taskly.png"
-                alt="Taskly"
+                alt={t("land.cmpHeaderTaskly")}
                 width={32}
                 height={32}
                 className="h-8 w-8 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110"
               />
-              <span className="text-2xl font-extrabold tracking-tight text-gradient-brand">
-                Taskly
-              </span>
+              <span className="text-2xl font-extrabold tracking-tight text-gradient-brand">{t("land.cmpHeaderTaskly")}</span>
             </Link>
 
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
@@ -100,7 +100,7 @@ export default function Footer() {
               </a>
             </div>
 
-            <div className="mt-6 flex items-center gap-2" aria-label="Social links">
+            <div className="mt-6 flex items-center gap-2" aria-label={t("land.footerSocialAria")}>
               {SOCIALS.map((s) => {
                 const Icon = s.icon;
                 return (
@@ -159,30 +159,22 @@ export default function Footer() {
             <Link
               href="/privacy"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
-            >
-              Privacy
-            </Link>
+            >{t("land.footerLinkPrivacy")}</Link>
             <Link
               href="/terms"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
-            >
-              Termini
-            </Link>
+            >{t("land.footerLinkTerms")}</Link>
             <Link
               href="/docs"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
-            >
-              Documentazione
-            </Link>
+            >{t("auth.docsTitle")}</Link>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            Tutti i sistemi operativi
-          </div>
+            </span>{t("land.footerStatus")}</div>
         </div>
       </div>
     </footer>

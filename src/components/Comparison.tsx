@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 
@@ -15,6 +18,7 @@ const rows = [
 ];
 
 export default function Comparison() {
+  const { t } = useLanguage();
   return (
     <section className="landing-section px-4 py-20 bg-white dark:bg-[#151020] sm:px-6">
       <div className="max-w-5xl mx-auto">
@@ -24,15 +28,14 @@ export default function Comparison() {
           </div>
           <h2 className="landing-heading-lg mt-3">
             Pi&ugrave; semplice di Notion,{" "}
-            <span className="landing-display-accent">pi&ugrave; flessibile di Trello</span>, meno caotico di ClickUp
-          </h2>
+            <span className="landing-display-accent">pi&ugrave; flessibile di Trello</span>{t("land.cmpTitleSuffix")}</h2>
         </div>
 
         <div className="mt-9 overflow-hidden rounded-2xl border border-[#7b39fc]/10 dark:border-[#a484d7]/20">
           <div className="grid grid-cols-[1.1fr_0.95fr_0.95fr] bg-[#f6f7f9] dark:bg-[#2b2344]/40 text-[10px] font-black uppercase tracking-[0.08em] text-gray-500 dark:text-gray-300 sm:text-xs sm:tracking-[0.12em]">
-            <div className="p-4">Criterio</div>
-            <div className="p-4 text-[#7b39fc] dark:text-[#a67cff]">Taskly</div>
-            <div className="p-4">Altre suite</div>
+            <div className="p-4">{t("land.cmpHeaderCriterion")}</div>
+            <div className="p-4 text-[#7b39fc] dark:text-[#a67cff]">{t("land.cmpHeaderTaskly")}</div>
+            <div className="p-4">{t("land.cmpHeaderOthers")}</div>
           </div>
           {rows.map((row) => (
             <div key={row.label} className="grid grid-cols-[1.1fr_0.95fr_0.95fr] border-t border-[#7b39fc]/10 dark:border-[#a484d7]/15 text-xs sm:text-sm">

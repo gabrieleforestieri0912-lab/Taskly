@@ -1,9 +1,11 @@
 "use client";
 
+import { useLanguage } from "../../lib/LanguageContext";
 import { Calendar, CheckSquare, Clock, User } from "lucide-react";
 import { landingContent } from "@/content/landing";
 
 export function BoardMockup() {
+  const { t } = useLanguage();
   const { workspace, columns, cards } = landingContent.hero.mockup;
 
   // Dati fittizi plausibili per colonne
@@ -59,21 +61,21 @@ export function BoardMockup() {
         <aside className="hidden w-56 shrink-0 border-r border-black/5 bg-[#f6f7f9]/60 p-4 dark:border-white/10 dark:bg-white/[0.02] md:block">
           <div className="space-y-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Workspace</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t("land.mockWorkspace")}</p>
               <ul className="mt-2 space-y-1 text-sm">
                 <li className="flex items-center gap-2 rounded-lg bg-white px-2 py-1.5 font-medium shadow-sm dark:bg-white/10">
                   <span className="h-6 w-6 rounded bg-[#7b39fc] grid place-items-center text-xs text-white">T</span> Marketing Q4
                 </li>
-                <li className="px-2 py-1.5 text-muted-foreground">Prodotto</li>
-                <li className="px-2 py-1.5 text-muted-foreground">Design System</li>
+                <li className="px-2 py-1.5 text-muted-foreground">{t("land.mockTagProduct")}</li>
+                <li className="px-2 py-1.5 text-muted-foreground">{t("misc.boardDesignSystem")}</li>
               </ul>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Viste</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t("misc.landingViews")}</p>
               <ul className="mt-2 space-y-1 text-sm">
                 <li className="px-2 py-1 text-[#7b39fc] font-medium">▦ Board</li>
                 <li className="px-2 py-1 text-muted-foreground">≡ Lista</li>
-                <li className="px-2 py-1 text-muted-foreground flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> Calendario</li>
+                <li className="px-2 py-1 text-muted-foreground flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{t("land.showcaseTabCalendar")}</li>
               </ul>
             </div>
           </div>

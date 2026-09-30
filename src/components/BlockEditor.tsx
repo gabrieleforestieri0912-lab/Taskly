@@ -1,8 +1,10 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useState } from 'react';
 import { apiFetch } from '../lib/api';
 
 export default function BlockEditor({ workspaceId, slug }){
+  const { t } = useLanguage();
   const [doc, setDoc] = useState<any>(null);
   const [blocks, setBlocks] = useState<any[]>([]);
   const [title, setTitle] = useState('');
@@ -66,10 +68,10 @@ export default function BlockEditor({ workspaceId, slug }){
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
         <input value={title} onChange={e=>setTitle(e.target.value)} style={{fontSize:20,padding:8}} />
         <div>
-          <button onClick={()=>addBlock('paragraph')}>+Paragraph</button>{' '}
-          <button onClick={()=>addBlock('heading')}>+Heading</button>{' '}
-          <button onClick={save}>Save</button>{' '}
-          <button onClick={loadVersions}>Versions</button>
+          <button onClick={()=>addBlock('paragraph')}>{t("views.blockAddParagraph")}</button>{' '}
+          <button onClick={()=>addBlock('heading')}>{t("views.blockAddHeading")}</button>{' '}
+          <button onClick={save}>{t("views.blockSave")}</button>{' '}
+          <button onClick={loadVersions}>{t("views.blockVersions")}</button>
         </div>
       </div>
 
@@ -78,11 +80,11 @@ export default function BlockEditor({ workspaceId, slug }){
           <div key={i} style={{border:'1px solid #eee',padding:8,marginTop:8}}>
             <div style={{display:'flex',justifyContent:'space-between'}}>
               <select value={b.type} onChange={e=>{ const copy=[...blocks]; copy[i].type=e.target.value; setBlocks(copy); }}>
-                <option value="paragraph">Paragraph</option>
-                <option value="heading">Heading</option>
-                <option value="todo">Todo</option>
+                <option value="paragraph">{t("views.blockParagraph")}</option>
+                <option value="heading">{t("views.blockHeading")}</option>
+                <option value="todo">{t("views.blockTodo")}</option>
               </select>
-              <button onClick={()=>removeBlock(i)}>Delete</button>
+              <button onClick={()=>removeBlock(i)}>{t("views.blockDelete")}</button>
             </div>
             <div contentEditable suppressContentEditableWarning onInput={(e)=>updateBlock(i, e.currentTarget.textContent)} style={{minHeight:30}}>
               {b.text}
@@ -92,17 +94,17 @@ export default function BlockEditor({ workspaceId, slug }){
       </div>
 
       <div style={{marginTop:12}}>
-        <strong>Backlinks:</strong>
+        <strong>{t("views.blockBacklinks")}</strong>
         <div>{extractBacklinks().map((l,idx)=>(<div key={idx}>{l}</div>))}</div>
       </div>
 
       <div style={{marginTop:12}}>
-        <strong>Status:</strong> {status}
+        <strong>{t("views.blockStatus")}</strong> {status}
       </div>
 
       {versions.length>0 && (
         <div style={{marginTop:12}}>
-          <h4>Versions</h4>
+          <h4>{t("views.blockVersions")}</h4>
           <ul>
             {versions.map(v=> (<li key={v._id}>v{v.version} — {new Date(v.createdAt).toLocaleString()}</li>))}
           </ul>

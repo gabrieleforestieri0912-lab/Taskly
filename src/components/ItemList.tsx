@@ -1,6 +1,9 @@
+"use client";
+
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
@@ -42,6 +45,7 @@ import { nextDeadline } from "../lib/recurrence";
 // --- Sotto-Componenti per le Viste ---
 
 const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
+  const { t, tWith } = useLanguage();
   const [dragCol, setDragCol] = useState(statuses[0].id);
   const [overCol, setOverCol] = useState(null);
   const [draft, setDraft] = useState({});
@@ -187,7 +191,7 @@ const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
                       setDraft((d) => ({ ...d, [status.id]: "" }));
                     }
                   }}
-                  placeholder="Aggiungi task..."
+                  placeholder={t("views.tasksAddTask")}
                   className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl px-3 py-2 text-xs font-bold focus:ring-cyan-500 outline-none"
                 />
                 <button
@@ -210,6 +214,7 @@ const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
 };
 
 const TimelineView = ({ items }) => {
+  const { t, tWith } = useLanguage();
   return (
     <div className="bg-white dark:bg-gray-800/40 rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 shadow-2xl shadow-cyan-500/5">
       <div className="flex flex-col gap-6">
@@ -236,9 +241,7 @@ const TimelineView = ({ items }) => {
             </div>
           ))}
         {items.filter((i) => i.deadline).length === 0 && (
-          <div className="text-center py-12 text-gray-400 font-bold uppercase tracking-widest text-xs">
-            Nessuna scadenza impostata per la timeline
-          </div>
+          <div className="text-center py-12 text-gray-400 font-bold uppercase tracking-widest text-xs">{t("views.tasksNoDeadline")}</div>
         )}
       </div>
     </div>
@@ -302,6 +305,7 @@ export default function ItemList({
   defaultView,
   loading = false,
 }) {
+  const { t, tWith } = useLanguage();
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto space-y-6 pb-10">
@@ -563,8 +567,7 @@ export default function ItemList({
             onClick={() => setShowAddColPopup(!showAddColPopup)}
             className="flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2.5 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 border border-cyan-200 dark:border-cyan-800 rounded-xl transition-all shadow-md shadow-cyan-500/5"
           >
-            <Plus size={14} /> + Colonna Custom
-          </Button>
+            <Plus size={14} />{t("views.tasksCustomCol")}</Button>
 
           <AnimatePresence>
             {showAddColPopup && (
@@ -575,9 +578,7 @@ export default function ItemList({
                 className="absolute left-0 mt-2 z-[110] w-64 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl shadow-2xl p-4 space-y-4"
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                    Aggiungi Colonna
-                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("views.tasksAddCol")}</span>
                   <button
                     type="button"
                     onClick={() => setShowAddColPopup(false)}
@@ -588,7 +589,7 @@ export default function ItemList({
                 </div>
                 <input
                   type="text"
-                  placeholder="Nome colonna (es. Budget)"
+                  placeholder={t("views.tasksColNamePh")}
                   value={newColName}
                   onChange={(e) => setNewColName(e.target.value)}
                   className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl px-3 py-2 text-xs font-bold focus:ring-cyan-500 outline-none"
@@ -596,9 +597,7 @@ export default function ItemList({
                 <Button
                   onClick={addCustomColumn}
                   className="w-full text-[10px] font-black uppercase tracking-widest h-9"
-                >
-                  Crea Colonna
-                </Button>
+                >{t("views.tasksCreateCol")}</Button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -750,7 +749,7 @@ export default function ItemList({
               <input
                 type="text"
                 list="taskly-assignees"
-                placeholder="Assegnatario"
+                placeholder={t("views.tasksAssigneePh")}
                 value={assignee}
                 onChange={(e) => setAssignee(e.target.value)}
                 className="w-28 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-[10px] font-bold focus:ring-cyan-500 outline-none"
@@ -764,8 +763,7 @@ export default function ItemList({
                 onClick={addItem}
                 className="h-11 px-8 gap-2 text-xs font-black uppercase tracking-widest shadow-xl shadow-cyan-500/20 whitespace-nowrap"
               >
-                <Plus size={16} /> Aggiungi
-              </Button>
+                <Plus size={16} />{t("views.calAddShort")}</Button>
             </div>
           </CardContent>
         </Card>
@@ -929,7 +927,7 @@ export default function ItemList({
                                       e.target.value = "";
                                     }}
                                   >
-                                    <option value="">+ Collega</option>
+                                    <option value="">{t("views.tasksLink")}</option>
                                     {allPages
                                       .filter(
                                         (p) => !item.links?.includes(p.id),
@@ -976,7 +974,7 @@ export default function ItemList({
                                         removeCustomColumn(col.name)
                                       }
                                       className="opacity-0 group-hover/col:opacity-100 p-0.5 text-gray-400 hover:text-red-500 transition-opacity"
-                                      title="Rimuovi colonna"
+                                      title={t("views.tasksRemoveCol")}
                                     >
                                       <X size={10} />
                                     </button>
@@ -1010,7 +1008,7 @@ export default function ItemList({
                                   })
                                 }
                                 className="bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-widest focus:ring-0 text-cyan-500 outline-none"
-                                title="Ricorrenza"
+                                title={t("views.calRecurrence")}
                               >
                                 {recurrences.map((r) => (
                                   <option key={r.id} value={r.id}>
@@ -1027,7 +1025,7 @@ export default function ItemList({
                                 }))
                               }
                               className="flex items-center gap-1 text-gray-400 hover:text-cyan-500 transition-colors"
-                              title="Commenti"
+                              title={t("views.tasksComments")}
                             >
                               <MessageSquare size={12} />
                               <span>{(item.comments || []).length}</span>
@@ -1036,9 +1034,7 @@ export default function ItemList({
 
                           <div className="mt-3 space-y-2">
                             <div className="flex items-center gap-2">
-                              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
-                                Subtask
-                              </span>
+                              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{t("views.tasksSubtask")}</span>
                               {(item.subtasks || []).length > 0 && (
                                 <span className="text-[9px] font-black text-cyan-500">
                                   {item.subtasks.filter((s) => s.done).length}/
@@ -1090,7 +1086,7 @@ export default function ItemList({
                                   if (e.key === "Enter")
                                     addSubtask(item.id);
                                 }}
-                                placeholder="Aggiungi un subtask..."
+                                placeholder={t("views.tasksAddSubtask")}
                                 className="bg-transparent border-b border-dashed border-gray-300 dark:border-gray-600 focus:border-cyan-500 pb-0.5 text-xs font-semibold focus:ring-0 w-48 outline-none"
                               />
                               <button
@@ -1106,9 +1102,7 @@ export default function ItemList({
                             <div className="mt-3 space-y-2 border-t border-gray-100 dark:border-gray-800 pt-3">
                               <div className="flex items-center gap-2">
                                 <MessageSquare size={12} className="text-cyan-500" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">
-                                  Commenti
-                                </span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{t("views.tasksComments")}</span>
                               </div>
                               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar">
                                 {(item.comments || []).map((c) => (
@@ -1141,9 +1135,7 @@ export default function ItemList({
                                   </div>
                                 ))}
                                 {(item.comments || []).length === 0 && (
-                                  <p className="text-[10px] text-gray-400 italic">
-                                    Nessun commento.
-                                  </p>
+                                  <p className="text-[10px] text-gray-400 italic">{t("views.tasksNoComments")}</p>
                                 )}
                               </div>
                               <div className="flex items-center gap-1.5">
@@ -1160,7 +1152,7 @@ export default function ItemList({
                                     if (e.key === "Enter")
                                       addComment(item.id);
                                   }}
-                                  placeholder="Scrivi un commento..."
+                                  placeholder={t("views.tasksCommentPh")}
                                   className="flex-1 bg-transparent border-b border-dashed border-gray-300 dark:border-gray-600 focus:border-cyan-500 pb-0.5 text-xs font-semibold focus:ring-0 outline-none"
                                 />
                                 <button
@@ -1207,12 +1199,8 @@ export default function ItemList({
 
       {items.length === 0 && (
         <div className="text-center py-20 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-[3rem]">
-          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">
-            Nessun task in elenco
-          </p>
-          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 font-medium">
-            Scegli una vista e inizia a popolare il tuo workspace.
-          </p>
+          <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-sm">{t("views.tasksEmpty")}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 font-medium">{t("views.tasksEmptyDesc")}</p>
         </div>
       )}
     </div>

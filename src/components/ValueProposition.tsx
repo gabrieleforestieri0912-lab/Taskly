@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 import { Layers, ListChecks, NotebookPen } from "lucide-react";
@@ -38,16 +41,15 @@ const cardVariants = {
 };
 
 export default function ValueProposition() {
+  const { t } = useLanguage();
   return (
     <section className="px-6 py-20 bg-white dark:bg-[#151020]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="landing-eyebrow">
-            Per chi lavora e studia ogni giorno
-          </div>
+          <div className="landing-eyebrow">{t("land.vpEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
             Gestisci progetti, note e task in un unico spazio{" "}
-            <span className="landing-display-accent">senza cambiare app</span>
+            <span className="landing-display-accent">{t("land.vpTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-3">
             Quando tutto &egrave; nello stesso workspace, smetti di rincorrere strumenti e torni a chiudere attivit&agrave;.
@@ -80,9 +82,7 @@ export default function ValueProposition() {
         </motion.div>
 
         <div className="mt-10 text-center">
-          <Link href="/register" className="landing-btn-primary">
-            Inizia gratis adesso
-          </Link>
+          <Link href="/register" className="landing-btn-primary">{t("land.vpCta")}</Link>
         </div>
       </div>
     </section>

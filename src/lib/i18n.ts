@@ -1,8 +1,18 @@
+import { appviewsIt, appviewsEn } from "./i18n-areas/appviews";
+import { authIt, authEn, miscIt, miscEn } from "./i18n-areas/auth";
+import { landingIt, landingEn } from "./i18n-areas/landing";
+import { pagesIt, pagesEn } from "./i18n-areas/pages";
+
 export type LangCode = "it" | "en";
 export type TranslationDict = Record<string, string>;
 export type Translations = Record<LangCode, TranslationDict>;
 
-export const translations: Translations = {
+// Dizionari per area (prefissi "views.", "auth.", "land.", "pg.").
+// Vivono in file separati per area; il core le merge in un unico dizionario.
+const areaIt: TranslationDict[] = [appviewsIt, authIt, miscIt, landingIt, pagesIt];
+const areaEn: TranslationDict[] = [appviewsEn, authEn, miscEn, landingEn, pagesEn];
+
+export const coreTranslations: Translations = {
   it: {
     // Navbar / General
     features: "Funzionalità",
@@ -175,5 +185,34 @@ export const translations: Translations = {
   },
 };
 
+/**
+ * Dizionario finale = core (chiavi senza prefisso) + dizionari per area
+ * (prefissi "views.", "auth.", "land.", "pg."). Le aree vengono merge
+ * per ultime: se una chiave areas coincide con una del core, l'area vince.
+ */
+export const translations: Translations = {
+  it: Object.assign({}, coreTranslations.it, ...areaIt),
+  en: Object.assign({}, coreTranslations.en, ...areaEn),
+};
+
 export const translate = (lang: LangCode, key: string): string =>
   translations[lang]?.[key] || translations["it"]?.[key] || key;
+
+/**
+ * Traduce una chiave sostituendo i placeholder `{name}` con i valori dati.
+ * Restituisce la chiave se la traduzione manca, per rendere ovvio in
+ * sviluppo quali stringhe non sono ancora state tradotte.
+ */
+export const translateWith = (
+  lang: LangCode,
+  key: string,
+  vars?: Record<string, string | number>,
+): string => {
+  let out = translate(lang, key);
+  if (vars) {
+    for (const [name, value] of Object.entries(vars)) {
+      out = out.split(`{${name}}`).join(String(value));
+    }
+  }
+  return out;
+};

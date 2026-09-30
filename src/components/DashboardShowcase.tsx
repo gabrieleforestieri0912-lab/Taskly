@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import { useState, useEffect, useRef } from "react";
 import {
   motion,
@@ -188,6 +189,7 @@ const AI_MESSAGES = [
 /* ── Number counter ──────────────────────────────────────────────────── */
 
 function CountUp({ value, suffix = "" }) {
+  const { t } = useLanguage();
   const [display, setDisplay] = useState(0);
   const ref = useRef(null);
   const started = useRef(false);
@@ -227,22 +229,19 @@ function CountUp({ value, suffix = "" }) {
 /* ── Sidebar mock ────────────────────────────────────────────────────── */
 
 function MockSidebar() {
+  const { t, tWith } = useLanguage();
   return (
     <div className="hidden h-full w-56 shrink-0 flex-col border-r border-[#2b2344]/60 bg-[#120d20]/95 p-4 md:flex">
       <div className="mb-6 flex items-center gap-2.5 px-1">
         <svg viewBox="0 0 24 24" fill="#7b39fc" className="h-6 w-6">
           <path d="M1.04356 6.35771L13.6437 0.666504L23.3335 6.35771V17.6423L13.6437 23.3335L1.04356 17.6423V6.35771ZM12.5 4.2L4.5 8.5V15.5L12.5 19.8L20.5 15.5V8.5L12.5 4.2Z" />
         </svg>
-        <span className="font-inter text-[15px] font-bold tracking-tight text-white">
-          Taskly
-        </span>
+        <span className="font-inter text-[15px] font-bold tracking-tight text-white">{t("land.cmpHeaderTaskly")}</span>
       </div>
 
       <button className="mb-4 flex items-center justify-between rounded-xl border border-[#a484d7]/20 bg-[#7b39fc]/10 px-3 py-2 text-left transition-colors hover:bg-[#7b39fc]/20">
         <span className="flex items-center gap-2 text-[13px] font-semibold text-[#a67cff]">
-          <Plus size={14} />
-          Nuova pagina
-        </span>
+          <Plus size={14} />{t("views.uiNewPage")}</span>
         <kbd className="rounded-md border border-[#a484d7]/25 bg-[#120d20] px-1.5 py-0.5 text-[9px] font-bold text-[#a67cff]">
           ⌘N
         </kbd>
@@ -266,9 +265,7 @@ function MockSidebar() {
           );
         })}
 
-        <div className="px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-600">
-          Workspace
-        </div>
+        <div className="px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-600">{t("land.mockWorkspace")}</div>
         {SPACE_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -291,7 +288,7 @@ function MockSidebar() {
           <div className="truncate text-[12px] font-semibold text-gray-200">
             Sofia Rossi
           </div>
-          <div className="text-[10px] text-gray-500">Plan Pro</div>
+          <div className="text-[10px] text-gray-500">{t("land.mockPlanPro")}</div>
         </div>
         <ChevronDown size={14} className="text-gray-500" />
       </div>
@@ -335,6 +332,7 @@ function StatCard({ stat, index }) {
 /* ── View: Dashboard (task list + AI panel) ──────────────────────────── */
 
 function TasksView() {
+  const { t, tWith } = useLanguage();
   const [todos, setTodos] = useState(TODOS);
 
   const toggle = (id) =>
@@ -350,9 +348,7 @@ function TasksView() {
       <div className="rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 sm:p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">
-              Oggi
-            </h4>
+            <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("views.calToday")}</h4>
             <p className="mt-0.5 text-[12px] text-gray-500">
               {doneCount} di {todos.length} completati
             </p>
@@ -432,9 +428,7 @@ function TasksView() {
         </div>
 
         <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#a484d7]/25 py-2.5 text-[12px] font-semibold text-gray-500 transition-colors hover:border-[#a67cff]/50 hover:text-[#a67cff]">
-          <Plus size={14} />
-          Aggiungi task
-        </button>
+          <Plus size={14} />{t("land.mockAddTask")}</button>
       </div>
 
       {/* AI panel */}
@@ -444,11 +438,9 @@ function TasksView() {
             <Bot size={15} />
           </div>
           <div className="flex-1">
-            <div className="text-[12px] font-bold text-white">Assistente AI</div>
+            <div className="text-[12px] font-bold text-white">{t("views.aiTitle")}</div>
             <div className="flex items-center gap-1 text-[10px] text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Online
-            </div>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{t("land.mockAiOnline")}</div>
           </div>
           <Sparkles size={15} className="text-[#a67cff]" />
         </div>
@@ -497,7 +489,7 @@ function TasksView() {
           <div className="flex items-center gap-2 rounded-xl border border-[#a484d7]/15 bg-[#120d20] px-3 py-2">
             <input
               readOnly
-              placeholder="Chiedi a Taskly…"
+              placeholder={t("land.mockAiPlaceholder")}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-gray-300 placeholder-gray-600 outline-none"
             />
             <Send size={14} className="text-[#a67cff]" />
@@ -583,14 +575,13 @@ function KanbanView() {
 /* ── View: Calendar ──────────────────────────────────────────────────── */
 
 function CalendarView() {
+  const { t, tWith } = useLanguage();
   const today = 3; // Wednesday
   return (
     <div className="rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">
-            Ottobre 2026
-          </h4>
+          <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("land.mockCalMonth")}</h4>
           <p className="mt-0.5 text-[12px] text-gray-500">
             La tua settimana, a colpo d&apos;occhio
           </p>
@@ -661,6 +652,7 @@ const TABS = [
 ];
 
 export default function DashboardShowcase() {
+  const { t, tWith } = useLanguage();
   const [tab, setTab] = useState("overview");
 
   const tiltRef = useRef<HTMLDivElement | null>(null);
@@ -713,17 +705,14 @@ export default function DashboardShowcase() {
             transition={{ duration: 0.5 }}
             className="landing-eyebrow"
           >
-            <Sparkles size={13} />
-            Una dashboard, tutto il tuo lavoro
-          </motion.div>
+            <Sparkles size={13} />{t("land.showcaseEyebrow")}</motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, delay: 0.05 }}
             className="landing-heading-lg mt-3"
-          >
-            Il tuo workspace, <span className="landing-display-accent">in tempo reale</span>
+          >{t("land.showcaseTitlePrefix")}<span className="landing-display-accent">{t("land.showcaseTitleAccent")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -790,20 +779,14 @@ export default function DashboardShowcase() {
                       <PanelLeft size={14} />
                     </button>
                     <div>
-                      <div className="text-[13px] font-bold text-white">
-                        Buongiorno, Sofia 👋
-                      </div>
-                      <div className="hidden text-[10px] text-gray-500 sm:block">
-                        Giovedì, 8 ottobre
-                      </div>
+                      <div className="text-[13px] font-bold text-white">{t("land.mockGreeting")}</div>
+                      <div className="hidden text-[10px] text-gray-500 sm:block">{t("land.mockDateSub")}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="hidden items-center gap-2 rounded-lg border border-[#a484d7]/15 bg-[#120d20] px-2.5 py-1.5 sm:flex">
                       <Search size={12} className="text-gray-600" />
-                      <span className="text-[11px] text-gray-500">
-                        Cerca (⌘K)
-                      </span>
+                      <span className="text-[11px] text-gray-500">{t("land.mockSearchHint")}</span>
                     </div>
                     <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
                       <Search size={14} />
@@ -895,8 +878,8 @@ export default function DashboardShowcase() {
                 <TrendingUp size={17} />
               </div>
               <div>
-                <div className="text-[13px] font-bold text-white">+27% produttività</div>
-                <div className="text-[10px] text-gray-500">dopo 2 settimane</div>
+                <div className="text-[13px] font-bold text-white">{t("land.mockBadge1Title")}</div>
+                <div className="text-[10px] text-gray-500">{t("land.mockBadge1Sub")}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -917,8 +900,8 @@ export default function DashboardShowcase() {
                 <Sparkles size={17} />
               </div>
               <div>
-                <div className="text-[13px] font-bold text-white">AI che lavora con te</div>
-                <div className="text-[10px] text-gray-500">suggerimenti contestuali</div>
+                <div className="text-[13px] font-bold text-white">{t("land.mockBadge2Title")}</div>
+                <div className="text-[10px] text-gray-500">{t("land.mockBadge2Sub")}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -937,9 +920,7 @@ export default function DashboardShowcase() {
             Questa è solo un&apos;anteprima. Il tuo workspace è personale, sincronizzato e pronto in 30 secondi.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href="/register" className="landing-btn-primary">
-              Prova Taskly gratis
-              <ArrowUpRight size={17} />
+            <Link href="/register" className="landing-btn-primary">{t("land.showcaseCtaPrimary")}<ArrowUpRight size={17} />
             </Link>
             <button
               type="button"
@@ -949,9 +930,7 @@ export default function DashboardShowcase() {
                   ?.scrollIntoView({ behavior: "smooth" });
               }}
               className="landing-btn-secondary"
-            >
-              Guarda il video demo
-            </button>
+            >{t("land.showcaseCtaSecondary")}</button>
           </div>
         </motion.div>
       </div>

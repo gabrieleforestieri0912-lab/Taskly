@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 import { XCircle, CheckCircle, Clock, Target, Sparkles } from "lucide-react";
@@ -32,17 +35,16 @@ const metrics = [
 ];
 
 export default function ProblemSolution() {
+  const { t } = useLanguage();
   return (
     <section className="px-6 py-20 bg-white dark:bg-[#151020]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
-            <Sparkles size={12} />
-            Problem to solution
-          </div>
+            <Sparkles size={12} />{t("land.psEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
             Da giornata caotica{" "}
-            <span className="landing-display-accent">a workflow ordinato</span>
+            <span className="landing-display-accent">{t("land.psTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-3 text-sm max-w-2xl mx-auto">
             Meno caos operativo, pi&ugrave; execution. Taskly unisce tutto in un unico spazio.
@@ -84,9 +86,7 @@ export default function ProblemSolution() {
         </div>
 
         <div className="mt-10 text-center">
-          <Link href="/register" className="landing-btn-primary">
-            Inizia ora e misura i risultati
-          </Link>
+          <Link href="/register" className="landing-btn-primary">{t("land.baCta")}</Link>
         </div>
       </div>
     </section>

@@ -1,10 +1,12 @@
 "use client";
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { FileText, ArrowRight, SearchX } from "lucide-react";
 import { resolvePageIcon } from "../lib/pageIcons";
 
 export default function SearchResults({ results = [] as any[], query = "" }) {
+  const { t } = useLanguage();
   const router = useRouter();
 
   if (!query || query.trim() === "") return null;
@@ -16,8 +18,8 @@ export default function SearchResults({ results = [] as any[], query = "" }) {
           <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-3">
              <SearchX size={20} className="text-gray-400" />
           </div>
-          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">Nessun risultato trovato</p>
-          <p className="text-xs text-gray-400 mt-1">Prova a cambiare i termini di ricerca.</p>
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{t("views.searchNone")}</p>
+          <p className="text-xs text-gray-400 mt-1">{t("views.searchTry")}</p>
         </div>
       ) : (
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar p-2">

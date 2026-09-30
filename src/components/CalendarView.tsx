@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Card,
@@ -66,6 +67,7 @@ const recurrences = [
 ];
 
 const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
+  const { t, tWith } = useLanguage();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Media");
   const [recurrence, setRecurrence] = useState("");
@@ -100,9 +102,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
           <div className="p-8">
             <div className="flex justify-between items-center mb-8">
               <div>
-                <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-                  Nuovo Impegno
-                </h3>
+                <h3 className="text-2xl font-black text-gray-900 dark:text-white">{t("views.calNewEvent")}</h3>
                 <p className="text-xs font-bold text-cyan-600 uppercase tracking-widest mt-1">
                   {selectedDate?.toLocaleDateString("it-IT", {
                     weekday: "long",
@@ -121,23 +121,19 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                  Cosa devi fare?
-                </label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t("views.calWhatToDo")}</label>
                 <input
                   autoFocus
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Es: Riunione di progetto"
+                  placeholder={t("views.calEventPh")}
                   className="w-full bg-gray-50 dark:bg-gray-800/50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-cyan-500 transition-all dark:text-white outline-none"
                 />
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                  Priorità
-                </label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t("views.calPriority")}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {priorities.map((p) => (
                     <button
@@ -160,9 +156,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                  Ricorrenza
-                </label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t("views.calRecurrence")}</label>
                 <select
                   value={recurrence}
                   onChange={(e) => setRecurrence(e.target.value)}
@@ -180,9 +174,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
                 <Button
                   type="submit"
                   className="w-full py-4 text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-cyan-500/20"
-                >
-                  Aggiungi al calendario
-                </Button>
+                >{t("views.calAddToCal")}</Button>
               </div>
             </form>
           </div>
@@ -200,6 +192,7 @@ export default function CalendarView({
   onRename,
   loading = false,
 }) {
+  const { t, tWith } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<any>(null);
@@ -403,9 +396,7 @@ export default function CalendarView({
             variant="ghost"
             onClick={goToToday}
             className="text-[10px] font-black uppercase tracking-widest"
-          >
-            Oggi
-          </Button>
+          >{t("views.calToday")}</Button>
           <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
           <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/50 p-1 rounded-xl">
             {[
@@ -483,9 +474,7 @@ export default function CalendarView({
                 <button
                   onClick={() => handleOpenModal(day)}
                   className="mt-auto text-[8px] font-black text-gray-300 hover:text-cyan-500 text-left"
-                >
-                  + Aggiungi
-                </button>
+                >{t("views.calAdd")}</button>
               </div>
             );
           })}
@@ -536,9 +525,7 @@ export default function CalendarView({
             </div>
           ))}
           {agendaItems.length === 0 && (
-            <div className="text-center py-16 text-gray-400 font-bold uppercase tracking-widest text-xs">
-              Nessun impegno in agenda
-            </div>
+            <div className="text-center py-16 text-gray-400 font-bold uppercase tracking-widest text-xs">{t("views.calNoAgenda")}</div>
           )}
         </div>
       )}
@@ -573,13 +560,11 @@ export default function CalendarView({
                 <div className="bg-white/60 dark:bg-gray-800/60 p-3 rounded-2xl border border-white dark:border-gray-700 shadow-sm">
                   <div className="flex items-center gap-2 mb-2 text-cyan-600 dark:text-cyan-400">
                     <Zap size={14} />
-                    <span className="text-[9px] font-black uppercase tracking-widest">
-                      Focus Principale
-                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">{t("views.calMainFocus")}</span>
                   </div>
                   <input
                     type="text"
-                    placeholder="Il tuo focus..."
+                    placeholder={t("views.calFocusPh")}
                     value={meta.focus}
                     onChange={(e) =>
                       updateDailyMeta(dateStr, "focus", e.target.value)
@@ -642,9 +627,7 @@ export default function CalendarView({
                     className="w-full py-2 flex items-center justify-center gap-2 text-gray-400 hover:text-cyan-600 hover:bg-white dark:hover:bg-gray-800 rounded-xl transition-all border border-transparent hover:border-cyan-100 dark:hover:border-cyan-900/30"
                   >
                     <Plus size={16} />
-                    <span className="text-[9px] font-black uppercase tracking-widest">
-                      Aggiungi
-                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">{t("views.calAddShort")}</span>
                   </button>
                 </div>
 
@@ -652,12 +635,10 @@ export default function CalendarView({
                 <div className="mt-auto pt-2 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center gap-2 mb-1.5 text-gray-400 px-1">
                     <StickyNote size={12} />
-                    <span className="text-[8px] font-black uppercase tracking-[0.15em]">
-                      Note Libere
-                    </span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.15em]">{t("views.calFreeNotes")}</span>
                   </div>
                   <textarea
-                    placeholder="Appunti..."
+                    placeholder={t("views.calNotesPh")}
                     value={meta.notes}
                     onChange={(e) =>
                       updateDailyMeta(dateStr, "notes", e.target.value)
@@ -725,9 +706,7 @@ export default function CalendarView({
                 <p className="text-4xl font-black text-gray-800 dark:text-gray-100">
                   {Math.round(stats.completedPct)}%
                 </p>
-                <p className="text-[10px] uppercase font-black tracking-widest text-gray-400">
-                  Completati
-                </p>
+                <p className="text-[10px] uppercase font-black tracking-widest text-gray-400">{t("views.calCompleted")}</p>
               </div>
             </div>
 
@@ -739,27 +718,19 @@ export default function CalendarView({
                       className="text-cyan-600 dark:text-cyan-400"
                       size={20}
                     />
-                  </div>
-                  Analisi Produttività
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">
-                  Stai mantenendo un ritmo eccellente questa settimana!
-                </p>
+                  </div>{t("views.calAnalysis")}</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">{t("views.calAnalysisDesc")}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
-                    Completati
-                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">{t("views.calCompleted")}</p>
                   <p className="text-3xl font-black text-emerald-700 dark:text-emerald-300">
                     {stats.completed}
                   </p>
                 </div>
                 <div className="p-5 rounded-3xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-1">
-                    In Attesa
-                  </p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-1">{t("views.calPending")}</p>
                   <p className="text-3xl font-black text-amber-700 dark:text-amber-300">
                     {stats.pending}
                   </p>

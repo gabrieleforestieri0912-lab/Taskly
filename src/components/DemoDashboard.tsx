@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import {
   LayoutDashboard,
   ListTodo,
@@ -57,13 +60,14 @@ const SAMPLE_TASKS = [
 ];
 
 export default function DemoDashboard() {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-gray-900 dark:text-gray-100">
       {/* Top bar */}
       <header className="sticky top-0 z-20 h-14 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl px-4 flex items-center gap-3">
         <div className="flex items-center gap-2 font-bold">
           <Star className="w-5 h-5 text-cyan-500" fill="currentColor" />
-          <span className="text-[15px] tracking-tight">Taskly</span>
+          <span className="text-[15px] tracking-tight">{t("land.cmpHeaderTaskly")}</span>
         </div>
         <nav className="flex-1 flex items-center gap-1 overflow-hidden">
           {["Dashboard", "Task", "Obiettivi", "Note"].map((t, i) => (
@@ -81,8 +85,7 @@ export default function DemoDashboard() {
         </nav>
         <div className="shrink-0 flex items-center gap-2">
           <span className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-800 px-2.5 py-1.5 text-xs text-gray-400">
-            <Search size={13} /> Cerca...
-          </span>
+            <Search size={13} />{t("land.demoSearchPlaceholder")}</span>
           <span className="relative p-2 text-gray-400">
             <Bell size={17} />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500" />
@@ -96,9 +99,7 @@ export default function DemoDashboard() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="hidden md:flex w-60 shrink-0 flex-col gap-1 p-3 border-r border-gray-200/60 dark:border-gray-800/60">
-          <div className="flex items-center gap-2 px-2 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
-            Menu
-          </div>
+          <div className="flex items-center gap-2 px-2 pb-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">{t("land.demoMenu")}</div>
           {NAV.map((item) => {
             const Icon = item.icon;
             return (
@@ -116,9 +117,7 @@ export default function DemoDashboard() {
               </button>
             );
           })}
-          <div className="mt-4 flex items-center gap-2 px-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
-            Le tue pagine
-          </div>
+          <div className="mt-4 flex items-center gap-2 px-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">{t("land.demoYourPages")}</div>
           {["Backlog", "Spedizioni", "Hobby"].map((p) => (
             <div
               key={p}
@@ -140,19 +139,14 @@ export default function DemoDashboard() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
-                    Dashboard
-                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">{t("land.mockNavDashboard")}</span>
                 </div>
-                <h1 className="text-2xl font-bold">Il tuo centro di comando</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Tutto sotto controllo. Demo dimostrativa.
-                </p>
+                <h1 className="text-2xl font-bold">{t("land.demoTitle")}</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t("land.demoSubtitle")}</p>
               </div>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-200 dark:border-cyan-800 text-cyan-600 dark:text-cyan-300 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest">
-              <Lock size={11} /> Read-only
-            </span>
+              <Lock size={11} />{t("land.demoReadOnly")}</span>
           </div>
 
           {/* Stats */}
@@ -182,8 +176,7 @@ export default function DemoDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="rounded-2xl border border-gray-200/70 dark:border-gray-800 bg-white dark:bg-gray-950/60 p-5">
               <div className="flex items-center gap-2 font-bold mb-4">
-                <Target size={16} className="text-emerald-500" /> Progressi Obiettivi
-              </div>
+                <Target size={16} className="text-emerald-500" />{t("land.demoGoalsTitle")}</div>
               <div className="space-y-4">
                 {GOALS.map((g) => (
                   <div key={g.title}>
@@ -204,8 +197,7 @@ export default function DemoDashboard() {
 
             <div className="rounded-2xl border border-gray-200/70 dark:border-gray-800 bg-white dark:bg-gray-950/60 p-5">
               <div className="flex items-center gap-2 font-bold mb-4">
-                <Clock size={16} className="text-rose-500" /> Task critici
-              </div>
+                <Clock size={16} className="text-rose-500" />{t("land.demoCriticalTitle")}</div>
               <div className="space-y-2">
                 {CRITICAL.map((t) => (
                   <div
@@ -228,8 +220,7 @@ export default function DemoDashboard() {
           {/* Sample task table */}
           <div className="rounded-2xl border border-gray-200/70 dark:border-gray-800 bg-white dark:bg-gray-950/60 p-5">
             <div className="flex items-center gap-2 font-bold mb-4">
-              <ListTodo size={16} className="text-cyan-500" /> Task del progetto
-            </div>
+              <ListTodo size={16} className="text-cyan-500" />{t("land.demoProjectTasksTitle")}</div>
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {SAMPLE_TASKS.map((t) => (
                 <div key={t.title} className="flex items-center gap-3 py-2.5">
@@ -246,9 +237,7 @@ export default function DemoDashboard() {
             </div>
           </div>
 
-          <p className="text-center text-xs text-gray-400 dark:text-gray-600">
-            Dashboard dimostrativa e statica: nessuna modifica sarà salvata.
-          </p>
+          <p className="text-center text-xs text-gray-400 dark:text-gray-600">{t("land.demoStaticNote")}</p>
         </main>
       </div>
 

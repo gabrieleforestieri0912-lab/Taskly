@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../../lib/LanguageContext";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export default function MeetingImportPanel({ onImported }: Props) {
+  const { t } = useLanguage();
   const router = useRouter();
   const [source, setSource] = useState<MeetingSource>("zoom");
   const [title, setTitle] = useState("");
@@ -199,7 +201,7 @@ export default function MeetingImportPanel({ onImported }: Props) {
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Titolo della riunione (opzionale)"
+        placeholder={t("views.meetTitlePh")}
         className="w-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
       />
 
@@ -246,9 +248,7 @@ export default function MeetingImportPanel({ onImported }: Props) {
             Trascrizione {source === "zoom" ? "(da cloud recording VTT)" : source === "google_meet" ? "(da Meet / Drive)" : ""}
           </label>
           <label className="flex items-center gap-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-400 cursor-pointer hover:underline">
-            <FileUp size={13} />
-            Carica .vtt/.srt/.txt
-            <input
+            <FileUp size={13} />{t("views.meetUpload")}<input
               type="file"
               accept=".vtt,.srt,.txt"
               className="hidden"
@@ -260,7 +260,7 @@ export default function MeetingImportPanel({ onImported }: Props) {
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
           rows={8}
-          placeholder="Incolla qui la trascrizione (Zoom: scarica il file VTT dalla cloud recording → incollalo, lo puliamo noi)…"
+          placeholder={t("views.meetTranscriptPh")}
           className="w-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-cyan-500/50 custom-scrollbar"
         />
       </div>

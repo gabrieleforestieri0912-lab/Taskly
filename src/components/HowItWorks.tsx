@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import { Layers, ListChecks, NotebookPen, Brain, Workflow, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -36,16 +39,15 @@ const features = [
 ];
 
 export default function HowItWorks() {
+  const { t } = useLanguage();
   return (
     <section id="features" className="py-20 px-6 bg-[#f6f7f9] dark:bg-[#1a1528]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <div className="landing-eyebrow">
-            Caratteristiche
-          </div>
+          <div className="landing-eyebrow">{t("land.hiwEyebrow")}</div>
           <h2 className="landing-heading-lg text-gray-900 dark:text-white mb-4">
             Tutto ci&ograve; che ti serve{" "}
-            <span className="landing-display-accent">in un unico posto</span>
+            <span className="landing-display-accent">{t("land.hiwTitleAccent")}</span>
           </h2>
           <p className="landing-body text-base max-w-2xl mx-auto">
             Non un tool in pi&ugrave;, ma il tool giusto. Taskly unisce produttivit&agrave; e semplicit&agrave;.

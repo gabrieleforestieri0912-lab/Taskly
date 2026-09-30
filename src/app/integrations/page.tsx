@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "../../lib/LanguageContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Webhook, CalendarDays, MessageSquare, ArrowLeft, Check, Link as LinkIcon, ExternalLink, Loader2 } from "lucide-react";
@@ -10,6 +11,7 @@ type IntegrationState = {
 };
 
 export default function IntegrationsPage() {
+  const { t } = useLanguage();
   const [connected, setConnected] = useState<IntegrationState>({ slack: false, google: false });
   const [webhookUrl, setWebhookUrl] = useState("");
   const [testMessage, setTestMessage] = useState("");
@@ -124,13 +126,9 @@ export default function IntegrationsPage() {
     <main className="min-h-screen bg-zinc-50 dark:bg-black px-6 py-12">
       <div className="mx-auto max-w-4xl">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff]">
-          <ArrowLeft size={16} />
-          Dashboard
-        </Link>
-        <h1 className="mt-8 text-3xl font-black text-gray-900 dark:text-white">Integrazioni</h1>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Collega Taskly ai tuoi strumenti per automatizzare i flussi di lavoro.
-        </p>
+          <ArrowLeft size={16} />{t("land.mockNavDashboard")}</Link>
+        <h1 className="mt-8 text-3xl font-black text-gray-900 dark:text-white">{t("auth.intTitle")}</h1>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t("auth.intSubtitle")}</p>
 
         {status && (
           <div className="mt-6 px-4 py-3 rounded-xl border border-[#7b39fc]/25 bg-[#7b39fc]/10 text-sm font-bold text-[#7b39fc] dark:text-[#a67cff]">
@@ -150,13 +148,10 @@ export default function IntegrationsPage() {
                   Google Calendar
                   {connected.google && (
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                      <Check size={11} /> Collegato
-                    </span>
+                      <Check size={11} />{t("auth.intConnectedBadge")}</span>
                   )}
                 </div>
-                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Sincronizza task e scadenze nel tuo calendario Google.
-                </div>
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.intGoogleDesc")}</div>
               </div>
             </div>
             <button
@@ -182,13 +177,10 @@ export default function IntegrationsPage() {
                   Slack
                   {connected.slack && (
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                      <Check size={11} /> Collegato
-                    </span>
+                      <Check size={11} />{t("auth.intConnectedBadge")}</span>
                   )}
                 </div>
-                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Ricevi le notifiche dei task direttamente sul tuo canale Slack.
-                </div>
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.intSlackDesc")}</div>
               </div>
             </div>
           </div>
@@ -206,9 +198,7 @@ export default function IntegrationsPage() {
                 <button
                   onClick={disconnectSlack}
                   className="shrink-0 px-4 py-2.5 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-sm font-bold text-gray-700 dark:text-gray-200 transition-all"
-                >
-                  Scollega
-                </button>
+                >{t("auth.intDisconnect")}</button>
               ) : (
                 <button
                   onClick={connectSlack}
@@ -226,7 +216,7 @@ export default function IntegrationsPage() {
                 <input
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
-                  placeholder="Messaggio di test (opzionale)"
+                  placeholder={t("auth.intTestPlaceholder")}
                   className={inp}
                 />
                 <button
@@ -249,9 +239,7 @@ export default function IntegrationsPage() {
             </div>
             <div>
               <div className="font-black text-gray-900 dark:text-white">Webhook API</div>
-              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Pronto per il backend: ricevi eventi in tempo reale da Taskly (task creati, completati, pagine pubblicate).
-              </div>
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.intWebhookDesc")}</div>
             </div>
           </div>
           <code className="mt-4 block px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">

@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useLanguage } from "../lib/LanguageContext";
 import { resolvePageIcon } from "../lib/pageIcons";
 import { Link2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Backlinks({ slug }) {
+  const { t, tWith } = useLanguage();
   const [backlinks, setBacklinks] = useState<any[]>([]);
   const router = useRouter();
 
@@ -55,7 +57,7 @@ export default function Backlinks({ slug }) {
         <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-xl">
            <Link2 size={16} className="text-gray-600 dark:text-gray-400" />
         </div>
-        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Backlinks</h3>
+        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500">{t("misc.backlinks")}</h3>
       </div>
       
       {backlinks.length === 0 ? (

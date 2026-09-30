@@ -1,12 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { translations, translate, type LangCode } from "./i18n";
+import { translations, translate, translateWith, type LangCode } from "./i18n";
 
 const LanguageContext = createContext<{
   language: string;
   setLanguage: (lang: string) => void;
   t: (key: string) => string;
+  tWith: (key: string, vars?: Record<string, string | number>) => string;
 } | null>(null);
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
@@ -47,10 +48,9 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
           new CustomEvent("language-changed", { detail: { language: lang } }),
         );
       } catch (e) {}
-      // automatic reload to ensure server-rendered and static text updates
-      try {
-        if (typeof window !== "undefined") window.location.reload();
-      } catch (e) {}
+      // Nessun reload: il cambio si applica subito a tutto il tree React.
+      // Un reload ripartiva da zero con i testi server-renderizzati in
+      // italiano e rendeva il cambio lingua sembrare non funzionante.
     }
   };
 
@@ -58,8 +58,12 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     return translate(language, key);
   };
 
+  const tWith = (key: string, vars?: Record<string, string | number>): string => {
+    return translateWith(language, key, vars);
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, tWith }}>
       {children}
     </LanguageContext.Provider>
   );

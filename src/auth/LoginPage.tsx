@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -75,19 +77,15 @@ export default function LoginPage() {
       <div className="fixed top-8 left-8 z-100">
             <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Torna alla home</span>
+          <span className="font-medium">{t("auth.backToHome")}</span>
         </Link>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6 relative z-10">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="font-inter text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-[-0.03em] dark:text-white">
-              Bentornato
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">
-              Accedi per gestire i tuoi obiettivi
-            </p>
+            <h2 className="font-inter text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-[-0.03em] dark:text-white">{t("auth.welcomeBack")}</h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t("auth.loginSubtitle")}</p>
           </div>
 
           <Card className="border-white/40 dark:border-gray-700/40">
@@ -106,7 +104,7 @@ export default function LoginPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input 
                       type="email" 
-                      placeholder="nome@esempio.it" 
+                      placeholder={t("auth.emailPlaceholder")} 
                       className="pl-12 py-3"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -120,9 +118,7 @@ export default function LoginPage() {
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Password
                     </label>
-                    <a href="#" className="text-xs font-medium text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff]">
-                      Dimenticata?
-                    </a>
+                    <a href="#" className="text-xs font-medium text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff]">{t("auth.forgotPassword")}</a>
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -148,7 +144,7 @@ export default function LoginPage() {
 
               <div className="my-6 flex items-center gap-3">
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">Oppure</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">{t("auth.orDivider")}</span>
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
@@ -164,9 +160,7 @@ export default function LoginPage() {
                   />
                 </div>
               ) : (
-                <p className="text-center text-xs text-amber-600 dark:text-amber-400">
-                  Google Login non disponibile: configura `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
-                </p>
+                <p className="text-center text-xs text-amber-600 dark:text-amber-400">{t("auth.googleLoginUnavailable")}</p>
               )}
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700/50 text-center">
@@ -175,9 +169,7 @@ export default function LoginPage() {
                   <Link
                     href="/register"
                     className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
-                  >
-                    Registrati ora
-                  </Link>
+                  >{t("auth.registerNow")}</Link>
                 </p>
               </div>
             </CardContent>

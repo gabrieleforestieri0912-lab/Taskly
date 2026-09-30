@@ -1,5 +1,8 @@
+"use client";
+
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @next/next/no-img-element */
+import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Card,
@@ -241,6 +244,7 @@ function BlockItem({
   allPages = [] as any[],
   onInsertPageRef,
 }) {
+  const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -451,9 +455,7 @@ function BlockItem({
             className="absolute left-10 top-full mt-1 z-100 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-2 w-64 overflow-hidden"
           >
             <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Blocchi disponibili
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("views.notesAvailableBlocks")}</p>
             </div>
             <div className="max-h-64 overflow-y-auto custom-scrollbar">
               {filteredBlocks.map((bt, i) => {
@@ -499,9 +501,7 @@ function BlockItem({
                 );
               })}
               {filteredBlocks.length === 0 && (
-                <p className="p-4 text-center text-xs text-gray-400 italic">
-                  Nessun comando trovato
-                </p>
+                <p className="p-4 text-center text-xs text-gray-400 italic">{t("views.notesNoCommand")}</p>
               )}
             </div>
           </motion.div>
@@ -518,9 +518,7 @@ function BlockItem({
             className="absolute left-10 top-full mt-1 z-100 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-2 w-64 overflow-hidden"
           >
             <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Collega pagina
-              </p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("views.notesLinkPage")}</p>
             </div>
             <div className="max-h-64 overflow-y-auto custom-scrollbar">
               {bracketPageItems.map((page, i) => {
@@ -551,9 +549,7 @@ function BlockItem({
                 );
               })}
               {bracketPageItems.length === 0 && (
-                <p className="p-4 text-center text-xs text-gray-400 italic">
-                  Nessuna pagina trovata
-                </p>
+                <p className="p-4 text-center text-xs text-gray-400 italic">{t("views.notesNoPageFound")}</p>
               )}
             </div>
           </motion.div>
@@ -568,9 +564,7 @@ function BlockItem({
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             className="absolute left-0 top-8 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl p-1.5 w-52"
           >
-            <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-              Inserisci blocco
-            </p>
+            <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("views.notesInsertBlock")}</p>
             {BLOCK_TYPES.map((bt) => {
               const Icon = bt.icon;
               return (
@@ -596,9 +590,7 @@ function BlockItem({
               disabled={index === 0}
               className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-700 transition-colors disabled:opacity-40"
             >
-              <ArrowUp size={16} />
-              Sposta su
-            </button>
+              <ArrowUp size={16} />{t("views.notesMoveUp")}</button>
             <button
               onClick={() => {
                 onMoveDown && onMoveDown(block.id);
@@ -607,9 +599,7 @@ function BlockItem({
               disabled={index >= totalCount - 1}
               className="w-full flex items-center gap-2.5 mt-1 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-700 transition-colors disabled:opacity-40"
             >
-              <ArrowDown size={16} />
-              Sposta giù
-            </button>
+              <ArrowDown size={16} />{t("views.notesMoveDown")}</button>
             <hr className="my-1 border-gray-200 dark:border-gray-800" />
             <button
               onClick={() => {
@@ -618,9 +608,7 @@ function BlockItem({
               }}
               className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-500 transition-colors"
             >
-              <Trash2 size={16} />
-              Elimina blocco
-            </button>
+              <Trash2 size={16} />{t("views.notesDeleteBlock")}</button>
           </motion.div>
         )}
         {/* Color picker removed per user request */}
@@ -659,7 +647,7 @@ function BlockItem({
                     alert("Codice copiato negli appunti!");
                   }}
                   className="p-1 hover:bg-zinc-800 rounded text-zinc-400 hover:text-white transition-colors"
-                  title="Copia codice"
+                  title={t("views.notesCopyCode")}
                 >
                   <svg
                     width="14"
@@ -679,7 +667,7 @@ function BlockItem({
             <textarea
               value={block.content}
               onChange={(e) => onUpdate(block.id, { content: e.target.value })}
-              placeholder="// Scrivi il tuo codice qui..."
+              placeholder={t("views.notesCodePlaceholder")}
               className="w-full min-h-32 p-4 font-mono text-xs bg-transparent border-none outline-none text-emerald-400 focus:ring-0 resize-y leading-relaxed"
             />
           </div>
@@ -696,7 +684,7 @@ function BlockItem({
                   type="text"
                   value={block.alt || ""}
                   onChange={(e) => onUpdate(block.id, { alt: e.target.value })}
-                  placeholder="Alt text"
+                  placeholder={t("misc.altText")}
                   className="w-full bg-transparent border-none outline-none text-sm text-gray-700 dark:text-gray-300"
                 />
               </div>
@@ -714,7 +702,7 @@ function BlockItem({
                     reader.readAsDataURL(f);
                   }}
                 />
-                <span className="text-sm text-gray-500">Carica immagine</span>
+                <span className="text-sm text-gray-500">{t("views.notesUploadImage")}</span>
               </div>
             )}
           </div>
@@ -725,22 +713,18 @@ function BlockItem({
                 <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
                   <iframe
                     src={block.src}
-                    title="YouTube video player"
+                    title={t("misc.youtubePlayer")}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="absolute inset-0 w-full h-full border-none"
                   />
                 </div>
                 <div className="flex justify-between items-center px-2">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-red-500">
-                    Video Incorporato YouTube
-                  </span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-red-500">{t("views.notesYoutubeEmbedded")}</span>
                   <button
                     onClick={() => onUpdate(block.id, { src: "" })}
                     className="text-[9px] font-black uppercase tracking-widest text-cyan-600 hover:underline"
-                  >
-                    Modifica Link
-                  </button>
+                  >{t("views.notesEditLink")}</button>
                 </div>
               </div>
             ) : (
@@ -759,9 +743,7 @@ function BlockItem({
                   </svg>
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">
-                    Incorpora Video YouTube
-                  </h4>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">{t("views.notesEmbedYoutube")}</h4>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                     Inserisci l&apos;URL di un video per incorporarlo nel tuo
                     foglio
@@ -788,9 +770,7 @@ function BlockItem({
                       else alert("URL YouTube non valido.");
                     }}
                     className="h-10 text-[10px] font-black uppercase tracking-widest px-6"
-                  >
-                    Incorpora
-                  </Button>
+                  >{t("views.notesEmbed")}</Button>
                 </div>
               </div>
             )}
@@ -830,9 +810,7 @@ function BlockItem({
                     href={block.src}
                     download={block.alt || "allegato"}
                     className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-cyan-600 text-white rounded-xl shadow-lg shadow-cyan-500/10 hover:bg-cyan-700 transition-all shrink-0"
-                  >
-                    Scarica
-                  </a>
+                  >{t("views.notesDownload")}</a>
                   <button
                     onClick={() =>
                       onUpdate(block.id, { src: "", alt: "", size: "" })
@@ -860,17 +838,11 @@ function BlockItem({
                   </svg>
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">
-                    Allega Documento o File
-                  </h4>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    Carica un file PDF, DOCX, TXT o qualsiasi foglio dal tuo PC
-                  </p>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">{t("views.notesAttachDoc")}</h4>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{t("views.notesAttachDocDesc")}</p>
                 </div>
                 <div className="flex items-center justify-center">
-                  <label className="flex items-center gap-2 text-xs font-black uppercase tracking-widest px-6 py-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-200 rounded-xl cursor-pointer transition-all shadow-md shadow-cyan-500/5">
-                    Scegli File...
-                    <input
+                  <label className="flex items-center gap-2 text-xs font-black uppercase tracking-widest px-6 py-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-600 border border-cyan-200 rounded-xl cursor-pointer transition-all shadow-md shadow-cyan-500/5">{t("views.notesChooseFile")}<input
                       type="file"
                       className="hidden"
                       onChange={(e) => {
@@ -899,9 +871,7 @@ function BlockItem({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-cyan-600">
                 <Calendar size={18} />
-                <span className="text-xs font-black uppercase tracking-widest">
-                  Mini Task Planner
-                </span>
+                <span className="text-xs font-black uppercase tracking-widest">{t("views.notesMiniPlanner")}</span>
               </div>
               <button
                 onClick={() => {
@@ -943,7 +913,7 @@ function BlockItem({
                       newTasks[ti] = { ...newTasks[ti], title: e.target.value };
                       onUpdate(block.id, { tasks: newTasks });
                     }}
-                    placeholder="Nuovo task..."
+                    placeholder={t("views.notesNewTask")}
                     className={`flex-1 bg-transparent border-none outline-none text-sm font-medium ${t.done ? "line-through opacity-50" : ""}`}
                   />
                   <button
@@ -958,9 +928,7 @@ function BlockItem({
                 </div>
               ))}
               {(block.tasks || []).length === 0 && (
-                <p className="text-[10px] text-center text-gray-400 py-2 italic">
-                  Aggiungi i tuoi task qui
-                </p>
+                <p className="text-[10px] text-center text-gray-400 py-2 italic">{t("views.notesAddTasksHere")}</p>
               )}
             </div>
           </div>
@@ -1102,7 +1070,7 @@ function BlockItem({
                     };
                     onUpdate(block.id, { children: newChildren });
                   }}
-                  placeholder="Contenuto..."
+                  placeholder={t("views.notesContentPh")}
                   className={`flex-1 bg-transparent border-none outline-none text-sm ${getColorClass(child.color || "default")}`}
                 />
                 <button
@@ -1128,8 +1096,7 @@ function BlockItem({
               }}
               className="text-xs text-gray-400 hover:text-gray-900 dark:hover:text-white flex items-center gap-1 py-1 transition-colors"
             >
-              <Plus size={12} /> Aggiungi riga
-            </button>
+              <Plus size={12} />{t("views.notesAddRow")}</button>
           </div>
         </div>
       )}
@@ -1149,6 +1116,7 @@ export default function NotesView({
   activePageId,
   allPages = [] as any[],
 }) {
+  const { t, tWith } = useLanguage();
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto space-y-8 pb-12">
@@ -1487,9 +1455,7 @@ export default function NotesView({
             onClick={saveVersion}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-violet-50 dark:bg-violet-900/20 text-violet-600 border border-violet-200 dark:border-violet-800 transition-all hover:brightness-95"
           >
-            <LucideIcons.Save size={12} />
-            Salva versione
-          </button>
+            <LucideIcons.Save size={12} />{t("views.notesSaveVersion")}</button>
         </div>
       </div>
 
@@ -1503,9 +1469,7 @@ export default function NotesView({
             className="max-w-4xl mx-auto w-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-4"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Cronologia versioni
-              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t("views.notesVersionHistory")}</span>
               <button
                 onClick={() => setShowVersions(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -1534,9 +1498,7 @@ export default function NotesView({
                     <button
                       onClick={() => restoreVersion(v)}
                       className="px-2 py-1 text-[9px] font-black uppercase tracking-widest text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
-                    >
-                      Ripristina
-                    </button>
+                    >{t("views.notesRestore")}</button>
                     <button
                       onClick={() => deleteVersion(v.id)}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors"
@@ -1603,9 +1565,7 @@ export default function NotesView({
                 </svg>
               </div>
               <div className="space-y-2 max-w-sm">
-                <h3 className="text-lg font-black tracking-tight text-gray-800 dark:text-gray-100">
-                  Nota Protetta E2EE
-                </h3>
+                <h3 className="text-lg font-black tracking-tight text-gray-800 dark:text-gray-100">{t("views.notesProtectedTitle")}</h3>
                 <p className="text-xs text-gray-400 font-medium">
                   Questa nota è cifrata lato client con crittografia
                   PBKDF2/AES-GCM a conoscenza zero. Digita la password di
@@ -1615,7 +1575,7 @@ export default function NotesView({
               <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
                 <input
                   type="password"
-                  placeholder="Password di sblocco"
+                  placeholder={t("views.notesUnlockPh")}
                   value={passcode}
                   onChange={(e) => setPasscode(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
@@ -1624,9 +1584,7 @@ export default function NotesView({
                 <Button
                   onClick={handleUnlock}
                   className="h-10 text-xs font-black uppercase tracking-widest px-6 shadow-xl shadow-cyan-500/10"
-                >
-                  Sblocca
-                </Button>
+                >{t("views.notesUnlock")}</Button>
               </div>
               {decryptError && (
                 <p className="text-xs text-red-500 font-bold uppercase tracking-widest">
