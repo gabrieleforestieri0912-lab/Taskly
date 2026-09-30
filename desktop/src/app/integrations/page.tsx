@@ -248,7 +248,7 @@ export default function IntegrationsPage(): React.JSX.Element {
             lotto di sviluppo.
           </p>
           <a
-            href="mailto:hello@taskly.app?subject=Richiesta%20integrazione"
+            href="mailto:gabriele.forestieri0912@gmail.com?subject=Richiesta%20integrazione"
             className="inline-block mt-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 text-sm font-bold"
           >
             Proponi un&apos;app

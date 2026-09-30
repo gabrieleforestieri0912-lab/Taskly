@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
+import MeetingImportPanel from "../../components/meetings/MeetingImportPanel";
 
 declare global {
   interface Window {
@@ -33,6 +34,7 @@ export default function TranscriptionPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [sttSupported, setSttSupported] = useState(true);
   const [title, setTitle] = useState("");
+  const [sourceTab, setSourceTab] = useState<"mic" | "import">("mic");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -161,19 +163,14 @@ export default function TranscriptionPage() {
     if (!transcript.trim()) return;
     setIsSummarizing(true);
     try {
-      const res = await apiFetch("/ai/chat", {
+      const res = await apiFetch("/meetings/recap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message:
-            "Riassumi questa trascrizione di una riunione in italiano. " +
-            "Restituisci: Obiettivo, Decisioni prese, Prossimi passi. Usa elenchi puntati con ** grassetti **.\n\nTrascrizione:\n" +
-            transcript,
-        }),
+        body: JSON.stringify({ transcript, lang: "it" }),
       });
       if (res.ok) {
         const data = await res.json();
-        setSummary(data.message || "");
+        setSummary(data.recap || data.message || "");
       }
     } catch (e) {
       console.error("Summary error:", e);
@@ -200,6 +197,7 @@ export default function TranscriptionPage() {
       summary:
         summary ||
         "• **Obiettivo**: Registrazione vocale salvata dall'utente.\n• **Prossimi passi**: Rivedere il testo trascritto.",
+      source: "manual",
     };
 
     setIsSaving(true);
@@ -221,6 +219,7 @@ export default function TranscriptionPage() {
             category: newMeeting.category,
             duration: newMeeting.duration,
             date: newMeeting.date,
+            source: "manual",
           }),
         });
         if (res.ok) {
@@ -275,7 +274,35 @@ export default function TranscriptionPage() {
         </div>
 
         {/* Voice recording container centered */}
-        <div className="w-full p-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col items-center gap-10">
+        <div className="w-full p-8 sm:p-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col items-center gap-8">
+          {/* Sorgente: microfono vs provider esterni (estendibile) */}
+          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-900 rounded-full p-1">
+            <button
+              onClick={() => setSourceTab("mic")}
+              className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all ${
+                sourceTab === "mic"
+                  ? "bg-white dark:bg-gray-700 shadow text-cyan-700 dark:text-cyan-300"
+                  : "text-gray-500"
+              }`}
+            >
+              Microfono
+            </button>
+            <button
+              onClick={() => setSourceTab("import")}
+              className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all ${
+                sourceTab === "import"
+                  ? "bg-white dark:bg-gray-700 shadow text-cyan-700 dark:text-cyan-300"
+                  : "text-gray-500"
+              }`}
+            >
+              Zoom / Meet / File
+            </button>
+          </div>
+
+          {sourceTab === "import" ? (
+            <MeetingImportPanel />
+          ) : (
+          <>
           {/* Visualizer placeholder */}
           <div className="w-full h-20 flex items-center justify-center">
             {isRecording && !isPaused && (
@@ -475,6 +502,8 @@ export default function TranscriptionPage() {
                 </button>
               </div>
             </div>
+          )}
+          </>
           )}
         </div>
         <p className="mt-6 text-xs text-gray-400 text-center max-w-md">

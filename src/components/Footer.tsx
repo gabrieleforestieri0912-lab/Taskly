@@ -92,11 +92,11 @@ export default function Footer() {
 
             <div className="mt-6 space-y-2.5">
               <a
-                href="mailto:info@taskly.com"
+                href="mailto:gabriele.forestieri0912@gmail.com"
                 className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:text-[#7b39fc] dark:hover:text-[#a67cff]"
               >
                 <Mail size={15} className="shrink-0 text-[#7b39fc]/70" />
-                info@taskly.com
+                gabriele.forestieri0912@gmail.com
               </a>
             </div>
 

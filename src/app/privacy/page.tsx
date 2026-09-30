@@ -138,8 +138,8 @@ export default function PrivacyPage() {
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               Per domande relative a questa informativa o per esercitare i tuoi diritti, puoi contattarci all'indirizzo:
               <br />
-              <a href="mailto:support@taskly-productivity.vercel.app" className="text-blue-600 dark:text-blue-400 underline">
-                support@taskly-productivity.vercel.app
+              <a href="mailto:gabriele.forestieri0912@gmail.com" className="text-blue-600 dark:text-blue-400 underline">
+                gabriele.forestieri0912@gmail.com
               </a>
             </p>
           </section>

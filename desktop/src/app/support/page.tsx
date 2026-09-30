@@ -9,7 +9,7 @@ export default function SupportPage() {
     e.preventDefault();
     const subject = encodeURIComponent("Feedback Taskly");
     const body = encodeURIComponent(message || "");
-    window.location.href = `mailto:support@taskly.example?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:gabriele.forestieri0912@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (

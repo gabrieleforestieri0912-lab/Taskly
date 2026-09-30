@@ -1,5 +1,5 @@
 // main.ts
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain, screen } from "electron";
 import * as path from "path";
 import * as http from "http";
 
@@ -7,7 +7,146 @@ import * as http from "http";
 const isDev = !app.isPackaged && process.env.NODE_ENV !== "production";
 
 let mainWindow: BrowserWindow | null = null;
+let badgeWindow: BrowserWindow | null = null;
 let nextServer: http.Server | null = null;
+let lastAudible = false;
+
+// ---------------------------------------------------------------------------
+// Floating badge: finestra overlay sempre in primo piano, in alto al centro
+// dello schermo, fuori dalla finestra principale. Mostra lo stato della
+// trascrizione (in ascolto / audio rilevato / trascrizione live).
+// ---------------------------------------------------------------------------
+function createBadgeWindow(): void {
+  if (badgeWindow) return;
+  const primary = screen.getPrimaryDisplay();
+  const { width: screenW } = primary.workAreaSize;
+  const BADGE_W = 460;
+  const BADGE_H = 76;
+
+  badgeWindow = new BrowserWindow({
+    width: BADGE_W,
+    height: BADGE_H,
+    x: Math.round(primary.workArea.x + (primary.workAreaSize.width - BADGE_W) / 2),
+    y: primary.workArea.y + 12,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    focusable: false,
+    show: false,
+    title: "Taskly — Stato trascrizione",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+    backgroundColor: "#00000000",
+  });
+  // Non rubare mai il focus alla riunione / al video
+  badgeWindow.setAlwaysOnTop(true, "screen-saver");
+  badgeWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+
+  const badgeURL =
+    (isDev ? "http://localhost:3333" : "http://localhost:3333") + "/badge";
+  badgeWindow.loadURL(badgeURL).catch((err) => {
+    console.error("[Electron Main] Failed to load badge URL:", err);
+  });
+
+  badgeWindow.on("closed", () => {
+    badgeWindow = null;
+  });
+
+  // Riposiziona in alto al centro se il display cambia
+  screen.on("display-metrics-changed", () => {
+    if (!badgeWindow) return;
+    const p = screen.getPrimaryDisplay();
+    badgeWindow.setPosition(
+      Math.round(p.workArea.x + (p.workAreaSize.width - BADGE_W) / 2),
+      p.workArea.y + 12,
+    );
+  });
+
+  // screenW evita warning unused in alcune config
+  void screenW;
+}
+
+function sendToBadge(channel: string, payload: unknown): void {
+  try {
+    badgeWindow?.webContents.send(channel, payload);
+  } catch (e) {
+    console.error("[Electron Main] sendToBadge failed:", e);
+  }
+}
+
+// Rileva se una pagina sta producendo audio e notifica badge + renderer.
+// Electron emette media-started-playing / media-paused-playing sul webContents;
+// isCurrentlyAudible() copre i casi limite (poll ogni 2s).
+function setupAudioDetection(): void {
+  if (!mainWindow) return;
+  const wc = mainWindow.webContents;
+
+  const notify = (audible: boolean) => {
+    if (audible === lastAudible) return;
+    lastAudible = audible;
+    console.log(`[Electron Main] Page audio state: ${audible ? "PLAYING" : "STOPPED"}`);
+    sendToBadge("badge:audio", { pageAudio: audible });
+    try {
+      mainWindow?.webContents.send("main:audio-state", audible);
+    } catch {}
+    // Quando parte dell'audio in una pagina, mostra il badge come segnale
+    if (audible) badgeWindow?.showInactive();
+  };
+
+  wc.on("media-started-playing", () => notify(true));
+  // "media-paused-playing" non è nei tipi di Electron 30: cast a EventEmitter
+  (wc as unknown as NodeJS.EventEmitter).on("media-paused-playing", () => {
+    // Piccolo debounce: lo stato audible potrebbe aggiornarsi in ritardo
+    setTimeout(() => notify(wc.isCurrentlyAudible()), 400);
+  });
+
+  setInterval(() => {
+    try {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        notify(mainWindow.webContents.isCurrentlyAudible());
+      }
+    } catch {}
+  }, 2000);
+}
+
+// IPC renderer <-> badge
+function setupBadgeIPC(): void {
+  ipcMain.on("badge:update", (_event, state) => {
+    if (!badgeWindow || badgeWindow.isDestroyed()) createBadgeWindow();
+    sendToBadge("badge:update", state || {});
+    // Mostra il badge per ogni stato attivo, nascondilo solo su idle esplicito
+    const status = (state as { status?: string })?.status;
+    if (status && status !== "idle") {
+      try {
+        badgeWindow?.showInactive();
+      } catch {}
+    } else if (status === "idle") {
+      try {
+        badgeWindow?.hide();
+      } catch {}
+    }
+  });
+  ipcMain.on("badge:show", () => {
+    if (!badgeWindow || badgeWindow.isDestroyed()) createBadgeWindow();
+    try {
+      badgeWindow?.showInactive();
+    } catch {}
+  });
+  ipcMain.on("badge:hide", () => {
+    try {
+      badgeWindow?.hide();
+    } catch {}
+  });
+}
 
 // Function to start the Express backend server (port 5000)
 function startBackendServer(): void {
@@ -98,11 +237,16 @@ function createWindow(): void {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+
+  setupAudioDetection();
 }
 
 // App Lifecycle
 app.whenReady().then(async () => {
   console.log(`[Electron Main] App ready. Running in ${isDev ? "DEVELOPMENT" : "PRODUCTION"} mode.`);
+
+  setupBadgeIPC();
+  createBadgeWindow();
 
   // In production, start the servers from Electron itself
   if (!isDev) {
@@ -143,5 +287,3 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-
-

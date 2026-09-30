@@ -27,10 +27,10 @@ export default function Footer() {
 
           <div className="flex items-center gap-4 mt-4" aria-hidden>
             <a
-              href="mailto:info@taskly.com"
+              href="mailto:gabriele.forestieri0912@gmail.com"
               className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-purple-600 transition-colors text-sm"
             >
-              <Mail size={16} /> info@taskly.com
+              <Mail size={16} /> gabriele.forestieri0912@gmail.com
             </a>
             <span className="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
               <MapPin size={16} /> Italia

@@ -3,9 +3,9 @@ import Stripe from "stripe";
 import { getProfile } from "@/lib/server/db";
 import { getAuthUser } from "@/lib/server/auth";
 import { unauthorized } from "@/lib/server/http";
+import { APP_URL } from "@/lib/site";
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const APP_URL = process.env.APP_URL || "http://localhost:3000";
 
 export async function POST(request: NextRequest) {
   const user = getAuthUser(request);

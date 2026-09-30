@@ -88,7 +88,7 @@ function Pricing() {
     }
 
     if (plan.checkoutType === "contact") {
-      window.location.href = "mailto:sales@taskly.com?subject=Piano%20Team%20Taskly";
+      window.location.href = "mailto:gabriele.forestieri0912@gmail.com?subject=Piano%20Team%20Taskly";
       return;
     }
 

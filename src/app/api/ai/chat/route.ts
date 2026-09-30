@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseBody } from "@/lib/server/http";
+import { xkiroChat } from "@/lib/server/xkiro";
 
-// Lightweight contextual fallback so the demo always answers even
-// when Ollama isn't installed / not reachable.
+// Fallback locale: risponde sempre anche se xKiro non è raggiungibile.
 function fallbackReply(message: string): string {
   const t = (message || "").trim().toLowerCase();
   if (/ciao|salve|hey|buongiorno|buonasera/.test(t))
@@ -33,42 +33,16 @@ export async function POST(request: NextRequest) {
   };
   const text = String(message || "");
 
-  // Fast failure: allow a graceful answer even without a message body.
   let reply: string;
   try {
-    const { Ollama } = await import("ollama");
-    const ollamaUrl =
-      process.env.OLLAMA_URL ||
-      process.env.NEXT_PUBLIC_OLLAMA_URL ||
-      "http://localhost:11434";
-    const model =
-      process.env.OLLAMA_MODEL ||
-      process.env.NEXT_PUBLIC_OLLAMA_MODEL ||
-      "llama3";
-
-    const client = new Ollama({ host: ollamaUrl });
-
-    // Timeout so a missing/unresponsive Ollama doesn't hang the request.
-    const timeout = new Promise<never>((_, rej) =>
-      setTimeout(() => rej(new Error("Ollama timeout")), 25000),
-    );
-
-    const chat = client.chat({
-      model,
-      messages: [
-        {
-          role: "system",
-          content: `Sei Taskly AI, un assistente intelligente per la produttività personale. Aiuti gli utenti a gestire obiettivi, task, idee e progetti. Sei conciso, motivante e sempre utile. Rispondi in italiano. Contesto attuale: ${JSON.stringify(context || {})}`,
-        },
-        { role: "user", content: text },
-      ],
-    });
-
-    const response = await Promise.race([chat, timeout]);
-    reply = (response as any)?.message?.content || "";
-    if (!reply) throw new Error("Empty Ollama response");
-  } catch (e) {
-    // Fall back to the local contextual answer.
+    reply = await xkiroChat([
+      {
+        role: "system",
+        content: `Sei Taskly AI, un assistente intelligente per la produttività personale. Aiuti gli utenti a gestire obiettivi, task, idee e progetti. Sei conciso, motivante e sempre utile. Rispondi in italiano. Contesto attuale: ${JSON.stringify(context || {})}`,
+      },
+      { role: "user", content: text },
+    ]);
+  } catch {
     reply = fallbackReply(text);
   }
 

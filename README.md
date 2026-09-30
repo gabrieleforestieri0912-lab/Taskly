@@ -20,7 +20,7 @@ Next.js (npm run dev / npm start)  → http://localhost:3000
   ├─ Supabase Auth (email/password + Google)
   ├─ Supabase Postgres (via @supabase/supabase-js)
   ├─ Stripe (billing + webhooks)
-  └─ Ollama (AI chat + embeddings, optional)
+  └─ xKiro (unico provider AI — chat + recap meeting)
 ```
 
 The API contract the frontend already uses is preserved:
@@ -54,8 +54,8 @@ Copy `.env.example` into `.env` and fill in:
 | `SUPABASE_JWT_SECRET` | Dashboard → Project Settings → API → JWT Secret (used to verify tokens) |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google Cloud Console → OAuth client (same as Supabase Google provider) |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard |
-| `OLLAMA_URL` / `OLLAMA_MODEL` | Local Ollama instance (defaults `http://localhost:11434`, `llama3`) |
-| `ENABLE_VECTOR` | `true` to enable semantic search via pgvector (requires Ollama embeddings) |
+| `XKIRO_API_KEY` / `XKIRO_BASE_URL` / `XKIRO_CHAT_MODEL` | xKiro (unico provider AI — defaults `https://api.xkiro.com/v1`, `mistralai/mistral-medium-3.5`) |
+| `ENABLE_VECTOR` | `false` — ricerca semantica disabilitata (fallback full-text Postgres) |
 | `RESEND_API_KEY` / `SUPPORT_EMAIL` | Resend (support form emails) — without a key `/api/support` returns 500 |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Optional — accurate global rate limiting on serverless (falls back to in-memory) |
 | `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | Optional — defaults `200` requests / `900000` ms (15 min). `RATE_LIMIT_DISABLED=1` disables it |
@@ -87,12 +87,10 @@ The Stripe webhook URL must point at the same origin
   You can raise the expiry under Authentication → Settings → JWT expiry.
 - Password hashing is handled by Supabase Auth — no bcrypt on the server.
 
-## Semantic search (optional)
+## Semantic search
 
-1. Install [Ollama](https://ollama.com) and pull `nomic-embed-text`.
-2. Run the schema (creates the `vector` extension + `match_documents`).
-3. Set `ENABLE_VECTOR=true`. Documents will embed on save; search falls back to
-   Postgres full-text (`ILINE`/`tsvector`) when embeddings are missing.
+Ricerca full-text Postgres di default. La colonna vettoriale resta opzionale
+ma gli embedding sono disabilitati (unico provider AI = xKiro chat).
 
 ## API contract preserved
 

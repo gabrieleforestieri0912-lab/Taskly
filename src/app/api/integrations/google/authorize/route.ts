@@ -22,8 +22,12 @@ export async function POST(request: NextRequest) {
         { status: 503 },
       );
     }
-    const scope =
-      "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events";
+    const scope = [
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events",
+      // Meet: gli eventi Meet si leggono dal calendario, le trascrizioni/registrazioni da Drive
+      "https://www.googleapis.com/auth/drive.readonly",
+    ].join(" ");
     const url =
       `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${encodeURIComponent(clientId)}` +

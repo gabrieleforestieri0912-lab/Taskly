@@ -30,6 +30,8 @@ import AIPanel from "../../components/AIPanel";
 import { useUserData } from "../../hooks/useUserData";
 import { useLanguage } from "../../lib/LanguageContext";
 import { Skeleton } from "../../components/UIComponents";
+import { apiFetch } from "../../lib/api";
+import { getMeetingProvider, buildRecapPrompt, fallbackRecap } from "../../lib/meetings/providers";
 
 function MeetingsContent() {
   const { t } = useLanguage();
@@ -63,6 +65,7 @@ function MeetingsContent() {
   const [expandedMeetingId, setExpandedMeetingId] = useState(null);
   const [playingId, setPlayingId] = useState(null);
   const [activeTab, setActiveTab] = useState("all"); // 'all' or 'summaries'
+  const [recappingId, setRecappingId] = useState(null);
 
   // Update theme class on HTML element
   useEffect(() => {
@@ -85,6 +88,48 @@ function MeetingsContent() {
     localStorage.setItem("meetings_data", JSON.stringify(filtered));
     if (expandedMeetingId === id) setExpandedMeetingId(null);
     if (playingId === id) setPlayingId(null);
+  };
+
+  // Genera (o rigenera) il recap AI e lo salva in locale + server
+  const handleRecap = async (meet) => {
+    if (!meet?.text || recappingId) return;
+    setRecappingId(meet.id);
+    try {
+      let recap = "";
+      try {
+        const res = await apiFetch("/ai/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: buildRecapPrompt(meet.text, "it"),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          recap = data.message || "";
+        }
+      } catch {}
+      if (!recap) recap = fallbackRecap(meet.text, "it");
+      // Sync server se loggato (PUT /meetings/:id)
+      try {
+        await apiFetch(`/meetings/${meet.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary: recap }),
+        });
+      } catch {}
+      setMeetings((prev) => {
+        const next = prev.map((m) =>
+          m.id === meet.id ? { ...m, summary: recap } : m,
+        );
+        try {
+          localStorage.setItem("meetings_data", JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+    } finally {
+      setRecappingId(null);
+    }
   };
 
   // Filter meetings
@@ -338,6 +383,24 @@ function MeetingsContent() {
                             <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-md text-[10px] font-bold text-gray-500 dark:text-gray-400">
                               {meet.category}
                             </span>
+                            {meet.source && meet.source !== "manual" && (
+                              <span
+                                className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${getMeetingProvider(meet.source).badgeClass}`}
+                              >
+                                {getMeetingProvider(meet.source).shortLabel}
+                              </span>
+                            )}
+                            {meet.meetingUrl && (
+                              <a
+                                href={meet.meetingUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:underline"
+                              >
+                                Apri link
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -415,25 +478,48 @@ function MeetingsContent() {
                               </h4>
                               <div className="bg-purple-50/30 dark:bg-purple-950/15 border border-purple-100/50 dark:border-purple-900/30 rounded-2xl p-4 h-60 overflow-y-auto custom-scrollbar text-xs leading-relaxed text-gray-700 dark:text-gray-300">
                                 {meet.summary ? (
-                                  <div
-                                    className="prose dark:prose-invert max-w-none text-xs space-y-2"
-                                    dangerouslySetInnerHTML={{
-                                      __html: meet.summary
-                                        .replace(/\n/g, "<br/>")
-                                        .replace(
-                                          /\*\*(.*?)\*\*/g,
-                                          "<strong>$1</strong>",
-                                        ),
-                                    }}
-                                  />
+                                  <>
+                                    <div
+                                      className="prose dark:prose-invert max-w-none text-xs space-y-2"
+                                      dangerouslySetInnerHTML={{
+                                        __html: meet.summary
+                                          .replace(/\n/g, "<br/>")
+                                          .replace(
+                                            /\*\*(.*?)\*\*/g,
+                                            "<strong>$1</strong>",
+                                          ),
+                                      }}
+                                    />
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRecap(meet);
+                                      }}
+                                      disabled={recappingId === meet.id}
+                                      className="mt-3 text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline disabled:opacity-60"
+                                    >
+                                      {recappingId === meet.id
+                                        ? "Rigenero il recap..."
+                                        : "Rigenera recap AI"}
+                                    </button>
+                                  </>
                                 ) : (
                                   <div className="h-full flex flex-col items-center justify-center text-center">
                                     <BrainCircuit className="text-purple-300 dark:text-purple-800 w-10 h-10 mb-2" />
                                     <p className="font-bold text-gray-500">
                                       Nessun riassunto disponibile
                                     </p>
-                                    <button className="mt-2 text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline">
-                                      Genera con AI ora
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRecap(meet);
+                                      }}
+                                      disabled={recappingId === meet.id}
+                                      className="mt-2 text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline disabled:opacity-60"
+                                    >
+                                      {recappingId === meet.id
+                                        ? "Generazione..."
+                                        : "Genera con AI ora"}
                                     </button>
                                   </div>
                                 )}

@@ -1211,11 +1211,16 @@ function mapMeeting(data: any) {
     category: data.category || "Generale",
     duration: data.duration || "",
     date: data.date || data.created_at,
+    source: data.source || "manual",
+    externalId: data.external_id || null,
+    meetingUrl: data.meeting_url || null,
   };
 }
 
 async function createMeeting(userId: string, body: any) {
   const supabase = getSupabase();
+  const allowedSources = ["manual", "zoom", "google_meet", "upload"];
+  const source = allowedSources.includes(body.source) ? body.source : "manual";
   const { data, error } = await supabase
     .from("meetings")
     .insert({
@@ -1226,7 +1231,33 @@ async function createMeeting(userId: string, body: any) {
       category: body.category || "Generale",
       duration: body.duration || null,
       date: body.date ? new Date(body.date).toISOString() : undefined,
+      source,
+      external_id: body.externalId || body.external_id || null,
+      meeting_url: body.meetingUrl || body.meeting_url || null,
     })
+    .select("*")
+    .maybeSingle();
+  if (error) throw error;
+  return mapMeeting(data);
+}
+
+async function updateMeeting(userId: string, id: string, body: any) {
+  const supabase = getSupabase();
+  const patch: any = {};
+  if (body.title !== undefined) patch.title = body.title;
+  if (body.transcript !== undefined) patch.transcript = body.transcript;
+  if (body.summary !== undefined) patch.summary = body.summary;
+  if (body.category !== undefined) patch.category = body.category;
+  if (body.duration !== undefined) patch.duration = body.duration;
+  if (body.date !== undefined) patch.date = new Date(body.date).toISOString();
+  if (body.source !== undefined) patch.source = body.source;
+  if (body.externalId !== undefined) patch.external_id = body.externalId;
+  if (body.meetingUrl !== undefined) patch.meeting_url = body.meetingUrl;
+  const { data, error } = await supabase
+    .from("meetings")
+    .update(patch)
+    .eq("id", id)
+    .eq("user_id", userId)
     .select("*")
     .maybeSingle();
   if (error) throw error;
@@ -1431,6 +1462,7 @@ export {
   markActivityRead,
   // meetings
   createMeeting,
+  updateMeeting,
   listMeetings,
   deleteMeeting,
   // integrations

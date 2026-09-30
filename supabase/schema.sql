@@ -226,9 +226,17 @@ create table if not exists public.meetings (
   category   text default 'Generale',
   duration   text,
   date       timestamptz default now(),
+  source     text not null default 'manual',
+  external_id text,
+  meeting_url text,
   created_at timestamptz not null default now()
 );
 create index if not exists meetings_user_idx on public.meetings (user_id, created_at desc);
+
+-- Estendibilità provider riunioni (Zoom / Google Meet): idempotente
+alter table public.meetings add column if not exists source text not null default 'manual';
+alter table public.meetings add column if not exists external_id text;
+alter table public.meetings add column if not exists meeting_url text;
 
 create table if not exists public.integrations (
   id         uuid primary key default gen_random_uuid(),
@@ -323,6 +331,8 @@ alter table public.notifications    enable row level security;
 alter table public.activity         enable row level security;
 alter table public.analytics        enable row level security;
 alter table public.analytics_events enable row level security;
+alter table public.meetings         enable row level security;
+alter table public.integrations     enable row level security;
 
 -- Own-row policies ---------------------------------------------------------
 create policy "profiles_select_own" on public.profiles
@@ -418,6 +428,24 @@ create policy "activity_insert_own" on public.activity
   for insert with check (auth.uid() = user_id);
 create policy "activity_update_own" on public.activity
   for update using (auth.uid() = user_id);
+
+create policy "meetings_select_own" on public.meetings
+  for select using (auth.uid() = user_id);
+create policy "meetings_insert_own" on public.meetings
+  for insert with check (auth.uid() = user_id);
+create policy "meetings_update_own" on public.meetings
+  for update using (auth.uid() = user_id);
+create policy "meetings_delete_own" on public.meetings
+  for delete using (auth.uid() = user_id);
+
+create policy "integrations_select_own" on public.integrations
+  for select using (auth.uid() = user_id);
+create policy "integrations_insert_own" on public.integrations
+  for insert with check (auth.uid() = user_id);
+create policy "integrations_update_own" on public.integrations
+  for update using (auth.uid() = user_id);
+create policy "integrations_delete_own" on public.integrations
+  for delete using (auth.uid() = user_id);
 
 -- Everyone may write analytics events (used by the public marketing pages)
 create policy "analytics_insert_all" on public.analytics

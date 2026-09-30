@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getAuthUser } from "@/lib/server/auth";
 import { parseBody } from "@/lib/server/http";
+import { APP_URL } from "@/lib/site";
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const APP_URL = process.env.APP_URL || "http://localhost:3000";
 
 const PLAN_CONFIG: Record<
   string,
