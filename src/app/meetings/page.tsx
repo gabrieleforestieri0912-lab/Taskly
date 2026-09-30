@@ -41,8 +41,8 @@ function MeetingsContent() {
 
   // Theme state
   const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") return "dark";
-    return localStorage.getItem("theme") || "dark";
+    if (typeof window === "undefined") return "light";
+    return localStorage.getItem("theme") || "light";
   });
 
   // Layout states
@@ -68,7 +68,7 @@ function MeetingsContent() {
 
   // Update theme class on HTML element
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
+    const savedTheme = localStorage.getItem("theme") || "light";
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
   }, []);
 

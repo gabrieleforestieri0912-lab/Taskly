@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Globe, User, LogOut } from "lucide-react";
+import { ArrowLeft, CreditCard, Globe, Moon, Palette, Sun, User, LogOut } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
 
@@ -16,6 +16,22 @@ export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("theme");
+      setTheme(saved === "dark" ? "dark" : "light");
+    } catch (e) {}
+  }, []);
+
+  const applyTheme = (next: "light" | "dark") => {
+    setTheme(next);
+    try {
+      document.documentElement.classList.toggle("dark", next === "dark");
+      localStorage.setItem("theme", next);
+    } catch (e) {}
+  };
 
   useEffect(() => {
     try {
@@ -123,6 +139,39 @@ export default function SettingsPage() {
                   }`}
                 >
                   {lang.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Aspetto */}
+        <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 shadow-xl shadow-cyan-500/5">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 font-black text-gray-900 dark:text-white">
+              <Palette size={18} className="text-cyan-500" />
+              {t("appearance")}
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t("appearanceDesc")}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { code: "light", name: t("lightMode"), Icon: Sun },
+                { code: "dark", name: t("darkMode"), Icon: Moon },
+              ].map(({ code, name, Icon }) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => applyTheme(code as "light" | "dark")}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    theme === code
+                      ? "bg-cyan-600 text-white shadow-md shadow-cyan-500/20"
+                      : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-700 hover:bg-cyan-50 dark:hover:bg-cyan-900/10 hover:text-cyan-600 dark:hover:text-cyan-300"
+                  }`}
+                >
+                  <Icon size={16} />
+                  {name}
                 </button>
               ))}
             </div>

@@ -25,7 +25,6 @@ import {
   X,
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
-import ThemeToggle from "./ThemeToggle";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
@@ -128,6 +127,64 @@ export default function Navbar({
     { name: t("demo"), href: "#demo" },
     { name: t("pricing"), href: "#pricing" },
     { name: t("faq"), href: "#faq" },
+  ];
+
+  // Gruppi con dropdown per la navbar delle pagine interne (stesse sezioni della landing)
+  const groupedNavLinks = [
+    {
+      name: "Funzionalità",
+      key: "features",
+      children: [
+        {
+          name: t("howItWorks"),
+          href: "#getting-started",
+          desc: "Scopri il flusso di lavoro passo dopo passo",
+          icon: Map,
+        },
+        {
+          name: t("demo"),
+          href: "#demo",
+          desc: "Guarda Taskly in azione dal vivo",
+          icon: PlayCircle,
+        },
+        {
+          name: "Use Cases",
+          href: "#use-cases",
+          desc: "Casi d'uso per team, freelancer e studenti",
+          icon: Users,
+        },
+        {
+          name: "Confronto",
+          href: "#comparison",
+          desc: "Taskly a confronto con altri strumenti",
+          icon: Scale,
+        },
+      ],
+    },
+    {
+      name: "Risorse",
+      key: "resources",
+      children: [
+        {
+          name: "Testimonianze",
+          href: "#social-proof",
+          desc: "Cosa dicono i nostri utenti",
+          icon: Star,
+        },
+        {
+          name: t("pricing"),
+          href: "#pricing",
+          desc: "Piani flessibili per ogni esigenza",
+          icon: Sparkles,
+        },
+        {
+          name: t("faq"),
+          href: "#faq",
+          desc: "Risposte alle domande più comuni",
+          icon: CircleHelp,
+        },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -310,7 +367,6 @@ export default function Navbar({
 
             {/* Desktop actions */}
             <div className="hidden shrink-0 items-center gap-2 lg:flex">
-              <ThemeToggle className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white" />
               {user ? (
                 <div className="flex items-center gap-2">
                   <Link
@@ -503,11 +559,6 @@ export default function Navbar({
                 </Link>
               </nav>
 
-              <div className="mt-6 flex items-center justify-between">
-                <span className="text-sm font-medium text-white/60">Tema</span>
-                <ThemeToggle className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:bg-white/10" />
-              </div>
-
               {!user && (
                 <div className="mt-auto flex flex-col gap-3 pb-8">
                   <Link
@@ -565,9 +616,6 @@ export default function Navbar({
 
   const iconBtn =
     "inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]";
-
-  const linkBtn =
-    "rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]";
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 py-3 sm:px-5 pointer-events-none">
@@ -679,10 +727,67 @@ export default function Navbar({
 
         {!isDashboard && (
           <div className="hidden items-center gap-1 lg:flex">
-            {navLinks.map((link) => (
-              <a key={link.name} href={link.href} className={linkBtn}>
-                {link.name}
-              </a>
+            {groupedNavLinks.map((group) => (
+              <div
+                key={group.key}
+                className="relative"
+                onMouseEnter={() => setOpenMenu(group.key)}
+                onMouseLeave={() =>
+                  setOpenMenu((k) => (k === group.key ? null : k))
+                }
+              >
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOpenMenu((k) => (k === group.key ? null : group.key))
+                  }
+                  className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
+                >
+                  {group.name}
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${
+                      openMenu === group.key ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {openMenu === group.key && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-[#111414f2]"
+                    >
+                      {group.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        return (
+                          <a
+                            key={child.name}
+                            href={child.href}
+                            onClick={() => setOpenMenu(null)}
+                            className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 hover:bg-[#7b39fc]/10 dark:hover:bg-[#7b39fc]/15"
+                          >
+                            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff]">
+                              <ChildIcon size={17} />
+                            </span>
+                            <span className="min-w-0">
+                              <span className="block text-sm font-semibold text-gray-900 dark:text-white">
+                                {child.name}
+                              </span>
+                              <span className="mt-0.5 block text-xs leading-snug text-gray-500 dark:text-gray-400">
+                                {child.desc}
+                              </span>
+                            </span>
+                          </a>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
           </div>
         )}

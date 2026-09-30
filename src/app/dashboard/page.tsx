@@ -97,7 +97,7 @@ function DashboardContent() {
 
   useEffect(() => {
     setMounted(true);
-    setTheme(localStorage.getItem("theme") || "dark");
+    setTheme(localStorage.getItem("theme") || "light");
     try {
       const parsed = JSON.parse(
         localStorage.getItem("dashboardOpenTabs") || "[]",
@@ -261,7 +261,7 @@ function DashboardContent() {
   }, [activePage?.locked]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
+    const savedTheme = localStorage.getItem("theme") || "light";
     document.documentElement.classList.toggle("dark", savedTheme === "dark");
   }, []);
 
