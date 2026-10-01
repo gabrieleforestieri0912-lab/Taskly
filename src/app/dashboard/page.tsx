@@ -50,6 +50,7 @@ import NotificationBell from "../../components/NotificationBell";
 import { useUserData } from "../../hooks/useUserData";
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
+import { applyTheme, readTheme } from "../../lib/theme";
 
 function DashboardContent() {
   const { t, language, setLanguage } = useLanguage();
@@ -97,7 +98,9 @@ function DashboardContent() {
 
   useEffect(() => {
     setMounted(true);
-    setTheme(localStorage.getItem("theme") || "light");
+    const saved = readTheme();
+    setTheme(saved);
+    document.documentElement.classList.toggle("dark", saved === "dark");
     try {
       const parsed = JSON.parse(
         localStorage.getItem("dashboardOpenTabs") || "[]",
@@ -261,8 +264,8 @@ function DashboardContent() {
   }, [activePage?.locked]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    // Chiaro di default: solo themeChoice esplicito abilita il dark.
+    applyTheme(readTheme());
   }, []);
 
   // If focusTitle param is present, remove it shortly after mount so it
@@ -319,8 +322,7 @@ function DashboardContent() {
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    applyTheme(newTheme, true);
   };
 
   const addPage = (pageConfig) => {
@@ -1197,36 +1199,47 @@ function DashboardContent() {
 
       <AnimatePresence mode="wait">
         {shouldShowSidebar && (
-          <motion.div
-            initial={{ x: -256, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -256, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed left-0 top-0 bottom-0 w-64 z-40"
-            onMouseLeave={() => {
-              if (!isSidebarOpen) setIsSidebarPeekOpen(false);
-            }}
-          >
-            <Sidebar
-              user={user}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
-              theme={theme}
-              toggleTheme={toggleTheme}
-              pages={pages}
-              onAddPage={addPage}
-              onDeletePage={deletePage}
-              onUpdatePage={(id, updates) => updatePage(id, updates)}
-              isModalOpen={isModalOpen}
-              setIsModalOpen={setIsModalOpen}
-              loading={loading}
+          <>
+            {/* Mobile backdrop */}
+            <div
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-35 md:hidden"
+              onClick={() => {
+                setIsSidebarOpen(false);
+                setIsSidebarPeekOpen(false);
+              }}
+              aria-hidden="true"
             />
-          </motion.div>
+            <motion.div
+              initial={{ x: -256, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -256, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="fixed left-0 top-0 bottom-0 w-64 z-40"
+              onMouseLeave={() => {
+                if (!isSidebarOpen) setIsSidebarPeekOpen(false);
+              }}
+            >
+              <Sidebar
+                user={user}
+                isSidebarOpen={isSidebarOpen}
+                setIsSidebarOpen={setIsSidebarOpen}
+                theme={theme}
+                toggleTheme={toggleTheme}
+                pages={pages}
+                onAddPage={addPage}
+                onDeletePage={deletePage}
+                onUpdatePage={(id, updates) => updatePage(id, updates)}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                loading={loading}
+              />
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
       <main
-        className={`transition-all duration-300 ${shouldShowSidebar ? "pl-64" : "pl-0"}`}
+        className={`transition-all duration-300 ${shouldShowSidebar ? "md:pl-64 pl-0" : "pl-0"}`}
       >
         <div className="sticky top-0 z-50 h-14 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-900/60 backdrop-blur-xl px-3 flex items-center gap-3">
           <button

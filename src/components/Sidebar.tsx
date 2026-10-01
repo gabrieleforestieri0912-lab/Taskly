@@ -37,6 +37,8 @@ import {
   Mic,
   Inbox,
   HelpCircle,
+  ChevronLeft,
+  Copy,
 } from "lucide-react";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
@@ -156,6 +158,10 @@ export default function Sidebar({
 
   const [isAIActive, setIsAIActive] = useState(false);
   const [aiMessages, setAiMessages] = useState<any[]>([]);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteCopied, setInviteCopied] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   const [deletedCounts, setDeletedCounts] = useState({
     pages: 0,
     tasks: 0,
@@ -616,6 +622,120 @@ export default function Sidebar({
     };
   }, [isHelpOpen]);
 
+  // invite members modal portal
+  let inviteModalPortal: React.ReactNode = null;
+  if (isInviteOpen && typeof document !== "undefined") {
+    inviteModalPortal = createPortal(
+      <div className="fixed inset-0 z-500 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={() => {
+            setIsInviteOpen(false);
+            setInviteSent(false);
+          }}
+        />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-6 w-full max-w-md"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+              <Users size={20} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
+                {t("land.sideInviteMembers") || "Invita membri"}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Collabora in tempo reale condividendo il tuo workspace
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1.5">
+                Email della persona da invitare
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="collega@azienda.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl text-xs text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (inviteEmail.trim()) {
+                      setInviteSent(true);
+                      setTimeout(() => setInviteSent(false), 3000);
+                      setInviteEmail("");
+                    }
+                  }}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition-colors shrink-0"
+                >
+                  {inviteSent ? "Inviato!" : "Invia"}
+                </button>
+              </div>
+              {inviteSent && (
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">
+                  Invito inviato con successo!
+                </p>
+              )}
+            </div>
+
+            <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Oppure condividi il link diretto
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      navigator.clipboard.writeText(window.location.origin);
+                      setInviteCopied(true);
+                      setTimeout(() => setInviteCopied(false), 2000);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+                >
+                  {inviteCopied ? (
+                    <>
+                      <Check size={13} />
+                      <span>Copiato!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={13} />
+                      <span>Copia link</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                setIsInviteOpen(false);
+                setInviteSent(false);
+              }}
+              className="px-4 py-1.5 rounded-lg bg-gray-100 dark:bg-zinc-800 text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
+            >
+              Chiudi
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body,
+    );
+  }
+
   // close trash menu on outside click or Esc
   useEffect(() => {
     if (!isTrashOpen) return;
@@ -653,7 +773,7 @@ export default function Sidebar({
         aria-label="Navigazione sidebar"
       >
         {/* ── Workspace / user header ─────────────────────────────────────────── */}
-        <div className="flex items-center px-2 pt-2 pb-1" ref={profileRef}>
+        <div className="flex items-center px-2 pt-2 pb-1 gap-1" ref={profileRef}>
           <button
             type="button"
             onClick={(e) => {
@@ -666,7 +786,7 @@ export default function Sidebar({
             aria-expanded={isProfileOpen}
             aria-haspopup="menu"
             aria-label="Menu account"
-            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 min-w-0"
           >
             {user.picture ? (
               <img
@@ -691,13 +811,17 @@ export default function Sidebar({
               }`}
             />
           </button>
-        </div>
 
-        {/* Portals (rendered outside normal flow) */}
-        {profileMenuPortal}
-        {helpMenuPortal}
-        {trashMenuPortal}
-        {pendingDeletePortal}
+          {/* Close sidebar button on mobile */}
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Chiudi barra laterale"
+            className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          >
+            <ChevronLeft size={16} aria-hidden="true" />
+          </button>
+        </div>
 
         {/* ── Scrollable nav body ────────────────────────────────────────────── */}
         <nav
@@ -916,7 +1040,7 @@ export default function Sidebar({
           <button
             type="button"
             id="sidebar-invite-btn"
-            onClick={() => { /* placeholder — Fase 5 */ }}
+            onClick={() => setIsInviteOpen(true)}
             className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
             <Users size={16} aria-hidden="true" className="shrink-0" />
@@ -938,6 +1062,7 @@ export default function Sidebar({
       {helpMenuPortal}
       {trashMenuPortal}
       {pendingDeletePortal}
+      {inviteModalPortal}
 
       {/* ── Search modal portal ───────────────────────────────────────────── */}
       {isSearchOpen &&
