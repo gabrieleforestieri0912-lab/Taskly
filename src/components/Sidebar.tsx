@@ -840,7 +840,7 @@ export default function Sidebar({
             <SidebarNavItem
               id="sidebar-home-btn"
               icon={LayoutDashboard}
-              label={t("homePages")}
+              label={t("homePages") || "Dashboard & Analitiche"}
               href="/dashboard"
               isActive={!isTranscriptionMode && !isAIActive && !activePageId}
               onClick={() => {

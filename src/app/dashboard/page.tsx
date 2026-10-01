@@ -1254,8 +1254,19 @@ function DashboardContent() {
             )}
           </button>
 
-          {/* Tabs ÔÇö scrollable */}
+          {/* Tabs — scrollable */}
           <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0 scrollbar-hide">
+            <Link
+              href="/dashboard"
+              className={`inline-flex shrink-0 items-center gap-1.5 px-3 h-9 rounded-lg text-xs font-bold border whitespace-nowrap transition-colors ${
+                !activePageId
+                  ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-700"
+                  : "bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+              }`}
+            >
+              <LayoutDashboard size={14} className="shrink-0" />
+              <span>Analitiche</span>
+            </Link>
             {mounted && openTabs.length > 0 ? (
               openTabs.map((tab) => (
                 <Link

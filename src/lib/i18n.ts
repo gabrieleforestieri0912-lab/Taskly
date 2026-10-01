@@ -29,7 +29,7 @@ export const coreTranslations: Translations = {
 
     // Sidebar
     home: "Home",
-    homePages: "Home (Pagine)",
+    homePages: "Dashboard & Analitiche",
     meetingsVoice: "Riunioni (Registrazione Vocale)",
     aiAssistant: "Assistente AI (Chat)",
     search: "Cerca",
@@ -114,7 +114,7 @@ export const coreTranslations: Translations = {
 
     // Sidebar
     home: "Home",
-    homePages: "Home (Pages)",
+    homePages: "Dashboard & Analytics",
     meetingsVoice: "Meetings (Voice Recording)",
     aiAssistant: "AI Assistant (Chat)",
     search: "Search",
