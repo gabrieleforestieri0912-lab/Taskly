@@ -54,7 +54,7 @@ import { useLanguage } from "../../lib/LanguageContext";
 function DashboardContent() {
   const { t, language, setLanguage } = useLanguage();
   const searchParams = useSearchParams();
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarPeekOpen, setIsSidebarPeekOpen] = useState(false);
   const [planNotice, setPlanNotice] = useState<string | null>(null);

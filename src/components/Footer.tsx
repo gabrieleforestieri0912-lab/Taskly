@@ -169,12 +169,6 @@ export default function Footer() {
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
             >{t("auth.docsTitle")}</Link>
           </div>
-
-          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>{t("land.footerStatus")}</div>
         </div>
       </div>
     </footer>
