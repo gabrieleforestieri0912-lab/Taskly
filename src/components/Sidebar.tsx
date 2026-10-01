@@ -811,7 +811,13 @@ export default function Sidebar({
             /* Normal pages section */
             <SidebarSection
               label={t("yourPages") || "Privato"}
-              onAdd={() => setIsModalOpen(true)}
+              onAdd={() =>
+                onAddPage({
+                  type: "empty",
+                  label: "Senza titolo",
+                  parentId: null,
+                })
+              }
               addLabel={t("newPage") || "Nuova pagina"}
             >
               {loading ? (
@@ -826,7 +832,13 @@ export default function Sidebar({
                     {t("land.sideNoPages") || "Nessuna pagina"}
                   </p>
                   <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() =>
+                      onAddPage({
+                        type: "empty",
+                        label: "Senza titolo",
+                        parentId: null,
+                      })
+                    }
                     className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
                   >
                     {t("newPage") || "Crea una pagina"}

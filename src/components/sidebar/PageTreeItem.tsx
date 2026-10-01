@@ -52,6 +52,34 @@ export function PageTreeItem({
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const itemRef = useRef<HTMLLIElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLabel, setEditLabel] = useState(page.label || "");
+
+  // Sync internal editLabel if external page.label changes while not editing
+  useEffect(() => {
+    if (!isEditing) {
+      setEditLabel(page.label || "");
+    }
+  }, [page.label, isEditing]);
+
+  // Autofocus input on entering editing mode
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
+
+  const handleCommitRename = () => {
+    setIsEditing(false);
+    const trimmed = editLabel.trim();
+    const nextLabel = trimmed || "Senza titolo";
+    if (nextLabel !== page.label) {
+      onUpdatePage && onUpdatePage(page.id, { label: nextLabel });
+    }
+  };
 
   const children = childrenMap.get(page.id) || [];
   const hasChildren = children.length > 0;
@@ -139,8 +167,11 @@ export function PageTreeItem({
       if (currentIndex > 0) {
         allTreeItems[currentIndex - 1].focus();
       }
+    } else if (e.key === "F2") {
+      e.preventDefault();
+      setIsEditing(true);
     } else if (e.key === "Enter" || e.key === " ") {
-      if ((e.target as HTMLElement).tagName !== "BUTTON") {
+      if ((e.target as HTMLElement).tagName !== "BUTTON" && !isEditing) {
         e.preventDefault();
         router.push(`/dashboard?page=${page.id}`);
       }
@@ -220,65 +251,107 @@ export function PageTreeItem({
           />
         </button>
 
-        {/* Page link */}
-        <Link
-          href={`/dashboard?page=${page.id}`}
-          draggable
-          onDragStart={(e) => {
-            e.dataTransfer.setData("text/plain", String(page.id));
-            e.dataTransfer.effectAllowed = "move";
-            e.currentTarget.classList.add("opacity-50");
-          }}
-          onDragEnd={(e) => {
-            e.currentTarget.classList.remove("opacity-50");
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            e.currentTarget.classList.add("bg-cyan-50", "dark:bg-cyan-900/10");
-          }}
-          onDragLeave={(e) => {
-            e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
-            const draggedId = e.dataTransfer.getData("text/plain");
-            if (!draggedId || String(draggedId) === String(page.id)) return;
-            const targetChildren = childrenMap.get(page.id) || [];
-            onUpdatePage &&
-              onUpdatePage(draggedId, {
-                parentId: page.id,
-                order: targetChildren.length,
-              });
-          }}
-          className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden"
-        >
-          {/* Icon or emoji */}
-          {isEmoji ? (
-            <span className="text-sm shrink-0 leading-none select-none">
-              {page.icon}
-            </span>
-          ) : Icon ? (
-            <Icon
-              size={15}
-              aria-hidden="true"
-              className={`${iconColor} shrink-0 transition-colors`}
-            />
-          ) : (
-            <FileText
-              size={15}
-              aria-hidden="true"
-              className="text-gray-400 shrink-0"
-            />
-          )}
-
-          {/* Label */}
-          <span className="truncate text-xs">
-            {page.label?.trim() ? page.label : (
-              <span className="text-gray-400 italic font-normal">Senza titolo</span>
+        {/* Page link or inline rename input */}
+        {isEditing ? (
+          <div className="flex-1 flex items-center gap-2 py-0.5 pr-1 min-w-0 h-full overflow-hidden">
+            {isEmoji ? (
+              <span className="text-sm shrink-0 leading-none select-none">
+                {page.icon}
+              </span>
+            ) : Icon ? (
+              <Icon
+                size={15}
+                aria-hidden="true"
+                className={`${iconColor} shrink-0 transition-colors`}
+              />
+            ) : (
+              <FileText
+                size={15}
+                aria-hidden="true"
+                className="text-gray-400 shrink-0"
+              />
             )}
-          </span>
-        </Link>
+            <input
+              ref={inputRef}
+              type="text"
+              value={editLabel}
+              onChange={(e) => setEditLabel(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleCommitRename();
+                } else if (e.key === "Escape") {
+                  e.preventDefault();
+                  setIsEditing(false);
+                  setEditLabel(page.label || "");
+                }
+              }}
+              onBlur={handleCommitRename}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 bg-white dark:bg-zinc-900 border border-cyan-500 rounded px-1.5 py-0.5 text-xs text-gray-900 dark:text-gray-100 outline-none ring-1 ring-cyan-500 shadow-sm"
+            />
+          </div>
+        ) : (
+          <Link
+            href={`/dashboard?page=${page.id}`}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("text/plain", String(page.id));
+              e.dataTransfer.effectAllowed = "move";
+              e.currentTarget.classList.add("opacity-50");
+            }}
+            onDragEnd={(e) => {
+              e.currentTarget.classList.remove("opacity-50");
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.add("bg-cyan-50", "dark:bg-cyan-900/10");
+            }}
+            onDragLeave={(e) => {
+              e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
+              const draggedId = e.dataTransfer.getData("text/plain");
+              if (!draggedId || String(draggedId) === String(page.id)) return;
+              const targetChildren = childrenMap.get(page.id) || [];
+              onUpdatePage &&
+                onUpdatePage(draggedId, {
+                  parentId: page.id,
+                  order: targetChildren.length,
+                });
+            }}
+            className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden"
+          >
+            {/* Icon or emoji */}
+            {isEmoji ? (
+              <span className="text-sm shrink-0 leading-none select-none">
+                {page.icon}
+              </span>
+            ) : Icon ? (
+              <Icon
+                size={15}
+                aria-hidden="true"
+                className={`${iconColor} shrink-0 transition-colors`}
+              />
+            ) : (
+              <FileText
+                size={15}
+                aria-hidden="true"
+                className="text-gray-400 shrink-0"
+              />
+            )}
+
+            {/* Label */}
+            <span className="truncate text-xs">
+              {page.label?.trim() ? page.label : (
+                <span className="text-gray-400 italic font-normal">Senza titolo</span>
+              )}
+            </span>
+          </Link>
+        )}
 
         {/* Hover action buttons (⋯ and +) */}
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pr-1.5 shrink-0">
@@ -329,20 +402,19 @@ export function PageTreeItem({
             onClick={(e) => e.stopPropagation()}
             className="w-48 bg-white dark:bg-zinc-950 rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 p-1 text-xs text-gray-700 dark:text-gray-300 animate-in fade-in zoom-in-95 duration-100"
           >
-            {onStartRename && (
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  onStartRename(page);
-                }}
-                className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors text-left"
-              >
-                <Edit2 size={13} className="text-gray-400" />
-                <span>Rinomina</span>
-              </button>
-            )}
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsMenuOpen(false);
+                setIsEditing(true);
+                onStartRename && onStartRename(page);
+              }}
+              className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors text-left"
+            >
+              <Edit2 size={13} className="text-gray-400" />
+              <span>Rinomina</span>
+            </button>
 
             <button
               type="button"
