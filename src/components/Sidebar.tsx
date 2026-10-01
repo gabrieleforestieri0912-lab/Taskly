@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
+import { PageTreeItem } from "./sidebar/PageTreeItem";
+import { getAncestorIds } from "../lib/pageTree";
 
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -126,6 +128,31 @@ export default function Sidebar({
 
   const searchParams = useSearchParams();
   const activePageId = searchParams?.get("page");
+
+  // Auto-expand ancestors of the active page so deep pages are visible in the tree
+  useEffect(() => {
+    if (!activePageId || !pages || pages.length === 0) return;
+    const ancestorIds = getAncestorIds(pages, activePageId);
+    if (ancestorIds.size === 0) return;
+
+    setExpandedPages((prev: Record<string, boolean>) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const id of ancestorIds) {
+        if (next[id] !== true) {
+          next[id] = true;
+          changed = true;
+        }
+      }
+      if (changed) {
+        try {
+          localStorage.setItem("expanded_pages", JSON.stringify(next));
+        } catch {}
+        return next;
+      }
+      return prev;
+    });
+  }, [activePageId, pages]);
 
   const [isAIActive, setIsAIActive] = useState(false);
   const [aiMessages, setAiMessages] = useState<any[]>([]);
@@ -272,128 +299,40 @@ export default function Sidebar({
     return { rootNodes: map.get(null) || [], childrenMap: map };
   }, [pages]);
 
-  const renderPageNode = (page, depth = 0, indexInParent = 0) => {
-    const Icon = resolvePageIcon(page);
-    const children = childrenMap.get(page.id) || [];
-    const hasChildren = children.length > 0;
-    const isExpanded = expandedPages[page.id] !== false; // default expanded to true
-    const iconColor = page.iconColor || "text-gray-400";
+  const handleAddSubpage = (parentId: string, e?: React.MouseEvent) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    setExpandedPages((prev: Record<string, boolean>) => {
+      const next = { ...prev, [parentId]: true };
+      try {
+        localStorage.setItem("expanded_pages", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    onAddPage &&
+      onAddPage({
+        type: "empty",
+        label: "Senza titolo",
+        parentId,
+      });
+  };
 
-    return (
-      <div key={page.id} className="space-y-0.5">
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            e.currentTarget.classList.add("bg-cyan-400", "h-1");
-          }}
-          onDragLeave={(e) => {
-            e.currentTarget.classList.remove("bg-cyan-400", "h-1");
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            e.currentTarget.classList.remove("bg-cyan-400", "h-1");
-            const draggedId = e.dataTransfer.getData("text/plain");
-            if (!draggedId || String(draggedId) === String(page.id)) return;
-            // insert dragged before this page among siblings
-            onUpdatePage &&
-              onUpdatePage(draggedId, {
-                parentId: page.parentId || null,
-                order: indexInParent,
-              });
-          }}
-          className="h-0.5 transition-all duration-200"
-          style={{ marginLeft: `${8 + depth * 14}px` }}
-        />
-
-        <div
-          className={`group flex items-center rounded-xl transition-all text-sm font-medium relative ${String(activePageId) === String(page.id) ? "bg-cyan-50/50 dark:bg-cyan-900/10 text-cyan-600 font-bold" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50/70 dark:hover:bg-gray-800/40"}`}
-          style={{ paddingLeft: `${8 + depth * 14}px` }}
-        >
-          {/* Notion-style Chevron Toggle */}
-          <button
-            onClick={(e) => togglePageExpand(page.id, e)}
-            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-gray-200/60 dark:hover:bg-white/10 transition-colors mr-1 ${hasChildren ? "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" : "opacity-0 pointer-events-none"}`}
-            aria-label={isExpanded ? "Comprimi" : "Espandi"}
-          >
-            <ChevronRight
-              size={13}
-              className={`transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
-            />
-          </button>
-
-          <Link
-            href={`/dashboard?page=${page.id}`}
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData("text/plain", String(page.id));
-              e.dataTransfer.effectAllowed = "move";
-              e.currentTarget.classList.add("opacity-50");
-            }}
-            onDragEnd={(e) => {
-              e.currentTarget.classList.remove("opacity-50");
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.currentTarget.classList.add(
-                "bg-cyan-50",
-                "dark:bg-cyan-900/10",
-              );
-            }}
-            onDragLeave={(e) => {
-              e.currentTarget.classList.remove(
-                "bg-cyan-50",
-                "dark:bg-cyan-900/10",
-              );
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.currentTarget.classList.remove(
-                "bg-cyan-50",
-                "dark:bg-cyan-900/10",
-              );
-              const draggedId = e.dataTransfer.getData("text/plain");
-              if (!draggedId || String(draggedId) === String(page.id)) return;
-              // make dragged page a child of this page (append at end)
-              const children = childrenMap.get(page.id) || [];
-              onUpdatePage &&
-                onUpdatePage(draggedId, {
-                  parentId: page.id,
-                  order: children.length,
-                });
-            }}
-            className="flex-1 flex items-center gap-2 py-2 pr-3 min-w-0"
-          >
-            <Icon
-              size={16}
-              className={`${iconColor} shrink-0 transition-colors`}
-            />
-            <span className="truncate">{page.label}</span>
-          </Link>
-
-          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pr-2 shrink-0">
-            <button
-              onClick={(e) => confirmAndDelete(page.id, e)}
-              className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all"
-              title={t("views.habitDelete")}
-            >
-              <Trash2 size={13} />
-            </button>
-          </div>
-        </div>
-
-        {hasChildren && isExpanded && (
-          <div className="space-y-0.5 mt-0.5">
-            {children.map((child, idx) =>
-              renderPageNode(child, depth + 1, idx),
-            )}
-          </div>
-        )}
-      </div>
-    );
+  const handleDuplicatePage = (pageToDup: any) => {
+    const copyLabel = pageToDup.label
+      ? `Copia di ${pageToDup.label}`
+      : "Copia di Pagina";
+    onAddPage &&
+      onAddPage({
+        type: pageToDup.type || "empty",
+        label: copyLabel,
+        icon: pageToDup.icon,
+        iconColor: pageToDup.iconColor,
+        parentId: pageToDup.parentId || null,
+        initialData: pageToDup.data,
+      });
   };
 
   // allow dropping on root (make page a root child)
-  const handleRootDrop = (e) => {
+  const handleRootDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const draggedId = e.dataTransfer.getData("text/plain");
     if (!draggedId) return;
@@ -401,13 +340,13 @@ export default function Sidebar({
   };
 
   // Toggle expand/collapse for a page in the sidebar and persist to localStorage
-  const togglePageExpand = (id, e) => {
+  const togglePageExpand = (id: string, e?: React.MouseEvent) => {
     if (e && e.preventDefault) {
       e.preventDefault();
       e.stopPropagation();
     }
-    setExpandedPages((prev) => {
-      const currentlyExpanded = prev[id] !== false; // default to expanded
+    setExpandedPages((prev: Record<string, boolean>) => {
+      const currentlyExpanded = prev[id] === true;
       const next = { ...prev, [id]: !currentlyExpanded };
       try {
         localStorage.setItem("expanded_pages", JSON.stringify(next));
@@ -901,7 +840,22 @@ export default function Sidebar({
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleRootDrop}
                 >
-                  {rootNodes.map((page, idx) => renderPageNode(page, 0, idx))}
+                  {rootNodes.map((page, idx) => (
+                    <PageTreeItem
+                      key={page.id}
+                      page={page}
+                      depth={0}
+                      indexInParent={idx}
+                      childrenMap={childrenMap}
+                      activePageId={activePageId}
+                      expandedPages={expandedPages}
+                      onToggleExpand={togglePageExpand}
+                      onAddSubpage={handleAddSubpage}
+                      onDeletePage={(id) => setPendingDelete({ id })}
+                      onUpdatePage={onUpdatePage}
+                      onDuplicatePage={handleDuplicatePage}
+                    />
+                  ))}
                 </ul>
               )}
             </SidebarSection>
@@ -967,6 +921,11 @@ export default function Sidebar({
           }}
         />
       </aside>
+
+      {profileMenuPortal}
+      {helpMenuPortal}
+      {trashMenuPortal}
+      {pendingDeletePortal}
 
       {/* ── Search modal portal ───────────────────────────────────────────── */}
       {isSearchOpen &&
