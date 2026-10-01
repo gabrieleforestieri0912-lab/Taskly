@@ -35,7 +35,11 @@ import {
   Clock,
   Sparkles,
   Mic,
+  Inbox,
+  HelpCircle,
 } from "lucide-react";
+import { SidebarSection } from "./sidebar/SidebarSection";
+import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -688,199 +692,167 @@ export default function Sidebar({
     };
   }, [isTrashOpen]);
 
+  // ── Keyboard shortcut Ctrl+\ to collapse sidebar ──────────────────────────
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "\\") {
+        e.preventDefault();
+        setIsSidebarOpen((s) => !s);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [setIsSidebarOpen]);
+
   return (
     <>
-      <aside className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50 shadow-2xl overflow-y-auto">
-        <div className="flex items-center mb-3 px-4 pt-4">
-          <div className="flex items-center gap-2" ref={profileRef}>
-            <button
-              onClick={(e) => {
-                const rect = profileRef.current?.getBoundingClientRect();
-                if (rect) {
-                  setProfileMenuPos({
-                    top: rect.bottom + 8,
-                    left: rect.left,
-                  });
-                }
-                setIsProfileOpen((s) => !s);
-              }}
-              className="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
-            >
-              {user.picture ? (
-                <img
-                  src={user.picture}
-                  alt={user.name}
-                  className="w-8 h-8 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="w-8 h-8 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
-                  <User
-                    size={16}
-                    className="text-[#7b39fc] dark:text-[#a67cff]"
-                  />
-                </div>
-              )}
-              <div className="hidden sm:flex flex-col text-left truncate">
-                <p className="text-sm font-bold text-gray-700 dark:text-gray-200 truncate">
-                  {user.name}
-                </p>
+      {/* ════════════════════════════════════════════════════════════════════
+          ASIDE — the Notion-style sidebar panel
+          ════════════════════════════════════════════════════════════════════ */}
+      <aside
+        className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
+        aria-label="Navigazione sidebar"
+      >
+        {/* ── Workspace / user header ─────────────────────────────────────────── */}
+        <div className="flex items-center px-2 pt-2 pb-1" ref={profileRef}>
+          <button
+            type="button"
+            onClick={(e) => {
+              const rect = profileRef.current?.getBoundingClientRect();
+              if (rect) {
+                setProfileMenuPos({ top: rect.bottom + 8, left: rect.left });
+              }
+              setIsProfileOpen((s) => !s);
+            }}
+            aria-expanded={isProfileOpen}
+            aria-haspopup="menu"
+            aria-label="Menu account"
+            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          >
+            {user.picture ? (
+              <img
+                src={user.picture}
+                alt={user.name}
+                className="w-6 h-6 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-6 h-6 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
+                <User size={13} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
               </div>
-            </button>
-
-            {/* profile menu rendered as portal below (popup) */}
-          </div>
-
-          {/** Render profile menu via portal (kept as separate var below) */}
+            )}
+            <span className="flex-1 text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+              {user.name || "Workspace"}
+            </span>
+            <ChevronUp
+              size={14}
+              aria-hidden="true"
+              className={`text-gray-400 shrink-0 transition-transform duration-200 ${
+                isProfileOpen ? "" : "rotate-180"
+              }`}
+            />
+          </button>
         </div>
 
+        {/* Portals (rendered outside normal flow) */}
         {profileMenuPortal}
         {helpMenuPortal}
         {trashMenuPortal}
+        {pendingDeletePortal}
 
-        <div
-          className="flex-1 px-3 space-y-3"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleRootDrop}
+        {/* ── Scrollable nav body ────────────────────────────────────────────── */}
+        <nav
+          className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden px-2 pb-2"
+          style={{ scrollbarWidth: "thin" }}
+          aria-label="Navigazione principale"
         >
-          {/* Menu di Navigazione Orizzontale */}
-          <div className="flex items-center justify-between gap-1 p-1 bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl">
-            <button
+          {/* ── Quick actions ──────────────────────────────────────────────── */}
+          <div className="mt-1 space-y-0.5" role="list" aria-label="Azioni rapide">
+            <SidebarNavItem
+              id="sidebar-search-btn"
+              icon={Search}
+              label={t("search")}
+              onClick={() => setIsSearchOpen(true)}
+            />
+            <SidebarNavItem
+              id="sidebar-home-btn"
+              icon={LayoutDashboard}
+              label={t("homePages")}
+              href="/dashboard"
+              isActive={!isTranscriptionMode && !isAIActive && !activePageId}
               onClick={() => {
                 setIsTranscriptionMode(false);
                 setIsAIActive(false);
-                router.push("/dashboard");
               }}
-              className={`flex-1 flex h-9 items-center justify-center rounded-lg transition-all ${
-                !isTranscriptionMode && !isAIActive
-                  ? "bg-white dark:bg-gray-800 text-cyan-600 dark:text-cyan-400 shadow-sm border border-gray-200/50 dark:border-gray-700"
-                  : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-              }`}
-              title={t("homePages")}
-            >
-              <LayoutDashboard size={17} />
-            </button>
-
-            <button
+            />
+            <SidebarNavItem
+              id="sidebar-inbox-btn"
+              icon={Inbox}
+              label="Inbox"
+              onClick={() => {
+                /* placeholder — Fase 5 */
+              }}
+            />
+            <SidebarNavItem
+              id="sidebar-ai-btn"
+              icon={Sparkles}
+              label={t("aiAssistant")}
+              isActive={isAIActive}
+              onClick={() => {
+                setIsTranscriptionMode(false);
+                setIsAIActive(true);
+                router.push("/dashboard?ai=1");
+                window.dispatchEvent(new Event("open-ai-panel-page"));
+              }}
+            />
+            <SidebarNavItem
+              id="sidebar-meetings-btn"
+              icon={Mic}
+              label={t("meetingsVoice")}
+              isActive={isTranscriptionMode}
               onClick={() => {
                 setIsTranscriptionMode(true);
                 setIsAIActive(false);
                 router.push("/meetings");
               }}
-              className={`flex-1 flex h-9 items-center justify-center rounded-lg transition-all ${
-                isTranscriptionMode
-                  ? "bg-white dark:bg-gray-800 text-cyan-600 dark:text-cyan-400 shadow-sm border border-gray-200/50 dark:border-gray-700"
-                  : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-              }`}
-              title={t("meetingsVoice")}
-            >
-              <Mic size={17} />
-            </button>
-
-            <button
-              onClick={() => {
-                // behave like other nav buttons: deactivate transcription and navigate
-                setIsTranscriptionMode(false);
-                setIsAIActive(true);
-                // navigate to dashboard with ai flag so the main content becomes the AI page
-                router.push("/dashboard?ai=1");
-                // also notify AIPanel if available
-                window.dispatchEvent(new Event("open-ai-panel-page"));
-              }}
-              className={`flex-1 flex h-9 items-center justify-center rounded-lg transition-all ${isAIActive ? "bg-white dark:bg-gray-800 text-cyan-600 dark:text-cyan-400 shadow-sm border border-gray-200/50 dark:border-gray-700" : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"}`}
-              title={t("aiAssistant")}
-            >
-              <Sparkles size={17} />
-            </button>
-
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="flex-1 flex h-9 items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-all"
-              title={t("search")}
-            >
-              <Search size={17} />
-            </button>
-          </div>
-
-          {/* Bottone azione condizionale sotto la barra */}
-          <div className="px-1">
-            {!isTranscriptionMode ? (
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="w-full py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-600/20"
-              >
-                <Plus size={18} />
-                {t("newPage")}
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push("/transcription")}
-                className="w-full py-2.5 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-600/20"
-              >
-                <Plus size={18} />
-                {t("newTranscription")}
-              </button>
-            )}
+            />
           </div>
 
           <div className="my-2 border-t border-gray-100 dark:border-gray-800" />
 
-          {/* Contenuto dinamico della Sidebar */}
-          {!isTranscriptionMode ? (
-            isAIActive ? (
-              <div className="space-y-1">
-                <p className="px-3 pt-1 pb-1 text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">
-                  {t("history")} AI
-                </p>
-                {aiMessages.length === 0 ? (
-                  <div className="px-3 py-4 text-center text-xs text-gray-400">{t("land.sideNoAiHistory")}</div>
-                ) : (
-                  <div className="px-2 space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
-                    {aiMessages
-                      .slice()
-                      .reverse()
-                      .slice(0, 8)
-                      .map((m, i) => (
-                        <button
-                          key={i}
-                          className="w-full text-left px-3 py-2 rounded-xl hover:bg-cyan-50 dark:hover:bg-cyan-900/20 text-sm font-semibold text-gray-700 dark:text-gray-300"
-                        >
-                          <div className="truncate">
-                            {String(
-                              m.content || m.text || m.summary || "",
-                            ).slice(0, 80)}
-                          </div>
-                          <div className="text-[10px] text-gray-400 mt-1">
-                            {m.role || ""}
-                          </div>
-                        </button>
-                      ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-1">
-                <p className="px-3 pt-1 pb-1 text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">
-                  {t("yourPages")}
-                </p>
-                {loading ? (
-                  <div className="px-3 space-y-3 mt-2">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Skeleton key={i} className="h-8 w-full rounded-xl" />
+          {/* ── Private pages section ───────────────────────────────────────── */}
+          {isAIActive ? (
+            /* AI history list */
+            <SidebarSection label={`${t("history")} AI`}>
+              {aiMessages.length === 0 ? (
+                <div className="px-3 py-4 text-center text-xs text-gray-400">
+                  {t("land.sideNoAiHistory")}
+                </div>
+              ) : (
+                <div className="px-1 space-y-0.5 max-h-64 overflow-y-auto">
+                  {aiMessages
+                    .slice()
+                    .reverse()
+                    .slice(0, 8)
+                    .map((m, i) => (
+                      <button
+                        key={i}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-cyan-50 dark:hover:bg-cyan-900/20 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors"
+                      >
+                        <div className="truncate">
+                          {String(m.content || m.text || m.summary || "").slice(0, 80)}
+                        </div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">{m.role || ""}</div>
+                      </button>
                     ))}
-                  </div>
-                ) : (
-                  rootNodes.map((page, idx) => renderPageNode(page, 0, idx))
-                )}
-              </div>
-            )
-          ) : (
-            <div className="px-2 py-4 text-center">
+                </div>
+              )}
+            </SidebarSection>
+          ) : isTranscriptionMode ? (
+            /* Transcription-mode info panel */
+            <div className="px-2 py-6 text-center">
               <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <Mic
-                  size={22}
-                  className="text-cyan-600 dark:text-cyan-400 animate-pulse"
-                />
+                <Mic size={22} className="text-cyan-600 dark:text-cyan-400" />
               </div>
               <h4 className="text-xs font-bold text-gray-700 dark:text-gray-200 mb-1">
                 {t("meetingRecording")}
@@ -888,50 +860,103 @@ export default function Sidebar({
               <p className="text-[11px] text-gray-400 mb-4 px-2 leading-relaxed">
                 {t("meetingRecordingDesc")}
               </p>
+              <button
+                onClick={() => router.push("/transcription")}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg transition-all"
+              >
+                <Plus size={14} />
+                {t("newTranscription")}
+              </button>
             </div>
+          ) : (
+            /* Normal pages section */
+            <SidebarSection
+              label={t("yourPages") || "Privato"}
+              onAdd={() => setIsModalOpen(true)}
+              addLabel={t("newPage") || "Nuova pagina"}
+            >
+              {loading ? (
+                <div className="px-2 space-y-1 mt-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Skeleton key={i} className="h-7 w-full rounded-lg" />
+                  ))}
+                </div>
+              ) : rootNodes.length === 0 ? (
+                <div className="px-3 py-6 text-center">
+                  <p className="text-xs text-gray-400 mb-2">
+                    {t("land.sideNoPages") || "Nessuna pagina"}
+                  </p>
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+                  >
+                    {t("newPage") || "Crea una pagina"}
+                  </button>
+                </div>
+              ) : (
+                <ul
+                  role="tree"
+                  aria-label={t("yourPages") || "Pagine private"}
+                  className="space-y-0.5"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleRootDrop}
+                >
+                  {rootNodes.map((page, idx) => renderPageNode(page, 0, idx))}
+                </ul>
+              )}
+            </SidebarSection>
           )}
-        </div>
 
-        {/* Bottom badges: Cestino & Aiuto (stacked vertically) */}
-        <div className="px-3 py-3 mt-2">
-          <div className="flex flex-col items-stretch gap-2">
-            <button
-              ref={trashRef}
-              onClick={() => {
-                setTrashSearch("");
-                setIsTrashOpen((s) => !s);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              title={t("land.sideTrash")}
-            >
-              <Trash2 size={16} className="text-gray-500" />
-              <div className="flex-1 text-left">
-                <div className="text-sm font-bold text-gray-700 dark:text-gray-200">{t("land.sideTrash")}</div>
-              </div>
-            </button>
+          {/* Spacer */}
+          <div className="flex-1" />
+        </nav>
 
-            <button
-              ref={helpRef}
-              onClick={() => setIsHelpOpen((s) => !s)}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              title={t("land.sideHelpTitle")}
-            >
-              <BookOpen size={16} className="text-gray-500" />
-              <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{t("land.sideHelp")}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Transcription Badge - always in the same position */}
-        {isTranscriptionMode && (
+        {/* ── Footer ────────────────────────────────────────────────────────── */}
+        <div className="border-t border-gray-100 dark:border-gray-800 px-2 py-2 space-y-0.5">
+          <SidebarNavItem
+            id="sidebar-settings-btn"
+            icon={Settings}
+            label={t("land.demoNavSettings")}
+            href="/settings"
+          />
           <button
-            onClick={() => router.push("/transcription")}
-            className="absolute bottom-24 left-0 right-0 mx-auto w-fit flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-bold rounded-full shadow-lg transition-all z-10"
+            ref={trashRef}
+            type="button"
+            onClick={() => {
+              setTrashSearch("");
+              setIsTrashOpen((s) => !s);
+            }}
+            title={t("land.sideTrash")}
+            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
-            <Mic size={16} />
-            {t("newTranscription")}
+            <Trash2 size={16} aria-hidden="true" className="shrink-0" />
+            <span className="flex-1 truncate">{t("land.sideTrash")}</span>
+            {deletedCounts.pages > 0 && (
+              <span className="text-[10px] font-bold text-gray-400">
+                {deletedCounts.pages}
+              </span>
+            )}
           </button>
-        )}
+          <button
+            ref={helpRef}
+            type="button"
+            onClick={() => setIsHelpOpen((s) => !s)}
+            title={t("land.sideHelpTitle")}
+            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          >
+            <HelpCircle size={16} aria-hidden="true" className="shrink-0" />
+            <span className="flex-1 truncate">{t("land.sideHelp")}</span>
+          </button>
+          <button
+            type="button"
+            id="sidebar-invite-btn"
+            onClick={() => { /* placeholder — Fase 5 */ }}
+            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          >
+            <Users size={16} aria-hidden="true" className="shrink-0" />
+            <span className="flex-1 truncate">{t("land.sideInviteMembers") || "Invita membri"}</span>
+          </button>
+        </div>
 
         <AddPageModal
           isOpen={isModalOpen}
@@ -943,6 +968,7 @@ export default function Sidebar({
         />
       </aside>
 
+      {/* ── Search modal portal ───────────────────────────────────────────── */}
       {isSearchOpen &&
         typeof document !== "undefined" &&
         createPortal(
