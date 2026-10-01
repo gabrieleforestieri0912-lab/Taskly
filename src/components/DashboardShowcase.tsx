@@ -231,7 +231,7 @@ function CountUp({ value, suffix = "" }) {
 function MockSidebar() {
   const { t, tWith } = useLanguage();
   return (
-    <div className="hidden h-full w-56 shrink-0 flex-col border-r border-[#2b2344]/60 bg-[#120d20]/95 p-4 md:flex">
+    <div className="hidden h-full w-56 shrink-0 flex-col border-r border-white/10 bg-black p-4 md:flex">
       <div className="mb-6 flex items-center gap-2.5 px-1">
         <svg viewBox="0 0 24 24" fill="#7b39fc" className="h-6 w-6">
           <path d="M1.04356 6.35771L13.6437 0.666504L23.3335 6.35771V17.6423L13.6437 23.3335L1.04356 17.6423V6.35771ZM12.5 4.2L4.5 8.5V15.5L12.5 19.8L20.5 15.5V8.5L12.5 4.2Z" />
@@ -239,10 +239,10 @@ function MockSidebar() {
         <span className="font-inter text-[15px] font-bold tracking-tight text-white">{t("land.cmpHeaderTaskly")}</span>
       </div>
 
-      <button className="mb-4 flex items-center justify-between rounded-xl border border-[#a484d7]/20 bg-[#7b39fc]/10 px-3 py-2 text-left transition-colors hover:bg-[#7b39fc]/20">
+      <button className="mb-4 flex items-center justify-between rounded-xl border border-[#7b39fc]/25 bg-[#7b39fc]/10 px-3 py-2 text-left transition-colors hover:bg-[#7b39fc]/20">
         <span className="flex items-center gap-2 text-[13px] font-semibold text-[#a67cff]">
           <Plus size={14} />{t("views.uiNewPage")}</span>
-        <kbd className="rounded-md border border-[#a484d7]/25 bg-[#120d20] px-1.5 py-0.5 text-[9px] font-bold text-[#a67cff]">
+        <kbd className="rounded-md border border-white/15 bg-black px-1.5 py-0.5 text-[9px] font-bold text-[#a67cff]">
           ⌘N
         </kbd>
       </button>
@@ -280,7 +280,7 @@ function MockSidebar() {
         })}
       </div>
 
-      <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-[#2b2344]/60 bg-[#1a1528] p-2.5">
+      <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 p-2.5">
         <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#5a1fd4] text-xs font-bold text-white">
           S
         </div>
@@ -306,7 +306,7 @@ function StatCard({ stat, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="group rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#a484d7]/30 hover:shadow-lg hover:shadow-[#7b39fc]/10"
+      className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7b39fc]/40 hover:shadow-lg hover:shadow-[#7b39fc]/10"
     >
       <div className="flex items-center justify-between">
         <div
@@ -345,7 +345,7 @@ function TasksView() {
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
       {/* Today's tasks */}
-      <div className="rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 sm:p-5">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("views.calToday")}</h4>
@@ -354,17 +354,17 @@ function TasksView() {
             </p>
           </div>
           <div className="flex items-center gap-1.5">
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+            <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
               <ListChecks size={14} />
             </button>
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+            <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
               <KanbanSquare size={14} />
             </button>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-[#2b2344]">
+        <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-white/10">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-[#7b39fc] to-[#a67cff]"
             initial={{ width: 0 }}
@@ -386,8 +386,8 @@ function TasksView() {
               transition={{ duration: 0.35 }}
               className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all duration-200 ${
                 todo.done
-                  ? "border-[#a484d7]/8 bg-[#120d20]/60 opacity-60"
-                  : "border-[#a484d7]/12 bg-[#221c3a]/60 hover:border-[#a484d7]/30 hover:bg-[#2b2344]/70"
+                  ? "border-white/10 bg-white/5 opacity-60"
+                  : "border-white/10 bg-black hover:border-[#7b39fc]/40 hover:bg-[#7b39fc]/10"
               }`}
             >
               {todo.done ? (
@@ -427,13 +427,13 @@ function TasksView() {
           ))}
         </div>
 
-        <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#a484d7]/25 py-2.5 text-[12px] font-semibold text-gray-500 transition-colors hover:border-[#a67cff]/50 hover:text-[#a67cff]">
+        <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-2.5 text-[12px] font-semibold text-gray-500 transition-colors hover:border-[#7b39fc]/50 hover:text-[#a67cff]">
           <Plus size={14} />{t("land.mockAddTask")}</button>
       </div>
 
       {/* AI panel */}
-      <div className="flex flex-col overflow-hidden rounded-2xl border border-[#7b39fc]/25 bg-gradient-to-b from-[#221c3a]/80 to-[#120d20]/90">
-        <div className="flex items-center gap-2 border-b border-[#a484d7]/12 px-4 py-3">
+      <div className="flex flex-col overflow-hidden rounded-2xl border border-[#7b39fc]/25 bg-black">
+        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
           <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#7b39fc] text-white">
             <Bot size={15} />
           </div>
@@ -459,7 +459,7 @@ function TasksView() {
                 className={`max-w-[90%] rounded-2xl px-3 py-2 text-[12px] leading-relaxed ${
                   msg.from === "user"
                     ? "rounded-br-sm bg-[#7b39fc] text-white"
-                    : "rounded-bl-sm bg-[#2b2344]/70 text-gray-300"
+                    : "rounded-bl-sm bg-white/10 text-gray-200"
                 }`}
               >
                 {msg.text}
@@ -476,7 +476,7 @@ function TasksView() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.9 + i * 0.12 }}
-                className="flex w-full items-center gap-2 rounded-xl border border-[#a484d7]/20 bg-[#120d20]/70 px-3 py-2 text-left text-[11px] font-medium text-gray-400 transition-all hover:border-[#a67cff]/50 hover:text-[#a67cff]"
+                className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-[11px] font-medium text-gray-400 transition-all hover:border-[#7b39fc]/50 hover:text-[#a67cff]"
               >
                 <Sparkles size={12} className="shrink-0 text-[#a67cff]" />
                 {s}
@@ -485,8 +485,8 @@ function TasksView() {
           </div>
         </div>
 
-        <div className="border-t border-[#a484d7]/12 p-3">
-          <div className="flex items-center gap-2 rounded-xl border border-[#a484d7]/15 bg-[#120d20] px-3 py-2">
+        <div className="border-t border-white/10 p-3">
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black px-3 py-2">
             <input
               readOnly
               placeholder={t("land.mockAiPlaceholder")}
@@ -512,7 +512,7 @@ function KanbanView() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: ci * 0.08, duration: 0.4 }}
-          className="rounded-2xl border border-[#a484d7]/10 bg-[#120d20]/60 p-3"
+          className="rounded-2xl border border-white/10 bg-black p-3"
         >
           <div className="mb-3 flex items-center justify-between px-1">
             <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ function KanbanView() {
               <span className="text-[12px] font-bold text-gray-300">
                 {col.column}
               </span>
-              <span className="rounded-md bg-[#2b2344] px-1.5 py-0.5 text-[10px] font-bold text-gray-500">
+              <span className="rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-gray-500">
                 {col.cards.length}
               </span>
             </div>
@@ -536,7 +536,7 @@ function KanbanView() {
                 key={card.title}
                 whileHover={{ y: -3, scale: 1.01 }}
                 transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                className="group cursor-default rounded-xl border border-[#a484d7]/12 bg-[#221c3a]/70 p-3 transition-colors hover:border-[#a484d7]/35"
+                className="group cursor-default rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:border-[#7b39fc]/40"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[12px] font-semibold leading-snug text-gray-200">
@@ -578,7 +578,7 @@ function CalendarView() {
   const { t, tWith } = useLanguage();
   const today = 3; // Wednesday
   return (
-    <div className="rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 sm:p-5">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("land.mockCalMonth")}</h4>
@@ -587,10 +587,10 @@ function CalendarView() {
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+          <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
             <ChevronRight size={14} className="rotate-180" />
           </button>
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+          <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -610,7 +610,7 @@ function CalendarView() {
               className={`flex min-h-[110px] flex-col rounded-xl border p-2 transition-colors ${
                 isToday
                   ? "border-[#7b39fc]/50 bg-[#7b39fc]/10"
-                  : "border-[#a484d7]/10 bg-[#120d20]/50 hover:border-[#a484d7]/25"
+                  : "border-white/10 bg-black hover:border-[#7b39fc]/30"
               }`}
             >
               <div className="mb-1.5 flex items-center justify-between">
@@ -678,23 +678,6 @@ export default function DashboardShowcase() {
 
   return (
     <section className="landing-section relative overflow-hidden px-4 py-20 sm:px-6 sm:py-28">
-      {/* Ambient purple glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          style={{ x: "-50%" }}
-          initial={{ opacity: 0.4, scale: 0.85 }}
-          animate={{ opacity: [0.4, 0.95, 0.4], scale: [0.85, 1.18, 0.85] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-1/2 top-0 h-[500px] w-[900px] rounded-full bg-[#7b39fc]/12 blur-[140px]"
-        />
-        <motion.div
-          initial={{ opacity: 0.3 }}
-          animate={{ opacity: [0.3, 0.7, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-0 right-[-100px] h-[400px] w-[500px] rounded-full bg-[#5a1fd4]/10 blur-[120px]"
-        />
-      </div>
-
       <div className="relative mx-auto max-w-6xl">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
@@ -749,15 +732,15 @@ export default function DashboardShowcase() {
             }}
             whileTap={{ scale: 0.995 }}
           >
-            <div className="relative overflow-hidden rounded-2xl border border-[#a484d7]/20 bg-[#0d0a1a] shadow-2xl shadow-black/60">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl shadow-black/60">
             {/* Window chrome */}
-            <div className="flex items-center gap-3 border-b border-[#2b2344]/60 bg-[#120d20] px-4 py-2.5">
+            <div className="flex items-center gap-3 border-b border-white/10 bg-black px-4 py-2.5">
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
               </div>
-              <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg border border-[#2b2344]/70 bg-[#0d0a1a] px-3 py-1 text-[11px] text-gray-500">
+              <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg border border-white/10 bg-black px-3 py-1 text-[11px] text-gray-500">
                 <Globe size={11} className="shrink-0 text-[#7b39fc]" />
                 <span className="truncate">app.taskly.io/dashboard</span>
               </div>
@@ -773,9 +756,9 @@ export default function DashboardShowcase() {
 
               <div className="flex min-w-0 flex-1 flex-col">
                 {/* App topbar */}
-                <div className="flex items-center justify-between border-b border-[#2b2344]/60 px-4 py-2.5 sm:px-5">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5 sm:px-5">
                   <div className="flex items-center gap-2.5">
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] md:hidden">
+                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] md:hidden">
                       <PanelLeft size={14} />
                     </button>
                     <div>
@@ -784,14 +767,14 @@ export default function DashboardShowcase() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="hidden items-center gap-2 rounded-lg border border-[#a484d7]/15 bg-[#120d20] px-2.5 py-1.5 sm:flex">
+                    <div className="hidden items-center gap-2 rounded-lg border border-white/10 bg-black px-2.5 py-1.5 sm:flex">
                       <Search size={12} className="text-gray-600" />
                       <span className="text-[11px] text-gray-500">{t("land.mockSearchHint")}</span>
                     </div>
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
+                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
                       <Search size={14} />
                     </button>
-                    <button className="relative grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+                    <button className="relative grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
                       <Bell size={14} />
                       <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#7b39fc]" />
                     </button>
@@ -811,7 +794,7 @@ export default function DashboardShowcase() {
                   </div>
 
                   {/* Tab switcher */}
-                  <div className="mb-4 flex items-center gap-1 rounded-xl border border-[#a484d7]/12 bg-[#120d20]/70 p-1">
+                  <div className="mb-4 flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
                     {TABS.map((t) => {
                       const Icon = t.icon;
                       const active = tab === t.id;
@@ -872,7 +855,7 @@ export default function DashboardShowcase() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5, type: "spring", stiffness: 260, damping: 18 }}
-              className="flex items-center gap-2 rounded-2xl border border-[#a484d7]/20 bg-[#1a1528]/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
+              className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
             >
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500/15 text-emerald-400">
                 <TrendingUp size={17} />
@@ -894,7 +877,7 @@ export default function DashboardShowcase() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.65, type: "spring", stiffness: 260, damping: 18 }}
-              className="flex items-center gap-2 rounded-2xl border border-[#a484d7]/20 bg-[#1a1528]/95 px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
+              className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
             >
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#7b39fc]/15 text-[#a67cff]">
                 <Sparkles size={17} />

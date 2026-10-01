@@ -147,7 +147,7 @@ function Pricing() {
     {
       title: "Pro",
       description: "Tutto ciò di cui hai bisogno per la tua produttività quotidiana.",
-      price: isAnnual ? "7" : "9",
+      price: isAnnual ? "4.79" : "5.99",
       period: "Mese",
       icon: Zap,
       features: [
@@ -166,7 +166,7 @@ function Pricing() {
     {
       title: "Team",
       description: "Per team piccoli che vogliono collaborare in tempo reale.",
-      price: isAnnual ? "19" : "24",
+      price: isAnnual ? "11.99" : "14.99",
       period: "Mese",
       icon: ShieldCheck,
       features: [

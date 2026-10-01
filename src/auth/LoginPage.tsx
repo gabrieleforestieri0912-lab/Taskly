@@ -69,10 +69,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfaff] dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col relative overflow-hidden transition-colors duration-300">
-      {/* Decorative background elements */}
-      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#7b39fc]/10 dark:bg-[#7b39fc]/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#a67cff]/10 dark:bg-[#a67cff]/15 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-[#fcfaff] dark:bg-black text-gray-900 dark:text-gray-100 flex flex-col relative overflow-hidden transition-colors duration-300">
 
       <div className="fixed top-8 left-8 z-100">
             <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">

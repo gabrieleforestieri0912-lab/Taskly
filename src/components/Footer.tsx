@@ -64,11 +64,6 @@ export default function Footer() {
       role="contentinfo"
       aria-label={t("land.footerAria")}
     >
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
-        <div className="h-40 w-[700px] max-w-full rounded-full bg-[#7b39fc]/10 blur-[120px]" />
-      </div>
-
       <div className="relative mx-auto max-w-6xl px-6 pt-16 pb-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Brand */}

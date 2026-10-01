@@ -8,11 +8,9 @@ import { ArrowRight, Sparkles } from "lucide-react";
 export default function CtaBanner() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-24 bg-white dark:bg-[#151020]">
+    <section className="px-6 py-24 bg-white dark:bg-black">
       <div className="max-w-5xl mx-auto">
-        <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#7b39fc] via-[#6d28d9] to-[#2b2344] p-10 md:p-16 text-center">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        <div className="relative overflow-hidden rounded-3xl bg-[#7b39fc] p-10 md:p-16 text-center">
 
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 text-white text-xs font-black uppercase tracking-widest mb-6 backdrop-blur-sm">

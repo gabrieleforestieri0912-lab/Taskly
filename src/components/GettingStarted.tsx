@@ -26,7 +26,7 @@ const steps = [
 export default function GettingStarted() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-20 bg-white dark:bg-[#151020]">
+    <section className="px-6 py-20 bg-white dark:bg-black">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">{t("land.gsEyebrow")}</div>

@@ -11,18 +11,18 @@ const PLAN_CONFIG: Record<
   { unitAmount: number; name: string; interval: "month" | "year" }
 > = {
   pro_monthly: {
-    unitAmount: 9,
+    unitAmount: 5.99,
     name: "Taskly Pro (Mensile)",
     interval: "month",
   },
-  pro_yearly: { unitAmount: 7, name: "Taskly Pro (Annuale)", interval: "month" },
+  pro_yearly: { unitAmount: 4.79, name: "Taskly Pro (Annuale)", interval: "month" },
   team_monthly: {
-    unitAmount: 24,
+    unitAmount: 14.99,
     name: "Taskly Team (Mensile)",
     interval: "month",
   },
   team_yearly: {
-    unitAmount: 19,
+    unitAmount: 11.99,
     name: "Taskly Team (Annuale)",
     interval: "month",
   },

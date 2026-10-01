@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -30,21 +29,7 @@
 
   /* gray-850 only ever appears as a dark-mode surface (legacy app pages),
      so it can live in the theme directly. */
-  --color-gray-850: #221c3a;
-
-  --animate-gradient: gradient 3s ease infinite;
-
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
+  --color-gray-850: #171717;
 }
 
 @variant dark (&:where(.dark, .dark *));
@@ -56,14 +41,14 @@
    touching light mode. Text colors are unaffected because all dark-mode
    text already uses explicit dark:text-* overrides. */
 .dark {
-  --color-black: #0a0716;
-  --color-gray-950: #120d20;
-  --color-gray-900: #1a1528;
-  --color-gray-850: #221c3a;
-  --color-gray-800: #2b2344;
-  --color-zinc-950: #120d20;
-  --color-zinc-900: #1a1528;
-  --color-zinc-800: #2b2344;
+  --color-black: #000000;
+  --color-gray-950: #000000;
+  --color-gray-900: #0a0a0a;
+  --color-gray-850: #111111;
+  --color-gray-800: #1a1a1a;
+  --color-zinc-950: #000000;
+  --color-zinc-900: #0a0a0a;
+  --color-zinc-800: #1a1a1a;
 }
 
 @layer base {
@@ -111,7 +96,7 @@
 
   /* Landing design system */
   .landing-section-light {
-    @apply px-6 py-20 bg-white dark:bg-[#0e0e0e];
+    @apply px-6 py-20 bg-white dark:bg-black;
   }
 
   .landing-section-alt {
@@ -141,7 +126,7 @@
   }
 
   .landing-display-accent {
-    @apply font-instrument-serif italic text-[#7b39fc] dark:text-[#a67cff];
+    @apply font-inter not-italic text-[#7b39fc] dark:text-[#a67cff];
   }
 
   .landing-body {
@@ -149,11 +134,11 @@
   }
 
   .landing-card {
-    @apply rounded-2xl border border-[#7b39fc]/10 dark:border-[#a484d7]/15 bg-white/90 dark:bg-[#2b2344]/30 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-[#7b39fc]/10;
+    @apply rounded-2xl border border-[#7b39fc]/10 dark:border-white/10 bg-white/90 dark:bg-white/5 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-[#7b39fc]/10;
   }
 
   .landing-icon-wrap {
-    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff];
+    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff];
   }
 
   .landing-btn-primary {
@@ -161,43 +146,29 @@
   }
 
   .landing-btn-secondary {
-    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#2b2344] px-8 text-base font-semibold tracking-[-0.01em] text-[#f6f7f9] transition-colors hover:bg-[#3a3058];
+    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-gray-900 px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200;
   }
 
   .landing-stat-card {
-    @apply rounded-xl bg-[#7b39fc]/8 dark:bg-[#7b39fc]/15 border border-[#7b39fc]/12 dark:border-[#a484d7]/20 p-5;
+    @apply rounded-xl bg-[#7b39fc]/8 dark:bg-[#7b39fc]/10 border border-[#7b39fc]/12 dark:border-white/10 p-5;
   }
 
   .text-gradient-brand {
-    background: linear-gradient(
-      to right,
-      #7b39fc,
-      #a67cff,
-      #7b39fc
-    );
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline;
+    color: #7b39fc;
+  }
+
+  .dark .text-gradient-brand {
+    color: #a67cff;
   }
 
   .text-gradient-purple,
   .text-gradient-cyan {
-    background: linear-gradient(
-      to right,
-      #7b39fc,
-      #a67cff,
-      #5a1fd4,
-      #7b39fc
-    );
-    background-size: 300% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+    color: #7b39fc;
+  }
+
+  .dark .text-gradient-purple,
+  .dark .text-gradient-cyan {
+    color: #a67cff;
   }
 }
 

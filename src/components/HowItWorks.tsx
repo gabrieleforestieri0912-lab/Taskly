@@ -41,7 +41,7 @@ const features = [
 export default function HowItWorks() {
   const { t } = useLanguage();
   return (
-    <section id="features" className="py-20 px-6 bg-[#f6f7f9] dark:bg-[#1a1528]">
+    <section id="features" className="py-20 px-6 bg-[#f6f7f9] dark:bg-black">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <div className="landing-eyebrow">{t("land.hiwEyebrow")}</div>

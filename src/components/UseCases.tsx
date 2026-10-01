@@ -43,7 +43,7 @@ const cardVariants = {
 export default function UseCases() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-20 bg-[#f6f7f9] dark:bg-[#1a1528]">
+    <section className="px-6 py-20 bg-[#f6f7f9] dark:bg-black">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">{t("land.ucEyebrow")}</div>

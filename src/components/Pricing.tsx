@@ -151,7 +151,7 @@ function Pricing() {
     {
       title: "Pro",
       description: "Tutto ciò di cui hai bisogno per la produttività quotidiana.",
-      price: isAnnual ? "7.99" : "9.99",
+      price: isAnnual ? "4.79" : "5.99",
       period: "Mese",
       icon: Zap,
       features: [
@@ -171,7 +171,7 @@ function Pricing() {
     {
       title: "Business",
       description: "Per team piccoli che collaborano in tempo reale.",
-      price: isAnnual ? "19.99" : "24.99",
+      price: isAnnual ? "11.99" : "14.99",
       period: "Mese",
       icon: ShieldCheck,
       features: [
@@ -191,8 +191,8 @@ function Pricing() {
     {
       title: "Enterprise",
       description: "Scala, sicurezza e controllo per organizzazioni grandi.",
-      price: isAnnual ? "49.99" : "59.99",
-      period: "Mese",
+      price: "Contattaci",
+      period: "",
       icon: Building2,
       features: [
         "Membri illimitati",
@@ -213,11 +213,8 @@ function Pricing() {
   return (
     <section
       id="pricing"
-      className="landing-section relative min-h-screen flex flex-col items-center justify-center px-4 py-20 bg-white dark:bg-[#151020] overflow-hidden sm:px-6"
+      className="landing-section relative min-h-screen flex flex-col items-center justify-center px-4 py-20 bg-white dark:bg-black overflow-hidden sm:px-6"
     >
-      {/* Background Orbs */}
-      <div className="absolute top-0 right-0 h-[360px] w-[min(420px,85vw)] bg-[#7b39fc]/10 dark:bg-[#7b39fc]/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 h-[360px] w-[min(420px,85vw)] bg-[#a67cff]/10 dark:bg-[#a67cff]/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none" />
 
       <div className="text-center max-w-4xl mb-12 relative z-10">
         <motion.div

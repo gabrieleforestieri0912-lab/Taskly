@@ -8,7 +8,7 @@ const logos = ["Studio Nova", "BrightOps", "Creative Lab", "Focus Team", "Nord A
 export default function SocialProof() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-20 bg-white dark:bg-[#151020]">
+    <section className="px-6 py-20 bg-white dark:bg-black">
       <div className="max-w-6xl mx-auto text-center">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{t("land.spEyebrow")}</p>
         <div className="mt-5 grid md:grid-cols-3 gap-4">
@@ -28,7 +28,7 @@ export default function SocialProof() {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {logos.map((logo) => (
-            <span key={logo} className="px-4 py-2 rounded-lg border border-[#7b39fc]/15 dark:border-[#a484d7]/20 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-[#2b2344]/30">
+            <span key={logo} className="px-4 py-2 rounded-lg border border-[#7b39fc]/15 dark:border-white/10 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-white/5">
               {logo}
             </span>
           ))}

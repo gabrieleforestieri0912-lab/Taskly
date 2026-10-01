@@ -23,7 +23,7 @@ const blocks = [
       "Dashboard chiara con pagine annidate e AI",
       "Flusso operativo continuo: idea to task to completamento",
     ],
-    tone: "from-[#7b39fc]/5 to-purple-50 dark:from-[#7b39fc]/10 dark:to-purple-900/10 border-[#7b39fc]/20 dark:border-[#a484d7]/30",
+    tone: "from-[#7b39fc]/5 to-purple-50 dark:from-[#7b39fc]/10 dark:to-white/5 border-[#7b39fc]/20 dark:border-white/10",
     icon: CheckCircle,
   },
 ];
@@ -37,7 +37,7 @@ const metrics = [
 export default function ProblemSolution() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-20 bg-white dark:bg-[#151020]">
+    <section className="px-6 py-20 bg-white dark:bg-black">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
@@ -79,7 +79,7 @@ export default function ProblemSolution() {
         <div className="mt-8 grid md:grid-cols-3 gap-4">
           {metrics.map((m) => (
             <div key={m.value} className="landing-stat-card text-center">
-              <p className="text-2xl font-black bg-clip-text text-transparent bg-linear-to-r from-[#7b39fc] to-[#a67cff]">{m.value}</p>
+              <p className="text-2xl font-black text-[#7b39fc]">{m.value}</p>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 font-medium">{m.label}</p>
             </div>
           ))}

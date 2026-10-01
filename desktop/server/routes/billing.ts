@@ -11,10 +11,10 @@ const APP_URL = process.env.APP_URL || "http://localhost:3000";
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 const PLAN_CONFIG = {
-  pro_monthly: { unitAmount: 9, name: "Taskly Pro (Mensile)", interval: "month" },
-  pro_yearly: { unitAmount: 7, name: "Taskly Pro (Annuale)", interval: "month" },
-  team_monthly: { unitAmount: 24, name: "Taskly Team (Mensile)", interval: "month" },
-  team_yearly: { unitAmount: 19, name: "Taskly Team (Annuale)", interval: "month" },
+  pro_monthly: { unitAmount: 5.99, name: "Taskly Pro (Mensile)", interval: "month" },
+  pro_yearly: { unitAmount: 4.79, name: "Taskly Pro (Annuale)", interval: "month" },
+  team_monthly: { unitAmount: 14.99, name: "Taskly Team (Mensile)", interval: "month" },
+  team_yearly: { unitAmount: 11.99, name: "Taskly Team (Annuale)", interval: "month" },
 };
 
 async function patchSubscription(userId, patch) {

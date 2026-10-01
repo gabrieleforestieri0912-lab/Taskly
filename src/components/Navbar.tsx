@@ -240,7 +240,7 @@ export default function Navbar({
     // Barra fissa a tutta larghezza: niente effetto "floating" ne' animazione
     // allo scroll, la superficie e' sempre la stessa.
     const barSurface =
-      "h-16 border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#120d20]/90";
+      "h-16 border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-black/90";
 
     const menuItem =
       "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-[#7b39fc]/10 hover:text-gray-900 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white";
@@ -304,7 +304,7 @@ export default function Navbar({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/12 dark:bg-[#120d20]/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/10 dark:bg-black/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
                       >
                         {link.children.map((child) => {
                           const Icon = child.icon;
@@ -379,7 +379,7 @@ export default function Navbar({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.97 }}
                           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/12 dark:bg-[#120d20]/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/10 dark:bg-black/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
                         >
                           <div className="border-b border-gray-200/70 p-4 dark:border-white/10">
                             <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:text-white/50">

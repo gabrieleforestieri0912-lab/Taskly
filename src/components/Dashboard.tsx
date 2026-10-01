@@ -192,7 +192,7 @@ export default function Dashboard({
       {plan && plan.maxPages && (
         <motion.div
           variants={item}
-          className="flex items-center gap-3 rounded-2xl border border-[#7b39fc]/15 bg-white/60 dark:bg-[#1a1528]/60 px-4 py-3"
+          className="flex items-center gap-3 rounded-2xl border border-[#7b39fc]/15 bg-white/60 dark:bg-white/5 px-4 py-3"
         >
           <div className="w-10 h-10 rounded-xl bg-[#7b39fc]/10 flex items-center justify-center shrink-0">
             <Zap size={18} className="text-[#a67cff]" />
@@ -511,13 +511,13 @@ export default function Dashboard({
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] border-2 border-[#7b39fc]/20 bg-linear-to-br from-[#2b2344]/15 to-[#7b39fc]/10 dark:bg-linear-to-br dark:from-[#2b2344]/40 dark:to-[#7b39fc]/15">
+          <Card className="rounded-[2rem] border-2 border-[#7b39fc]/20 bg-[#7b39fc]/5 dark:bg-[#7b39fc]/10">
             <CardContent className="p-6 text-center space-y-4">
               <Sparkles className="mx-auto text-[#a67cff]" size={32} />
               <p className="text-xs font-bold text-gray-700 dark:text-gray-200">
                 {t("aiAnalysis")}
               </p>
-              <button className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-linear-to-r from-[#7b39fc] to-[#a67cff] text-white shadow-lg shadow-[#7b39fc]/25 transition-all hover:from-[#8b4dff] hover:to-[#a67cff] hover:shadow-xl hover:shadow-[#7b39fc]/40 active:translate-y-0">
+              <button className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-[#7b39fc] text-white shadow-lg shadow-[#7b39fc]/25 transition-colors hover:bg-[#8b4dff] active:translate-y-0">
                 {t("aiAction")}
               </button>
             </CardContent>

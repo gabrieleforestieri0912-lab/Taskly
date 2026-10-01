@@ -17,7 +17,7 @@ export default function ProductDemo() {
   };
 
   return (
-    <section className="landing-section px-4 py-20 bg-[#f6f7f9] dark:bg-[#1a1528] sm:px-6">
+    <section className="landing-section px-4 py-20 bg-[#f6f7f9] dark:bg-black sm:px-6">
       <div className="max-w-6xl mx-auto grid min-w-0 lg:grid-cols-2 gap-10 items-center">
         <div className="min-w-0">
           <div className="landing-eyebrow">{t("land.pdEyebrow")}</div>

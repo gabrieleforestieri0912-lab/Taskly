@@ -38,9 +38,9 @@ export function BoardMockup() {
   ];
 
   return (
-    <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-2xl shadow-[#7b39fc]/10 dark:border-white/10 dark:bg-[#1a1528] dark:shadow-black/20">
+    <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-2xl shadow-[#7b39fc]/10 dark:border-white/10 dark:bg-black dark:shadow-black/20">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b border-black/5 bg-[#f6f7f9] px-4 py-3 dark:border-white/10 dark:bg-[#0a0716]">
+      <div className="flex items-center justify-between border-b border-black/5 bg-[#f6f7f9] px-4 py-3 dark:border-white/10 dark:bg-black">
         <div className="flex items-center gap-3">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-red-400" />

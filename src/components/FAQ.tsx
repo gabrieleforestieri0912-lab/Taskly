@@ -9,7 +9,7 @@ import { FAQ_ITEMS } from "../lib/faq";
 function FAQItem({ item, isOpen, onToggle }) {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl border border-[#7b39fc]/10 dark:border-[#a484d7]/15 bg-white/70 dark:bg-[#2b2344]/30 backdrop-blur-sm shadow-sm">
+    <div className="rounded-2xl border border-[#7b39fc]/10 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-sm shadow-sm">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
@@ -47,9 +47,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="faq" className="landing-section relative px-4 py-20 bg-[#f6f7f9] dark:bg-[#1a1528] overflow-hidden sm:px-6">
-<div className="absolute top-0 left-0 h-[320px] w-[min(360px,85vw)] bg-[#7b39fc]/10 dark:bg-[#7b39fc]/5 blur-[90px] rounded-full -translate-y-1/3 -translate-x-1/4 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 h-[320px] w-[min(360px,85vw)] bg-[#a67cff]/10 dark:bg-[#a67cff]/5 blur-[90px] rounded-full translate-y-1/3 translate-x-1/4 pointer-events-none" />
+    <section id="faq" className="landing-section relative px-4 py-20 bg-[#f6f7f9] dark:bg-black overflow-hidden sm:px-6">
 
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-10">

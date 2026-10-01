@@ -20,7 +20,7 @@ function Hero({ onStart, onDiscover }) {
           {/* Headline */}
           <h1 className="font-inter text-5xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 dark:text-white sm:text-7xl lg:text-[72px]">
             {t("land.heroTitlePrefix")}{" "}
-            <span className="bg-gradient-to-r from-[#7b39fc] to-[#a67cff] bg-clip-text text-transparent">
+            <span className="text-[#7b39fc] dark:text-[#a67cff]">
               {t("land.heroTitleAccent")}
             </span>
           </h1>
@@ -42,7 +42,7 @@ function Hero({ onStart, onDiscover }) {
             <button
               type="button"
               onClick={onStart}
-              className="font-inter inline-flex h-[52px] min-w-[200px] items-center justify-center rounded-[10px] bg-[#2b2344] px-8 text-base font-semibold tracking-[-0.01em] text-[#f6f7f9] transition-colors hover:bg-[#3a3058]"
+              className="font-inter inline-flex h-[52px] min-w-[200px] items-center justify-center rounded-[10px] bg-gray-900 px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
             >
               {t("land.heroCtaStart")}
             </button>
