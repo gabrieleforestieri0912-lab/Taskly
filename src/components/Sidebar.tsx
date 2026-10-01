@@ -39,6 +39,12 @@ import {
   HelpCircle,
   ChevronLeft,
   Copy,
+  Bell,
+  Globe,
+  Shield,
+  Sliders,
+  Download,
+  Key,
 } from "lucide-react";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
@@ -97,7 +103,7 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const [localUser, setLocalUser] = useState({
     name: "Utente",
     email: "utente@esempio.it",
@@ -259,10 +265,16 @@ export default function Sidebar({
     setIsAIActive(pathname === "/dashboard" && !!searchParams?.get("ai"));
   }, [pathname, searchParams]);
 
-  const handleLogout = (e) => {
-    e.preventDefault();
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const handleLogout = async (e?: any) => {
+    if (e && e.preventDefault) e.preventDefault();
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {}
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } catch (err) {}
+    setIsProfileOpen(false);
     router.push("/login");
   };
 
@@ -369,29 +381,254 @@ export default function Sidebar({
         onClick={(e) => e.stopPropagation()}
         style={{
           top: profileMenuPos.top,
-          left: profileMenuPos.left,
+          left: Math.max(8, Math.min(profileMenuPos.left, (typeof window !== "undefined" ? window.innerWidth : 800) - 310)),
           position: "fixed",
-          zIndex: 60,
+          zIndex: 80,
         }}
-        className="p-3 bg-white dark:bg-zinc-950 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 w-64"
+        className="w-76 p-3 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 max-h-[85vh] overflow-y-auto scrollbar-hide text-gray-800 dark:text-gray-100 animate-in fade-in zoom-in-95 duration-150"
       >
-        <Link
-          href="/settings"
-          onClick={() => setIsProfileOpen(false)}
-          className="flex items-center gap-2 w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
-        >
-          <Settings size={16} />
-          <span>{t("land.demoNavSettings")}</span>
-        </Link>
+        {/* User Card */}
+        <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-gray-50/80 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800/60 mb-2.5">
+          {user.picture ? (
+            <img
+              src={user.picture}
+              alt=""
+              className="w-10 h-10 rounded-full object-cover border border-[#7b39fc]/30 shrink-0"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center text-white font-black text-sm shadow-md shadow-[#7b39fc]/20 shrink-0">
+              {(user.name || user.email || "U").charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-1">
+              <p className="font-extrabold text-xs truncate text-gray-900 dark:text-white">
+                {user.name || "Utente"}
+              </p>
+              <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+                Pro
+              </span>
+            </div>
+            <p className="text-[10px] text-gray-400 truncate mt-0.5">
+              {user.email || "utente@esempio.it"}
+            </p>
+          </div>
+        </div>
 
-        <Link
-          href="/billing"
-          onClick={() => setIsProfileOpen(false)}
-          className="flex items-center gap-2 w-full px-3 py-2 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
-        >
-          <CreditCard size={16} />
-          <span>{t("land.sideSubPlan")}</span>
-        </Link>
+        {/* Quick in-menu settings */}
+        <div className="p-2 rounded-2xl bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/60 mb-2 space-y-1.5">
+          <span className="text-[9px] font-black uppercase tracking-wider text-gray-400 px-1">
+            {t("quickSettings") || "Impostazioni Rapide"}
+          </span>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            {/* Theme Toggle */}
+            <div className="flex items-center bg-white dark:bg-gray-900 rounded-xl p-0.5 border border-gray-200/60 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => {
+                  if (theme !== "light" && toggleTheme) toggleTheme();
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
+                  theme === "light"
+                    ? "bg-[#7b39fc] text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+                title="Tema Chiaro"
+              >
+                <Sun size={12} />
+                <span className="text-[10px]">Chiaro</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (theme !== "dark" && toggleTheme) toggleTheme();
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
+                  theme === "dark"
+                    ? "bg-[#7b39fc] text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+                title="Tema Scuro"
+              >
+                <Moon size={12} />
+                <span className="text-[10px]">Scuro</span>
+              </button>
+            </div>
+
+            {/* Language Toggle */}
+            <div className="flex items-center bg-white dark:bg-gray-900 rounded-xl p-0.5 border border-gray-200/60 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setLanguage("it")}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
+                  language === "it"
+                    ? "bg-cyan-600 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                <span className="text-[10px]">IT</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
+                  language === "en"
+                    ? "bg-cyan-600 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                <span className="text-[10px]">EN</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* All App Settings Links */}
+        <div className="space-y-0.5 pt-0.5">
+          <p className="px-2 pb-1 text-[9px] font-black uppercase tracking-wider text-gray-400">
+            {t("settings") || "Tutte le Impostazioni"}
+          </p>
+
+          <Link
+            href="/settings"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-bold transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+                <Settings size={13} />
+              </div>
+              <span>Panoramica Impostazioni</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=profile"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-blue-500/10 text-blue-500">
+                <User size={13} />
+              </div>
+              <span>Profilo & Account</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=appearance"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-purple-500/10 text-purple-500">
+                <Palette size={13} />
+              </div>
+              <span>Aspetto, Colori & Font</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=notifications"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-amber-500/10 text-amber-500">
+                <Bell size={13} />
+              </div>
+              <span>Notifiche & Promemoria</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=workflow"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-500">
+                <Sliders size={13} />
+              </div>
+              <span>Workflow & Produttività</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/integrations"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-cyan-500/10 text-cyan-500">
+                <Layers size={13} />
+              </div>
+              <span>Integrazioni App (Google, Slack)</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=data"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-rose-500/10 text-rose-500">
+                <Download size={13} />
+              </div>
+              <span>Dati, Backup & Esportazione</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=security"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-indigo-500/10 text-indigo-500">
+                <Shield size={13} />
+              </div>
+              <span>Sicurezza, Password & 2FA</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
+          <Link
+            href="/settings?tab=billing"
+            onClick={() => setIsProfileOpen(false)}
+            className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-1 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc]">
+                <CreditCard size={13} />
+              </div>
+              <span>Abbonamento & Fatturazione</span>
+            </div>
+            <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
+
+        {/* Divider & Logout */}
+        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center gap-2 w-full px-2.5 py-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+          >
+            <LogOut size={13} />
+            <span>{t("logout") || "Disconnetti"}</span>
+          </button>
+        </div>
       </div>,
       document.body,
     );
@@ -750,6 +987,21 @@ export default function Sidebar({
       document.removeEventListener("keydown", onEsc);
     };
   }, [isTrashOpen]);
+
+  // close profile menu on outside click or Esc
+  useEffect(() => {
+    if (!isProfileOpen) return;
+    const onDocClick = () => setIsProfileOpen(false);
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsProfileOpen(false);
+    };
+    document.addEventListener("click", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [isProfileOpen]);
 
   // ── Keyboard shortcut Ctrl+\ to collapse sidebar ──────────────────────────
   useEffect(() => {
