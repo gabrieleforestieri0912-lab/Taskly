@@ -49,6 +49,7 @@ import {
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 import { PageTreeItem } from "./sidebar/PageTreeItem";
+import { GoogleCalendarSidebarCard } from "./sidebar/GoogleCalendarSidebarCard";
 import { getAncestorIds } from "../lib/pageTree";
 
 import { createPortal } from "react-dom";
@@ -1131,7 +1132,37 @@ export default function Sidebar({
                 router.push("/meetings");
               }}
             />
+            <SidebarNavItem
+              id="sidebar-calendar-nav-btn"
+              icon={Calendar}
+              label={t("land.showcaseTabCalendar") || "Calendario"}
+              isActive={!isTranscriptionMode && !isAIActive && pages.some((p) => String(p.id) === String(activePageId) && p.type === "calendar")}
+              onClick={() => {
+                setIsTranscriptionMode(false);
+                setIsAIActive(false);
+                const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
+                if (calPage) {
+                  router.push(`/dashboard?page=${calPage.id}`);
+                } else {
+                  router.push("/calendar");
+                }
+              }}
+            />
           </div>
+
+          {/* ── Google Calendar Integration Card & Connection Message ─────── */}
+          <GoogleCalendarSidebarCard
+            onNavigateToCalendar={() => {
+              setIsTranscriptionMode(false);
+              setIsAIActive(false);
+              const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
+              if (calPage) {
+                router.push(`/dashboard?page=${calPage.id}`);
+              } else {
+                router.push("/calendar");
+              }
+            }}
+          />
 
           <div className="my-2 border-t border-gray-100 dark:border-gray-800" />
 
