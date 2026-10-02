@@ -745,7 +745,7 @@ export default function Sidebar({
 
         <div className="flex-1 overflow-auto space-y-2 min-h-0">
           {filtered.length === 0 ? (
-            <div className="text-sm text-gray-400 italic text-center py-8">
+            <div className="text-sm text-gray-400 text-center py-8">
               {trashSearch ? "Nessun risultato" : "Nessun elemento eliminato"}
             </div>
           ) : (
@@ -1382,52 +1382,70 @@ export default function Sidebar({
                   />
                 </div>
 
-                {pageHistory.length > 0 && !searchQuery && (
+                {!searchQuery && (
                   <div className="pt-2">
                     <div className="flex items-center justify-between mb-2 px-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500">
-                        {t("history")}
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500 flex items-center gap-1.5">
+                        <Clock size={12} className="text-cyan-500" />
+                        {t("recentPages") || "Pagine Recenti"}
                       </p>
-                      <button
-                        onClick={() => {
-                          setPageHistory([]);
-                          localStorage.removeItem("page_history");
-                        }}
-                        className="text-[10px] font-bold text-gray-400 hover:text-red-500 transition-colors"
-                      >{t("land.sideClear")}</button>
+                      {pageHistory.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPageHistory([]);
+                            localStorage.removeItem("page_history");
+                          }}
+                          className="text-[10px] font-bold text-gray-400 hover:text-red-500 transition-colors"
+                        >{t("land.sideClear")}</button>
+                      )}
                     </div>
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                      {pageHistory
-                        .filter((ph) =>
-                          pages.find(
-                            (p) => String(p.id) === String(ph.id) && !p.deleted,
-                          ),
-                        )
-                        .slice(0, 6)
-                        .map((page) => (
-                          <button
-                            key={page.id}
-                            onClick={() => {
-                              router.push(`/dashboard?page=${page.id}`);
-                              setIsSearchOpen(false);
-                            }}
-                            className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <Clock
-                                size={13}
-                                className="text-gray-400 group-hover:text-cyan-500 transition-colors"
+                      {(() => {
+                        const activePages = (pages || []).filter((p) => p && !p.deleted);
+                        const matchedHistory = pageHistory
+                          .map((ph) => activePages.find((p) => String(p.id) === String(ph.id)))
+                          .filter(Boolean) as any[];
+                        const seenIds = new Set(matchedHistory.map((p) => String(p.id)));
+                        const remaining = activePages.filter((p) => !seenIds.has(String(p.id)));
+                        const recentList = [...matchedHistory, ...remaining].slice(0, 8);
+
+                        if (recentList.length === 0) {
+                          return (
+                            <p className="py-4 text-center text-xs text-gray-400">
+                              Nessuna pagina disponibile
+                            </p>
+                          );
+                        }
+
+                        return recentList.map((page) => {
+                          const PageIcon = resolvePageIcon(page);
+                          return (
+                            <button
+                              key={page.id}
+                              onClick={() => {
+                                router.push(`/dashboard?page=${page.id}`);
+                                setIsSearchOpen(false);
+                              }}
+                              className="w-full flex items-center justify-between px-3 py-2 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <PageIcon
+                                  size={14}
+                                  className={page.iconColor || "text-gray-400 group-hover:text-cyan-500 transition-colors"}
+                                />
+                                <span className="truncate font-semibold">
+                                  {page.label || "Senza titolo"}
+                                </span>
+                              </div>
+                              <ChevronRight
+                                size={12}
+                                className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-1 group-hover:translate-x-0"
                               />
-                              <span className="truncate font-semibold">
-                                {page.label}
-                              </span>
-                            </div>
-                            <ChevronRight
-                              size={12}
-                              className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-1 group-hover:translate-x-0"
-                            />
-                          </button>
-                        ))}
+                            </button>
+                          );
+                        });
+                      })()}
                     </div>
                   </div>
                 )}

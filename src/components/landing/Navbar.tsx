@@ -15,7 +15,7 @@ export function Navbar() {
   const { logo, links, ctaLogin, ctaPrimary } = landingContent.nav;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/5 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-black/40">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
           {logo}
@@ -57,7 +57,7 @@ export function Navbar() {
           >
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="right" className="bg-white dark:bg-[#0a0a0a]">
+          <SheetContent side="right" className="bg-white dark:bg-black">
             <SheetHeader>
               <SheetTitle>{logo}</SheetTitle>
             </SheetHeader>

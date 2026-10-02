@@ -70,13 +70,13 @@ export default function ImportExport({
             {status === "success" && (
               <Check
                 size={14}
-                className="text-emerald-500 animate-in fade-in zoom-in"
+                className="text-emerald-500"
               />
             )}
             {status === "error" && (
               <AlertCircle
                 size={14}
-                className="text-red-500 animate-in fade-in zoom-in"
+                className="text-red-500"
               />
             )}
           </div>

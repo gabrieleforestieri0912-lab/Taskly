@@ -33,7 +33,7 @@ export function Pricing() {
               {toggleYearly}
             </button>
           </div>
-          {yearly && <p className="mt-2 text-xs text-muted-foreground">Risparmia 20% con fatturazione annuale — TODO</p>}
+          {yearly && <p className="mt-2 text-xs text-muted-foreground">Risparmia con la fatturazione annuale</p>}
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -43,7 +43,7 @@ export function Pricing() {
               className={`rounded-2xl border p-6 flex flex-col ${
                 plan.highlighted
                   ? "bg-[#7b39fc] text-white border-[#7b39fc] shadow-xl shadow-[#7b39fc]/20 scale-[1.02]"
-                  : "bg-white dark:bg-[#1a1528] border-black/10 dark:border-white/10"
+                  : "bg-white dark:bg-black border-black/10 dark:border-white/10"
               }`}
             >
               <h3 className={`text-lg font-semibold ${plan.highlighted ? "text-white" : "text-gray-900 dark:text-white"}`}>{plan.name}</h3>

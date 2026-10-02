@@ -17,14 +17,16 @@ import FAQ from "../components/FAQ";
 import CtaBanner from "../components/CtaBanner";
 import Footer from "../components/Footer";
 import { ScrollReveal } from "../components/UIComponents";
+import { readTheme, applyTheme } from "../lib/theme";
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    // Chiaro di default: solo themeChoice esplicito abilita il dark.
+    // Ignora la vecchia chiave "theme" che forzava lo scuro.
+    applyTheme(readTheme());
   }, []);
 
   const handleStart = () => {

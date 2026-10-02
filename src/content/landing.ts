@@ -64,8 +64,8 @@ export const landingContent = {
     ],
   },
   socialProof: {
-    title: "TODO: sostituire con dato reale",
-    description: "Sezione predisposta — nessun dato finto. Sostituire con loghi/testimonianze reali quando disponibili.",
+    title: "Un workspace per team che vogliono chiarezza",
+    description: "Taskly riunisce task, note, calendario e obiettivi in un unico posto.",
   },
   useCases: {
     eyebrow: "Casi d'uso",
@@ -98,7 +98,7 @@ export const landingContent = {
     plans: [
       {
         name: "Free",
-        price: "TODO: €0",
+        price: "€0",
         period: "/mese",
         features: ["Task illimitati (personali)", "3 progetti", "Vista lista e board", "Supporto community"],
         cta: "Inizia gratis",
@@ -106,7 +106,7 @@ export const landingContent = {
       },
       {
         name: "Pro",
-        price: "TODO: €9",
+        price: "€5.99",
         period: "/mese",
         features: ["Tutto Free +", "Progetti illimitati", "Calendario e Timeline", "Automazioni e ricerca AI", "Supporto prioritario"],
         cta: "Prova Pro",
@@ -114,14 +114,14 @@ export const landingContent = {
       },
       {
         name: "Team",
-        price: "TODO: €19",
+        price: "€14.99",
         period: "/utente/mese",
         features: ["Tutto Pro +", "Permessi avanzati", "SSO e audit", "Onboarding dedicato"],
         cta: "Contatta vendite",
         highlighted: false,
       },
     ],
-    footnote: "Prezzi placeholder — TODO: sostituire con listino reale.",
+    footnote: "Nessuna carta di credito richiesta. Disdici quando vuoi.",
   },
   faq: {
     title: "Domande frequenti",

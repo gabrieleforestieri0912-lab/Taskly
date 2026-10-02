@@ -1135,7 +1135,7 @@ export default function ItemList({
                                   </div>
                                 ))}
                                 {(item.comments || []).length === 0 && (
-                                  <p className="text-[10px] text-gray-400 italic">{t("views.tasksNoComments")}</p>
+                                  <p className="text-[10px] text-gray-400">{t("views.tasksNoComments")}</p>
                                 )}
                               </div>
                               <div className="flex items-center gap-1.5">

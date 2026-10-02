@@ -35,7 +35,7 @@ export default function HabitCard({ dayObj, onClick }) {
             </li>
           ))
         ) : (
-          <li className="text-gray-300 italic">{t("views.habitNone")}</li>
+          <li className="text-gray-300">{t("views.habitNone")}</li>
         )}
       </ul>
     </button>

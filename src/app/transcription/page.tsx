@@ -310,10 +310,9 @@ export default function TranscriptionPage() {
                 {Array.from({ length: 40 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-1 bg-cyan-500 rounded-full animate-pulse"
+                    className="w-1 bg-cyan-500 rounded-full"
                     style={{
                       height: `${15 + (Math.sin(i * 0.5) + 1) * 25}%`,
-                      animationDelay: `${i * 0.05}s`,
                     }}
                   />
                 ))}
@@ -403,7 +402,7 @@ export default function TranscriptionPage() {
                   <>
                     {transcript}
                     {interim && (
-                      <span className="text-gray-400 italic">{interim}</span>
+                      <span className="text-gray-400">{interim}</span>
                     )}
                   </>
                 ) : (
@@ -455,7 +454,7 @@ export default function TranscriptionPage() {
                       className="flex items-center gap-2 text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-60"
                     >
                       {isSummarizing ? (
-                        <Loader2 size={15} className="animate-spin" />
+                        <Loader2 size={15} />
                       ) : (
                         <Sparkles size={15} />
                       )}
@@ -486,7 +485,7 @@ export default function TranscriptionPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold shadow-md shadow-cyan-600/10 hover:shadow-lg transition-all disabled:opacity-60"
                 >
                   {isSaving ? (
-                    <Loader2 size={16} className="animate-spin" />
+                    <Loader2 size={16} />
                   ) : (
                     <Save size={16} />
                   )}

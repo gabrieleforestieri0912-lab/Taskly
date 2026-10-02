@@ -8,7 +8,7 @@
   --font-instrument-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --color-primary: #7b39fc;
-  --color-primary-dark: #2b2344;
+  --color-primary-dark: #000000;
   --color-off-white: #f6f7f9;
 
   /* Brand remap of the legacy cyan scale → Taskly purple.
@@ -25,7 +25,7 @@
   --color-cyan-700: #6d28d9;
   --color-cyan-800: #5a1fd4;
   --color-cyan-900: #4c1d95;
-  --color-cyan-950: #2b2344;
+  --color-cyan-950: #000000;
 
   /* gray-850 only ever appears as a dark-mode surface (legacy app pages),
      so it can live in the theme directly. */
@@ -44,11 +44,11 @@
   --color-black: #000000;
   --color-gray-950: #000000;
   --color-gray-900: #0a0a0a;
-  --color-gray-850: #111111;
-  --color-gray-800: #1a1a1a;
+  --color-gray-850: #000000;
+  --color-gray-800: #0a0a0a;
   --color-zinc-950: #000000;
   --color-zinc-900: #0a0a0a;
-  --color-zinc-800: #1a1a1a;
+  --color-zinc-800: #0a0a0a;
 }
 
 @layer base {
@@ -353,7 +353,6 @@
   border-left: 3px solid #7b39fc;
   padding: 2px 0 2px 1em;
   color: #64748b;
-  font-style: italic;
 }
 
 .tl-editor pre {
@@ -605,8 +604,8 @@
 
 /* ── Dark mode ──────────────────────────────────────────────────────── */
 .dark .tl-toolbar {
-  background: rgba(15, 23, 42, 0.9);
-  border-color: #1e293b;
+  background: rgba(0, 0, 0, 0.9);
+  border-color: #1a1a1a;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
@@ -615,17 +614,17 @@
 }
 
 .dark .tl-toolbar button:hover {
-  background: #1e293b;
+  background: #1a1a1a;
   color: #e2e8f0;
 }
 
 .dark .tl-toolbar button.is-active {
-  background: #2b2344;
+  background: #000000;
   color: #a67cff;
 }
 
 .dark .tl-toolbar .tl-toolbar-sep {
-  background: #1e293b;
+  background: #1a1a1a;
 }
 
 .dark .tl-toolbar .tl-save-btn {
@@ -648,16 +647,16 @@
 
 .dark .tl-editor pre,
 .dark .tl-editor code {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: #000000;
+  border-color: #1a1a1a;
 }
 
 .dark .tl-editor hr {
-  border-top-color: #1e293b;
+  border-top-color: #1a1a1a;
 }
 
 .dark .tl-editor .mention {
-  background: #2b2344;
+  background: #000000;
   color: #a67cff;
 }
 
@@ -667,8 +666,8 @@
 
 
 .dark .tl-hint kbd {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: #000000;
+  border-color: #1a1a1a;
   color: #94a3b8;
 }
 
@@ -681,7 +680,7 @@
 }
 
 .dark .toggle-body-wrap {
-  border-left-color: #1e293b;
+  border-left-color: #1a1a1a;
 }
 
 .dark .callout-block {
@@ -691,18 +690,18 @@
 }
 
 .dark .tl-suggestion-popup {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: #000000;
+  border-color: #1a1a1a;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 
 .dark .tl-suggestion-item:hover,
 .dark .tl-suggestion-item.active {
-  background: #2b2344;
+  background: #000000;
 }
 
 .dark .tl-suggestion-icon {
-  background: #1e293b;
+  background: #1a1a1a;
 }
 
 .dark .tl-suggestion-title {
@@ -724,7 +723,7 @@
 
 .dark .tl-bubble button:hover {
   background: #cbd5e1;
-  color: #0f172a;
+  color: #000000;
 }
 
 .dark .tl-bubble button.is-active {
@@ -1015,19 +1014,19 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: #7b39fc;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.05 0 0);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.05 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.05 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);

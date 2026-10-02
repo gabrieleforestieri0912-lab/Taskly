@@ -4,7 +4,6 @@ import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Zap, Star, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const PricingCard = ({ 
   title, 
@@ -12,24 +11,23 @@ const PricingCard = ({
   period, 
   description, 
   features, 
-  buttonText,    isPopular, 
-  isHighlighted = false,
+  buttonText,    
+  isPopular, 
   icon: Icon,
   onCheckout,
   loading
 }) => {
   const { t, tWith } = useLanguage();
   return (
-    <motion.div
-      whileHover={{ y: -10 }}
-      className={`relative rounded-2xl p-5 md:p-6 flex flex-col h-full transition-all duration-500 ${
-        isPopular 
-          ? "bg-white dark:bg-gray-800 shadow-[0_20px_50px_rgba(123,57,252,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-2 border-[#7b39fc]/30 md:scale-[1.02] z-10" 
-          : "bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/5 shadow-xl"
-      }`}
-    >
+    <div className={`relative rounded-2xl p-5 md:p-6 flex flex-col h-full transition-colors ${
+      isPopular 
+        ? "bg-white dark:bg-black border-2 border-[#7b39fc] shadow-lg" 
+        : "bg-white dark:bg-black border border-gray-200 dark:border-gray-800"
+    }`}>
       {isPopular && (
-        <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-linear-to-r from-[#7b39fc] to-[#a67cff] rounded-full text-white text-xs font-black uppercase tracking-widest shadow-lg">{t("land.prMostChosen")}</div>
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#7b39fc] rounded-full text-white text-xs font-black uppercase tracking-widest">
+          {t("land.prMostChosen")}
+        </div>
       )}
 
       <div className="flex items-start justify-between mb-5">
@@ -39,7 +37,7 @@ const PricingCard = ({
             {description}
           </p>
         </div>
-        <div className={`p-2 rounded-lg ${isPopular ? "bg-[#7b39fc]/10 dark:bg-[#7b39fc]/25 text-[#7b39fc] dark:text-[#a67cff]" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
+        <div className={`p-2 rounded-lg ${isPopular ? "bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 text-[#7b39fc] dark:text-[#a67cff]" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
           <Icon size={18} />
         </div>
       </div>
@@ -51,11 +49,11 @@ const PricingCard = ({
 
       <div className="flex-1 space-y-3 mb-6">
         {features.map((feature, idx) => (
-          <div key={idx} className="flex items-start gap-3 group">
-            <div className="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-500 transition-colors group-hover:bg-emerald-500/25">
+          <div key={idx} className="flex items-start gap-3">
+            <div className="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/15 text-emerald-500">
               <Check size={12} strokeWidth={3} />
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-300 font-medium group-hover:text-gray-900 dark:group-hover:text-white transition-colors leading-tight">
+            <span className="text-sm text-gray-600 dark:text-gray-300 font-medium leading-tight">
               {feature}
             </span>
           </div>
@@ -65,23 +63,23 @@ const PricingCard = ({
       <button
         onClick={onCheckout}
         disabled={loading}
-        className={`w-full group relative flex items-center justify-center gap-2 py-3.5 rounded-xl font-black uppercase tracking-[0.15em] text-xs transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed ${
+        className={`w-full group relative flex items-center justify-center gap-2 py-3.5 rounded-xl font-black uppercase tracking-[0.15em] text-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
         isPopular 
-          ? "bg-[#7b39fc] text-white hover:bg-[#8b4dff] hover:shadow-2xl hover:shadow-[#7b39fc]/25" 
-          : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm"
+          ? "bg-[#7b39fc] text-white hover:bg-[#8b4dff]" 
+          : "bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
       >
         {loading ? "Reindirizzamento..." : buttonText}
         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
       </button>
-    </motion.div>
+    </div>
   );
 };
 
 function Pricing() {
   const { t, tWith } = useLanguage();
   const router = useRouter();
-  const [isAnnual, setIsAnnual] = useState(true);
+  const [isAnnual, setIsAnnual] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(null);
 
   const handleCheckout = async (plan) => {
@@ -213,37 +211,26 @@ function Pricing() {
   return (
     <section
       id="pricing"
-      className="landing-section relative min-h-screen flex flex-col items-center justify-center px-4 py-20 bg-white dark:bg-black overflow-hidden sm:px-6"
+      className="landing-section relative flex flex-col items-center justify-center px-4 py-20 bg-white dark:bg-black overflow-hidden sm:px-6"
     >
 
       <div className="text-center max-w-4xl mb-12 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="landing-eyebrow"
-        >
-          <Star size={12} fill="currentColor" />{t("land.prEyebrow")}</motion.div>
+        <div className="landing-eyebrow">
+          <Star size={12} fill="currentColor" />{t("land.prEyebrow")}</div>
         
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-           className="landing-heading-lg leading-tight mb-5"
-        >{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
-        </motion.h2>
+        <h2 className="landing-heading-lg leading-tight mb-5">{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
+        </h2>
 
         {/* Toggle Switch */}
         <div className="flex items-center justify-center gap-4 mt-12">
           <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("views.tasksMonthly")}</span>
           <button 
             onClick={() => setIsAnnual(!isAnnual)}
-            className="w-16 h-9 rounded-full bg-gray-200 dark:bg-gray-800 p-1 relative transition-colors border border-gray-100 dark:border-gray-700"
+            className="w-14 h-8 rounded-full bg-gray-200 dark:bg-gray-800 p-1 relative transition-colors border border-gray-200 dark:border-gray-700"
           >
-            <motion.div 
-              animate={{ x: isAnnual ? 28 : 0 }}
-              className="w-7 h-7 bg-white dark:bg-[#7b39fc] rounded-full shadow-lg"
+            <div 
+              style={{ transform: `translateX(${isAnnual ? '28px' : '0'})` }}
+              className="w-6 h-6 bg-white dark:bg-[#7b39fc] rounded-full shadow-lg transition-transform duration-200"
             />
           </button>
           <div className="flex flex-col items-start leading-none">
@@ -255,30 +242,18 @@ function Pricing() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full max-w-7xl relative z-10">
         {plans.map((plan, index) => (
-          <motion.div
-            key={plan.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1 + 0.2 }}
-          >
+          <div key={plan.title}>
             <PricingCard
               {...plan}
               loading={loadingPlan === plan.checkoutPlanId}
               onCheckout={() => handleCheckout(plan)}
             />
-          </motion.div>
+          </div>
         ))}
       </div>
 
-      <motion.p 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.6 }}
-        className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium"
-      >{t("land.prCustomPrefix")}<button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">{t("land.prCustomLink")}</button>
-      </motion.p>
+      <p className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium">{t("land.prCustomPrefix")}<button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">{t("land.prCustomLink")}</button>
+      </p>
     </section>
   );
 }

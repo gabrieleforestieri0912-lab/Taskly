@@ -523,21 +523,21 @@ export default function Dashboard({
                   whileHover={{ y: -4 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <Card className="h-full rounded-3xl border border-[#7b39fc]/10 bg-white/70 shadow-xl shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#17103a]/60">
-                    <CardContent className="p-5">
-                      <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-2xl ${s.bgClass || "bg-[#7b39fc]/10"}`}>
+                  <Card className="h-full rounded-2xl border border-[#7b39fc]/10 bg-white/70 shadow-lg shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#17103a]/60">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-[#7b39fc]/10"}`}>
                           {React.isValidElement(s.icon)
                             ? s.icon
                             : typeof s.icon === "function"
                               ? React.createElement(s.icon, {
                                   className: s.iconColor || "text-[#7b39fc]",
-                                  size: 20,
+                                  size: 18,
                                 })
                               : null}
                         </div>
                         <div>
-                          <p className="text-2xl font-black text-gray-800 dark:text-white">
+                          <p className="text-base font-bold text-gray-800 dark:text-white">
                             {s.value}
                           </p>
                           <p className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest">
@@ -560,18 +560,18 @@ export default function Dashboard({
         return (
           <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
             {editToolbar}
-            <Card className="relative overflow-hidden rounded-[2rem] border border-[#7b39fc]/15 bg-white/70 shadow-2xl shadow-[#7b39fc]/10 backdrop-blur-xl dark:bg-[#1d1630]/60">
+            <Card className="relative overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/70 shadow-xl shadow-[#7b39fc]/10 backdrop-blur-xl dark:bg-[#1d1630]/60">
               <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#7b39fc] to-[#a67cff]" />
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="space-y-4">
+              <CardContent className="p-5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  <div className="space-y-3">
                     <div className="flex items-center gap-2 text-[#7b39fc] dark:text-[#a67cff]">
-                      <Zap size={20} />
+                      <Zap size={18} />
                       <span className="text-xs font-bold uppercase tracking-[0.2em]">
                         Focus di Oggi
                       </span>
                     </div>
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white leading-tight">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
                       {todayFocus}
                     </h3>
                     <div className="flex flex-wrap gap-3">
@@ -773,7 +773,7 @@ export default function Dashboard({
                       className="rounded-2xl border-l-4 border-l-amber-400 bg-amber-50/40 dark:bg-amber-900/10 border-gray-100 dark:border-gray-800/40"
                     >
                       <CardContent className="p-4">
-                        <p className="text-sm font-bold italic text-amber-900 dark:text-amber-200">
+                        <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
                           &quot;{idea.title}&quot;
                         </p>
                         <p className="text-[9px] font-black text-amber-600/70 uppercase mt-2">
@@ -831,7 +831,7 @@ export default function Dashboard({
                       );
                     })
                   ) : (
-                    <p className="text-xs opacity-75 italic">
+                    <p className="text-xs opacity-75">
                       {t("noActiveGoals") || "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!"}
                     </p>
                   )}

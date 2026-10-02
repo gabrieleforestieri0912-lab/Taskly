@@ -159,7 +159,7 @@ export default function IntegrationsPage() {
               disabled={googleBusy}
               className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-xs font-bold transition-all disabled:opacity-60"
             >
-              {googleBusy ? <Loader2 size={14} className="animate-spin" /> : connected.google ? <ExternalLink size={14} /> : <LinkIcon size={14} />}
+              {googleBusy ? <Loader2 size={14} /> : connected.google ? <ExternalLink size={14} /> : <LinkIcon size={14} />}
               {googleBusy ? "..." : connected.google ? "Scollega" : "Connetti"}
             </button>
           </div>
@@ -205,7 +205,7 @@ export default function IntegrationsPage() {
                   disabled={slackBusy}
                   className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-sm font-bold transition-all disabled:opacity-60"
                 >
-                  {slackBusy ? <Loader2 size={14} className="animate-spin" /> : <LinkIcon size={14} />}
+                  {slackBusy ? <Loader2 size={14} /> : <LinkIcon size={14} />}
                   Collega webhook
                 </button>
               )}

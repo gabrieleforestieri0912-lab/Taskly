@@ -61,7 +61,7 @@ export default function Backlinks({ slug }) {
       </div>
       
       {backlinks.length === 0 ? (
-        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center py-4 italic">
+        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center py-4">
           Nessun riferimento trovato
         </div>
       ) : (

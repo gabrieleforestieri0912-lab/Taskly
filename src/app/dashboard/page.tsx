@@ -1315,11 +1315,11 @@ function DashboardContent() {
         </div>
         <div className={`p-3 md:p-6 ${activePage?.font && activePage.font !== "system-ui" ? activePage.font === "serif" ? "font-serif" : activePage.font === "monospace" ? "font-mono" : "font-serif" : ""}`}>
           {activePageId && activePage && !loading && (
-            <div className="mb-8 flex items-start gap-6 group relative">
+            <div className="mb-6 flex items-start gap-4 group relative">
               <div className="relative">
                 <button
                   onClick={() => !activePage.locked && setIsIconMenuOpen(!isIconMenuOpen)}
-                  className={`w-20 h-20 rounded-3xl bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 flex items-center justify-center ${activePage.iconColor || "text-gray-400"} hover:text-cyan-500 hover:border-cyan-500/50 transition-all shadow-xl shadow-cyan-500/5 group-hover:scale-105 ${activePage.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
+                  className={`w-10 h-10 md:w-11 md:h-11 rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 flex items-center justify-center ${activePage.iconColor || "text-gray-400"} hover:text-cyan-500 hover:border-cyan-500/50 transition-all shadow-md shadow-cyan-500/5 group-hover:scale-105 ${activePage.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   {(() => {
                     const rawIcon = activePage.icon;
@@ -1344,7 +1344,7 @@ function DashboardContent() {
 
                     return React.isValidElement(IconOrElement)
                       ? IconOrElement
-                      : React.createElement(IconOrElement, { size: 36 });
+                      : React.createElement(IconOrElement, { size: 24 });
                   })()}
                 </button>
 
@@ -1569,7 +1569,7 @@ function DashboardContent() {
                   onSave={(nextTitle) =>
                     updatePage(activePage.id, { label: nextTitle })
                   }
-                  className="text-4xl md:text-5xl font-black"
+                  className="text-xl md:text-2xl font-extrabold"
                   autoEdit={
                     focusTitleParam === "1" || focusTitleParam === "true"
                   }

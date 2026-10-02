@@ -37,6 +37,8 @@ import {
   Target,
   Video,
   Activity,
+  Palette,
+  Check,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -103,28 +105,62 @@ const TEXT_COLORS = [
     value: "default",
     label: "Default",
     class: "text-gray-800 dark:text-gray-200",
+    bgHex: "#64748b",
   },
-  { value: "red", label: "Rosso", class: "text-red-500 dark:text-red-400" },
+  {
+    value: "gray",
+    label: "Grigio",
+    class: "text-gray-500 dark:text-gray-400",
+    bgHex: "#94a3b8",
+  },
+  {
+    value: "red",
+    label: "Rosso",
+    class: "text-red-500 dark:text-red-400",
+    bgHex: "#ef4444",
+  },
   {
     value: "orange",
     label: "Arancione",
     class: "text-orange-500 dark:text-orange-400",
+    bgHex: "#f97316",
   },
   {
     value: "yellow",
     label: "Giallo",
-    class: "text-yellow-600 dark:text-yellow-400",
+    class: "text-amber-500 dark:text-amber-400",
+    bgHex: "#f59e0b",
   },
   {
     value: "green",
     label: "Verde",
-    class: "text-green-500 dark:text-green-400",
+    class: "text-emerald-500 dark:text-emerald-400",
+    bgHex: "#10b981",
   },
-  { value: "blue", label: "Blu", class: "text-blue-500 dark:text-blue-400" },
-  { value: "purple", label: "Viola", class: "text-[#7b39fc] dark:text-[#a67cff]" },
-  { value: "cyan", label: "Lilla", class: "text-cyan-500 dark:text-cyan-400" },
-  { value: "pink", label: "Rosa", class: "text-pink-500 dark:text-pink-400" },
-  { value: "gray", label: "Grigio", class: "text-gray-400 dark:text-gray-500" },
+  {
+    value: "blue",
+    label: "Blu",
+    class: "text-blue-500 dark:text-blue-400",
+    bgHex: "#3b82f6",
+  },
+  {
+    value: "purple",
+    label: "Viola",
+    class: "text-[#7b39fc] dark:text-[#a67cff]",
+    bgHex: "#7b39fc",
+  },
+  {
+    value: "cyan",
+    label: "Ciano",
+    class: "text-cyan-500 dark:text-cyan-400",
+    bgHex: "#06b6d4",
+  },
+  {
+    value: "pink",
+    label: "Rosa",
+    class: "text-pink-500 dark:text-pink-400",
+    bgHex: "#ec4899",
+  },
 ];
 
 function generateId() {
@@ -246,6 +282,7 @@ function BlockItem({
 }) {
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
+  const [showColorMenu, setShowColorMenu] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
@@ -260,6 +297,7 @@ function BlockItem({
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
+        setShowColorMenu(false);
         setSlashMenuOpen(false);
         setBracketMenuOpen(false);
       }
@@ -437,12 +475,28 @@ function BlockItem({
       className="group flex items-start gap-1 py-1 relative"
       ref={menuRef}
     >
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
         <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
+          type="button"
+          onClick={() => {
+            setShowMenu(!showMenu);
+            setShowColorMenu(false);
+          }}
+          title={t("views.notesInsertBlock")}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
         >
           <Plus size={14} />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowColorMenu(!showColorMenu);
+            setShowMenu(false);
+          }}
+          title="Colore del testo"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+        >
+          <Palette size={14} />
         </button>
       </div>
 
@@ -501,7 +555,7 @@ function BlockItem({
                 );
               })}
               {filteredBlocks.length === 0 && (
-                <p className="p-4 text-center text-xs text-gray-400 italic">{t("views.notesNoCommand")}</p>
+                <p className="p-4 text-center text-xs text-gray-400">{t("views.notesNoCommand")}</p>
               )}
             </div>
           </motion.div>
@@ -549,7 +603,7 @@ function BlockItem({
                 );
               })}
               {bracketPageItems.length === 0 && (
-                <p className="p-4 text-center text-xs text-gray-400 italic">{t("views.notesNoPageFound")}</p>
+                <p className="p-4 text-center text-xs text-gray-400">{t("views.notesNoPageFound")}</p>
               )}
             </div>
           </motion.div>
@@ -582,6 +636,30 @@ function BlockItem({
               );
             })}
             <hr className="my-1 border-gray-200 dark:border-gray-800" />
+            <p className="px-2 pt-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Colore Testo</p>
+            <div className="grid grid-cols-5 gap-1.5 px-2 pb-1">
+              {TEXT_COLORS.map((tc) => (
+                <button
+                  key={tc.value}
+                  type="button"
+                  title={tc.label}
+                  onClick={() => {
+                    onUpdate(block.id, { color: tc.value });
+                    setShowMenu(false);
+                  }}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${
+                    (block.color || "default") === tc.value
+                      ? "ring-2 ring-cyan-500 scale-110 shadow-sm"
+                      : "hover:scale-110 opacity-80 hover:opacity-100"
+                  }`}
+                  style={{
+                    backgroundColor: tc.bgHex,
+                    borderColor: "rgba(0,0,0,0.15)",
+                  }}
+                />
+              ))}
+            </div>
+            <hr className="my-1 border-gray-200 dark:border-gray-800" />
             <button
               onClick={() => {
                 onMoveUp && onMoveUp(block.id);
@@ -611,7 +689,44 @@ function BlockItem({
               <Trash2 size={16} />{t("views.notesDeleteBlock")}</button>
           </motion.div>
         )}
-        {/* Color picker removed per user request */}
+
+        {/* Dedicated color palette dropdown */}
+        {showColorMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+            className="absolute left-8 top-7 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-2 w-48"
+          >
+            <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Colore testo</p>
+            <div className="space-y-0.5 mt-1 max-h-56 overflow-y-auto custom-scrollbar">
+              {TEXT_COLORS.map((tc) => (
+                <button
+                  key={tc.value}
+                  type="button"
+                  onClick={() => {
+                    onUpdate(block.id, { color: tc.value });
+                    setShowColorMenu(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                    (block.color || "default") === tc.value
+                      ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
+                      style={{ backgroundColor: tc.bgHex }}
+                    />
+                    <span>{tc.label}</span>
+                  </div>
+                  {(block.color || "default") === tc.value && <Check size={12} className="text-cyan-500" />}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <div className="flex-1 flex items-start gap-2">
@@ -928,7 +1043,7 @@ function BlockItem({
                 </div>
               ))}
               {(block.tasks || []).length === 0 && (
-                <p className="text-[10px] text-center text-gray-400 py-2 italic">{t("views.notesAddTasksHere")}</p>
+                <p className="text-[10px] text-center text-gray-400 py-2">{t("views.notesAddTasksHere")}</p>
               )}
             </div>
           </div>
@@ -1043,12 +1158,12 @@ function BlockItem({
                 : ""
             } ${
               block.type === "h1"
-                ? "text-3xl font-black"
+                ? "text-xl font-bold"
                 : block.type === "h2"
-                  ? "text-2xl font-black"
+                  ? "text-base font-bold"
                   : block.type === "h3"
-                    ? "text-xl font-bold"
-                    : "text-base"
+                    ? "text-sm font-semibold"
+                    : "text-sm leading-relaxed"
             }`}
           />
         )}
@@ -1124,7 +1239,7 @@ export default function NotesView({
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
         </div>
-        <Skeleton className="h-150 w-full rounded-[2.5rem]" />
+        <Skeleton className="h-72 w-full rounded-2xl" />
       </div>
     );
   }
@@ -1412,7 +1527,7 @@ export default function NotesView({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto h-full flex flex-col gap-6 pb-12"
+      className="max-w-3xl mx-auto h-full flex flex-col gap-4 pb-8"
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1479,7 +1594,7 @@ export default function NotesView({
             </div>
             <div className="flex flex-col gap-2 max-h-72 overflow-y-auto custom-scrollbar">
               {versions.length === 0 && (
-                <p className="text-xs text-gray-400 italic px-2 py-4">
+                <p className="text-xs text-gray-400 px-2 py-4">
                   Nessuna versione salvata. Usa &quot;Salva versione&quot; per creare uno snapshot.
                 </p>
               )}
@@ -1538,8 +1653,8 @@ export default function NotesView({
       </div>
 
       {/* Blocks editor */}
-      <Card className="flex-1 min-h-125 border-none bg-white/60 dark:bg-gray-900/90 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden">
-        <CardContent className="h-full p-6 md:p-8">
+      <Card className="flex-1 min-h-96 border-none bg-white/60 dark:bg-gray-900/90 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden">
+        <CardContent className="h-full p-4 md:p-5">
           {isNoteLocked ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-6">
               <div className="w-16 h-16 rounded-3xl bg-cyan-50 dark:bg-cyan-950/30 flex items-center justify-center text-cyan-500 shadow-xl shadow-cyan-500/5">

@@ -196,7 +196,7 @@ export default function WorkspacesPanel() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-32 rounded-3xl border border-white/10 bg-white/5 animate-pulse"
+                className="h-32 rounded-3xl border border-white/10 bg-white/5"
               />
             ))}
           </div>
@@ -276,7 +276,7 @@ export default function WorkspacesPanel() {
                     {/* Members list */}
                     <div className="space-y-2">
                       {members.length === 0 && (
-                        <p className="text-xs text-gray-500 italic">{t("views.wsNoMembers")}</p>
+                        <p className="text-xs text-gray-500">{t("views.wsNoMembers")}</p>
                       )}
                       {members.map((m: any) => {
                         const isSelf =

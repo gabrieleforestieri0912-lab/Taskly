@@ -5,6 +5,7 @@ import GoogleAuthProvider from "../components/GoogleAuthProvider";
 import { LanguageProvider } from "../lib/LanguageContext";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
+import { themeBootstrapScript } from "../lib/theme";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
 
@@ -119,20 +120,7 @@ export default function RootLayout({ children }) {
           <LanguageProvider>
             <script
               dangerouslySetInnerHTML={{
-                __html: `
-              (function(){
-                try{
-                  // Light by default: apply .dark only if the user explicitly
-                  // chose dark. Runs before hydration to avoid a flash.
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                }catch(e){ document.documentElement.classList.remove('dark'); }
-              })();
-            `,
+                __html: themeBootstrapScript(),
               }}
             />
             <script

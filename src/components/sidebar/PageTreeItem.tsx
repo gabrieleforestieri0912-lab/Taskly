@@ -347,7 +347,7 @@ export function PageTreeItem({
             {/* Label */}
             <span className="truncate text-xs">
               {page.label?.trim() ? page.label : (
-                <span className="text-gray-400 italic font-normal">Senza titolo</span>
+                <span className="text-gray-400 font-normal">Senza titolo</span>
               )}
             </span>
           </Link>
@@ -495,7 +495,7 @@ export function PageTreeItem({
             ) : (
               /* Notion-style "Nessuna pagina all'interno" */
               <div
-                className="text-[11px] text-gray-400 dark:text-gray-500 italic py-1 select-none pointer-events-none"
+                className="text-[11px] text-gray-400 dark:text-gray-500 py-1 select-none pointer-events-none"
                 style={{ paddingLeft: `${8 + (depth + 1) * 14 + 18}px` }}
               >
                 Nessuna pagina all&apos;interno

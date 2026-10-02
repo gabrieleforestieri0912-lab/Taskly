@@ -17,7 +17,7 @@ export default function CtaBanner() {
               <Sparkles size={12} />{t("land.ctaBadge")}</div>
 
             <h2 className="font-instrument-serif text-4xl md:text-6xl text-white leading-[1.08] tracking-[-0.02em] mb-4">{t("land.ctaTitlePrefix")}<br className="md:hidden" />
-              <em className="font-instrument-serif italic text-white/90">{t("land.ctaTitleAccent")}</em>
+              <span className="font-instrument-serif text-white/90">{t("land.ctaTitleAccent")}</span>
             </h2>
 
             <p className="text-white/80 text-base max-w-xl mx-auto mb-8 font-medium">

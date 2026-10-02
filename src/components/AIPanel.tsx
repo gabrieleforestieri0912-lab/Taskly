@@ -17,11 +17,25 @@ import {
   Check,
   MessageSquare,
   Maximize2,
+  Mic,
+  Plus,
+  Square,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useAIChat, createAIChatController } from "../lib/aiChatStore";
 import type { OnAction } from "../lib/aiChatStore";
+
+type ChatInputProps = {
+  input: string;
+  setInput: (v: string | ((prev: string) => string)) => void;
+  isStreaming: boolean;
+  isEmptyState: boolean;
+  handleSend: (override?: string) => void;
+  controller: ReturnType<typeof createAIChatController>;
+  t: (key: string) => string;
+  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+};
 
 const QUICK_ACTIONS = [
   { id: "sum", icon: FileText, label: "Riassumi" },
@@ -50,8 +64,8 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
       <div className="relative max-w-[85%]">
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1 ml-1">
-            <div className="w-4 h-4 rounded               bg-[#7b39fc]/10 flex items-center justify-center">
-              <Sparkles size={9} className="              text-[#7b39fc]" />
+            <div className="w-4 h-4 rounded bg-[#7b39fc]/10 flex items-center justify-center">
+              <Sparkles size={9} className="text-[#7b39fc]" />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
               AI Assistant
@@ -67,7 +81,7 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
         >
           {msg.content || "…"}
           {msg.streaming && (
-            <span className="inline-block w-1.5 h-4               bg-[#7b39fc] ml-0.5 animate-pulse rounded-full align-middle" />
+            <span className="inline-block w-1.5 h-4 bg-[#7b39fc] ml-0.5 rounded-full align-middle" />
           )}
         </div>
         {!isUser && !msg.streaming && (
@@ -82,6 +96,228 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
     </motion.div>
   );
 }
+
+const ChatInput = ({
+  input,
+  setInput,
+  isStreaming,
+  isEmptyState,
+  handleSend,
+  controller,
+  t,
+  inputRef,
+}: ChatInputProps) => {
+  const [textareaHeight, setTextareaHeight] = React.useState(44);
+  const [showSuggestions, setShowSuggestions] = React.useState(true);
+  const [composing, setComposing] = React.useState(false);
+  const suggestionsRef = React.useRef<HTMLDivElement>(null);
+
+  const suggestedPrompts = React.useMemo(
+    () => [
+      t("views.aiSuggest1") || "Riassumi le mie note",
+      t("views.aiSuggest2") || "Crea un piano settimanale",
+      t("views.aiSuggest3") || "Trova task scaduti",
+      t("views.aiSuggest4") || "Organizza i miei progetti",
+    ],
+    [t]
+  );
+
+  const adjustHeight = React.useCallback(() => {
+    const ta = inputRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    const lineHeight = 22;
+    const maxRows = 6;
+    const maxHeight = lineHeight * maxRows + 16;
+    const newHeight = Math.min(ta.scrollHeight, maxHeight);
+    setTextareaHeight(newHeight);
+    ta.style.height = `${newHeight}px`;
+  }, [inputRef]);
+
+  React.useEffect(() => {
+    adjustHeight();
+  }, [input, adjustHeight]);
+
+  React.useEffect(() => {
+    if (!isEmptyState) setShowSuggestions(false);
+  }, [isEmptyState]);
+
+  const onCompositionStart = () => setComposing(true);
+  const onCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
+    setComposing(false);
+    if (e.nativeEvent.data) {
+      setInput((prev) => prev + e.nativeEvent.data);
+    }
+  };
+
+  const insertSuggestion = (text: string) => {
+    setInput((prev) => (prev ? `${prev} ${text}` : text));
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  };
+
+  const handleSubmit = (e?: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e) {
+      if (composing) return;
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    } else {
+      handleSend();
+    }
+  };
+
+  const lastSentRef = React.useRef("");
+  const originalHandleSend = handleSend;
+  const wrappedHandleSend = React.useCallback(
+    (override?: string | React.MouseEvent<HTMLButtonElement>) => {
+      const text = typeof override === "string" ? override : input.trim();
+      if (text) lastSentRef.current = text;
+      originalHandleSend(typeof override === "string" ? override : undefined);
+    },
+    [input, originalHandleSend]
+  );
+
+  const { error } = useAIChat();
+  React.useEffect(() => {
+    if (error && lastSentRef.current && !input) {
+      setInput(lastSentRef.current);
+      lastSentRef.current = "";
+    }
+  }, [error, input, setInput]);
+
+  const hasText = input.trim().length > 0;
+
+  return (
+    <div className="relative">
+      {showSuggestions && isEmptyState && (
+        <motion.div
+          ref={suggestionsRef}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.15, staggerChildren: 0.03 }}
+          className="mb-3 flex flex-wrap gap-2"
+          role="list"
+          aria-label={t("views.aiSuggestionsLabel") || "Suggerimenti"}
+        >
+          {suggestedPrompts.map((prompt) => (
+            <motion.button
+              key={prompt}
+              onClick={() => insertSuggestion(prompt)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
+              role="listitem"
+            >
+              <Sparkles size={12} className="text-[#7b39fc]" />
+              {prompt}
+            </motion.button>
+          ))}
+        </motion.div>
+      )}
+
+      <div
+        className={`
+          relative flex items-end gap-2
+          bg-white dark:bg-gray-900
+          border border-gray-200 dark:border-gray-800
+          shadow-sm dark:shadow-lg
+          transition-all duration-200 ease-out
+          focus-within:ring-2 focus-within:ring-[#7b39fc]/30 focus-within:border-[#7b39fc]/60
+          max-w-[720px] mx-auto
+          px-4 py-3
+        `}
+        style={{
+          borderRadius: textareaHeight > 48 ? "24px" : "9999px",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+        }}
+        role="group"
+        aria-label={t("views.aiInputLabel") || "Input chat"}
+      >
+        <button
+          type="button"
+          className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label={t("views.aiAttachLabel") || "Allega file"}
+          disabled={isStreaming}
+        >
+          <Plus size={18} />
+        </button>
+
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleSubmit}
+          onCompositionStart={onCompositionStart}
+          onCompositionEnd={onCompositionEnd}
+          placeholder={t("views.aiInputPh")}
+          rows={1}
+          className={`
+            flex-1 min-h-[44px] max-h-[150px]
+            bg-transparent border-0 resize-none
+            text-sm text-gray-900 dark:text-gray-100
+            placeholder-gray-400
+            focus:outline-none
+            leading-relaxed
+            pr-2
+          `}
+          style={{
+            height: `${textareaHeight}px`,
+            overflowY: textareaHeight >= 22 * 6 + 16 ? "auto" : "hidden",
+          }}
+          disabled={isStreaming}
+          aria-label={t("views.aiInputPh")}
+        />
+
+        <div className="shrink-0 flex items-center justify-center">
+          {isStreaming ? (
+            <button
+              type="button"
+              onClick={controller.stop}
+              className="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+              aria-label={t("views.aiStopLabel") || "Ferma generazione"}
+            >
+              <Square size={16} />
+            </button>
+          ) : hasText ? (
+            <motion.button
+              type="button"
+              onClick={wrappedHandleSend}
+              initial={{ scale: 0.8, opacity: 0, rotate: -90 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotate: 90 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className="w-9 h-9 rounded-full bg-[#7b39fc] text-white flex items-center justify-center hover:bg-[#8b4dff] active:scale-95 transition-colors shadow-lg shadow-[#7b39fc]/20"
+              aria-label={t("views.aiSendLabel") || "Invia messaggio"}
+            >
+              <Send size={16} />
+            </motion.button>
+          ) : (
+            <motion.button
+              type="button"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              className="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+              aria-label={t("views.aiVoiceLabel") || "Input vocale"}
+              disabled
+            >
+              <Mic size={18} />
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {textareaHeight > 80 && (
+        <div
+          className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80 pointer-events-none"
+          aria-hidden="true"
+        />
+      )}
+    </div>
+  );
+};
 
 export default function AIPanel({
   pages = [],
@@ -112,7 +348,6 @@ export default function AIPanel({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Open full-page chat when ?ai=1 is in the URL (sidebar AI button).
   useEffect(() => {
     if (searchParams?.get("ai")) {
       setForcedFull(true);
@@ -120,7 +355,6 @@ export default function AIPanel({
     }
   }, [searchParams]);
 
-  // Floating variant closes on route change (unless opened full-page).
   useEffect(() => {
     if (!isPageVariant && !searchParams?.get("ai")) {
       setIsOpen(false);
@@ -128,12 +362,10 @@ export default function AIPanel({
     }
   }, [isPageVariant, pathname, searchParams]);
 
-  // Focus input on open.
   useEffect(() => {
     if (isOpen || isPageVariant) setTimeout(() => inputRef.current?.focus(), 200);
   }, [isOpen, isPageVariant]);
 
-  // Auto-scroll.
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
@@ -148,13 +380,6 @@ export default function AIPanel({
     }
     setInput("");
     void controller.send(override ?? input);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
   };
 
   const handleClose = () => {
@@ -174,10 +399,8 @@ export default function AIPanel({
 
   return (
     <>
-      {/* Floating reactive button (Notion-style) */}
       {!isPageVariant && (
         <div className="fixed bottom-6 right-6 z-[120] flex flex-col items-end gap-2">
-          {/* expanding label */}
           <AnimatePresence>
             {expanded && (
               <motion.button
@@ -191,7 +414,7 @@ export default function AIPanel({
                 }}
                 className="flex items-center gap-2 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-xl hover:scale-105 transition-transform"
               >
-                <Maximize2 size={15} className="              text-[#7b39fc]" />{t("views.aiOpenFull")}</motion.button>
+                <Maximize2 size={15} className="text-[#7b39fc]" />{t("views.aiOpenFull")}</motion.button>
             )}
           </AnimatePresence>
 
@@ -203,19 +426,18 @@ export default function AIPanel({
             whileTap={{ scale: 0.9 }}
             animate={{
               boxShadow: isOpen
-                ? "0 0 0 0 rgba(                123,57,252,0.5)"
-                : "0 0 24px 4px rgba(                123,57,252,0.35)",
+                ? "0 0 0 0 rgba(123,57,252,0.5)"
+                : "0 0 24px 4px rgba(123,57,252,0.35)",
             }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
             className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/30"
             aria-label={t("views.aiOpenChat")}
           >
-            {/* pulsing ring when unread replies exist */}
             {messages.length > 0 && !isOpen && (
-              <span className="absolute inset-0 rounded-full               bg-[#7b39fc] opacity-60 animate-ping" />
+              <span className="absolute inset-0 rounded-full bg-[#7b39fc] opacity-60" />
             )}
             {isStreaming && !isOpen && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400" />
             )}
             {isOpen ? (
               <X size={22} />
@@ -247,11 +469,10 @@ export default function AIPanel({
               transition={{ duration: 0.2, ease: "easeOut" }}
               className={panelClasses}
             >
-              {/* Header */}
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg               bg-[#7b39fc]/10 flex items-center justify-center">
-                    <Sparkles size={14} className="              text-[#7b39fc]" />
+                  <div className="w-7 h-7 rounded-lg bg-[#7b39fc]/10 flex items-center justify-center">
+                    <Sparkles size={14} className="text-[#7b39fc]" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{t("views.aiTitle")}</h3>
                 </div>
@@ -267,7 +488,7 @@ export default function AIPanel({
                   )}
                   {messages.length > 0 && (
                     <button
-                      onClick={controller.clear}
+                      onClick={() => controller.clear()}
                       className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors"
                       title={t("views.aiClear")}
                     >
@@ -283,14 +504,13 @@ export default function AIPanel({
                 </div>
               </div>
 
-              {/* messages */}
               <div
                 className={`flex-1 ${messages.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"} px-5 py-4 space-y-4 custom-scrollbar flex flex-col`}
               >
                 {isEmptyState && (
                   <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-4">
-                    <div className="w-12 h-12 rounded-2xl               bg-[#7b39fc]/10 flex items-center justify-center mb-4">
-                      <Sparkles size={20} className="              text-[#7b39fc]" />
+                    <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 flex items-center justify-center mb-4">
+                      <Sparkles size={20} className="text-[#7b39fc]" />
                     </div>
                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">{t("views.aiHelp")}</p>
                     <p className="text-xs text-gray-400 leading-relaxed">{t("views.aiHelpDesc")}</p>
@@ -310,52 +530,16 @@ export default function AIPanel({
                 <div ref={chatEndRef} />
               </div>
 
-              {/* quick actions + input */}
-              <div className="p-4 border-t border-gray-100 dark:border-gray-800/80 space-y-3">
-                {isEmptyState && (
-                  <div className="flex gap-2 flex-wrap">
-                    {QUICK_ACTIONS.map((a) => (
-                      <button
-                        key={a.id}
-                        onClick={() => handleSend(a.label)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-100 dark:border-gray-800 text-[11px] font-semibold hover:border-[#a67cff]/60 dark:hover:border-[#7b39fc]/60 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-all"
-                      >
-                        <a.icon size={12} />
-                        {a.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-end gap-2">
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder={t("views.aiInputPh")}
-                    rows={1}
-                    className="flex-1 resize-none bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/50 focus:border-[#7b39fc] leading-relaxed"
-                    style={{ maxHeight: 120 }}
-                  />
-                  {isStreaming ? (
-                    <button
-                      onClick={controller.stop}
-                      className="shrink-0 w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleSend()}
-                      disabled={!input.trim()}
-                      className="shrink-0 w-9 h-9 rounded-xl bg-[#7b39fc] text-white flex items-center justify-center hover:bg-[#8b4dff] transition-colors disabled:opacity-30 shadow-lg shadow-[#7b39fc]/20"
-                    >
-                      <Send size={15} />
-                    </button>
-                  )}
-                </div>
-              </div>
+              <ChatInput
+                input={input}
+                setInput={setInput}
+                isStreaming={isStreaming}
+                isEmptyState={isEmptyState}
+                handleSend={handleSend}
+                controller={controller}
+                t={t}
+                inputRef={inputRef}
+              />
             </motion.div>
           </>
         )}

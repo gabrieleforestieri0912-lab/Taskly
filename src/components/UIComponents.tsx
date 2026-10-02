@@ -223,7 +223,7 @@ export const ScrollReveal = ({ children, delay = 0, direction = "up" }) => {
 
 export const Skeleton = ({ className = "" }) => (
   <div
-    className={`animate-pulse bg-gray-200 dark:bg-gray-800 rounded-lg ${className}`}
+    className={`bg-gray-200 dark:bg-gray-800 rounded-lg ${className}`}
   />
 );
 

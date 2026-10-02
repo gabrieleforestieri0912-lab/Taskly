@@ -237,13 +237,12 @@ export default function Navbar({
 
   /* ── Landing floating navbar ─────────────────────────────────── */
   if (isLanding && !isDashboard) {
-    // Barra fissa a tutta larghezza: niente effetto "floating" ne' animazione
-    // allo scroll, la superficie e' sempre la stessa.
+    // Barra fissa solida, niente glassmorphism
     const barSurface =
-      "h-16 border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-black/90";
+      "h-16 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-black";
 
     const menuItem =
-      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-[#7b39fc]/10 hover:text-gray-900 dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white";
+      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
 
     return (
       <>
@@ -304,7 +303,7 @@ export default function Navbar({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/10 dark:bg-black/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                        className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-black"
                       >
                         {link.children.map((child) => {
                           const Icon = child.icon;
@@ -379,10 +378,10 @@ export default function Navbar({
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.97 }}
                           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/95 p-1.5 shadow-[0_24px_70px_rgba(15,10,30,0.18)] dark:border-white/10 dark:bg-black/95 dark:shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+                          className="absolute right-0 top-full z-50 mt-3 w-64 overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-black"
                         >
-                          <div className="border-b border-gray-200/70 p-4 dark:border-white/10">
-                            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:text-white/50">
+                          <div className="border-b border-gray-200 p-4 dark:border-gray-700">
+                            <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
                               {t("account")}
                             </div>
                             <div className="mt-1.5 truncate text-sm font-bold text-gray-900 dark:text-white">
@@ -393,7 +392,7 @@ export default function Navbar({
                             <button
                               type="button"
                               onClick={handleLogout}
-                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
+                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                             >
                               <LogOut size={17} />
                               {t("logout")}
@@ -408,13 +407,13 @@ export default function Navbar({
                 <>
                   <Link
                     href="/login"
-                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-[#7b39fc]/25 bg-[#7b39fc]/5 px-5 text-sm font-semibold text-gray-800 dark:border-white/20 dark:bg-white/5 dark:text-white backdrop-blur-md transition-all duration-300 hover:border-[#7b39fc]/60 hover:bg-[#7b39fc]/15"
+                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     {t("login")}
                   </Link>
                   <Link
                     href="/register"
-                    className="font-inter inline-flex h-9 items-center justify-center rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(123,57,252,0.35)] transition-all duration-300 hover:bg-[#8b4dff] hover:shadow-[0_10px_32px_rgba(123,57,252,0.5)]"
+                    className="font-inter inline-flex h-9 items-center justify-center rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
                   >
                     {t("start")}
                   </Link>
@@ -582,10 +581,10 @@ export default function Navbar({
 
   /* ── Dashboard / scrolled landing navbar (legacy) ────────────── */
   const surfaceClass =
-    "border-b border-[#7b39fc]/15 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-[#120d20]/90";
+    "border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-black";
 
   const iconBtn =
-    "inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]";
+    "inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white";
 
   return (
     <header className="sticky top-0 z-50">
@@ -596,7 +595,7 @@ export default function Navbar({
           {isDashboard && !isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               aria-label={t("land.navOpenSidebar")}
             >
               <PanelLeftOpen size={18} />
@@ -605,7 +604,7 @@ export default function Navbar({
           {isDashboard && isSidebarOpen && (
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
               aria-label={t("land.navCloseSidebar")}
             >
               <PanelLeftClose size={18} />
@@ -616,7 +615,7 @@ export default function Navbar({
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((open) => !open)}
-                className="flex h-10 items-center gap-2 rounded-xl border border-[#7b39fc]/20 bg-white px-2.5 pl-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:border-[#7b39fc]/40 dark:border-[#a484d7]/15 dark:bg-white/7 dark:text-gray-200 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
+                className="flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-2.5 pl-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-600"
               >
                 <span className="hidden max-w-32.5 truncate sm:block">
                   {user.name}
@@ -625,11 +624,11 @@ export default function Navbar({
                   <img
                     src={user.picture}
                     alt={user.name}
-                    className="h-7 w-7 rounded-full object-cover shrink-0 border border-[#7b39fc]/15"
+                    className="h-7 w-7 rounded-full object-cover shrink-0 border border-gray-300 dark:border-gray-600"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#7b39fc] text-white shadow-sm">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#7b39fc] text-white">
                     <User size={14} />
                   </span>
                 )}
@@ -646,9 +645,9 @@ export default function Navbar({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.97 }}
                     transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute left-0 mt-2 w-64 overflow-hidden rounded-2xl border border-gray-200/30 bg-white shadow-2xl dark:border-white/10 dark:bg-[#111414e6]"
+                    className="absolute left-0 mt-2 w-64 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-black"
                   >
-                    <div className="border-b border-gray-200/30 p-4 dark:border-white/10">
+                    <div className="border-b border-gray-200 p-4 dark:border-gray-700">
                       <div className="text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
                         {t("account")}
                       </div>
@@ -660,7 +659,7 @@ export default function Navbar({
                       <Link
                         href="/dashboard"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
                         <LayoutDashboard size={17} />
                         {t("dashboard")}
@@ -668,14 +667,14 @@ export default function Navbar({
                       <Link
                         href="/settings"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
                         <Settings size={17} />
                         {t("settings")}
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/8"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
                       >
                         <LogOut size={17} />
                         {t("logout")}
@@ -709,7 +708,7 @@ export default function Navbar({
                   onClick={() =>
                     setOpenMenu((k) => (k === group.key ? null : group.key))
                   }
-                  className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] dark:text-gray-400 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
+                  className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                 >
                   {group.name}
                   <ChevronDown
@@ -727,7 +726,7 @@ export default function Navbar({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 6, scale: 0.97 }}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-[#111414f2]"
+                      className="absolute left-0 top-full z-50 mt-3 w-[300px] origin-top overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-gray-700 dark:bg-black"
                     >
                       {group.children.map((child) => {
                         const ChildIcon = child.icon;
@@ -736,7 +735,7 @@ export default function Navbar({
                             key={child.name}
                             href={child.href}
                             onClick={() => setOpenMenu(null)}
-                            className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 hover:bg-[#7b39fc]/10 dark:hover:bg-[#7b39fc]/15"
+                            className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                           >
                             <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff]">
                               <ChildIcon size={17} />
@@ -771,13 +770,13 @@ export default function Navbar({
             <div className="hidden items-center gap-1.5 sm:flex">
               <Link
                 href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-[#d4d4d4] bg-white px-3.5 text-sm font-semibold text-[#171717] transition-opacity hover:opacity-90"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800"
               >
                 {t("login")}
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-[#7b39fc] px-5 text-sm font-semibold text-[#fafafa] shadow-sm transition-colors hover:bg-[#8b4dff]"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
               >
                 {t("start")}
               </Link>
@@ -803,7 +802,7 @@ export default function Navbar({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="mx-auto mt-2.5 max-w-7xl overflow-hidden rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-2xl pointer-events-auto dark:border-white/10 dark:bg-[#111414e6]"
+            className="mx-auto mt-2.5 max-w-7xl overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-700 dark:bg-black"
           >
             {navLinks.map((link) => (
               <a
@@ -816,11 +815,11 @@ export default function Navbar({
               </a>
             ))}
             {!user && (
-              <div className="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-2 dark:border-white/10">
+              <div className="mt-2 grid grid-cols-2 gap-2 border-t border-gray-200 pt-2 dark:border-gray-700">
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex h-11 items-center justify-center rounded-lg border border-[#d4d4d4] text-sm font-semibold text-[#171717]"
+                  className="inline-flex h-11 items-center justify-center rounded-lg border border-gray-300 text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white"
                 >{t("auth.signIn")}</Link>
                 <Link
                   href="/register"

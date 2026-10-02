@@ -8,10 +8,10 @@ export function SocialProof() {
       <Container className="text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{title}</p>
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl mx-auto">{description}</p>
-        <div className="mt-6 flex flex-wrap justify-center gap-6 opacity-40">
-          {/* Placeholder loghi generici testuali */}
-          {["TODO: Cliente A", "TODO: Cliente B", "TODO: Cliente C"].map((c) => (
-            <span key={c} className="text-sm font-medium border border-dashed border-muted-foreground/30 rounded-lg px-4 py-2">
+        <div className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2">
+          {/* Marchi testuali, niente placeholder */}
+          {["Freelance", "Piccoli team", "Studenti", "Startup"].map((c) => (
+            <span key={c} className="text-sm font-semibold text-gray-500 dark:text-gray-400">
               {c}
             </span>
           ))}

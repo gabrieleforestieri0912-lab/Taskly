@@ -30,6 +30,7 @@ import AIPanel from "../../components/AIPanel";
 import { getMeetingProvider } from "../../lib/meetings/providers";
 import { useUserData } from "../../hooks/useUserData";
 import { useLanguage } from "../../lib/LanguageContext";
+import { applyTheme, readTheme, type Theme } from "../../lib/theme";
 import { Skeleton } from "../../components/UIComponents";
 
 function MeetingsContent() {
@@ -40,10 +41,7 @@ function MeetingsContent() {
   const { user, pages, loading } = useUserData();
 
   // Theme state
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === "undefined") return "light";
-    return localStorage.getItem("theme") || "light";
-  });
+  const [theme, setTheme] = useState<Theme>("light");
 
   // Layout states
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -68,8 +66,9 @@ function MeetingsContent() {
 
   // Update theme class on HTML element
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    const saved = readTheme();
+    setTheme(saved);
+    applyTheme(saved);
   }, []);
 
   // Sync server-persisted meetings (logged-in users) into the local list
@@ -117,8 +116,7 @@ function MeetingsContent() {
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    applyTheme(newTheme, true);
   };
 
   // Delete a meeting

@@ -60,7 +60,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="relative bg-[#f6f7f9] dark:bg-black text-gray-900 dark:text-gray-100 mt-auto overflow-hidden transition-colors duration-300 border-t border-[#7b39fc]/10 dark:border-white/5"
+      className="relative bg-[#f6f7f9] dark:bg-black text-gray-900 dark:text-gray-100 mt-auto border-t border-gray-200 dark:border-gray-800"
       role="contentinfo"
       aria-label={t("land.footerAria")}
     >
@@ -105,7 +105,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={s.label}
-                    className="grid h-9 w-9 place-items-center rounded-xl border border-[#7b39fc]/10 bg-white text-gray-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#7b39fc]/40 hover:text-[#7b39fc] hover:shadow-lg hover:shadow-[#7b39fc]/15 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:text-[#a67cff]"
+                    className="grid h-9 w-9 place-items-center rounded-xl border border-gray-200 bg-white text-gray-500 transition-colors hover:border-[#7b39fc] hover:text-[#7b39fc] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:text-[#a67cff]"
                   >
                     <Icon size={16} />
                   </a>
@@ -144,7 +144,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="relative border-t border-gray-100 bg-white/40 dark:border-white/5 dark:bg-black/40">
+      <div className="relative border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
           <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
             © {new Date().getFullYear()} Taskly. Tutti i diritti riservati.

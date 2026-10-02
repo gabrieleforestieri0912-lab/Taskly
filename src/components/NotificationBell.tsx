@@ -92,7 +92,6 @@ export default function NotificationBell({ pollInterval = 10000 }) {
         <Bell size={20} strokeWidth={2.5} />
         {unreadCount > 0 && (
           <span className="absolute top-2 right-2 w-3.5 h-3.5 bg-red-500 border-2 border-white dark:border-gray-950 rounded-full flex items-center justify-center">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           </span>
         )}
       </button>
