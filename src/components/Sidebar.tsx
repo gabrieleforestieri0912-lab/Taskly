@@ -20,6 +20,7 @@ import {
   Moon,
   Palette,
   Check,
+  CheckSquare,
   ListTodo,
   Target,
   Calendar,
@@ -137,6 +138,28 @@ export default function Sidebar({
 
   const searchParams = useSearchParams();
   const activePageId = searchParams?.get("page");
+  const activeView = searchParams?.get("view");
+  const isMyTasksActive = pathname === "/dashboard" && activeView === "mytasks";
+
+  const [activeTasksCount, setActiveTasksCount] = useState<number>(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      try {
+        const raw = localStorage.getItem("taskly_tasks_v1") || localStorage.getItem("tasks");
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            const active = list.filter((t: any) => !t.deleted && t.status !== "done").length;
+            setActiveTasksCount(active);
+          }
+        }
+      } catch {}
+    };
+    updateCount();
+    window.addEventListener("taskly-tasks-updated", updateCount);
+    return () => window.removeEventListener("taskly-tasks-updated", updateCount);
+  }, []);
 
   // Auto-expand ancestors of the active page so deep pages are visible in the tree
   useEffect(() => {
@@ -1095,18 +1118,22 @@ export default function Sidebar({
               icon={LayoutDashboard}
               label={t("homePages") || "Dashboard & Analitiche"}
               href="/dashboard"
-              isActive={!isTranscriptionMode && !isAIActive && !activePageId}
+              isActive={!isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive}
               onClick={() => {
                 setIsTranscriptionMode(false);
                 setIsAIActive(false);
               }}
             />
             <SidebarNavItem
-              id="sidebar-inbox-btn"
-              icon={Inbox}
-              label="Inbox"
+              id="sidebar-mytasks-btn"
+              icon={CheckSquare}
+              label="I miei task"
+              href="/dashboard?view=mytasks"
+              badge={activeTasksCount > 0 ? activeTasksCount : undefined}
+              isActive={!isTranscriptionMode && !isAIActive && isMyTasksActive}
               onClick={() => {
-                /* placeholder — Fase 5 */
+                setIsTranscriptionMode(false);
+                setIsAIActive(false);
               }}
             />
             <SidebarNavItem

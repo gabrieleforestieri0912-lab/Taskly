@@ -44,6 +44,7 @@ import NotesView from "../../components/NotesView";
 import CalendarView from "../../components/CalendarView";
 import BrainDumpView from "../../components/BrainDumpView";
 import EmptyPageView from "../../components/EmptyPageView";
+import MyTasksView from "../../components/MyTasksView";
 import { motion, AnimatePresence } from "framer-motion";
 import AIPanel from "../../components/AIPanel";
 import NotificationBell from "../../components/NotificationBell";
@@ -771,6 +772,9 @@ function DashboardContent() {
   const shouldShowSidebar = isSidebarOpen || isSidebarPeekOpen;
 
   const breadcrumbs = React.useMemo(() => {
+    if (searchParams.get("view") === "mytasks") {
+      return [{ id: "mytasks", label: "I miei task" }];
+    }
     const crumbs = [] as any[];
     let cur = activePage;
     while (cur) {
@@ -779,9 +783,19 @@ function DashboardContent() {
       cur = pages.find((p) => String(p.id) === String(cur.parentId));
     }
     return crumbs;
-  }, [activePage, pages]);
+  }, [activePage, pages, searchParams]);
 
   const renderActiveView = () => {
+    // If view query param is mytasks, show MyTasksView
+    if (searchParams.get("view") === "mytasks") {
+      return (
+        <MyTasksView
+          allPages={pages}
+          onNavigateToPage={(pId) => router.push(`/dashboard?page=${pId}`)}
+        />
+      );
+    }
+
     // If trash query param is present, show Trash UI
     if (searchParams.get("trash") === "1") {
       const deletedPages = (pages || [])

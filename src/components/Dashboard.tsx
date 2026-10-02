@@ -711,7 +711,7 @@ export default function Dashboard({
                   <Flame size={16} className="text-orange-500" /> {t("priorityHigh") || "Task ad Alta Priorità"}
                 </h4>
                 <Link
-                  href="/dashboard"
+                  href="/dashboard?view=mytasks"
                   className="text-[10px] font-black text-[#7b39fc] uppercase tracking-wider hover:underline"
                 >
                   {t("seeAll") || "Vedi tutti"}
