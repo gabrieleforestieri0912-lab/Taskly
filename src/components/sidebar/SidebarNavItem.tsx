@@ -71,7 +71,13 @@ export function SidebarNavItem({
 
   if (href) {
     return (
-      <Link id={id} href={href} className={baseClass} aria-current={isActive ? "page" : undefined}>
+      <Link
+        id={id}
+        href={href}
+        className={baseClass}
+        aria-current={isActive ? "page" : undefined}
+        onClick={onClick}
+      >
         {inner}
       </Link>
     );
