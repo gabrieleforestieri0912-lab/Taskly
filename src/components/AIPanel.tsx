@@ -220,18 +220,17 @@ const ChatInput = ({
 
       <div
         className={`
-          relative flex items-end gap-2
+          relative flex items-end gap-1.5
           bg-white dark:bg-gray-900
-          border border-gray-200 dark:border-gray-800
-          shadow-sm dark:shadow-lg
+          border border-gray-300 dark:border-gray-700
           transition-all duration-200 ease-out
           focus-within:ring-2 focus-within:ring-[#7b39fc]/30 focus-within:border-[#7b39fc]/60
           max-w-[720px] mx-auto
-          px-4 py-3
+          px-2 py-2
         `}
         style={{
-          borderRadius: textareaHeight > 48 ? "24px" : "9999px",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+          borderRadius: textareaHeight > 48 ? "26px" : "9999px",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.05)",
         }}
         role="group"
         aria-label={t("views.aiInputLabel", "Input chat")}
@@ -255,13 +254,13 @@ const ChatInput = ({
           placeholder={t("views.aiInputPh")}
           rows={1}
           className={`
-            flex-1 min-h-[44px] max-h-[150px]
+            flex-1 min-h-[40px] max-h-[150px]
             bg-transparent border-0 resize-none
-            text-sm text-gray-900 dark:text-gray-100
+            text-[15px] text-gray-900 dark:text-gray-100
             placeholder-gray-400
             focus:outline-none
             leading-relaxed
-            pr-2
+            py-2 px-1
           `}
           style={{
             height: `${textareaHeight}px`,
@@ -506,42 +505,64 @@ export default function AIPanel({
                 </div>
               </div>
 
-              <div
-                className={`flex-1 ${messages.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"} px-5 py-4 space-y-4 custom-scrollbar flex flex-col`}
-              >
-                {isEmptyState && (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 flex items-center justify-center mb-4">
-                      <Sparkles size={20} className="text-[#7b39fc]" />
+              {/* Stato vuoto: contenuto e input sono centrati insieme,
+                  come in Google AI Mode. Dopo il primo messaggio l'input
+                  torna in fondo al pannello ( ramo else ). */}
+              {isEmptyState ? (
+                <div className="flex-1 flex flex-col items-center justify-center overflow-y-hidden px-6 pb-10">
+                  <div className="w-full max-w-[720px]">
+                    <div className="flex flex-col items-center text-center mb-7">
+                      <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 flex items-center justify-center mb-4">
+                        <Sparkles size={20} className="text-[#7b39fc]" />
+                      </div>
+                      <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
+                        {t("views.aiHelp")}
+                      </p>
+                      <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
+                        {t("views.aiHelpDesc")}
+                      </p>
                     </div>
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">{t("views.aiHelp")}</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">{t("views.aiHelpDesc")}</p>
+
+                    <ChatInput
+                      input={input}
+                      setInput={setInput}
+                      isStreaming={isStreaming}
+                      isEmptyState={isEmptyState}
+                      handleSend={handleSend}
+                      controller={controller}
+                      t={t}
+                      inputRef={inputRef}
+                    />
                   </div>
-                )}
+                </div>
+              ) : (
+                <>
+                  <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 custom-scrollbar flex flex-col">
+                    {messages.map((msg, i) => (
+                      <MessageBubble key={i} msg={msg} />
+                    ))}
 
-                {messages.map((msg, i) => (
-                  <MessageBubble key={i} msg={msg} />
-                ))}
+                    {error && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-xs text-red-600 dark:text-red-400">
+                        {error}
+                      </div>
+                    )}
 
-                {error && (
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-xs text-red-600 dark:text-red-400">
-                    {error}
+                    <div ref={chatEndRef} />
                   </div>
-                )}
 
-                <div ref={chatEndRef} />
-              </div>
-
-              <ChatInput
-                input={input}
-                setInput={setInput}
-                isStreaming={isStreaming}
-                isEmptyState={isEmptyState}
-                handleSend={handleSend}
-                controller={controller}
-                t={t}
-                inputRef={inputRef}
-              />
+                  <ChatInput
+                    input={input}
+                    setInput={setInput}
+                    isStreaming={isStreaming}
+                    isEmptyState={isEmptyState}
+                    handleSend={handleSend}
+                    controller={controller}
+                    t={t}
+                    inputRef={inputRef}
+                  />
+                </>
+              )}
             </motion.div>
           </>
         )}
