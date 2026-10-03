@@ -4,6 +4,7 @@ import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, Clock, Users } from "lucide-react";
 import { useLanguage } from "../lib/LanguageContext";
+import { FloatingWorkspace } from "./FloatingWorkspace";
 
 function Hero({ onStart, onDiscover }) {
   const { t } = useLanguage();
@@ -65,6 +66,9 @@ function Hero({ onStart, onDiscover }) {
         />
         {/* bordo inferiore netto: separa l'hero dalla sezione successiva */}
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#7b39fc]/25 to-transparent" />
+
+        {/* elementi workspace fluttanti (tabella, task, calendario, …) */}
+        <FloatingWorkspace />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-[900px] flex-col items-center text-center">
