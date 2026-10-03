@@ -45,8 +45,10 @@ import {
   saveTasksToStorage,
   loadTaskPreferences,
   saveTaskPreferences,
+  softDeleteTaskLocal,
 } from "../lib/taskModel";
 import { track } from "../lib/activity";
+import { trackOnboardingEvent } from "../hooks/useOnboarding";
 
 interface MyTasksViewProps {
   allPages?: any[];
@@ -388,6 +390,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
       }
 
       updateTasks((prev) => [newTask, ...prev]);
+      trackOnboardingEvent("task_created");
 
       track({
         type: "task_created",
@@ -422,6 +425,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
       );
 
       if (nextStatus === "done") {
+        trackOnboardingEvent("task_completed");
         track({
           type: "task_completed",
           title: "Task completato",
@@ -477,10 +481,12 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
     [selectedTaskId, updateTasks],
   );
 
-  // Delete task
+  // Delete task -> soft delete nel Cestino (recuperabile per 30 giorni)
   const deleteTask = useCallback(
     (taskId: string) => {
-      updateTasks((prev) => prev.filter((t) => t.id !== taskId));
+      updateTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? softDeleteTaskLocal(t) : t)),
+      );
       if (selectedTaskId === taskId) setSelectedTaskId(null);
     },
     [selectedTaskId, updateTasks],

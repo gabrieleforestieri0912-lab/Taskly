@@ -51,6 +51,7 @@ import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 import { PageTreeItem } from "./sidebar/PageTreeItem";
 import { GoogleCalendarSidebarCard } from "./sidebar/GoogleCalendarSidebarCard";
+import { OneTimeTooltip } from "./OnboardingTooltips";
 import { getAncestorIds } from "../lib/pageTree";
 
 import { createPortal } from "react-dom";
@@ -97,6 +98,7 @@ export default function Sidebar({
   onUpdatePage = (..._args: any[]) => {},
   isModalOpen = false,
   setIsModalOpen = (..._args: any[]) => {},
+  onOpenTemplateGallery = () => {},
   isSidebarOpen,
   setIsSidebarOpen,
   theme,
@@ -1106,7 +1108,13 @@ export default function Sidebar({
           aria-label="Navigazione principale"
         >
           {/* ── Quick actions ──────────────────────────────────────────────── */}
-          <div className="mt-1 space-y-0.5" role="list" aria-label="Azioni rapide">
+          <div className="mt-1 space-y-0.5 relative" role="list" aria-label="Azioni rapide">
+            <OneTimeTooltip
+              id="tip-sidebar-search"
+              title="Ricerca veloce (Ctrl+K)"
+              body="Premi Ctrl+K ovunque per cercare pagine, task e azioni."
+              whileStepPending="search"
+            />
             <SidebarNavItem
               id="sidebar-search-btn"
               icon={Search}
@@ -1243,6 +1251,13 @@ export default function Sidebar({
             </div>
           ) : (
             /* Normal pages section */
+            <div className="relative">
+            <OneTimeTooltip
+              id="tip-sidebar-newpage"
+              title="Nuova pagina (+)"
+              body="Usa + per creare una pagina vuota o partire da un template."
+              whileStepPending="create_page"
+            />
             <SidebarSection
               label={t("yourPages") || "Privato"}
               onAdd={() =>
@@ -1305,6 +1320,7 @@ export default function Sidebar({
                 </ul>
               )}
             </SidebarSection>
+            </div>
           )}
 
           {/* Spacer */}
@@ -1361,6 +1377,7 @@ export default function Sidebar({
         <AddPageModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onOpenTemplateGallery={onOpenTemplateGallery}
           onAdd={(type) => {
             onAddPage(type);
             setIsModalOpen(false);

@@ -2,6 +2,7 @@
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { buildIndex, searchIndex } from "../lib/searchIndex";
+import { trackOnboardingEvent } from "../hooks/useOnboarding";
 import SearchResults from "./SearchResults";
 import { Search, Command, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,6 +42,7 @@ export default function SearchBar({ pages = [] as any[] }) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         inputRef.current?.focus();
+        trackOnboardingEvent("search_used");
       }
     };
     window.addEventListener("keydown", handleKeyDown);

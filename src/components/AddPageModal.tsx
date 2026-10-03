@@ -243,7 +243,7 @@ const TEMPLATES = [
   },
 ];
 
-export default function AddPageModal({ isOpen, onClose, onAdd }) {
+export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGallery }) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("types");
 
@@ -373,7 +373,17 @@ export default function AddPageModal({ isOpen, onClose, onAdd }) {
           </div>
         </div>
 
-        <div className="px-5 py-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
+        <div className="px-5 py-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              onClose && onClose();
+              if (onOpenTemplateGallery) onOpenTemplateGallery();
+            }}
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-[#7b39fc] hover:underline px-2 py-2"
+          >
+            <Sparkles size={13} /> Galleria template
+          </button>
           <Button
             variant="ghost"
             onClick={onClose}

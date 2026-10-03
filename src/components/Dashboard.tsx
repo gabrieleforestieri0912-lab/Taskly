@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
+import { trackOnboardingEvent } from "../hooks/useOnboarding";
 import FileUploader from "./FileUploader";
 import TemplateGallery from "./TemplateGallery";
 import ImportExport from "./ImportExport";
@@ -244,6 +245,7 @@ export default function Dashboard({
           visibility: nextVisibility,
         }),
       );
+      trackOnboardingEvent("dashboard_customized");
     } catch {
       // ignore
     }

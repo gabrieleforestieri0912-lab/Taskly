@@ -24,6 +24,8 @@ export interface Task {
   updatedAt?: string;
   completedAt?: string;
   deleted?: boolean;
+  /** ISO timestamp di soft-delete (cestino). Usato per ordinamento + retention 30gg. */
+  deletedAt?: string;
 }
 
 export type GroupBy = "deadline" | "project" | "priority" | "status";
@@ -423,4 +425,37 @@ export function saveTaskPreferences(prefs: TaskPreferences): void {
   try {
     localStorage.setItem(TASK_PREFS_STORAGE_KEY, JSON.stringify(prefs));
   } catch {}
+}
+
+/** Soft-delete di un task con deletedAt (cestino + retention 30gg). */
+export function softDeleteTaskLocal(task: Task): Task {
+  const now = new Date().toISOString();
+  return { ...task, deleted: true, deletedAt: now, updatedAt: now };
+}
+
+/** Ripristino di un task dal cestino. */
+export function restoreTaskLocal(task: Task): Task {
+  const next: any = { ...task, deleted: false, updatedAt: new Date().toISOString() };
+  delete next.deletedAt;
+  return next as Task;
+}
+
+function getTaskDeletedAtLocal(t: any): string | undefined {
+  return t?.deletedAt || t?.updatedAt || t?.completedAt || t?.createdAt || undefined;
+}
+
+/** Rimuove i task cestinati da oltre 30 giorni. */
+export function purgeExpiredTasksLocal(tasks: Task[]): { kept: Task[]; purgedIds: string[] } {
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const purgedIds: string[] = [];
+  const kept = (tasks || []).filter((t: any) => {
+    if (!t?.deleted) return true;
+    const ts = getTaskDeletedAtLocal(t) ? new Date(getTaskDeletedAtLocal(t)!).getTime() : NaN;
+    if (!Number.isNaN(ts) && Date.now() - ts > THIRTY_DAYS_MS) {
+      purgedIds.push(String(t.id));
+      return false;
+    }
+    return true;
+  });
+  return { kept, purgedIds };
 }

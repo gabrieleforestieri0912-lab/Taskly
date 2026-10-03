@@ -31,6 +31,9 @@ import {
   Lock,
   Unlock,
   Copy,
+  Check,
+  BookmarkPlus,
+  LayoutTemplate,
   Move,
   Type,
 } from "lucide-react";
@@ -45,6 +48,10 @@ import CalendarView from "../../components/CalendarView";
 import BrainDumpView from "../../components/BrainDumpView";
 import EmptyPageView from "../../components/EmptyPageView";
 import MyTasksView from "../../components/MyTasksView";
+import TrashView from "../../components/TrashView";
+import TemplateGalleryModal from "../../components/TemplateGalleryModal";
+import OnboardingModal from "../../components/OnboardingModal";
+import OnboardingChecklist from "../../components/OnboardingChecklist";
 import { motion, AnimatePresence } from "framer-motion";
 import AIPanel from "../../components/AIPanel";
 import NotificationBell from "../../components/NotificationBell";
@@ -52,6 +59,15 @@ import { useUserData } from "../../hooks/useUserData";
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
 import { applyTheme, readTheme } from "../../lib/theme";
+import { PageTemplate, saveCustomTemplate } from "../../lib/templates";
+import {
+  hardDeletePageCascade,
+  purgeExpiredPages,
+  restorePageCascade,
+  softDeletePageCascade,
+} from "../../lib/trashUtils";
+import { parseNaturalDate, loadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal } from "../../lib/taskModel";
+import { trackOnboardingEvent } from "../../hooks/useOnboarding";
 
 function DashboardContent() {
   const { t, language, setLanguage } = useLanguage();
@@ -82,6 +98,28 @@ function DashboardContent() {
   const activePageId = searchParams.get("page");
   const activeType = searchParams.get("type");
   const focusTitleParam = searchParams.get("focusTitle");
+
+  // Stat live per l'onboarding dinamico (riletti ad ogni render)
+  const [liveOnboardingTasks, setLiveOnboardingTasks] = useState(0);
+  const [liveOnboardingDone, setLiveOnboardingDone] = useState(0);
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        const raw = localStorage.getItem("taskly_tasks_v1");
+        const list = raw ? JSON.parse(raw) : [];
+        const active = Array.isArray(list) ? list.filter((t: any) => !t?.deleted) : [];
+        setLiveOnboardingTasks(active.length);
+        setLiveOnboardingDone(active.filter((t: any) => t?.status === "done").length);
+      } catch {}
+    };
+    refresh();
+    window.addEventListener("taskly-tasks-updated", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("taskly-tasks-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
   const activePage = (pages || []).find(
     (page) => String(page.id) === String(activePageId),
   );
@@ -96,6 +134,42 @@ function DashboardContent() {
   const pagesSyncedRef = React.useRef(false);
   const [isNestModalOpen, setIsNestModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
+  const [isPageMenuOpen, setIsPageMenuOpen] = useState(false);
+  const [templateToast, setTemplateToast] = useState<string | null>(null);
+  const [pageLinkCopied, setPageLinkCopied] = useState(false);
+
+  const handleCopyPageLink = (pageId: string) => {
+    try {
+      const url = `${window.location.origin}/dashboard?page=${pageId}`;
+      navigator.clipboard.writeText(url);
+      setPageLinkCopied(true);
+      setTimeout(() => setPageLinkCopied(false), 2000);
+    } catch {}
+  };
+
+  const handleSaveAsTemplate = (page: any) => {
+    if (!page) return;
+    try {
+      const data = page.data && typeof page.data === "object" ? page.data : { text: "" };
+      const cloned = JSON.parse(JSON.stringify(data));
+      const saved = saveCustomTemplate({
+        title: `${page.label || "Pagina senza titolo"} (template)`,
+        category: "Personale",
+        description: `Template personalizzato creato da "${page.label || "pagina"}"`,
+        icon: typeof page.icon === "string" ? page.icon : "sparkles",
+        iconColor: page.iconColor || "text-[#7b39fc]",
+        type: page.type === "tasks" ? "tasks" : "notes",
+        data: cloned,
+      });
+      trackOnboardingEvent("template_saved");
+      setTemplateToast(`Template "${saved.title}" salvato nella galleria`);
+      setTimeout(() => setTemplateToast(null), 3500);
+    } catch {
+      setTemplateToast("Impossibile salvare il template");
+      setTimeout(() => setTemplateToast(null), 3500);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -241,6 +315,35 @@ function DashboardContent() {
     return map;
   }, [ICON_CATEGORY_MAP]);
 
+  // Valid list of lucide exports that are actually renderable components.
+  // Object.keys(LucideIcons) also yields non-component exports such as
+  // `icons` (a plain map of every icon) and `createLucideIcon`; rendering or
+  // iterating those produced the "reading 'map'" crash when opening this menu.
+  // Computed once instead of inline so the render path never walks 5000+ keys.
+  const ICON_NAMES = React.useMemo(() => {
+    const names = Object.keys(LucideIcons);
+    const valid = names.filter((name) => {
+      if (name === "icons" || name === "createLucideIcon") return false;
+      const exported = LucideIcons[name];
+      if (typeof exported === "function") return true;
+      // forwardRef components are plain objects exposing `render`
+      return Boolean(exported && typeof exported === "object" && exported.render);
+    });
+    // Drop the `FooIcon` aliases when the plain `Foo` export also exists.
+    return valid.filter(
+      (name) => !(name.endsWith("Icon") && valid.includes(name.slice(0, -4))),
+    );
+  }, []);
+
+  // Resolve an icon name to a component, with a safe fallback for unknown names.
+  const renderIcon = (name, props) => {
+    const Comp = typeof name === "string" ? LucideIcons[name] : null;
+    const isComponent =
+      typeof Comp === "function" ||
+      (Comp && typeof Comp === "object" && (Comp as any).render);
+    return React.createElement(isComponent ? Comp : LayoutDashboard, props);
+  };
+
   const COLOR_OPTIONS = [
     { label: "Default", value: "text-gray-400", bg: "bg-gray-400" },
     { label: "Viola", value: "text-[#7b39fc]", bg: "bg-[#7b39fc]" },
@@ -274,46 +377,30 @@ function DashboardContent() {
   useEffect(() => {
     if (!focusTitleParam) return;
     const id = setTimeout(() => {
-      // navigate to same page without the focusTitle param
-      if (activePageId) {
-        router.replace(`/dashboard?page=${activePageId}`);
-      } else {
-        router.replace(`/dashboard`);
-      }
+      // Drop only focusTitle and preserve every other query param (view,
+      // type, trash, ai, ...) so we never kick the user out of the current mode.
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("focusTitle");
+      const qs = params.toString();
+      router.replace(qs ? `/dashboard?${qs}` : "/dashboard");
     }, 300);
     return () => clearTimeout(id);
-  }, [focusTitleParam, activePageId, router]);
+  }, [focusTitleParam, activePageId, router, searchParams]);
 
-  // Auto-delete trash items after 30 days
+  // Auto-delete trash items after 30 days (pagine + task locali)
   useEffect(() => {
     if (!hasLoadedUserData) return;
-    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
     const cleanup = () => {
       setPages((prev) => {
         const cur = Array.isArray(prev) ? prev : [];
-        const now = Date.now();
-        const expired = cur.filter((p) => {
-          if (!p.deleted || !p.deletedAt) return false;
-          return now - new Date(p.deletedAt).getTime() > THIRTY_DAYS;
-        });
-        if (expired.length === 0) return prev;
-        const expiredIds = new Set(expired.map((p) => p.id));
-        let changed = true;
-        while (changed) {
-          changed = false;
-          cur.forEach((page) => {
-            if (
-              page.parentId &&
-              expiredIds.has(page.parentId) &&
-              !expiredIds.has(page.id)
-            ) {
-              expiredIds.add(page.id);
-              changed = true;
-            }
-          });
-        }
-        return cur.filter((page) => !expiredIds.has(page.id));
+        const { kept } = purgeExpiredPages(cur);
+        return kept.length === cur.length ? prev : kept;
       });
+      try {
+        const current = loadTasksFromStorage();
+        const { kept } = purgeExpiredTasksLocal(current);
+        if (kept.length !== current.length) saveTasksToStorage(kept);
+      } catch {}
     };
     cleanup();
     const interval = setInterval(cleanup, 3600000);
@@ -369,6 +456,8 @@ function DashboardContent() {
       const cur = Array.isArray(prev) ? prev : [];
       return [...cur, newPage];
     });
+    trackOnboardingEvent("page_created");
+    if (pageConfig.parentId) trackOnboardingEvent("page_nested");
     // If this is a freshly created empty page, add a flag so the view
     // will autofocus the title input.
     if (pageType === "empty") {
@@ -379,63 +468,25 @@ function DashboardContent() {
   };
 
   const deletePage = (id) => {
-    // Soft-delete: mark page and its descendants with `deleted: true`
-    setPages((prev) => {
-      const cur = Array.isArray(prev) ? prev : [];
-      const idsToMark = new Set([id]);
-      let changed = true;
-
-      // collect children pages recursively
-      while (changed) {
-        changed = false;
-        cur.forEach((page) => {
-          if (
-            page.parentId &&
-            idsToMark.has(page.parentId) &&
-            !idsToMark.has(page.id)
-          ) {
-            idsToMark.add(page.id);
-            changed = true;
-          }
-        });
-      }
-
-      return cur.map((page) =>
-        idsToMark.has(page.id)
-          ? { ...page, deleted: true, deletedAt: new Date().toISOString() }
-          : page,
-      );
-    });
+    // Soft-delete a cascata: pagina + sottopagine (deletedAt per retention 30gg)
+    setPages((prev) => softDeletePageCascade(Array.isArray(prev) ? prev : [], id));
   };
 
   const restorePage = (id) => {
-    setPages((prev) => {
-      const cur = Array.isArray(prev) ? prev : [];
-      return cur.map((p) =>
-        p.id === id ? { ...p, deleted: false, deletedAt: undefined } : p,
-      );
-    });
+    // Ripristino a cascata con ricostruzione gerarchia / fallback al primo livello
+    setPages((prev) => restorePageCascade(Array.isArray(prev) ? prev : [], id));
   };
 
   const permanentlyDelete = (id) => {
+    // Hard delete a cascata: pagina + discendenti
+    setPages((prev) => hardDeletePageCascade(Array.isArray(prev) ? prev : [], id));
+  };
+
+  const purgeExpiredTrashPages = () => {
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
-      const idsToRemove = new Set([id]);
-      let changed = true;
-      while (changed) {
-        changed = false;
-        cur.forEach((page) => {
-          if (
-            page.parentId &&
-            idsToRemove.has(page.parentId) &&
-            !idsToRemove.has(page.id)
-          ) {
-            idsToRemove.add(page.id);
-            changed = true;
-          }
-        });
-      }
-      return cur.filter((page) => !idsToRemove.has(page.id));
+      const { kept } = purgeExpiredPages(cur);
+      return kept.length === cur.length ? prev : kept;
     });
   };
 
@@ -796,66 +847,22 @@ function DashboardContent() {
       );
     }
 
-    // If trash query param is present, show Trash UI
+    // If trash query param is present, show new TrashView
     if (searchParams.get("trash") === "1") {
-      const deletedPages = (pages || [])
-        .filter((p) => p && p.deleted)
-        .slice()
-        .sort((a, b) => {
-          const da = a.deletedAt ? new Date(a.deletedAt).getTime() : 0;
-          const db = b.deletedAt ? new Date(b.deletedAt).getTime() : 0;
-          return db - da;
+      const emptyTrashPages = () => {
+        setPages((prev) => {
+          const cur = Array.isArray(prev) ? prev : [];
+          return cur.filter((p) => !p.deleted);
         });
-
+      };
       return (
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold">{t("land.sideTrash")}</h2>
-          </div>
-
-          {deletedPages.length === 0 ? (
-            <div className="p-6 text-center text-gray-400 dark:text-gray-500">{t("pg.trashEmpty")}</div>
-          ) : (
-            <div className="space-y-3">
-              {deletedPages.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between p-3 bg-white dark:bg-gray-900 border rounded-xl"
-                >
-                  <div>
-                    <div className="font-bold text-sm text-gray-800 dark:text-gray-100">
-                      {p.label}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {p.type || "pagina"} ÔÇó eliminato{" "}
-                      {p.deletedAt
-                        ? new Date(p.deletedAt).toLocaleString()
-                        : ""}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => restorePage(p.id)}
-                      title={t("views.notesRestore")}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 font-semibold hover:bg-emerald-100 transition-colors"
-                    >
-                      <RotateCw size={14} />
-                      <span>{t("views.notesRestore")}</span>
-                    </button>
-                    <button
-                      onClick={() => permanentlyDelete(p.id)}
-                      title={t("pg.deletePermanently")}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 font-semibold hover:bg-red-100 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                      <span>{t("pg.deletePermanently")}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <TrashView
+          pages={pages || []}
+          onRestorePage={restorePage}
+          onPermanentlyDeletePage={permanentlyDelete}
+          onEmptyTrashPages={emptyTrashPages}
+          onPurgeExpiredPages={purgeExpiredTrashPages}
+        />
       );
     }
     const tabForActivePage = openTabs.find(
@@ -1051,6 +1058,65 @@ function DashboardContent() {
       }
     }
 
+    const liveStats = (() => {
+      let tasksCount = 0;
+      let completedTasks = 0;
+      try {
+        const raw = localStorage.getItem("taskly_tasks_v1");
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            const active = list.filter((x: any) => !x?.deleted);
+            tasksCount = active.length;
+            completedTasks = active.filter((x: any) => x?.status === "done").length;
+          }
+        }
+      } catch {}
+      const livePages = (pages || []).filter((p) => !p?.deleted);
+      let searchUsed = false;
+      let dashboardCustomized = false;
+      try {
+        const ob = localStorage.getItem("taskly_onboarding_state_v2");
+        if (ob) {
+          const parsed = JSON.parse(ob);
+          searchUsed = !!parsed.searchUsed;
+          dashboardCustomized = !!(parsed.stepsDone && parsed.stepsDone.customize);
+        }
+        if (!dashboardCustomized) dashboardCustomized = !!localStorage.getItem("taskly_dashboard_custom_widgets_v2");
+      } catch {}
+      return {
+        pagesCount: livePages.length,
+        tasksCount,
+        completedTasks,
+        hasNestedPage: livePages.some((p) => !!p?.parentId),
+        searchUsed,
+        dashboardCustomized,
+      };
+    })();
+    const obUseCase = (() => {
+      try {
+        const raw = localStorage.getItem("taskly_onboarding_state_v2");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.useCase === "work") return "Lavoro";
+          if (parsed.useCase === "study") return "Studio";
+          if (parsed.useCase === "personal") return "Personale";
+        }
+        const legacy = localStorage.getItem("taskly_user_usecase");
+        if (legacy === "work") return "Lavoro";
+        if (legacy === "study") return "Studio";
+        if (legacy === "personal") return "Personale";
+      } catch {}
+      return "";
+    })();
+    if (searchParams.get("view") === "mytasks") {
+      try {
+        const raw = localStorage.getItem("taskly_onboarding_state_v2");
+        const cur = raw ? JSON.parse(raw) : {};
+        localStorage.setItem("taskly_onboarding_state_v2", JSON.stringify({ ...cur, myTasksVisited: true }));
+        localStorage.setItem("taskly_mytasks_visited", "true");
+      } catch {}
+    }
     return (
       <>
         {planNotice && (
@@ -1070,6 +1136,37 @@ function DashboardContent() {
             </span>
           </div>
         )}
+        <OnboardingChecklist
+          liveStats={liveStats}
+          useCaseLabel={obUseCase}
+          onOpenTemplates={() => {
+            trackOnboardingEvent("template_opened");
+            setIsTemplateGalleryOpen(true);
+          }}
+          onVisitMyTasks={() => {
+            trackOnboardingEvent("mytasks_visited");
+            router.push("/dashboard?view=mytasks");
+          }}
+          onCreatePage={() => setIsModalOpen(true)}
+          onCreateTask={() => router.push("/dashboard?view=mytasks")}
+          onUseSearch={() => {
+            try {
+              const el = document.querySelector('input[role="search"]') as HTMLElement | null;
+              if (el) el.focus();
+            } catch {}
+            router.push("/dashboard");
+          }}
+          onCustomizeDashboard={() => {
+            router.push("/dashboard");
+            setTimeout(() => {
+              const btn = document.getElementById("customize-analytics-btn");
+              if (btn) {
+                btn.click();
+                btn.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+            }, 400);
+          }}
+        />
         <Dashboard
           tasks={tasks}
           goals={goals}
@@ -1095,16 +1192,20 @@ function DashboardContent() {
     return () => clearTimeout(timeout);
   }, [activePage]);
 
+  // Remove tabs whose page no longer exists. Gated on hasLoadedUserData because
+  // `pages` starts as [] during the initial fetch: without this gate the filter
+  // would run against an empty array and wipe every persisted tab.
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setOpenTabs((prev) =>
-        prev.filter((tab) =>
-          pages.some((page) => String(page.id) === String(tab.id)),
-        ),
-      );
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [pages]);
+    if (!hasLoadedUserData) return;
+    const knownIds = new Set(
+      (Array.isArray(pages) ? pages : []).map((page) => String(page.id)),
+    );
+    setOpenTabs((prev) => {
+      const next = prev.filter((tab) => knownIds.has(String(tab.id)));
+      // Keep the previous reference when nothing changed to avoid a re-render loop.
+      return next.length === prev.length ? prev : next;
+    });
+  }, [pages, hasLoadedUserData]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -1184,6 +1285,25 @@ function DashboardContent() {
     return () => clearTimeout(timeout);
   }, [pages, hasLoadedUserData]);
 
+  // Closing a tab must also fix the URL when the closed tab is the active one,
+  // otherwise we stay on a page whose tab no longer exists in the bar.
+  const closeTab = (tabId) => {
+    if (String(activePageId) === String(tabId)) {
+      const idx = openTabs.findIndex((t) => String(t.id) === String(tabId));
+      const remaining = openTabs.filter((t) => String(t.id) !== String(tabId));
+      const fallback =
+        remaining.length > 0
+          ? remaining[Math.min(idx < 0 ? 0 : idx, remaining.length - 1)]
+          : null;
+      router.push(
+        fallback ? `/dashboard?page=${fallback.id}` : "/dashboard",
+      );
+    }
+    setOpenTabs((prev) =>
+      prev.filter((t) => String(t.id) !== String(tabId)),
+    );
+  };
+
   const reorderTabs = (fromId, toId) => {
     if (!fromId || !toId || String(fromId) === String(toId)) return;
     setOpenTabs((prev) => {
@@ -1245,6 +1365,7 @@ function DashboardContent() {
                 onUpdatePage={(id, updates) => updatePage(id, updates)}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
+                onOpenTemplateGallery={() => setIsTemplateGalleryOpen(true)}
                 loading={loading}
               />
             </motion.div>
@@ -1303,11 +1424,12 @@ function DashboardContent() {
                   {tab.label}
                   <button
                     type="button"
+                    aria-label={`Chiudi la scheda ${tab.label || ""}`}
                     onClick={(e) => {
+                      // Don't trigger the parent Link navigation.
                       e.preventDefault();
-                      setOpenTabs((prev) =>
-                        prev.filter((t) => String(t.id) !== String(tab.id)),
-                      );
+                      e.stopPropagation();
+                      closeTab(tab.id);
                     }}
                     className="p-0.5 rounded hover:bg-black/5 dark:hover:bg-white/10"
                   >
@@ -1337,28 +1459,24 @@ function DashboardContent() {
                 >
                   {(() => {
                     const rawIcon = activePage.icon;
-                    let IconOrElement: any = null;
 
-                    if (typeof rawIcon === "string" && rawIcon) {
-                      IconOrElement =
-                        LucideIcons[rawIcon] ||
-                        ICON_MAP[rawIcon] ||
-                        LayoutDashboard;
-                    } else if (React.isValidElement(rawIcon)) {
-                      IconOrElement = rawIcon;
-                    } else if (
-                      typeof rawIcon === "function" ||
-                      typeof rawIcon === "object"
-                    ) {
-                      // component type (including forwardRef objects)
-                      IconOrElement = rawIcon;
-                    } else {
-                      IconOrElement = LayoutDashboard;
-                    }
+                    // A persisted page can carry a non-component value (e.g. the
+                    // `icons` map or a stale name): fall back to the default
+                    // instead of handing React an invalid element type.
+                    if (React.isValidElement(rawIcon)) return rawIcon;
 
-                    return React.isValidElement(IconOrElement)
-                      ? IconOrElement
-                      : React.createElement(IconOrElement, { size: 24 });
+                    const name = typeof rawIcon === "string" ? rawIcon : "";
+                    const looked = name
+                      ? LucideIcons[name] || ICON_MAP[name]
+                      : null;
+                    const isComponent =
+                      typeof looked === "function" ||
+                      (looked && typeof looked === "object" && (looked as any).render);
+
+                    return React.createElement(
+                      isComponent ? looked : LayoutDashboard,
+                      { size: 24 },
+                    );
                   })()}
                 </button>
 
@@ -1418,113 +1536,76 @@ function DashboardContent() {
 
                       <div className="grid grid-cols-6 gap-2 mb-6 max-h-72 overflow-y-auto">
                         {/** Build icon list from lucide-react exports **/}
-                        {typeof LucideIcons === "object" && LucideIcons !== null && Object.keys(LucideIcons).length > 0 && Object.keys(LucideIcons)
-                          .filter((name) => {
-                            const exported = LucideIcons[name];
-                            return (
-                              typeof exported === "function" ||
-                              typeof exported === "object"
-                            );
-                          })
-                          .filter((name) => {
+                        {ICON_NAMES.filter((name) => {
                             const lower = name.toLowerCase();
-                            // first try full mapping (manual + generated)
+                            const needle = iconSearch.trim().toLowerCase();
+                            if (needle && !lower.includes(needle)) return false;
+                            if (iconCategory === "All") return true;
                             const mapped =
                               FULL_ICON_CATEGORY_MAP[name] ||
-                              FULL_ICON_CATEGORY_MAP[name.toLowerCase()];
-                            if (iconCategory === "All") {
-                              return name
-                                .toLowerCase()
-                                .includes(iconSearch.toLowerCase());
-                            }
-                            if (mapped) {
-                              return (
-                                mapped === iconCategory &&
-                                name
-                                  .toLowerCase()
-                                  .includes(iconSearch.toLowerCase())
-                              );
-                            }
+                              FULL_ICON_CATEGORY_MAP[lower];
+                            if (mapped) return mapped === iconCategory;
                             // fallback heuristics when no manual mapping
-                            const matchesCategory = (() => {
-                              if (iconCategory === "Arrows")
-                                return /arrow|chev|triangle|corner/.test(lower);
-                              if (iconCategory === "Media")
-                                return /video|play|pause|camera|mic|volume|music|film|picture|image|video/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Files")
-                                return /file|folder|document|clipboard|filetext/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Editors")
-                                return /edit|pen|type|code|filetext|heading|list|check/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Users")
-                                return /user|person|people|users|user/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Interface")
-                                return /menu|more|settings|search|plus|minus|x|check|close|open|panel|layout|moon|sun/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Logos")
-                                return /github|gitlab|twitter|facebook|instagram|linkedin|youtube|npm|docker|mastodon/.test(
-                                  lower,
-                                );
-                              return true;
-                            })();
-
-                            return (
-                              matchesCategory &&
-                              name
-                                .toLowerCase()
-                                .includes(iconSearch.toLowerCase())
-                            );
+                            if (iconCategory === "Arrows")
+                              return /arrow|chev|triangle|corner/.test(lower);
+                            if (iconCategory === "Media")
+                              return /video|play|pause|camera|mic|volume|music|film|picture|image/.test(
+                                lower,
+                              );
+                            if (iconCategory === "Files")
+                              return /file|folder|document|clipboard|filetext/.test(
+                                lower,
+                              );
+                            if (iconCategory === "Editors")
+                              return /edit|pen|type|code|filetext|heading|list|check/.test(
+                                lower,
+                              );
+                            if (iconCategory === "Users")
+                              return /user|person|people/.test(lower);
+                            if (iconCategory === "Interface")
+                              return /menu|more|settings|search|plus|minus|x|check|close|open|panel|layout|moon|sun/.test(
+                                lower,
+                              );
+                            if (iconCategory === "Logos")
+                              return /github|gitlab|twitter|facebook|instagram|linkedin|youtube|npm|docker|mastodon/.test(
+                                lower,
+                              );
+                            return true;
                           })
                           .sort()
-                          .map((iconName) => {
-                            const IconComp = LucideIcons[iconName];
-                            const isSelected =
-                              String(activePage.icon) === iconName;
-                            return (
-                              <button
-                                key={iconName}
-                                type="button"
-                                onMouseEnter={() => setHoverIcon(iconName)}
-                                onMouseLeave={() => setHoverIcon(null)}
-                                onClick={() => {
-                                  updatePage(activePage.id, { icon: iconName });
-                                  setIsIconMenuOpen(false);
-                                }}
-                                title={iconName}
-                                className={`h-12 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs p-2 ${
-                                  isSelected
-                                    ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600"
-                                    : "border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                                }`}
-                              >
-                                <IconComp size={18} />
-                                <span className="text-[10px] truncate w-full">
-                                  {iconName}
-                                </span>
-                              </button>
-                            );
-                          })}
+                          .map((iconName) => (
+                            <button
+                              key={iconName}
+                              type="button"
+                              onMouseEnter={() => setHoverIcon(iconName)}
+                              onMouseLeave={() => setHoverIcon(null)}
+                              onClick={() => {
+                                updatePage(activePage.id, { icon: iconName });
+                                setIsIconMenuOpen(false);
+                              }}
+                              title={iconName}
+                              className={`h-12 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs p-2 ${
+                                String(activePage.icon) === iconName
+                                  ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600"
+                                  : "border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                              }`}
+                            >
+                              {renderIcon(iconName, { size: 18 })}
+                              <span className="text-[10px] truncate w-full">
+                                {iconName}
+                              </span>
+                            </button>
+                          ))}
                       </div>
 
                       {/* Hover preview */}
                       {hoverIcon && (
                         <div className="p-2 mb-3 flex items-center gap-3">
                           <div className="w-12 h-12 rounded-lg bg-white dark:bg-gray-900 border flex items-center justify-center">
-                            {React.createElement(
-                              LucideIcons[hoverIcon] || LayoutDashboard,
-                              {
-                                size: 24,
-                                className: `${pendingIconColor || activePage.iconColor || "text-gray-400"}`,
-                              },
-                            )}
+                            {renderIcon(hoverIcon, {
+                              size: 24,
+                              className: `${pendingIconColor || activePage.iconColor || "text-gray-400"}`,
+                            })}
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-300">
                             Anteprima: {hoverIcon}
@@ -1578,6 +1659,7 @@ function DashboardContent() {
                     ))}
                   </nav>
                 )}
+                <div className="flex items-start justify-between gap-3">
                 <EditableTitle
                   title={activePage.label}
                   onSave={(nextTitle) =>
@@ -1590,6 +1672,74 @@ function DashboardContent() {
                   locked={activePage.locked}
                   placeholder={"nuova pagina"}
                 />
+                <div className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsPageMenuOpen((v) => !v)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    title="Azioni pagina"
+                    aria-label="Azioni pagina"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                  {isPageMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setIsPageMenuOpen(false)} />
+                      <div className="absolute right-0 top-9 z-50 w-60 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl p-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPageMenuOpen(false);
+                            handleSaveAsTemplate(activePage);
+                          }}
+                          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                        >
+                          <BookmarkPlus size={14} className="text-[#7b39fc] shrink-0" />
+                          <span>Salva come template</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPageMenuOpen(false);
+                            setIsTemplateGalleryOpen(true);
+                          }}
+                          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                        >
+                          <LayoutTemplate size={14} className="text-gray-400 shrink-0" />
+                          <span>Da template…</span>
+                        </button>
+                        <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPageMenuOpen(false);
+                            handleCopyPageLink(activePage.id);
+                          }}
+                          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                        >
+                          {pageLinkCopied ? (
+                            <Check size={14} className="text-emerald-500 shrink-0" />
+                          ) : (
+                            <Copy size={14} className="text-gray-400 shrink-0" />
+                          )}
+                          <span>{pageLinkCopied ? "Link copiato!" : "Copia link pagina"}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPageMenuOpen(false);
+                            duplicatePage(activePage.id);
+                          }}
+                          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                        >
+                          <Copy size={14} className="text-gray-400 shrink-0" />
+                          <span>Duplica pagina</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+                </div>
               </div>
             </div>
           )}
@@ -1638,7 +1788,13 @@ function DashboardContent() {
             )}
           </AnimatePresence>
 
-          <div className={activePage?.locked ? "pointer-events-none select-none" : ""}>
+          {/* Keying on the active page forces React to unmount/remount the view
+              when switching between pages, so per-page local state (search
+              text, filters, selection, scroll) never leaks across pages. */}
+          <div
+            key={activePageId || "dashboard-home"}
+            className={activePage?.locked ? "pointer-events-none select-none" : ""}
+          >
             {renderActiveView()}
           </div>
           {activePage?.locked && (
@@ -1656,6 +1812,95 @@ function DashboardContent() {
           onAction={handleAIAction}
           isSidebarOpen={shouldShowSidebar}
         />
+      )}
+
+      {/* Onboarding Wizard dinamico */}
+      <OnboardingModal
+        userName={user?.name || ""}
+        liveStats={{ pagesCount: (pages || []).filter((p) => !p?.deleted).length, tasksCount: liveOnboardingTasks, completedTasks: liveOnboardingDone }}
+        onComplete={({ useCase, name, selectedTemplate, firstTaskTitle, skippedSteps }) => {
+          // Seed primo task solo se l'utente non ne ha gia'
+          if (firstTaskTitle && firstTaskTitle.trim() && !skippedSteps.includes("create_task")) {
+            const { title: parsedTitle, deadline } = parseNaturalDate(firstTaskTitle.trim());
+            const existingTasks = loadTasksFromStorage();
+            const firstTask = {
+              id: `task_onboarding_${Date.now()}`,
+              title: parsedTitle || firstTaskTitle.trim(),
+              status: "todo" as const,
+              priority: "medium" as const,
+              deadline: deadline || "",
+              subtasks: [],
+              tags: [],
+              createdAt: new Date().toISOString(),
+            };
+            saveTasksToStorage([firstTask, ...existingTasks]);
+            trackOnboardingEvent("task_created");
+          }
+          // Pagina da template solo se l'utente non ha gia' pagine
+          if (selectedTemplate && !skippedSteps.includes("create_page")) {
+            const newPageId = typeof crypto !== "undefined" && crypto.randomUUID
+              ? crypto.randomUUID()
+              : `page_${Date.now()}`;
+            const newPage = {
+              id: newPageId,
+              label: selectedTemplate.title,
+              type: selectedTemplate.type,
+              icon: selectedTemplate.icon,
+              iconColor: selectedTemplate.iconColor,
+              parentId: null,
+              order: 0,
+              data: selectedTemplate.data,
+              deleted: false,
+              createdAt: new Date().toISOString(),
+            };
+            setPages((prev) => {
+              const cur = Array.isArray(prev) ? prev : [];
+              return [...cur, newPage];
+            });
+            trackOnboardingEvent("template_used");
+            trackOnboardingEvent("page_created");
+            router.push(`/dashboard?page=${newPageId}`);
+          }
+        }}
+      />
+
+      {/* Template Gallery Modal */}
+      <TemplateGalleryModal
+        isOpen={isTemplateGalleryOpen}
+        onClose={() => setIsTemplateGalleryOpen(false)}
+        onSelectTemplate={(template) => {
+          const newPageId = typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `page_${Date.now()}`;
+          const newPage = {
+            id: newPageId,
+            label: template.title,
+            type: template.type,
+            icon: template.icon,
+            iconColor: template.iconColor,
+            parentId: null,
+            order: Date.now(),
+            data: template.data,
+            deleted: false,
+            createdAt: new Date().toISOString(),
+          };
+          setPages((prev) => {
+            const cur = Array.isArray(prev) ? prev : [];
+            return [...cur, newPage];
+          });
+          trackOnboardingEvent("template_used");
+          trackOnboardingEvent("page_created");
+          setIsTemplateGalleryOpen(false);
+          router.push(`/dashboard?page=${newPageId}`);
+        }}
+      />
+
+      {/* Toast template salvato */}
+      {templateToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] px-4 py-2.5 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold shadow-2xl flex items-center gap-2">
+          <Check size={14} className="text-emerald-400" />
+          <span>{templateToast}</span>
+        </div>
       )}
     </div>
   );
