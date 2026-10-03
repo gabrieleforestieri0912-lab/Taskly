@@ -394,31 +394,31 @@ export default function Dashboard({
 
   const stats = [
     {
-      label: t("statActiveTasks") || "Task Attivi",
+      label: t("statActiveTasks", "Task Attivi"),
       value: safeTasks.length - completedTasks,
       icon: <ListTodo className="text-[#7b39fc]" />,
       bgClass: "bg-[#7b39fc]/10",
       iconColor: "text-[#7b39fc]",
-      sub: t("statAwaiting") || "In attesa",
+      sub: t("statAwaiting", "In attesa"),
     },
     {
-      label: t("statGoals") || "Obiettivi",
+      label: t("statGoals", "Obiettivi"),
       value: safeGoals.length,
       icon: <Target className="text-rose-500" />,
       bgClass: "bg-rose-500/10",
       iconColor: "text-rose-500",
-      sub: `${completedGoals} ${t("statGoalsAchieved") || "Completati"}`,
+      sub: `${completedGoals} ${t("statGoalsAchieved", "Completati")}`,
     },
     {
-      label: t("statIdeas") || "Idee / Spunti",
+      label: t("statIdeas", "Idee / Spunti"),
       value: safeIdeas.length,
       icon: <Lightbulb className="text-amber-500" />,
       bgClass: "bg-amber-500/10",
       iconColor: "text-amber-500",
-      sub: t("statIdeasAwaiting") || "Nel Brain Dump",
+      sub: t("statIdeasAwaiting", "Nel Brain Dump"),
     },
     {
-      label: t("statFocus") || "Focus di Oggi",
+      label: t("statFocus", "Focus di Oggi"),
       value:
         todayFocus.length > 18
           ? todayFocus.substring(0, 18) + "..."
@@ -426,7 +426,7 @@ export default function Dashboard({
       icon: <Zap className="text-[#a67cff]" />,
       bgClass: "bg-[#a67cff]/10",
       iconColor: "text-[#a67cff]",
-      sub: t("statFocusSub") || "Priorità chiave",
+      sub: t("statFocusSub", "Priorità chiave"),
     },
   ];
 
@@ -581,19 +581,19 @@ export default function Dashboard({
                         variant="default"
                         className="bg-[#7b39fc]/10 text-[#7b39fc] border-none dark:bg-[#7b39fc]/25 dark:text-[#a67cff]"
                       >
-                        {highPriorityTasks.length} {t("criticalTasks") || "Task Critici"}
+                        {highPriorityTasks.length} {t("criticalTasks", "Task Critici")}
                       </Badge>
                       <Badge
                         variant="default"
                         className="bg-[#a67cff]/10 text-[#8b4dff] border-none dark:bg-[#a67cff]/20 dark:text-[#a67cff]"
                       >
-                        {activeGoals.length} {t("activeGoalsLabel") || "Obiettivi Attivi"}
+                        {activeGoals.length} {t("activeGoalsLabel", "Obiettivi Attivi")}
                       </Badge>
                       <Badge
                         variant="default"
                         className="bg-emerald-500/10 text-emerald-600 border-none dark:bg-emerald-500/20 dark:text-emerald-400"
                       >
-                        {completedTasks} {t("done") || "Completati"}
+                        {completedTasks} {t("done", "Completati")}
                       </Badge>
                     </div>
                   </div>
@@ -644,7 +644,7 @@ export default function Dashboard({
                           {completionRate}%
                         </span>
                         <span className="text-[8px] font-black uppercase tracking-tighter text-gray-400 mt-1">
-                          {t("done") || "Completato"}
+                          {t("done", "Completato")}
                         </span>
                       </div>
                     </div>
@@ -710,13 +710,13 @@ export default function Dashboard({
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
                 <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
-                  <Flame size={16} className="text-orange-500" /> {t("priorityHigh") || "Task ad Alta Priorità"}
+                  <Flame size={16} className="text-orange-500" /> {t("priorityHigh", "Task ad Alta Priorità")}
                 </h4>
                 <Link
                   href="/dashboard?view=mytasks"
                   className="text-[10px] font-black text-[#7b39fc] uppercase tracking-wider hover:underline"
                 >
-                  {t("seeAll") || "Vedi tutti"}
+                  {t("seeAll", "Vedi tutti")}
                 </Link>
               </div>
               <div className="space-y-3">
@@ -742,7 +742,7 @@ export default function Dashboard({
                 ) : (
                   <Card className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5">
                     <CardContent className="p-6 text-center text-xs text-gray-400 font-medium">
-                      {t("noCriticalTasks") || "Nessun task ad alta priorità in sospeso. Ottimo lavoro!"}
+                      {t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
                     </CardContent>
                   </Card>
                 )}
@@ -758,7 +758,7 @@ export default function Dashboard({
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
                 <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
-                  <Lightbulb size={16} className="text-amber-500" /> {t("recentIdeas") || "Brain Dump & Idee"}
+                  <Lightbulb size={16} className="text-amber-500" /> {t("recentIdeas", "Brain Dump & Idee")}
                 </h4>
                 <Link
                   href="/dashboard"
@@ -787,7 +787,7 @@ export default function Dashboard({
                 ) : (
                   <Card className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5">
                     <CardContent className="p-6 text-center text-xs text-gray-400 font-medium">
-                      {t("noIdeas") || "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!"}
+                      {t("noIdeas", "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!")}
                     </CardContent>
                   </Card>
                 )}
@@ -803,7 +803,7 @@ export default function Dashboard({
             <Card className="rounded-[2rem] border-none bg-linear-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/25">
               <CardContent className="p-6">
                 <h4 className="text-sm font-black uppercase tracking-widest opacity-90 mb-6 flex items-center gap-2">
-                  <Target size={16} /> {t("goalProgress") || "Progresso Obiettivi"}
+                  <Target size={16} /> {t("goalProgress", "Progresso Obiettivi")}
                 </h4>
                 <div className="space-y-6">
                   {activeGoals && activeGoals.length > 0 ? (
@@ -834,7 +834,7 @@ export default function Dashboard({
                     })
                   ) : (
                     <p className="text-xs opacity-75">
-                      {t("noActiveGoals") || "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!"}
+                      {t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
                     </p>
                   )}
                 </div>
@@ -850,7 +850,7 @@ export default function Dashboard({
             <Card className="rounded-[2rem] border border-[#7b39fc]/10 bg-white/70 shadow-xl shadow-[#7b39fc]/10 backdrop-blur-xl dark:bg-[#1a1528]/50">
               <CardContent className="p-6">
                 <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">
-                  {t("quickNav") || "Azioni Rapide"}
+                  {t("quickNav", "Azioni Rapide")}
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <Button
@@ -859,7 +859,7 @@ export default function Dashboard({
                   >
                     <Plus size={20} className="text-[#7b39fc]" />
                     <span className="text-[9px] font-black uppercase tracking-widest">
-                      {t("newProject") || "Nuovo Progetto"}
+                      {t("newProject", "Nuovo Progetto")}
                     </span>
                   </Button>
                   <Button
@@ -868,7 +868,7 @@ export default function Dashboard({
                   >
                     <Lightbulb size={20} className="text-amber-500" />
                     <span className="text-[9px] font-black uppercase tracking-widest">
-                      {t("newIdea") || "Nuova Idea"}
+                      {t("newIdea", "Nuova Idea")}
                     </span>
                   </Button>
                 </div>
@@ -885,7 +885,7 @@ export default function Dashboard({
               <CardContent className="p-6 text-center space-y-4">
                 <Sparkles className="mx-auto text-[#a67cff]" size={32} />
                 <p className="text-xs font-bold text-gray-700 dark:text-gray-200">
-                  {t("aiAnalysis") || "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale."}
+                  {t("aiAnalysis", "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale.")}
                 </p>
                 <button
                   type="button"
@@ -894,7 +894,7 @@ export default function Dashboard({
                   }}
                   className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-[#7b39fc] text-white shadow-lg shadow-[#7b39fc]/25 transition-colors hover:bg-[#8b4dff] active:translate-y-0 cursor-pointer"
                 >
-                  {t("aiAction") || "Genera Piano Ottimale"}
+                  {t("aiAction", "Genera Piano Ottimale")}
                 </button>
               </CardContent>
             </Card>
@@ -907,7 +907,7 @@ export default function Dashboard({
             {editToolbar}
             <div className="space-y-4">
               <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 px-2 flex items-center gap-2">
-                <Wrench size={16} className="text-[#7b39fc]" /> {t("resourcesTools") || "Strumenti & Risorse"}
+                <Wrench size={16} className="text-[#7b39fc]" /> {t("resourcesTools", "Strumenti & Risorse")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="rounded-[2rem] border border-[#7b39fc]/10 bg-white/70 shadow-xl shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#1a1528]/50 hover:shadow-[#7b39fc]/10 transition-all group overflow-hidden">
@@ -960,14 +960,14 @@ export default function Dashboard({
             <div className="flex items-center gap-2 mb-1">
               <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
-                {t("land.mockNavDashboard") || "Dashboard & Analitiche"}
+                {t("land.mockNavDashboard", "Dashboard & Analitiche")}
               </span>
             </div>
             <h2 className="font-inter font-extrabold text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-[-0.025em] text-gray-900 dark:text-white drop-shadow-[0_2px_20px_rgba(123,57,252,0.18)]">
-              {t("dashboardTitle") || "Panoramica Analitiche"}
+              {t("dashboardTitle", "Panoramica Analitiche")}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
-              {t("dashboardSubtitle") || "Monitora produttività, scadenze e obiettivi in un unico spazio."}
+              {t("dashboardSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
             </p>
           </div>
         </div>
@@ -1154,23 +1154,23 @@ export default function Dashboard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                {t("pg.planLabel") || "Piano"}{" "}
+                {t("pg.planLabel", "Piano")}{" "}
                 <span className="font-black uppercase tracking-widest text-[#7b39fc]">
                   {plan.name}
                 </span>{" "}
                 · {safePages.length} / {plan.maxPages}{" "}
-                {t("pg.pagesWord") || "pagine"}
+                {t("pg.pagesWord", "pagine")}
               </p>
               {safePages.length >= plan.maxPages ? (
                 <Link
                   href="/#pricing"
                   className="shrink-0 px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
                 >
-                  {t("pg.upgradePlan") || "Esegui Upgrade"}
+                  {t("pg.upgradePlan", "Esegui Upgrade")}
                 </Link>
               ) : (
                 <span className="shrink-0 text-[9px] font-black uppercase tracking-widest text-emerald-500">
-                  {t("pg.nextUp") || "Disponibili:"} {plan.maxPages - safePages.length}
+                  {t("pg.nextUp", "Disponibili:")} {plan.maxPages - safePages.length}
                 </span>
               )}
             </div>

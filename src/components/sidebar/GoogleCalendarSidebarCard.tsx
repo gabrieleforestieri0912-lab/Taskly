@@ -179,7 +179,7 @@ export function GoogleCalendarSidebarCard({
                 {isConnected ? (
                   <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-wider">
                     <Check size={9} />
-                    {t("auth.intConnectedBadge") || "Attivo"}
+                    {t("auth.intConnectedBadge", "Attivo")}
                   </span>
                 ) : (
                   <span className="px-1.5 py-0.5 rounded-full bg-blue-500/10 dark:bg-blue-400/10 text-blue-600 dark:text-blue-400 text-[9px] font-black tracking-wider">

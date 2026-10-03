@@ -428,7 +428,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
         transformOrigin: "bottom right",
       }}
       role="menu"
-      aria-label={t("nav.more") || "Altro"}
+      aria-label={t("nav.more", "Altro")}
       className="w-58 p-1.5 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
     >
       <button
@@ -497,7 +497,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
         <span className="grid place-items-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <Users size={13} aria-hidden="true" />
         </span>
-        {t("land.sideInviteMembers") || "Invita membri"}
+        {t("land.sideInviteMembers", "Invita membri")}
       </button>
     </div>,
     document.body,
@@ -555,7 +555,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
         {/* Quick in-menu settings */}
         <div className="p-2 rounded-2xl bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/60 mb-2 space-y-1.5">
           <span className="text-[9px] font-black uppercase tracking-wider text-gray-400 px-1">
-            {t("quickSettings") || "Impostazioni Rapide"}
+            {t("quickSettings", "Impostazioni Rapide")}
           </span>
 
           <div className="grid grid-cols-2 gap-1.5">
@@ -624,7 +624,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
         {/* All App Settings Links */}
         <div className="space-y-0.5 pt-0.5">
           <p className="px-2 pb-1 text-[9px] font-black uppercase tracking-wider text-gray-400">
-            {t("settings") || "Tutte le Impostazioni"}
+            {t("settings", "Tutte le Impostazioni")}
           </p>
 
           <Link
@@ -762,7 +762,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
             className="flex items-center gap-2 w-full px-2.5 py-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl text-xs font-bold transition-colors cursor-pointer"
           >
             <LogOut size={13} />
-            <span>{t("logout") || "Disconnetti"}</span>
+            <span>{t("logout", "Disconnetti")}</span>
           </button>
         </div>
       </div>,
@@ -1017,7 +1017,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
             </div>
             <div>
               <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
-                {t("land.sideInviteMembers") || "Invita membri"}
+                {t("land.sideInviteMembers", "Invita membri")}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Collabora in tempo reale condividendo il tuo workspace
@@ -1219,7 +1219,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                 {
                   id: "sidebar-home-btn",
                   icon: LayoutDashboard,
-                  label: t("nav.home") || "Home",
+                  label: t("nav.home", "Home"),
                   href: "/dashboard",
                   isActive: !isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive,
                   onClick: () => {
@@ -1242,7 +1242,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                 {
                   id: "sidebar-ai-btn",
                   icon: Sparkles,
-                  label: t("nav.ai") || "AI",
+                  label: t("nav.ai", "AI"),
                   isActive: isAIActive,
                   onClick: () => {
                     setIsTranscriptionMode(false);
@@ -1254,7 +1254,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                 {
                   id: "sidebar-meetings-btn",
                   icon: Mic,
-                  label: t("nav.meetings") || "Riunioni",
+                  label: t("nav.meetings", "Riunioni"),
                   isActive: isTranscriptionMode,
                   onClick: () => {
                     setIsTranscriptionMode(true);
@@ -1265,7 +1265,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                 {
                   id: "sidebar-calendar-nav-btn",
                   icon: Calendar,
-                  label: t("nav.calendar") || "Calendario",
+                  label: t("nav.calendar", "Calendario"),
                   isActive:
                     !isTranscriptionMode &&
                     !isAIActive &&
@@ -1359,7 +1359,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
               whileStepPending="create_page"
             />
             <SidebarSection
-              label={t("yourPages") || "Privato"}
+              label={t("yourPages", "Privato")}
               onAdd={() =>
                 onAddPage({
                   type: "empty",
@@ -1367,7 +1367,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                   parentId: null,
                 })
               }
-              addLabel={t("newPage") || "Nuova pagina"}
+              addLabel={t("newPage", "Nuova pagina")}
             >
               {loading ? (
                 <div className="px-2 space-y-1 mt-1">
@@ -1378,7 +1378,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
               ) : rootNodes.length === 0 ? (
                 <div className="px-3 py-6 text-center">
                   <p className="text-xs text-gray-400 mb-2">
-                    {t("land.sideNoPages") || "Nessuna pagina"}
+                    {t("land.sideNoPages", "Nessuna pagina")}
                   </p>
                   <button
                     onClick={() =>
@@ -1390,13 +1390,13 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                     }
                     className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
                   >
-                    {t("newPage") || "Crea una pagina"}
+                    {t("newPage", "Crea una pagina")}
                   </button>
                 </div>
               ) : (
                 <ul
                   role="tree"
-                  aria-label={t("yourPages") || "Pagine private"}
+                  aria-label={t("yourPages", "Pagine private")}
                   className="space-y-0.5"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleRootDrop}
@@ -1487,12 +1487,12 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
             }}
             aria-expanded={isMoreOpen}
             aria-haspopup="menu"
-            aria-label={t("nav.more") || "Altro"}
-            title={t("nav.more") || "Altro"}
+            aria-label={t("nav.more", "Altro")}
+            title={t("nav.more", "Altro")}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-800 dark:hover:text-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
             <Sliders size={16} aria-hidden="true" className="shrink-0" />
-            <span className="text-xs font-semibold">{t("nav.more") || "Altro"}</span>
+            <span className="text-xs font-semibold">{t("nav.more", "Altro")}</span>
           </button>
         </div>
 
@@ -1554,7 +1554,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                     <div className="flex items-center justify-between mb-2 px-1">
                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500 flex items-center gap-1.5">
                         <Clock size={12} className="text-cyan-500" />
-                        {t("recentPages") || "Pagine Recenti"}
+                        {t("recentPages", "Pagine Recenti")}
                       </p>
                       {pageHistory.length > 0 && (
                         <button

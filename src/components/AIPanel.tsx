@@ -33,7 +33,9 @@ type ChatInputProps = {
   isEmptyState: boolean;
   handleSend: (override?: string) => void;
   controller: ReturnType<typeof createAIChatController>;
-  t: (key: string) => string;
+  // il secondo parametro è il fallback: `t()` restituisce la chiave quando
+// la traduzione manca, e senza il fallback l'utente vedrebbe "views.aiSendLabel".
+t: (key: string, fallback?: string) => string;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 };
 
@@ -114,10 +116,10 @@ const ChatInput = ({
 
   const suggestedPrompts = React.useMemo(
     () => [
-      t("views.aiSuggest1") || "Riassumi le mie note",
-      t("views.aiSuggest2") || "Crea un piano settimanale",
-      t("views.aiSuggest3") || "Trova task scaduti",
-      t("views.aiSuggest4") || "Organizza i miei progetti",
+      t("views.aiSuggest1", "Riassumi le mie note"),
+      t("views.aiSuggest2", "Crea un piano settimanale"),
+      t("views.aiSuggest3", "Trova task scaduti"),
+      t("views.aiSuggest4", "Organizza i miei progetti"),
     ],
     [t]
   );
@@ -200,7 +202,7 @@ const ChatInput = ({
           transition={{ duration: 0.15, staggerChildren: 0.03 }}
           className="mb-3 flex flex-wrap gap-2"
           role="list"
-          aria-label={t("views.aiSuggestionsLabel") || "Suggerimenti"}
+          aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}
         >
           {suggestedPrompts.map((prompt) => (
             <motion.button
@@ -232,12 +234,12 @@ const ChatInput = ({
           boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
         }}
         role="group"
-        aria-label={t("views.aiInputLabel") || "Input chat"}
+        aria-label={t("views.aiInputLabel", "Input chat")}
       >
         <button
           type="button"
           className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label={t("views.aiAttachLabel") || "Allega file"}
+          aria-label={t("views.aiAttachLabel", "Allega file")}
           disabled={isStreaming}
         >
           <Plus size={18} />
@@ -275,7 +277,7 @@ const ChatInput = ({
               type="button"
               onClick={controller.stop}
               className="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
-              aria-label={t("views.aiStopLabel") || "Ferma generazione"}
+              aria-label={t("views.aiStopLabel", "Ferma generazione")}
             >
               <Square size={16} />
             </button>
@@ -288,7 +290,7 @@ const ChatInput = ({
               exit={{ scale: 0.8, opacity: 0, rotate: 90 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="w-9 h-9 rounded-full bg-[#7b39fc] text-white flex items-center justify-center hover:bg-[#8b4dff] active:scale-95 transition-colors shadow-lg shadow-[#7b39fc]/20"
-              aria-label={t("views.aiSendLabel") || "Invia messaggio"}
+              aria-label={t("views.aiSendLabel", "Invia messaggio")}
             >
               <Send size={16} />
             </motion.button>
@@ -300,7 +302,7 @@ const ChatInput = ({
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
-              aria-label={t("views.aiVoiceLabel") || "Input vocale"}
+              aria-label={t("views.aiVoiceLabel", "Input vocale")}
               disabled
             >
               <Mic size={18} />

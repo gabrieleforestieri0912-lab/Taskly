@@ -282,10 +282,10 @@ function SettingsContent() {
               className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] mb-2 transition-colors"
             >
               <ArrowLeft size={14} />
-              <span>{t("backToDashboard") || "Torna alla Dashboard"}</span>
+              <span>{t("backToDashboard", "Torna alla Dashboard")}</span>
             </Link>
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white">
-              {t("settingsTitle") || "Impostazioni Taskly"}
+              {t("settingsTitle", "Impostazioni Taskly")}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Personalizza il tuo spazio di lavoro, preferenze, account e integrazioni.
@@ -341,7 +341,7 @@ function SettingsContent() {
                 className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs font-bold transition-colors cursor-pointer"
               >
                 <LogOut size={15} />
-                <span>{t("logout") || "Disconnetti sessione"}</span>
+                <span>{t("logout", "Disconnetti sessione")}</span>
               </button>
             </div>
           </div>
@@ -459,7 +459,7 @@ function SettingsContent() {
                       >
                         <Sun size={18} />
                         <div className="text-left">
-                          <div>{t("lightMode") || "Tema Chiaro"}</div>
+                          <div>{t("lightMode", "Tema Chiaro")}</div>
                           <span className="text-[10px] text-gray-400 font-normal">Predefinito con contrasto morbido</span>
                         </div>
                       </button>
@@ -475,7 +475,7 @@ function SettingsContent() {
                       >
                         <Moon size={18} />
                         <div className="text-left">
-                          <div>{t("darkMode") || "Tema Scuro"}</div>
+                          <div>{t("darkMode", "Tema Scuro")}</div>
                           <span className="text-[10px] text-gray-400 font-normal">Nero OLED con riflessi viola</span>
                         </div>
                       </button>
@@ -1066,7 +1066,7 @@ function SettingsContent() {
                       disabled={loadingPortal}
                       className="px-5 py-2.5 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-bold shadow-lg shadow-[#7b39fc]/20 transition-all cursor-pointer shrink-0 disabled:opacity-50"
                     >
-                      {loadingPortal ? t("loading") || "Caricamento..." : "Gestisci su Stripe"}
+                      {loadingPortal ? t("loading", "Caricamento...") : "Gestisci su Stripe"}
                     </button>
                   </div>
 
@@ -1104,10 +1104,10 @@ function SettingsContent() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-black text-gray-900 dark:text-white">
-              {t("confirmLogoutTitle") || "Vuoi davvero uscire?"}
+              {t("confirmLogoutTitle", "Vuoi davvero uscire?")}
             </h2>
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {t("confirmLogoutDesc") || "La sessione verrà terminata e tornerai alla pagina di accesso."}
+              {t("confirmLogoutDesc", "La sessione verrà terminata e tornerai alla pagina di accesso.")}
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -1115,7 +1115,7 @@ function SettingsContent() {
                 onClick={() => setShowLogoutConfirm(false)}
                 className="rounded-xl bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
               >
-                {t("cancel") || "Annulla"}
+                {t("cancel", "Annulla")}
               </button>
               <button
                 type="button"
@@ -1123,7 +1123,7 @@ function SettingsContent() {
                 disabled={loggingOut}
                 className="rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-50 transition-colors shadow-lg shadow-red-600/20"
               >
-                {loggingOut ? t("loading") || "Uscita..." : t("confirmLogout") || "Disconnetti"}
+                {loggingOut ? t("loading", "Uscita...") : t("confirmLogout", "Disconnetti")}
               </button>
             </div>
           </div>

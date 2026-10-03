@@ -6,7 +6,7 @@ import { translations, translate, translateWith, type LangCode } from "./i18n";
 const LanguageContext = createContext<{
   language: string;
   setLanguage: (lang: string) => void;
-  t: (key: string) => string;
+  t: (key: string, fallback?: string) => string;
   tWith: (key: string, vars?: Record<string, string | number>) => string;
 } | null>(null);
 
@@ -54,8 +54,14 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  const t = (key: string): string => {
-    return translate(language, key);
+  const t = (key: string, fallback?: string): string => {
+    const value = translate(language, key);
+    // `translate` restituisce la chiave quando manca. Senza questo
+    // controllo il pattern `t("chiave", "Fallback")` non funzionava:
+    // la chiave è una stringa truthy, quindi il fallback era dead code
+    // e l'utente vedeva "yourPages" al posto di "Le tue pagine".
+    if (value === key && fallback !== undefined) return fallback;
+    return value;
   };
 
   const tWith = (key: string, vars?: Record<string, string | number>): string => {
