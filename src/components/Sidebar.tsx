@@ -49,6 +49,7 @@ import {
 } from "lucide-react";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
+import { SidebarQuickBar } from "./sidebar/SidebarQuickBar";
 import { PageTreeItem } from "./sidebar/PageTreeItem";
 import { GoogleCalendarSidebarCard } from "./sidebar/GoogleCalendarSidebarCard";
 import { OneTimeTooltip } from "./OnboardingTooltips";
@@ -114,6 +115,9 @@ export default function Sidebar({
   });
   const user = propUser || localUser;
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLButtonElement | null>(null);
+  const [moreMenuPos, setMoreMenuPos] = useState<any>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [pageHistory, setPageHistory] = useState<any[]>([]);
@@ -399,6 +403,107 @@ export default function Sidebar({
     });
   };
 
+  // ── "Altro" menu portal ────────────────────────────────────────────────
+// Voci secondarie raccolte in un menu che si apre verso l'alto, accanto
+// all'account in fondo alla sidebar. Stesso pattern del profile menu:
+// posizione in fixed calcolata dal bottone, chiusura su click fuori / Esc.
+let moreMenuPortal: React.ReactNode = null;
+if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
+  const rect = moreRef.current.getBoundingClientRect();
+  const menuW = 232;
+  const left = Math.max(
+    8,
+    Math.min(rect.right - menuW, (typeof window !== "undefined" ? window.innerWidth : 800) - menuW - 8),
+  );
+  moreMenuPortal = createPortal(
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        top: rect.top,
+        left,
+        position: "fixed",
+        zIndex: 80,
+        // si apre verso l'alto per restare dentro il viewport
+        transform: "translateY(-100%)",
+        transformOrigin: "bottom right",
+      }}
+      role="menu"
+      aria-label={t("nav.more") || "Altro"}
+      className="w-58 p-1.5 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
+    >
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() => {
+          setIsMoreOpen(false);
+          router.push("/settings");
+        }}
+        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+      >
+        <span className="grid place-items-center w-6 h-6 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+          <Settings size={13} aria-hidden="true" />
+        </span>
+        {t("land.demoNavSettings")}
+      </button>
+
+      <button
+        ref={trashRef}
+        type="button"
+        role="menuitem"
+        onClick={() => {
+          setIsMoreOpen(false);
+          setTrashSearch("");
+          setIsTrashOpen((s) => !s);
+        }}
+        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+      >
+        <span className="grid place-items-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          <Trash2 size={13} aria-hidden="true" />
+        </span>
+        <span className="flex-1 text-left">{t("land.sideTrash")}</span>
+        {deletedCounts.pages > 0 && (
+          <span className="text-[10px] font-bold tabular-nums text-gray-400">
+            {deletedCounts.pages}
+          </span>
+        )}
+      </button>
+
+      <button
+        ref={helpRef}
+        type="button"
+        role="menuitem"
+        onClick={() => {
+          setIsMoreOpen(false);
+          setIsHelpOpen((s) => !s);
+        }}
+        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+      >
+        <span className="grid place-items-center w-6 h-6 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+          <HelpCircle size={13} aria-hidden="true" />
+        </span>
+        {t("land.sideHelp")}
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        id="sidebar-invite-btn"
+        onClick={() => {
+          setIsMoreOpen(false);
+          setIsInviteOpen(true);
+        }}
+        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+      >
+        <span className="grid place-items-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <Users size={13} aria-hidden="true" />
+        </span>
+        {t("land.sideInviteMembers") || "Invita membri"}
+      </button>
+    </div>,
+    document.body,
+  );
+}
+
   // profile menu portal: render outside of JSX to avoid parser/context issues
   let profileMenuPortal: React.ReactNode = null;
   if (isProfileOpen && profileMenuPos && typeof document !== "undefined") {
@@ -410,6 +515,11 @@ export default function Sidebar({
           left: Math.max(8, Math.min(profileMenuPos.left, (typeof window !== "undefined" ? window.innerWidth : 800) - 310)),
           position: "fixed",
           zIndex: 80,
+          // translateY(-100%) + l'8px di offset fanno aprire il menu
+          // VERSO L'ALTO: l'account sta in fondo alla sidebar, quindi
+          // un menu che si apre sotto uscirebbe dal viewport.
+          transform: "translateY(-100%) translateY(-8px)",
+          transformOrigin: "bottom left",
         }}
         className="w-76 p-3 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 max-h-[85vh] overflow-y-auto scrollbar-hide text-gray-800 dark:text-gray-100 animate-in fade-in zoom-in-95 duration-150"
       >
@@ -1014,6 +1124,21 @@ export default function Sidebar({
     };
   }, [isTrashOpen]);
 
+  // close "Altro" menu on outside click or Esc
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const onDocClick = () => setIsMoreOpen(false);
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMoreOpen(false);
+    };
+    document.addEventListener("click", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [isMoreOpen]);
+
   // close profile menu on outside click or Esc
   useEffect(() => {
     if (!isProfileOpen) return;
@@ -1050,45 +1175,13 @@ export default function Sidebar({
         className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
         aria-label="Navigazione sidebar"
       >
-        {/* ── Workspace / user header ─────────────────────────────────────────── */}
-        <div className="flex items-center px-2 pt-2 pb-1 gap-1" ref={profileRef}>
-          <button
-            type="button"
-            onClick={(e) => {
-              const rect = profileRef.current?.getBoundingClientRect();
-              if (rect) {
-                setProfileMenuPos({ top: rect.bottom + 8, left: rect.left });
-              }
-              setIsProfileOpen((s) => !s);
-            }}
-            aria-expanded={isProfileOpen}
-            aria-haspopup="menu"
-            aria-label="Menu account"
-            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 min-w-0"
-          >
-            {user.picture ? (
-              <img
-                src={user.picture}
-                alt={user.name}
-                className="w-6 h-6 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-6 h-6 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
-                <User size={13} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
-              </div>
-            )}
-            <span className="flex-1 text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
-              {user.name || "Workspace"}
-            </span>
-            <ChevronUp
-              size={14}
-              aria-hidden="true"
-              className={`text-gray-400 shrink-0 transition-transform duration-200 ${
-                isProfileOpen ? "" : "rotate-180"
-              }`}
-            />
-          </button>
+        {/* ── Workspace header ──────────────────────────────────────────────────
+            L'account sta in fondo (vedi blocco "Account + altro"): qui resta
+            solo il nome del workspace e il chiudi su mobile. */}
+        <div className="flex items-center px-3 pt-3 pb-1 gap-1">
+          <span className="flex-1 text-[11px] font-black uppercase tracking-wider text-gray-400 truncate min-w-0">
+            {user.name || "Workspace"}
+          </span>
 
           {/* Close sidebar button on mobile */}
           <button
@@ -1107,8 +1200,8 @@ export default function Sidebar({
           style={{ scrollbarWidth: "thin" }}
           aria-label="Navigazione principale"
         >
-          {/* ── Quick actions ──────────────────────────────────────────────── */}
-          <div className="mt-1 space-y-0.5 relative" role="list" aria-label="Azioni rapide">
+          {/* ── Quick actions (barra orizzontale) ───────────────────────── */}
+          <div className="relative" role="list" aria-label="Azioni rapide">
             <OneTimeTooltip
               id="tip-sidebar-search"
               title="Ricerca veloce (Ctrl+K)"
@@ -1121,67 +1214,74 @@ export default function Sidebar({
               label={t("search")}
               onClick={() => setIsSearchOpen(true)}
             />
-            <SidebarNavItem
-              id="sidebar-home-btn"
-              icon={LayoutDashboard}
-              label={t("homePages") || "Dashboard & Analitiche"}
-              href="/dashboard"
-              isActive={!isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive}
-              onClick={() => {
-                setIsTranscriptionMode(false);
-                setIsAIActive(false);
-              }}
-            />
-            <SidebarNavItem
-              id="sidebar-mytasks-btn"
-              icon={CheckSquare}
-              label="I miei task"
-              href="/dashboard?view=mytasks"
-              badge={activeTasksCount > 0 ? activeTasksCount : undefined}
-              isActive={!isTranscriptionMode && !isAIActive && isMyTasksActive}
-              onClick={() => {
-                setIsTranscriptionMode(false);
-                setIsAIActive(false);
-              }}
-            />
-            <SidebarNavItem
-              id="sidebar-ai-btn"
-              icon={Sparkles}
-              label={t("aiAssistant")}
-              isActive={isAIActive}
-              onClick={() => {
-                setIsTranscriptionMode(false);
-                setIsAIActive(true);
-                router.push("/dashboard?ai=1");
-                window.dispatchEvent(new Event("open-ai-panel-page"));
-              }}
-            />
-            <SidebarNavItem
-              id="sidebar-meetings-btn"
-              icon={Mic}
-              label={t("meetingsVoice")}
-              isActive={isTranscriptionMode}
-              onClick={() => {
-                setIsTranscriptionMode(true);
-                setIsAIActive(false);
-                router.push("/meetings");
-              }}
-            />
-            <SidebarNavItem
-              id="sidebar-calendar-nav-btn"
-              icon={Calendar}
-              label={t("land.showcaseTabCalendar") || "Calendario"}
-              isActive={!isTranscriptionMode && !isAIActive && pages.some((p) => String(p.id) === String(activePageId) && p.type === "calendar")}
-              onClick={() => {
-                setIsTranscriptionMode(false);
-                setIsAIActive(false);
-                const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
-                if (calPage) {
-                  router.push(`/dashboard?page=${calPage.id}`);
-                } else {
-                  router.push("/calendar");
-                }
-              }}
+            <SidebarQuickBar
+              items={[
+                {
+                  id: "sidebar-home-btn",
+                  icon: LayoutDashboard,
+                  label: t("nav.home") || "Home",
+                  href: "/dashboard",
+                  isActive: !isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive,
+                  onClick: () => {
+                    setIsTranscriptionMode(false);
+                    setIsAIActive(false);
+                  },
+                },
+                {
+                  id: "sidebar-mytasks-btn",
+                  icon: CheckSquare,
+                  label: "Task",
+                  href: "/dashboard?view=mytasks",
+                  badge: activeTasksCount > 0 ? activeTasksCount : undefined,
+                  isActive: !isTranscriptionMode && !isAIActive && isMyTasksActive,
+                  onClick: () => {
+                    setIsTranscriptionMode(false);
+                    setIsAIActive(false);
+                  },
+                },
+                {
+                  id: "sidebar-ai-btn",
+                  icon: Sparkles,
+                  label: t("nav.ai") || "AI",
+                  isActive: isAIActive,
+                  onClick: () => {
+                    setIsTranscriptionMode(false);
+                    setIsAIActive(true);
+                    router.push("/dashboard?ai=1");
+                    window.dispatchEvent(new Event("open-ai-panel-page"));
+                  },
+                },
+                {
+                  id: "sidebar-meetings-btn",
+                  icon: Mic,
+                  label: t("nav.meetings") || "Riunioni",
+                  isActive: isTranscriptionMode,
+                  onClick: () => {
+                    setIsTranscriptionMode(true);
+                    setIsAIActive(false);
+                    router.push("/meetings");
+                  },
+                },
+                {
+                  id: "sidebar-calendar-nav-btn",
+                  icon: Calendar,
+                  label: t("nav.calendar") || "Calendario",
+                  isActive:
+                    !isTranscriptionMode &&
+                    !isAIActive &&
+                    pages.some((p) => String(p.id) === String(activePageId) && p.type === "calendar"),
+                  onClick: () => {
+                    setIsTranscriptionMode(false);
+                    setIsAIActive(false);
+                    const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
+                    if (calPage) {
+                      router.push(`/dashboard?page=${calPage.id}`);
+                    } else {
+                      router.push("/calendar");
+                    }
+                  },
+                },
+              ]}
             />
           </div>
 
@@ -1327,50 +1427,72 @@ export default function Sidebar({
           <div className="flex-1" />
         </nav>
 
-        {/* ── Footer ────────────────────────────────────────────────────────── */}
-        <div className="border-t border-gray-100 dark:border-gray-800 px-2 py-2 space-y-0.5">
-          <SidebarNavItem
-            id="sidebar-settings-btn"
-            icon={Settings}
-            label={t("land.demoNavSettings")}
-            href="/settings"
-          />
+        {/* ── Account + menu "Altro" ───────────────────────────────────────────
+            L'account è in fondo alla sidebar; accanto a lui un bottone
+            "Altro" raccoglie le voci secondarie che prima occupavano
+            quattro righe verticali (Impostazioni, Cestino, Aiuto, Invita). */}
+        <div
+          className="border-t border-gray-100 dark:border-gray-800 px-2 py-2 flex items-center gap-1.5"
+          ref={profileRef}
+        >
+          {/* Account trigger */}
           <button
-            ref={trashRef}
+            type="button"
+            onClick={(e) => {
+              const rect = profileRef.current?.getBoundingClientRect();
+              if (rect) {
+                // il menu si apre sopra l'account, non sotto: resterebbe
+                // tagliato dal bordo inferiore della sidebar.
+                setProfileMenuPos({ top: rect.top - 8, left: rect.left });
+              }
+              setIsMoreOpen(false);
+              setIsProfileOpen((s) => !s);
+            }}
+            aria-expanded={isProfileOpen}
+            aria-haspopup="menu"
+            aria-label="Menu account"
+            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 min-w-0"
+          >
+            {user.picture ? (
+              <img
+                src={user.picture}
+                alt=""
+                className="w-6 h-6 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-6 h-6 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
+                <User size={13} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
+              </div>
+            )}
+            <span className="flex-1 text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+              {user.name || "Account"}
+            </span>
+            <ChevronUp
+              size={14}
+              aria-hidden="true"
+              className={`text-gray-400 shrink-0 transition-transform duration-200 ${
+                isProfileOpen ? "" : "rotate-180"
+              }`}
+            />
+          </button>
+
+          {/* Menu "Altro" */}
+          <button
+            ref={moreRef}
             type="button"
             onClick={() => {
-              setTrashSearch("");
-              setIsTrashOpen((s) => !s);
+              setIsProfileOpen(false);
+              setIsMoreOpen((s) => !s);
             }}
-            title={t("land.sideTrash")}
-            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+            aria-expanded={isMoreOpen}
+            aria-haspopup="menu"
+            aria-label={t("nav.more") || "Altro"}
+            title={t("nav.more") || "Altro"}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-800 dark:hover:text-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
-            <Trash2 size={16} aria-hidden="true" className="shrink-0" />
-            <span className="flex-1 truncate">{t("land.sideTrash")}</span>
-            {deletedCounts.pages > 0 && (
-              <span className="text-[10px] font-bold text-gray-400">
-                {deletedCounts.pages}
-              </span>
-            )}
-          </button>
-          <button
-            ref={helpRef}
-            type="button"
-            onClick={() => setIsHelpOpen((s) => !s)}
-            title={t("land.sideHelpTitle")}
-            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
-          >
-            <HelpCircle size={16} aria-hidden="true" className="shrink-0" />
-            <span className="flex-1 truncate">{t("land.sideHelp")}</span>
-          </button>
-          <button
-            type="button"
-            id="sidebar-invite-btn"
-            onClick={() => setIsInviteOpen(true)}
-            className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
-          >
-            <Users size={16} aria-hidden="true" className="shrink-0" />
-            <span className="flex-1 truncate">{t("land.sideInviteMembers") || "Invita membri"}</span>
+            <Sliders size={16} aria-hidden="true" className="shrink-0" />
+            <span className="text-xs font-semibold">{t("nav.more") || "Altro"}</span>
           </button>
         </div>
 
@@ -1385,6 +1507,7 @@ export default function Sidebar({
         />
       </aside>
 
+      {moreMenuPortal}
       {profileMenuPortal}
       {helpMenuPortal}
       {trashMenuPortal}

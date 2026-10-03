@@ -3,6 +3,13 @@
 // tasks/itemlist, braindump, habit, template, import/export, search,
 // AI panel, notifiche, workspace, modal, meetings import panel.
 export const appviewsIt: Record<string, string> = {
+  // -- Sidebar: label corte per la barra orizzontale --
+  "nav.home": "Home",
+  "nav.tasks": "Task",
+  "nav.ai": "AI",
+  "nav.meetings": "Riunioni",
+  "nav.calendar": "Calendario",
+  "nav.more": "Altro",
   // ── NotesView / blocchi ──
   "views.blockText": "Testo",
   "views.blockH1": "Titolo 1",
@@ -396,6 +403,13 @@ export const appviewsIt: Record<string, string> = {
 };
 
 export const appviewsEn: Record<string, string> = {
+  // -- Sidebar: label corte per la barra orizzontale --
+  "nav.home": "Home",
+  "nav.tasks": "Task",
+  "nav.ai": "AI",
+  "nav.meetings": "Riunioni",
+  "nav.calendar": "Calendario",
+  "nav.more": "Altro",
   // ── NotesView / blocchi ──
   "views.blockText": "Text",
   "views.blockH1": "Heading 1",
