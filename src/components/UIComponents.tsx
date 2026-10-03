@@ -3,7 +3,7 @@
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef } from "react";
 import { Edit2, Check, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export const EditableTitle = ({
   title,
@@ -200,21 +200,44 @@ export const Checkbox = ({ checked, onChange }) => (
   />
 );
 
-export const ScrollReveal = ({ children, delay = 0, direction = "up" }) => {
+/* Effetto di reveal UNIFORME per tutte le sezioni della landing.
+
+   Prima ogni sezione usava una direzione diversa (up / left / right)
+   con offset 40px e durate 0.7–0.8s: l'effetto percepito cambiava
+   da sezione a sezione. Ora il movimento è sempre "dal basso verso
+   l'alto" (direzione visiva naturale in scroll) con la stessa easing.
+
+   `direction` resta supportato per retrocompatibilità, ma il default
+   "up" è ciò che usa tutta la landing. */
+export const ScrollReveal = ({
+  children,
+  delay = 0,
+  direction = "up",
+  distance = 40,
+  duration = 0.7,
+}) => {
+  const shouldReduceMotion = useReducedMotion();
+
   const variants = {
-    up: { y: 40, opacity: 0 },
-    down: { y: -40, opacity: 0 },
-    left: { x: 40, opacity: 0 },
-    right: { x: -40, opacity: 0 },
+    up: { y: distance, opacity: 0 },
+    down: { y: -distance, opacity: 0 },
+    left: { x: distance, opacity: 0 },
+    right: { x: -distance, opacity: 0 },
     none: { opacity: 0 },
   };
 
+  // Accessibilità: se l'utente ha chiesto meno animazioni,
+  // il contenuto appare subito senza dissolvenza.
+  if (shouldReduceMotion) {
+    return <div>{children}</div>;
+  }
+
   return (
     <motion.div
-      initial={variants[direction]}
+      initial={variants[direction] ?? variants.up}
       whileInView={{ x: 0, y: 0, opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>

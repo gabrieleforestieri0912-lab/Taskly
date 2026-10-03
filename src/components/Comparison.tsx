@@ -20,7 +20,7 @@ const rows = [
 export default function Comparison() {
   const { t } = useLanguage();
   return (
-    <section className="landing-section px-4 py-20 bg-white dark:bg-black sm:px-6">
+    <section className="landing-section landing-section-surface px-4 py-20 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center">
           <div className="landing-eyebrow">

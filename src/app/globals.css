@@ -27,7 +27,12 @@
   --color-cyan-900: #4c1d95;
   --color-cyan-950: #000000;
 
-  /* gray-850 only ever appears as a dark-mode surface (legacy app pages),
+  /* Sfondo unico per tutte le sezioni della landing in tema chiaro.
+     Usare `bg-landing-surface` invece di alternare bianco/grigio: evita
+     l'effetto "a scacchiera" e tiene la pagina uniforme. */
+  --color-landing-surface: #ffffff;
+
+  /* grays850 only ever appears as a dark-mode surface (legacy app pages),
      so it can live in the theme directly. */
   --color-gray-850: #171717;
 }
@@ -94,13 +99,29 @@
     font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   }
 
-  /* Landing design system */
+  /* Landing design system
+
+     ── Superficie unificata ──────────────────────────────────────────
+     In tema chiaro TUTTE le sezioni condividono lo stesso sfondo
+     (--color-landing-surface). Prima alternavano bg-white / bg-[#f6f7f9],
+     producendo una pagina "a scacchiera" e poco coerente.
+     Il ritmo visivo ora nasce da bordi e accenti, non da colori diversi. */
+
+  .landing-section-surface {
+    @apply bg-landing-surface dark:bg-black;
+  }
+
+  /* Separatore tra sezioni: mantiene il ritmo senza cambiare sfondo. */
+  .landing-section-divider {
+    @apply border-t border-[#7b39fc]/10 dark:border-white/10;
+  }
+
   .landing-section-light {
     @apply px-6 py-20 bg-white dark:bg-black;
   }
 
   .landing-section-alt {
-    @apply px-6 py-20 bg-[#f6f7f9] dark:bg-[#0a0a0a];
+    @apply px-6 py-20 bg-white dark:bg-black;
   }
 
   .landing-eyebrow {

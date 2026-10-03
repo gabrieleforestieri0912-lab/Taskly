@@ -9,6 +9,11 @@ export const landingIt: Record<string, string> = {
     "Un unico workspace intelligente per task, note, calendario e obiettivi. Pianifica con chiarezza, collabora in tempo reale e lascia che l'AI semplifichi ogni giornata.",
   "land.heroCtaDemo": "Prenota una demo gratuita",
   "land.heroCtaStart": "Inizia subito",
+  "land.heroEyebrow": "Task, note, calendario e obiettivi in un unico posto",
+  "land.heroBadge1": "Setup in 2 minuti",
+  "land.heroBadge2": "AI integrata",
+  "land.heroBadge3": "Collaborazione in tempo reale",
+  "land.heroProof": "Usato da oltre 2.000 team in Europa",
 
   // ── DashboardShowcase ──
   "land.showcaseEyebrow": "Una dashboard, tutto il tuo lavoro",
@@ -503,6 +508,11 @@ export const landingEn: Record<string, string> = {
     "One smart workspace for tasks, notes, calendar and goals. Plan with clarity, collaborate in real time and let AI simplify every day.",
   "land.heroCtaDemo": "Book a free demo",
   "land.heroCtaStart": "Get started now",
+  "land.heroEyebrow": "Tasks, notes, calendar and goals in one place",
+  "land.heroBadge1": "Set up in 2 minutes",
+  "land.heroBadge2": "Built-in AI",
+  "land.heroBadge3": "Real-time collaboration",
+  "land.heroProof": "Trusted by 2,000+ teams across Europe",
 
   // ── DashboardShowcase ──
   "land.showcaseEyebrow": "One dashboard, all your work",

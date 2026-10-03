@@ -47,7 +47,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="faq" className="landing-section relative px-4 py-20 bg-[#f6f7f9] dark:bg-black overflow-hidden sm:px-6">
+    <section id="faq" className="landing-section relative landing-section-surface px-4 py-20 overflow-hidden sm:px-6">
 
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-10">

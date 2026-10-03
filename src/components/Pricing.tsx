@@ -211,7 +211,7 @@ function Pricing() {
   return (
     <section
       id="pricing"
-      className="landing-section relative flex flex-col items-center justify-center px-4 py-20 bg-white dark:bg-black overflow-hidden sm:px-6"
+      className="landing-section landing-section-surface relative flex flex-col items-center justify-center px-4 py-20 overflow-hidden sm:px-6"
     >
 
       <div className="text-center max-w-4xl mb-12 relative z-10">

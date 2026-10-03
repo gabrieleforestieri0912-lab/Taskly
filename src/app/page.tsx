@@ -51,13 +51,15 @@ export default function Home() {
 
       <DashboardShowcase />
 
+      {/* Tutte le sezioni usano lo stesso reveal "up" e la stessa
+          superficie: effetto e sfondo identici lungo tutta la pagina. */}
       <ScrollReveal>
         <section id="value" className="landing-section">
           <ValueProposition />
         </section>
       </ScrollReveal>
 
-      <ScrollReveal delay={0.1}>
+      <ScrollReveal>
         <section id="getting-started" className="landing-section">
           <GettingStarted />
         </section>
@@ -69,7 +71,7 @@ export default function Home() {
         </section>
       </ScrollReveal>
 
-      <ScrollReveal direction="left">
+      <ScrollReveal>
         <section id="problem-solution" className="landing-section">
           <ProblemSolution />
         </section>
@@ -87,7 +89,7 @@ export default function Home() {
         </section>
       </ScrollReveal>
 
-      <ScrollReveal direction="up">
+      <ScrollReveal>
         <section id="comparison" className="landing-section">
           <Comparison />
         </section>

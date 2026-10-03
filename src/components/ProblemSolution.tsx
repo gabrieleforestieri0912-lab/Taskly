@@ -37,7 +37,7 @@ const metrics = [
 export default function ProblemSolution() {
   const { t } = useLanguage();
   return (
-    <section className="px-6 py-20 bg-white dark:bg-black">
+    <section className="landing-section-surface px-6 py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
