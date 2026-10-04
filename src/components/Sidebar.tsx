@@ -101,6 +101,7 @@ export default function Sidebar({
   setIsModalOpen = (..._args: any[]) => {},
   onOpenTemplateGallery = () => {},
   onOpenPage = (..._args: any[]) => {},
+  onOpenQuickPage = (pageId: string) => {},
   isSidebarOpen,
   setIsSidebarOpen,
   theme,
@@ -109,6 +110,7 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const currentPage = pages.find((p) => String(p.id) === String(activePageId));
   const { t, language, setLanguage } = useLanguage();
 
   // Apri la scheda per la pagina di destinazione PRIMA di navigare, così la
@@ -118,6 +120,7 @@ export default function Sidebar({
     onOpenPage(page);
     router.push(`/dashboard?page=${page.id}`);
   };
+
   const [localUser, setLocalUser] = useState({
     name: "Utente",
     email: "utente@esempio.it",
@@ -338,6 +341,12 @@ export default function Sidebar({
   };
 
   const { rootNodes, childrenMap } = React.useMemo(() => {
+    const quickPage = pages.find(
+      (p) => p && p.id === "new-empty-page",
+    );
+    const quickChatPage = pages.find(
+      (p) => p && p.id === "new-chat-page",
+    );
     const map = new Map();
     const filtered = (pages || []).filter((p) => !p?.deleted);
     for (const p of filtered) {
@@ -355,6 +364,14 @@ export default function Sidebar({
     }
     return { rootNodes: map.get(null) || [], childrenMap: map };
   }, [pages]);
+
+  const handleOpenQuickPage = (pageId: string) => {
+    const page = pages.find((p) => String(p.id) === String(pageId));
+    if (!page) return;
+    onOpenPage(page);
+    router.push(`/dashboard?page=${page.id}`);
+    onOpenQuickPage(pageId);
+  };
 
   const handleAddSubpage = (parentId: string, e?: React.MouseEvent) => {
     if (e && e.stopPropagation) e.stopPropagation();
@@ -413,105 +430,105 @@ export default function Sidebar({
   };
 
   // ── "Altro" menu portal ────────────────────────────────────────────────
-// Voci secondarie raccolte in un menu che si apre verso l'alto, accanto
-// all'account in fondo alla sidebar. Stesso pattern del profile menu:
-// posizione in fixed calcolata dal bottone, chiusura su click fuori / Esc.
-let moreMenuPortal: React.ReactNode = null;
-if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
-  const rect = moreRef.current.getBoundingClientRect();
-  const menuW = 232;
-  const left = Math.max(
-    8,
-    Math.min(rect.right - menuW, (typeof window !== "undefined" ? window.innerWidth : 800) - menuW - 8),
-  );
-  moreMenuPortal = createPortal(
-    <div
-      onClick={(e) => e.stopPropagation()}
-      style={{
-        top: rect.top,
-        left,
-        position: "fixed",
-        zIndex: 80,
-        // si apre verso l'alto per restare dentro il viewport
-        transform: "translateY(-100%)",
-        transformOrigin: "bottom right",
-      }}
-      role="menu"
-      aria-label={t("nav.more", "Altro")}
-      className="w-58 p-1.5 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
-    >
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          setIsMoreOpen(false);
-          router.push("/settings");
+  // Voci secondarie raccolte in un menu che si apre verso l'alto, accanto
+  // all'account in fondo alla sidebar. Stesso pattern del profile menu:
+  // posizione in fixed calcolata dal bottone, chiusura su click fuori / Esc.
+  let moreMenuPortal: React.ReactNode = null;
+  if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
+    const rect = moreRef.current.getBoundingClientRect();
+    const menuW = 232;
+    const left = Math.max(
+      8,
+      Math.min(rect.right - menuW, (typeof window !== "undefined" ? window.innerWidth : 800) - menuW - 8),
+    );
+    moreMenuPortal = createPortal(
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          top: rect.top,
+          left,
+          position: "fixed",
+          zIndex: 80,
+          // si apre verso l'alto per restare dentro il viewport
+          transform: "translateY(-100%)",
+          transformOrigin: "bottom right",
         }}
-        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+        role="menu"
+        aria-label={t("nav.more", "Altro")}
+        className="w-58 p-1.5 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
       >
-        <span className="grid place-items-center w-6 h-6 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
-          <Settings size={13} aria-hidden="true" />
-        </span>
-        {t("land.demoNavSettings")}
-      </button>
-
-      <button
-        ref={trashRef}
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          setIsMoreOpen(false);
-          setTrashSearch("");
-          setIsTrashOpen((s) => !s);
-        }}
-        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
-      >
-        <span className="grid place-items-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-          <Trash2 size={13} aria-hidden="true" />
-        </span>
-        <span className="flex-1 text-left">{t("land.sideTrash")}</span>
-        {deletedCounts.pages > 0 && (
-          <span className="text-[10px] font-bold tabular-nums text-gray-400">
-            {deletedCounts.pages}
+        <button
+          type="button"
+          role="menuitem"
+          onClick={() => {
+            setIsMoreOpen(false);
+            router.push("/settings");
+          }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+        >
+          <span className="grid place-items-center w-6 h-6 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+            <Settings size={13} aria-hidden="true" />
           </span>
-        )}
-      </button>
+          {t("land.demoNavSettings")}
+        </button>
 
-      <button
-        ref={helpRef}
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          setIsMoreOpen(false);
-          setIsHelpOpen((s) => !s);
-        }}
-        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
-      >
-        <span className="grid place-items-center w-6 h-6 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
-          <HelpCircle size={13} aria-hidden="true" />
-        </span>
-        {t("land.sideHelp")}
-      </button>
+        <button
+          ref={trashRef}
+          type="button"
+          role="menuitem"
+          onClick={() => {
+            setIsMoreOpen(false);
+            setTrashSearch("");
+            setIsTrashOpen((s) => !s);
+          }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+        >
+          <span className="grid place-items-center w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <Trash2 size={13} aria-hidden="true" />
+          </span>
+          <span className="flex-1 text-left">{t("land.sideTrash")}</span>
+          {deletedCounts.pages > 0 && (
+            <span className="text-[10px] font-bold tabular-nums text-gray-400">
+              {deletedCounts.pages}
+            </span>
+          )}
+        </button>
 
-      <button
-        type="button"
-        role="menuitem"
-        id="sidebar-invite-btn"
-        onClick={() => {
-          setIsMoreOpen(false);
-          setIsInviteOpen(true);
-        }}
-        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
-      >
-        <span className="grid place-items-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-          <Users size={13} aria-hidden="true" />
-        </span>
-        {t("land.sideInviteMembers", "Invita membri")}
-      </button>
-    </div>,
-    document.body,
-  );
-}
+        <button
+          ref={helpRef}
+          type="button"
+          role="menuitem"
+          onClick={() => {
+            setIsMoreOpen(false);
+            setIsHelpOpen((s) => !s);
+          }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+        >
+          <span className="grid place-items-center w-6 h-6 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+            <HelpCircle size={13} aria-hidden="true" />
+          </span>
+          {t("land.sideHelp")}
+        </button>
+
+        <button
+          type="button"
+          role="menuitem"
+          id="sidebar-invite-btn"
+          onClick={() => {
+            setIsMoreOpen(false);
+            setIsInviteOpen(true);
+          }}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
+        >
+          <span className="grid place-items-center w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <Users size={13} aria-hidden="true" />
+          </span>
+          {t("land.sideInviteMembers", "Invita membri")}
+        </button>
+      </div>,
+      document.body,
+    );
+  }
 
   // profile menu portal: render outside of JSX to avoid parser/context issues
   let profileMenuPortal: React.ReactNode = null;
@@ -967,7 +984,9 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={handleCancelDelete}
         />
-        <div className="relative bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-6 w-full max-w-md">
+        <div
+          className="relative bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-6 w-full max-w-md"
+        >
           <h3 className="text-lg font-bold mb-2">{t("land.sideConfirmDeleteTitle")}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             Sei sicuro di voler eliminare questa pagina? L&apos;operazione può essere
@@ -1185,19 +1204,32 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
         aria-label="Navigazione sidebar"
       >
         {/* ── Workspace header ──────────────────────────────────────────────────
-            L'account sta in fondo (vedi blocco "Account + altro"): qui resta
-            solo il nome del workspace e il chiudi su mobile. */}
+            L'account si sposta in fondo (vedi blocco "Account + altro"): qui resta
+            solo la logo di Taskly che torna alla landing e il chiudi su mobile. */}
         <div className="flex items-center px-3 pt-3 pb-1 gap-1">
-          <span className="flex-1 text-[11px] font-black uppercase tracking-wider text-gray-400 truncate min-w-0">
-            {user.name || "Workspace"}
-          </span>
+          <Link
+            href="/"
+            aria-label={t("land.cmpHeaderTaskly")}
+            className="flex shrink-0 items-center gap-2 rounded-xl px-2.5 py-1.5 transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+          >
+            <Image
+              src="/taskly.png"
+              alt={t("land.cmpHeaderTaskly")}
+              width={26}
+              height={26}
+              className="shrink-0 rounded-lg object-cover"
+            />
+            <span className="font-inter text-[11px] font-bold text-gray-800 dark:text-gray-100">
+              Taskly
+            </span>
+          </Link>
 
           {/* Close sidebar button on mobile */}
           <button
             type="button"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Chiudi barra laterale"
-            className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+            className="md:hidden p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
             <ChevronLeft size={16} aria-hidden="true" />
           </button>
@@ -1249,16 +1281,37 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                   },
                 },
                 {
-                  id: "sidebar-ai-btn",
-                  icon: Sparkles,
-                  label: t("nav.ai", "AI"),
-                  isActive: isAIActive,
+                  id: "sidebar-inbox-btn",
+                  icon: Inbox,
+                  label: t("nav.inbox", "Inbox"),
+                  href: "/dashboard?view=inbox",
+                  isActive: !isTranscriptionMode && !isAIActive && activeView === "inbox",
                   onClick: () => {
                     setIsTranscriptionMode(false);
-                    setIsAIActive(true);
-                    router.push("/dashboard?ai=1");
-                    window.dispatchEvent(new Event("open-ai-panel-page"));
+                    setIsAIActive(false);
                   },
+                },
+                {
+                  id: "sidebar-empty-btn",
+                  icon: FileText,
+                  label: t("nav.empty", "Pagina vuota"),
+                  onClick: () => handleOpenQuickPage("new-empty-page"),
+                },
+                {
+                  id: "sidebar-transcription-btn",
+                  icon: Mic,
+                  label: t("nav.transcription", "Trascrizione"),
+                  isActive: isTranscriptionMode,
+                  onClick: () => {
+                    setIsTranscriptionMode(true);
+                    setIsAIActive(false);
+                  },
+                },
+                {
+                  id: "sidebar-chat-btn",
+                  icon: Send,
+                  label: t("nav.chat", "Chat"),
+                  onClick: () => handleOpenQuickPage("new-chat-page"),
                 },
                 {
                   id: "sidebar-meetings-btn",
@@ -1517,166 +1570,6 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
       {trashMenuPortal}
       {pendingDeletePortal}
       {inviteModalPortal}
-
-      {/* ── Search modal portal ───────────────────────────────────────────── */}
-      {isSearchOpen &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-100 bg-black/40 dark:bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
-              onClick={() => setIsSearchOpen(false)}
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-zinc-800/80 w-120 max-w-full p-6 space-y-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="relative">
-                  <Search
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-                  />
-                  <input
-                    type="text"
-                    placeholder={t("searchPagesPlaceholder")}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-zinc-900/50 border border-gray-100 dark:border-zinc-800/50 rounded-2xl text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
-                    autoFocus
-                  />
-                </div>
-
-                {!searchQuery && (
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between mb-2 px-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500 flex items-center gap-1.5">
-                        <Clock size={12} className="text-cyan-500" />
-                        {t("recentPages", "Pagine Recenti")}
-                      </p>
-                      {pageHistory.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPageHistory([]);
-                            localStorage.removeItem("page_history");
-                          }}
-                          className="text-[10px] font-bold text-gray-400 hover:text-red-500 transition-colors"
-                        >{t("land.sideClear")}</button>
-                      )}
-                    </div>
-                    <div className="space-y-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
-                      {(() => {
-                        const activePages = (pages || []).filter((p) => p && !p.deleted);
-                        const matchedHistory = pageHistory
-                          .map((ph) => activePages.find((p) => String(p.id) === String(ph.id)))
-                          .filter(Boolean) as any[];
-                        const seenIds = new Set(matchedHistory.map((p) => String(p.id)));
-                        const remaining = activePages.filter((p) => !seenIds.has(String(p.id)));
-                        const recentList = [...matchedHistory, ...remaining].slice(0, 8);
-
-                        if (recentList.length === 0) {
-                          return (
-                            <p className="py-4 text-center text-xs text-gray-400">
-                              Nessuna pagina disponibile
-                            </p>
-                          );
-                        }
-
-                        return recentList.map((page) => {
-                          const PageIcon = resolvePageIcon(page);
-                          return (
-                            <button
-                              key={page.id}
-                              onClick={() => {
-                                goToPage(page);
-                                setIsSearchOpen(false);
-                              }}
-                              className="w-full flex items-center justify-between px-3 py-2 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <PageIcon
-                                  size={14}
-                                  className={page.iconColor || "text-gray-400 group-hover:text-cyan-500 transition-colors"}
-                                />
-                                <span className="truncate font-semibold">
-                                  {page.label || "Senza titolo"}
-                                </span>
-                              </div>
-                              <ChevronRight
-                                size={12}
-                                className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-1 group-hover:translate-x-0"
-                              />
-                            </button>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </div>
-                )}
-
-                {searchQuery && (
-                  <div className="pt-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500 mb-2 px-1">{t("land.sideSearchResults")}</p>
-                    <div className="space-y-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar text-xs text-gray-500">
-                      {pages.filter(
-                        (p) =>
-                          !p.deleted &&
-                          p.label
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase()),
-                      ).length === 0 ? (
-                        <div className="text-center py-6 text-gray-400 dark:text-gray-500 font-medium">
-                          {t("noPagesFound")}
-                        </div>
-                      ) : (
-                        pages
-                          .filter(
-                            (p) =>
-                              !p.deleted &&
-                              p.label
-                                .toLowerCase()
-                                .includes(searchQuery.toLowerCase()),
-                          )
-                          .map((page) => (
-                            <button
-                              key={page.id}
-                              onClick={() => {
-                                goToPage(page);
-                                setIsSearchOpen(false);
-                              }}
-                              className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <FileText
-                                  size={13}
-                                  className="text-gray-400 group-hover:text-cyan-500 transition-colors"
-                                />
-                                <span className="truncate font-semibold">
-                                  {page.label}
-                                </span>
-                              </div>
-                              <ChevronRight
-                                size={12}
-                                className="text-gray-300 dark:text-gray-600 group-hover:text-cyan-500 opacity-0 group-hover:opacity-100 transition-all transform -translate-x-1 group-hover:translate-x-0"
-                              />
-                            </button>
-                          ))
-                      )}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>,
-          document.body,
-        )}
     </>
   );
 }

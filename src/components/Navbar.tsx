@@ -45,6 +45,9 @@ function SiteLogo({ size = 28 }: { size?: number }) {
 export default function Navbar({
   isSidebarOpen,
   setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (v: boolean) => void;
 }) {
   const { t } = useLanguage();
   const router = useRouter();
@@ -57,6 +60,18 @@ export default function Navbar({
 
   const isLanding = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
+
+  // Navbar "floating": l'ombra si rinforza appena si scrolla, così la pillola
+  // si stacca dal contenuto che passa dietro. `false` iniziale = stesso valore
+  // in SSR, niente mismatch di idratazione.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!isLanding) return;
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isLanding]);
 
   const landingNavLinks = [
     { name: "Home", href: "#", key: "home" },
@@ -195,8 +210,8 @@ export default function Navbar({
       setTimeout(() => setUser(null), 0);
     }
 
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
     };
@@ -223,7 +238,7 @@ export default function Navbar({
   };
 
   // Smooth-scroll to an in-page section for landing hash links
-  const scrollToHash = (href) => (e) => {
+  const scrollToHash = (href: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const id = href?.replace(/^#/, "").trim();
     if (id) {
@@ -237,18 +252,24 @@ export default function Navbar({
 
   /* ── Landing floating navbar ─────────────────────────────────── */
   if (isLanding && !isDashboard) {
-    // Barra fissa solida, niente glassmorphism
-    const barSurface =
-      "h-16 border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-black";
+    // PILLOLA centrata che galleggia sopra il contenuto: sfondo bianco/neutro,
+    // bordo sottile, ombra molto leggera e sfumata. `sticky` + no padding-top
+    // sulla landing, come da scelta di design.
+    const barSurface = scrolled
+      ? "border-gray-200 bg-white/80 shadow-lg backdrop-blur-md dark:border-gray-800/80 dark:bg-black/80 dark:backdrop-blur-md"
+      : "border-gray-100 bg-white/70 shadow-sm backdrop-blur-sm dark:border-gray-900/80 dark:bg-black/70 dark:backdrop-blur-sm";
 
     const menuItem =
-      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white";
+
+    const navButtonClass =
+      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]/40";
 
     return (
       <>
-        <header className="sticky top-0 z-50">
+        <header className="pointer-events-none sticky top-0 z-50 w-full px-3 pt-3 sm:px-5 sm:pt-4">
           <nav
-            className={`mx-auto flex w-full items-center justify-between px-4 sm:px-6 ${barSurface}`}
+            className={`pointer-events-auto mx-auto flex h-14 w-full max-w-[720px] items-center justify-between rounded-2xl border bg-white/80 px-4 shadow-lg shadow-black/3 dark:border-white/10 dark:bg-black/80 dark:shadow-black/10 backdrop-blur-lg transition-all duration-300 ease-out sm:h-16 sm:px-5 ${barSurface}`}
           >
             {/* Logo */}
             <Link
@@ -256,7 +277,9 @@ export default function Navbar({
               className="flex shrink-0 items-center gap-2.5 rounded-full px-2 transition-opacity hover:opacity-85"
             >
               <SiteLogo />
-              <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
+              <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">
+                {t("land.cmpHeaderTaskly")}
+              </span>
             </Link>
 
             {/* Desktop nav links */}
@@ -265,9 +288,7 @@ export default function Navbar({
                 <div
                   key={link.key}
                   className="relative"
-                  onMouseEnter={() =>
-                    link.hasDropdown && setOpenMenu(link.key)
-                  }
+                  onMouseEnter={() => (link.hasDropdown ? setOpenMenu(link.key) : null)}
                   onMouseLeave={() => setOpenMenu((k) => (k === link.key ? null : k))}
                 >
                   {link.hasDropdown ? (
@@ -276,7 +297,7 @@ export default function Navbar({
                       onClick={() =>
                         setOpenMenu((k) => (k === link.key ? null : link.key))
                       }
-                      className={menuItem}
+                      className={navButtonClass}
                     >
                       {link.name}
                       <ChevronDown
@@ -334,10 +355,9 @@ export default function Navbar({
                 </div>
               ))}
 
-              <Link
-                href="/docs"
-                className={menuItem}
-              >{t("auth.docsTitle")}</Link>
+              <Link href="/docs" className={navButtonClass}>
+                {t("auth.docsTitle")}
+              </Link>
             </div>
 
             {/* Desktop actions */}
@@ -407,7 +427,7 @@ export default function Navbar({
                 <>
                   <Link
                     href="/login"
-                    className="font-inter inline-flex h-9 items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-800 dark:border-gray-600 dark:bg-gray-900 dark:text-white transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className={`font-inter inline-flex h-9 items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800`}
                   >
                     {t("login")}
                   </Link>
@@ -441,7 +461,7 @@ export default function Navbar({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-50 flex flex-col bg-black px-6 py-6 lg:hidden"
+              className="fixed inset-0 z-50 flex flex-col bg-white/90 backdrop-blur-xl px-6 py-6 lg:hidden dark:bg-black/90 dark:backdrop-blur-xl"
             >
               <div className="flex items-center justify-between">
                 <Link
@@ -450,12 +470,14 @@ export default function Navbar({
                   className="flex items-center gap-2.5"
                 >
                   <SiteLogo />
-                  <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
+                  <span className="font-inter text-lg font-semibold text-gray-900 dark:text-white">
+                    {t("land.cmpHeaderTaskly")}
+                  </span>
                 </Link>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center text-white"
+                  className="inline-flex h-10 w-10 items-center justify-center text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/10"
                   aria-label={t("land.navCloseMenu")}
                 >
                   <X size={24} />
@@ -474,7 +496,7 @@ export default function Navbar({
                               k === `m-${link.key}` ? null : `m-${link.key}`,
                             )
                           }
-                          className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left font-inter text-2xl font-medium text-white"
+                          className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left font-inter text-xl font-medium text-gray-800 transition-colors hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-white/5"
                         >
                           {link.name}
                           <ChevronDown
@@ -493,13 +515,13 @@ export default function Navbar({
                               transition={{ duration: 0.25, ease: "easeInOut" }}
                               className="overflow-hidden"
                             >
-                              <div className="mt-1 flex flex-col gap-1 rounded-2xl bg-white/5 p-2">
+                              <div className="mt-1 flex flex-col gap-1 rounded-2xl bg-white/60 p-2 dark:bg-white/5">
                                 {link.children.map((child) => (
                                   <Link
                                     key={child.name}
                                     href={child.href}
                                     onClick={scrollToHash(child.href)}
-                                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/80"
+                                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200"
                                   >
                                     <child.icon size={16} className="text-[#a67cff]" />
                                     {child.name}
@@ -515,7 +537,7 @@ export default function Navbar({
                         key={link.key}
                         href={link.href}
                         onClick={scrollToHash(link.href)}
-                        className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
+                        className="block rounded-xl px-3 py-2.5 font-inter text-xl font-medium text-gray-800 transition-colors hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-white/5"
                       >
                         {link.name}
                       </Link>
@@ -526,8 +548,10 @@ export default function Navbar({
                 <Link
                   href="/docs"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
-                >{t("auth.docsTitle")}</Link>
+                  className="block rounded-xl px-3 py-2.5 font-inter text-xl font-medium text-gray-800 transition-colors hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-white/5"
+                >
+                  {t("auth.docsTitle")}
+                </Link>
               </nav>
 
               {!user && (
@@ -535,14 +559,14 @@ export default function Navbar({
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center rounded-full border border-[#7b39fc]/40 bg-[#7b39fc]/10 text-sm font-semibold text-[#a67cff]"
+                    className="font-inter inline-flex h-12 items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   >
                     {t("login")}
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center rounded-full bg-[#7b39fc] text-sm font-semibold text-[#fafafa]"
+                    className="font-inter inline-flex h-12 items-center justify-center rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
                   >
                     {t("start")}
                   </Link>
@@ -554,7 +578,7 @@ export default function Navbar({
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#7b39fc] text-sm font-semibold text-[#fafafa]"
+                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
                   >
                     <LayoutDashboard size={16} />
                     {t("dashboard")}
@@ -565,7 +589,7 @@ export default function Navbar({
                       setMobileMenuOpen(false);
                       handleLogout();
                     }}
-                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 text-sm font-semibold text-white"
+                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                   >
                     <LogOut size={16} />
                     {t("logout")}
@@ -687,7 +711,9 @@ export default function Navbar({
           ) : (
             <Link href="/" className="group flex min-w-0 items-center gap-3">
               <SiteLogo />
-              <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">{t("land.cmpHeaderTaskly")}</span>
+              <span className="font-inter text-[17px] font-bold tracking-[-0.02em] text-gray-950 dark:text-white">
+                {t("land.cmpHeaderTaskly")}
+              </span>
             </Link>
           )}
         </div>
@@ -699,15 +725,11 @@ export default function Navbar({
                 key={group.key}
                 className="relative"
                 onMouseEnter={() => setOpenMenu(group.key)}
-                onMouseLeave={() =>
-                  setOpenMenu((k) => (k === group.key ? null : k))
-                }
+                onMouseLeave={() => setOpenMenu((k) => (k === group.key ? null : k))}
               >
                 <button
                   type="button"
-                  onClick={() =>
-                    setOpenMenu((k) => (k === group.key ? null : group.key))
-                  }
+                  onClick={() => setOpenMenu((k) => (k === group.key ? null : group.key))}
                   className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                 >
                   {group.name}
@@ -820,7 +842,9 @@ export default function Navbar({
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-11 items-center justify-center rounded-lg border border-gray-300 text-sm font-semibold text-gray-900 dark:border-gray-600 dark:text-white"
-                >{t("auth.signIn")}</Link>
+                >
+                  {t("auth.signIn")}
+                </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}

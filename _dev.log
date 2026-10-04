@@ -414,3 +414,1412 @@ Deleting this directory while Next.js is running can lead to undefined behavior.
  GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 11ms, application-code: 12ms)
  GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
  GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 47ms (next.js: 12ms, proxy.ts: 16ms, application-code: 20ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 60ms (next.js: 7ms, proxy.ts: 10ms, application-code: 43ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 6ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 7ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 41ms (next.js: 11ms, proxy.ts: 12ms, application-code: 19ms)
+ GET /api/activity/recent?limit=20 401 in 39ms (next.js: 9ms, proxy.ts: 13ms, application-code: 17ms)
+ GET /dashboard?page=page-notes 200 in 550ms (next.js: 200ms, application-code: 351ms)
+ POST /api/analytics/events 200 in 331ms (next.js: 43ms, proxy.ts: 34ms, application-code: 255ms)
+ GET /api/integrations 401 in 64ms (next.js: 15ms, proxy.ts: 10ms, application-code: 39ms)
+ GET /api/activity/recent?limit=20 401 in 44ms (next.js: 16ms, proxy.ts: 14ms, application-code: 14ms)
+ GET /api/integrations 401 in 61ms (next.js: 31ms, proxy.ts: 18ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 7ms, proxy.ts: 11ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /dashboard?page=84f7d187-7ada-438d-a04f-3ad514c10a10&focusTitle=1 200 in 76ms (next.js: 30ms, application-code: 46ms)
+ GET /dashboard?page=84f7d187-7ada-438d-a04f-3ad514c10a10 200 in 65ms (next.js: 15ms, application-code: 51ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 11ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 10ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 9ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 70ms (next.js: 18ms, proxy.ts: 21ms, application-code: 31ms)
+ GET /api/activity/recent?limit=20 401 in 65ms (next.js: 22ms, proxy.ts: 20ms, application-code: 23ms)
+ GET /api/activity/recent?limit=20 401 in 70ms (next.js: 19ms, proxy.ts: 24ms, application-code: 27ms)
+ GET /api/activity/recent?limit=20 401 in 54ms (next.js: 20ms, proxy.ts: 20ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 41ms (next.js: 11ms, proxy.ts: 14ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 58ms (next.js: 13ms, proxy.ts: 27ms, application-code: 18ms)
+ GET /api/activity/recent?limit=20 401 in 53ms (next.js: 16ms, proxy.ts: 16ms, application-code: 22ms)
+ GET /api/activity/recent?limit=20 401 in 67ms (next.js: 31ms, proxy.ts: 19ms, application-code: 17ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 9ms, proxy.ts: 13ms, application-code: 18ms)
+ GET /api/activity/recent?limit=20 401 in 88ms (next.js: 28ms, proxy.ts: 44ms, application-code: 17ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 9ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 9ms, proxy.ts: 16ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 9ms, application-code: 13ms)
+[browser] Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at DashboardPage (file://C:/Users/Utente/Documents/Vertex/Taskly/.next/dev/static/chunks/src_app_dashboard_page_tsx_11o8ilc._.js:2368:221)
+ POST /api/analytics/events 200 in 250ms (next.js: 8ms, proxy.ts: 9ms, application-code: 233ms)
+ GET /dashboard 200 in 355ms (next.js: 65ms, application-code: 290ms)
+ GET /api/integrations 401 in 43ms (next.js: 15ms, proxy.ts: 15ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 61ms (next.js: 28ms, proxy.ts: 16ms, application-code: 17ms)
+ GET /api/integrations 401 in 47ms (next.js: 16ms, proxy.ts: 19ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 65ms (next.js: 30ms, proxy.ts: 21ms, application-code: 13ms)
+ POST /api/analytics/events 200 in 616ms (next.js: 10ms, proxy.ts: 13ms, application-code: 594ms)
+ GET /dashboard?view=mytasks 200 in 115ms (next.js: 75ms, application-code: 40ms)
+ GET /api/activity/recent?limit=20 401 in 39ms (next.js: 14ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 10ms, application-code: 12ms)
+[browser] Cannot update a component (`Sidebar`) while rendering a different component (`MyTasksView`). To locate the bad setState() call inside `MyTasksView`, follow the stack trace as described in https://react.dev/link/setstate-in-render 
+    at Sidebar.useEffect.updateCount (file://C:/Users/Utente/Documents/Vertex/Taskly/.next/dev/static/chunks/src_components_Sidebar_tsx_1n79xm7._.js:197:33)
+    at saveTasksToStorage (src/lib/taskModel.ts:402:12)
+    at MyTasksView[updateTasks > setTasks()] (file://C:/Users/Utente/Documents/Vertex/Taskly/.next/dev/static/chunks/src_components_MyTasksView_tsx_1xl4efi._.js:131:174)
+    at MyTasksView (file://C:/Users/Utente/Documents/Vertex/Taskly/.next/dev/static/chunks/src_components_MyTasksView_tsx_1xl4efi._.js:67:205)
+  400 |     localStorage.setItem("tasks", JSON.stringify(tasks));
+  401 |     // Notifica ad altri componenti
+> 402 |     window.dispatchEvent(new CustomEvent("taskly-tasks-updated", { detail: tasks }));
+      |            ^
+  403 |   } catch (err) {
+  404 |     console.error("Errore nel salvataggio dei task:", err);
+  405 |   } (file://C:/Users/Utente/Documents/Vertex/Taskly/.next/dev/static/chunks/src_components_Sidebar_tsx_1n79xm7._.js:197:33)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 11ms, proxy.ts: 8ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 6ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 6ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 7ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 8ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 8ms, proxy.ts: 11ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 5ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 24ms (next.js: 6ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 22ms (next.js: 7ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 41ms (next.js: 24ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 7ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 9ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 8ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 39ms (next.js: 22ms, proxy.ts: 8ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 24ms (next.js: 7ms, proxy.ts: 8ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 8ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 9ms, proxy.ts: 11ms, application-code: 16ms)
+✓ Compiled in 444ms
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 6ms, proxy.ts: 11ms, application-code: 13ms)
+✓ Compiled in 299ms
+ GET /api/activity/recent?limit=20 401 in 66ms (next.js: 45ms, proxy.ts: 12ms, application-code: 10ms)
+✓ Compiled in 513ms
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 10ms, application-code: 10ms)
+✓ Compiled in 438ms
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 6ms, proxy.ts: 8ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 46ms (next.js: 25ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 11ms, proxy.ts: 14ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 7ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 8ms, application-code: 11ms)
+✓ Compiled in 2.4s
+ GET /dashboard?view=mytasks 200 in 90ms (next.js: 27ms, application-code: 62ms)
+ GET /api/integrations 401 in 52ms (next.js: 16ms, proxy.ts: 20ms, application-code: 16ms)
+ GET /api/activity/recent?limit=20 401 in 79ms (next.js: 42ms, proxy.ts: 18ms, application-code: 19ms)
+ GET /api/integrations 401 in 89ms (next.js: 29ms, proxy.ts: 46ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 77ms (next.js: 45ms, proxy.ts: 21ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 41ms (next.js: 18ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 7ms, proxy.ts: 13ms, application-code: 11ms)
+✓ Compiled in 1256ms
+ GET /dashboard?view=mytasks 200 in 76ms (next.js: 20ms, application-code: 56ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 13ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 9ms, proxy.ts: 8ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 6ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 24ms (next.js: 6ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 8ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 8ms, proxy.ts: 7ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 13ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 6ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 7ms, proxy.ts: 13ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 38ms (next.js: 18ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 12ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 5ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 17ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 8ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 41ms (next.js: 7ms, proxy.ts: 10ms, application-code: 24ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 7ms, proxy.ts: 9ms, application-code: 22ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 49ms (next.js: 20ms, proxy.ts: 14ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 10ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 9ms, proxy.ts: 11ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 22ms (next.js: 5ms, proxy.ts: 9ms, application-code: 8ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 10ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 43ms (next.js: 21ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 11ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 7ms, proxy.ts: 8ms, application-code: 25ms)
+ GET /api/activity/recent?limit=20 401 in 38ms (next.js: 9ms, proxy.ts: 14ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 7ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 24ms (next.js: 7ms, proxy.ts: 7ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 44ms (next.js: 23ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 6ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 6ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 46ms (next.js: 9ms, proxy.ts: 11ms, application-code: 26ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 22ms (next.js: 6ms, proxy.ts: 8ms, application-code: 8ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 7ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 45ms (next.js: 8ms, proxy.ts: 8ms, application-code: 29ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 9ms, proxy.ts: 8ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 88ms (next.js: 55ms, proxy.ts: 10ms, application-code: 23ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 7ms, proxy.ts: 14ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 45ms (next.js: 8ms, proxy.ts: 15ms, application-code: 21ms)
+ GET /api/activity/recent?limit=20 401 in 46ms (next.js: 8ms, proxy.ts: 22ms, application-code: 16ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 13ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 8ms, proxy.ts: 15ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 62ms (next.js: 35ms, proxy.ts: 15ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 6ms, proxy.ts: 12ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 8ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 7ms, proxy.ts: 11ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 11ms, proxy.ts: 14ms, application-code: 16ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 9ms, proxy.ts: 13ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 61ms (next.js: 28ms, proxy.ts: 16ms, application-code: 18ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 7ms, proxy.ts: 14ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 13ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 7ms, proxy.ts: 14ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 46ms (next.js: 8ms, proxy.ts: 9ms, application-code: 29ms)
+ GET /api/activity/recent?limit=20 401 in 44ms (next.js: 13ms, proxy.ts: 16ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 13ms, proxy.ts: 13ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 71ms (next.js: 16ms, proxy.ts: 31ms, application-code: 24ms)
+ GET /api/activity/recent?limit=20 401 in 55ms (next.js: 16ms, proxy.ts: 17ms, application-code: 22ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 64ms (next.js: 10ms, proxy.ts: 9ms, application-code: 45ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 9ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 8ms, application-code: 16ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 9ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 10ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 50ms (next.js: 7ms, proxy.ts: 11ms, application-code: 32ms)
+ GET /api/activity/recent?limit=20 401 in 63ms (next.js: 20ms, proxy.ts: 29ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 47ms (next.js: 8ms, proxy.ts: 13ms, application-code: 26ms)
+ GET /api/activity/recent?limit=20 401 in 47ms (next.js: 14ms, proxy.ts: 18ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 24ms (next.js: 6ms, proxy.ts: 9ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 6ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 7ms, proxy.ts: 9ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 9ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 10ms, proxy.ts: 11ms, application-code: 19ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 9ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 10ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 10ms, proxy.ts: 17ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 7ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 47ms (next.js: 15ms, proxy.ts: 15ms, application-code: 17ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 8ms, proxy.ts: 13ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 6ms, proxy.ts: 12ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 10ms, proxy.ts: 13ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 6ms, proxy.ts: 7ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 12ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 5ms, proxy.ts: 9ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 25ms (next.js: 6ms, proxy.ts: 8ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 23ms (next.js: 6ms, proxy.ts: 7ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 6ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 8ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 7ms, proxy.ts: 12ms, application-code: 18ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 7ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 8ms, proxy.ts: 15ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 51ms (next.js: 13ms, proxy.ts: 17ms, application-code: 21ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 5ms, proxy.ts: 13ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 39ms (next.js: 11ms, proxy.ts: 14ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 10ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 12ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 7ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 9ms, application-code: 12ms)
+✓ Compiled in 766ms
+ GET /dashboard?view=mytasks 200 in 75ms (next.js: 20ms, application-code: 54ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 13ms, proxy.ts: 10ms, application-code: 10ms)
+✓ Compiled in 585ms
+ GET /dashboard?view=mytasks 200 in 68ms (next.js: 20ms, application-code: 48ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 8ms, application-code: 13ms)
+✓ Compiled in 267ms
+ GET /dashboard?view=mytasks 200 in 80ms (next.js: 21ms, application-code: 59ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 9ms, application-code: 10ms)
+✓ Compiled in 246ms
+ GET /dashboard?view=mytasks 200 in 70ms (next.js: 15ms, application-code: 55ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 10ms, application-code: 11ms)
+✓ Compiled in 225ms
+ GET /dashboard?view=mytasks 200 in 70ms (next.js: 16ms, application-code: 53ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+✓ Compiled in 358ms
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+ GET /api/activity/recent?limit=20 500 in 4.5s (next.js: 4.2s, proxy.ts: 9ms, application-code: 330ms)
+[browser] ./src/components/TrashView.tsx:432:1
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/TrashView.tsx:
+./src/components/TrashView.tsx:432:1
+  430 |     </div>
+  431 |   );
+> 432 | }
+      | ^
+  433 |
+
+Import traces:
+  Client Component Browser:
+    ./src/components/TrashView.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/TrashView.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+ GET /dashboard?view=mytasks 200 in 77ms (next.js: 23ms, application-code: 54ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 13ms)
+✓ Compiled in 250ms
+ GET /dashboard?view=mytasks 200 in 122ms (next.js: 27ms, application-code: 95ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 10ms, proxy.ts: 12ms, application-code: 13ms)
+✓ Compiled in 264ms
+ GET /dashboard?view=mytasks 200 in 76ms (next.js: 18ms, application-code: 58ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 10ms, proxy.ts: 9ms, application-code: 12ms)
+✓ Compiled in 239ms
+ GET /dashboard?view=mytasks 200 in 75ms (next.js: 19ms, application-code: 56ms)
+✓ Compiled in 224ms
+ GET /dashboard?view=mytasks 200 in 66ms (next.js: 18ms, application-code: 48ms)
+✓ Compiled in 238ms
+ GET /dashboard?view=mytasks 200 in 63ms (next.js: 18ms, application-code: 45ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 9ms, proxy.ts: 14ms, application-code: 14ms)
+✓ Compiled in 251ms
+ GET /dashboard?view=mytasks 200 in 72ms (next.js: 18ms, application-code: 54ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 7ms, proxy.ts: 15ms, application-code: 10ms)
+✓ Compiled in 241ms
+ GET /dashboard?view=mytasks 200 in 80ms (next.js: 23ms, application-code: 57ms)
+ GET /api/activity/recent?limit=20 401 in 38ms (next.js: 11ms, proxy.ts: 15ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 38ms (next.js: 10ms, proxy.ts: 12ms, application-code: 16ms)
+✓ Compiled in 231ms
+ GET /dashboard?view=mytasks 200 in 86ms (next.js: 21ms, application-code: 65ms)
+✓ Compiled in 326ms
+ GET /dashboard?view=mytasks 200 in 76ms (next.js: 18ms, application-code: 58ms)
+ GET /dashboard?view=mytasks 200 in 78ms (next.js: 18ms, application-code: 60ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+✓ Compiled in 630ms
+ GET /dashboard?view=mytasks 200 in 87ms (next.js: 28ms, application-code: 59ms)
+ GET /api/activity/recent?limit=20 401 in 92ms (next.js: 35ms, proxy.ts: 21ms, application-code: 36ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 11ms, application-code: 14ms)
+✓ Compiled in 498ms
+ GET /dashboard?view=mytasks 200 in 66ms (next.js: 19ms, application-code: 47ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 11ms, proxy.ts: 9ms, application-code: 11ms)
+✓ Compiled in 421ms
+ GET /dashboard?view=mytasks 200 in 73ms (next.js: 16ms, application-code: 56ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 9ms, proxy.ts: 9ms, application-code: 12ms)
+✓ Compiled in 400ms
+ GET /dashboard?view=mytasks 200 in 71ms (next.js: 22ms, application-code: 49ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 8ms, proxy.ts: 8ms, application-code: 11ms)
+✓ Compiled in 562ms
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+ GET /api/activity/recent?limit=20 500 in 62ms (next.js: 27ms, proxy.ts: 10ms, application-code: 24ms)
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-client] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/app/dashboard/page.tsx:66:1
+Error: Export purgeExpiredTasksLocal doesn't exist in target module
+  64 | ...
+  65 | ...";
+> 66 | ...oadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal }...
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  67 | ...
+  68 | ...{
+  69 | ...nguage } = useLanguage();
+
+The export purgeExpiredTasksLocal was not found in module [project]/src/lib/taskModel.ts [app-ssr] (ecmascript).
+Did you mean to import parseNaturalDate?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+ GET /dashboard?view=mytasks 200 in 79ms (next.js: 21ms, application-code: 58ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 11ms, proxy.ts: 12ms, application-code: 11ms)
+✓ Compiled in 2.3s
+ GET /dashboard?view=mytasks 200 in 61ms (next.js: 17ms, application-code: 44ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 12ms, application-code: 12ms)
+✓ Compiled in 1275ms
+ GET /dashboard?view=mytasks 200 in 59ms (next.js: 19ms, application-code: 40ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 10ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 11ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 13ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 10ms, application-code: 11ms)
+✓ Compiled in 373ms
+ GET /dashboard?view=mytasks 200 in 63ms (next.js: 18ms, application-code: 45ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 8ms, proxy.ts: 13ms, application-code: 12ms)
+✓ Compiled in 296ms
+ GET /dashboard?view=mytasks 200 in 73ms (next.js: 20ms, application-code: 52ms)
+✓ Compiled in 348ms
+ GET /dashboard?view=mytasks 200 in 62ms (next.js: 20ms, application-code: 42ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 12ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 12ms)
+✓ Compiled in 3.8s
+ GET /dashboard?view=mytasks 200 in 74ms (next.js: 20ms, application-code: 54ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 8ms, proxy.ts: 9ms, application-code: 12ms)
+✓ Compiled in 3.1s
+ GET /dashboard?view=mytasks 200 in 81ms (next.js: 18ms, application-code: 62ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 9ms, proxy.ts: 8ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 26ms (next.js: 6ms, proxy.ts: 11ms, application-code: 9ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 8ms, proxy.ts: 12ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 12ms, application-code: 13ms)
+✓ Compiled in 483ms
+ GET /dashboard?view=mytasks 200 in 65ms (next.js: 18ms, application-code: 48ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 7ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 9ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 37ms (next.js: 11ms, proxy.ts: 13ms, application-code: 13ms)
+✓ Compiled in 1033ms
+ GET /dashboard?view=mytasks 200 in 89ms (next.js: 18ms, application-code: 71ms)
+ GET /api/activity/recent?limit=20 401 in 52ms (next.js: 30ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 46ms (next.js: 19ms, proxy.ts: 13ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 10ms, proxy.ts: 9ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 10ms, proxy.ts: 10ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 9ms, application-code: 10ms)
+✓ Compiled in 974ms
+ GET /dashboard?view=mytasks 200 in 83ms (next.js: 22ms, application-code: 61ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 11ms, proxy.ts: 10ms, application-code: 13ms)
+✓ Compiled in 466ms
+ GET /dashboard?view=mytasks 200 in 61ms (next.js: 17ms, application-code: 44ms)
+ GET /api/integrations 401 in 37ms (next.js: 15ms, proxy.ts: 12ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 58ms (next.js: 32ms, proxy.ts: 12ms, application-code: 13ms)
+ GET /api/integrations 401 in 69ms (next.js: 36ms, proxy.ts: 18ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 86ms (next.js: 37ms, proxy.ts: 38ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 8ms, proxy.ts: 9ms, application-code: 11ms)
+✓ Compiled in 375ms
+ GET /dashboard?view=mytasks 200 in 71ms (next.js: 19ms, application-code: 52ms)
+ GET /api/activity/recent?limit=20 401 in 28ms (next.js: 9ms, proxy.ts: 8ms, application-code: 11ms)
+✓ Compiled in 276ms
+ GET /dashboard?view=mytasks 200 in 66ms (next.js: 20ms, application-code: 47ms)
+ GET /api/activity/recent?limit=20 401 in 30ms (next.js: 8ms, proxy.ts: 11ms, application-code: 11ms)
+✓ Compiled in 293ms
+ GET /dashboard?view=mytasks 200 in 98ms (next.js: 20ms, application-code: 78ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 9ms, proxy.ts: 9ms, application-code: 12ms)
+✓ Compiled in 345ms
+ GET /dashboard?view=mytasks 200 in 70ms (next.js: 21ms, application-code: 49ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 8ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 12ms, application-code: 11ms)
+✓ Compiled in 172ms
+ GET /dashboard?view=mytasks 200 in 57ms (next.js: 16ms, application-code: 41ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 9ms, proxy.ts: 8ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 27ms (next.js: 7ms, proxy.ts: 10ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 11ms, proxy.ts: 12ms, application-code: 11ms)
+✓ Compiled in 344ms
+ GET /dashboard?view=mytasks 200 in 61ms (next.js: 16ms, application-code: 45ms)
+ GET /api/activity/recent?limit=20 401 in 43ms (next.js: 18ms, proxy.ts: 11ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 34ms (next.js: 10ms, proxy.ts: 11ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 33ms (next.js: 11ms, proxy.ts: 10ms, application-code: 11ms)
+✓ Compiled in 4.2s
+ GET /dashboard?view=mytasks 200 in 76ms (next.js: 21ms, application-code: 56ms)
+ GET /api/activity/recent?limit=20 401 in 83ms (next.js: 29ms, proxy.ts: 18ms, application-code: 36ms)
+✓ Compiled in 5s
+ GET /dashboard?view=mytasks 200 in 83ms (next.js: 30ms, application-code: 53ms)
+ GET /api/activity/recent?limit=20 401 in 36ms (next.js: 15ms, proxy.ts: 10ms, application-code: 11ms)
+✓ Compiled in 379ms
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+ GET /api/activity/recent?limit=20 500 in 80ms (next.js: 26ms, proxy.ts: 11ms, application-code: 44ms)
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+[browser] ./src/components/Sidebar.tsx:1321:12
+Error: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Parsing ecmascript source code failed
+
+Generated code of loaders [next/dist/build/babel/loader] transform of file content of src/components/Sidebar.tsx:
+./src/components/Sidebar.tsx:1321:12
+  1319 |               )}
+  1320 |             </SidebarSection>
+> 1321 |           )}
+       |            ^
+  1322 |
+  1323 |           {/* Spacer */}
+  1324 |           <div className="flex-1" />
+
+Import traces:
+  Client Component Browser:
+    ./src/components/Sidebar.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/Sidebar.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component] 
+✓ Compiled in 2.5s
+ GET /dashboard?view=mytasks 200 in 79ms (next.js: 23ms, application-code: 56ms)
+ GET /api/activity/recent?limit=20 401 in 60ms (next.js: 35ms, proxy.ts: 13ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 45ms (next.js: 17ms, proxy.ts: 14ms, application-code: 14ms)
+ GET /api/activity/recent?limit=20 401 in 29ms (next.js: 7ms, proxy.ts: 11ms, application-code: 10ms)
+ GET /api/activity/recent?limit=20 401 in 32ms (next.js: 9ms, proxy.ts: 11ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 10ms, application-code: 12ms)
+ GET /api/activity/recent?limit=20 401 in 31ms (next.js: 8ms, proxy.ts: 11ms, application-code: 11ms)
+ GET /api/activity/recent?limit=20 401 in 35ms (next.js: 9ms, proxy.ts: 13ms, application-code: 13ms)
+✓ Compiled in 614ms
+ GET /dashboard?view=mytasks 200 in 73ms (next.js: 16ms, application-code: 57ms)
+ GET /api/integrations 401 in 53ms (next.js: 22ms, proxy.ts: 13ms, application-code: 19ms)
+ GET /api/activity/recent?limit=20 401 in 76ms (next.js: 45ms, proxy.ts: 17ms, application-code: 14ms)
+ GET /api/integrations 401 in 52ms (next.js: 17ms, proxy.ts: 20ms, application-code: 15ms)
+ GET /api/activity/recent?limit=20 401 in 72ms (next.js: 35ms, proxy.ts: 23ms, application-code: 14ms)
+✓ Compiled in 526ms
+ GET /dashboard?view=mytasks 200 in 71ms (next.js: 19ms, application-code: 51ms)
+ GET /api/activity/recent?limit=20 401 in 68ms (next.js: 39ms, proxy.ts: 15ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 40ms (next.js: 13ms, proxy.ts: 14ms, application-code: 13ms)
+ GET /api/activity/recent?limit=20 401 in 65ms (next.js: 24ms, proxy.ts: 17ms, application-code: 23ms)
+ GET /api/activity/recent?limit=20 401 in 50ms (next.js: 14ms, proxy.ts: 19ms, application-code: 17ms)
+⨯ ./src/app/dashboard/page.tsx:54:1
+Error: Module not found: Can't resolve '../../components/OnboardingChecklist'
+  [90m52 |[0m [36mimport[0m [33mTemplateGalleryModal[0m [36mfrom[0m [32m"../../components/TemplateGalleryModal"[0m;
+  [90m53 |[0m [36mimport[0m [33mOnboardingModal[0m [36mfrom[0m [32m"../../components/OnboardingModal"[0m;
+[31m[1m>[0m [90m54 |[0m [36mimport[0m [33mOnboardingChecklist[0m [36mfrom[0m [32m"../../components/OnboardingChecklist"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m [36mimport[0m { motion, [33mAnimatePresence[0m } [36mfrom[0m [32m"framer-motion"[0m;
+  [90m56 |[0m [36mimport[0m [33mAIPanel[0m [36mfrom[0m [32m"../../components/AIPanel"[0m;
+  [90m57 |[0m [36mimport[0m [33mNotificationBell[0m [36mfrom[0m [32m"../../components/NotificationBell"[0m;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/dashboard/page.tsx:54:1
+Error: Module not found: Can't resolve '../../components/OnboardingChecklist'
+  [90m52 |[0m [36mimport[0m [33mTemplateGalleryModal[0m [36mfrom[0m [32m"../../components/TemplateGalleryModal"[0m;
+  [90m53 |[0m [36mimport[0m [33mOnboardingModal[0m [36mfrom[0m [32m"../../components/OnboardingModal"[0m;
+[31m[1m>[0m [90m54 |[0m [36mimport[0m [33mOnboardingChecklist[0m [36mfrom[0m [32m"../../components/OnboardingChecklist"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m [36mimport[0m { motion, [33mAnimatePresence[0m } [36mfrom[0m [32m"framer-motion"[0m;
+  [90m56 |[0m [36mimport[0m [33mAIPanel[0m [36mfrom[0m [32m"../../components/AIPanel"[0m;
+  [90m57 |[0m [36mimport[0m [33mNotificationBell[0m [36mfrom[0m [32m"../../components/NotificationBell"[0m;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/dashboard/page.tsx:54:1
+Error: Module not found: Can't resolve '../../components/OnboardingChecklist'
+  [90m52 |[0m [36mimport[0m [33mTemplateGalleryModal[0m [36mfrom[0m [32m"../../components/TemplateGalleryModal"[0m;
+  [90m53 |[0m [36mimport[0m [33mOnboardingModal[0m [36mfrom[0m [32m"../../components/OnboardingModal"[0m;
+[31m[1m>[0m [90m54 |[0m [36mimport[0m [33mOnboardingChecklist[0m [36mfrom[0m [32m"../../components/OnboardingChecklist"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m [36mimport[0m { motion, [33mAnimatePresence[0m } [36mfrom[0m [32m"framer-motion"[0m;
+  [90m56 |[0m [36mimport[0m [33mAIPanel[0m [36mfrom[0m [32m"../../components/AIPanel"[0m;
+  [90m57 |[0m [36mimport[0m [33mNotificationBell[0m [36mfrom[0m [32m"../../components/NotificationBell"[0m;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/dashboard/page.tsx:54:1
+Error: Module not found: Can't resolve '../../components/OnboardingChecklist'
+  [90m52 |[0m [36mimport[0m [33mTemplateGalleryModal[0m [36mfrom[0m [32m"../../components/TemplateGalleryModal"[0m;
+  [90m53 |[0m [36mimport[0m [33mOnboardingModal[0m [36mfrom[0m [32m"../../components/OnboardingModal"[0m;
+[31m[1m>[0m [90m54 |[0m [36mimport[0m [33mOnboardingChecklist[0m [36mfrom[0m [32m"../../components/OnboardingChecklist"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m55 |[0m [36mimport[0m { motion, [33mAnimatePresence[0m } [36mfrom[0m [32m"framer-motion"[0m;
+  [90m56 |[0m [36mimport[0m [33mAIPanel[0m [36mfrom[0m [32m"../../components/AIPanel"[0m;
+  [90m57 |[0m [36mimport[0m [33mNotificationBell[0m [36mfrom[0m [32m"../../components/NotificationBell"[0m;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/dashboard/page.tsx [Client Component Browser]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/dashboard/page.tsx [Client Component SSR]
+    ./src/app/dashboard/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ GET /dashboard 200 in 1464ms (next.js: 244ms, application-code: 1219ms)
+ GET /dashboard?page=test123 200 in 151ms (next.js: 11ms, application-code: 140ms)
+ GET /dashboard?view=mytasks 200 in 142ms (next.js: 11ms, application-code: 132ms)
+ GET /dashboard?trash=1 200 in 117ms (next.js: 10ms, application-code: 108ms)
+ GET /tasks 200 in 1874ms (next.js: 1800ms, application-code: 74ms)
+ GET /calendar 200 in 1022ms (next.js: 898ms, application-code: 124ms)
+ GET /notes 200 in 675ms (next.js: 600ms, application-code: 76ms)
+ GET /dashboard?page=xyz789 200 in 330ms (next.js: 91ms, application-code: 238ms)
+ GET /dashboard 200 in 265ms (next.js: 15ms, application-code: 250ms)
+ GET /dashboard?page=abc&focusTitle=1 200 in 164ms (next.js: 12ms, application-code: 152ms)
+ GET /dashboard?trash=1&page=zzz 200 in 186ms (next.js: 33ms, application-code: 153ms)
+ GET /dashboard 200 in 171ms (next.js: 16ms, application-code: 155ms)
+ GET /dashboard?page=pg1 200 in 150ms (next.js: 12ms, application-code: 138ms)
+ GET /dashboard?view=mytasks 200 in 123ms (next.js: 11ms, application-code: 113ms)
+ GET /dashboard?trash=1 200 in 120ms (next.js: 12ms, application-code: 108ms)
+ GET /dashboard?page=pg2&focusTitle=1 200 in 140ms (next.js: 10ms, application-code: 131ms)
+ GET /dashboard?page=pg3&view=mytasks&focusTitle=1 200 in 121ms (next.js: 10ms, application-code: 111ms)
+⨯ Error: Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering.
+    at useAIChat (src\lib\aiChatStore.ts:220:30)
+    at AIPanel (src\components\AIPanel.tsx:341:53)
+  218 |
+  219 | function useAIChat(): Snapshot {
+> 220 |   return useSyncExternalStore(subscribe, getSnapshot);
+      |                              ^
+  221 | }
+  222 |
+  223 | export function createAIChatController(opts: { {
+  digest: '2025888509'
+}
+ GET /dashboard?ai=1&page=pg4&focusTitle=1 200 in 831ms (next.js: 11ms, application-code: 820ms)
+ GET /dashboard 200 in 152ms (next.js: 10ms, application-code: 142ms)
+ GET /dashboard?view=mytasks 200 in 114ms (next.js: 11ms, application-code: 103ms)
+ GET /dashboard?page=zzz&focusTitle=1 200 in 126ms (next.js: 11ms, application-code: 115ms)
+ GET /dashboard?view=mytasks 200 in 129ms (next.js: 12ms, application-code: 118ms)
+ GET /dashboard 200 in 131ms (next.js: 11ms, application-code: 120ms)
+ GET /dashboard?trash=1 200 in 128ms (next.js: 8ms, application-code: 119ms)
+ GET /dashboard?page=icontest 200 in 177ms (next.js: 17ms, application-code: 160ms)
+ GET /dashboard 200 in 176ms (next.js: 11ms, application-code: 165ms)
+ GET /dashboard?view=mytasks 200 in 154ms (next.js: 11ms, application-code: 143ms)
+Error: Cannot apply unknown utility class `bg-landing-surface`
+    [2m[at onInvalidCandidate (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:21:1511)][0m
+    [2m[at Ee (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:16:37066)][0m
+    [2m[at C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:21:355][0m
+    [2m[at _r (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:3:1733)][0m
+    [2m[at I (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:3:1377)][0m
+    [2m[at Te (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:21:172)][0m
+    [2m[at mn (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:38:294)][0m
+    [2m[at async gn (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\tailwindcss\dist\lib.js:38:631)][0m
+    [2m[at async Xr (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\@tailwindcss\node\dist\index.js:10:3416)][0m
+    [2m[at async N (C:\Users\Utente\Documents\Vertex\Taskly\node_modules\@tailwindcss\postcss\dist\index.js:10:3979)][0m

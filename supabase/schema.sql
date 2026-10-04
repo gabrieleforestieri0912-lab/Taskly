@@ -1,9 +1,3 @@
--- ============================================================================
--- Taskly — Supabase schema (replaces MongoDB + Mongoose)
--- Run this file in the Supabase SQL editor (or via `supabase db push`).
--- It is idempotent: safe to run multiple times.
--- ============================================================================
-
 -- Extensions ---------------------------------------------------------------
 create extension if not exists "pgcrypto";   -- gen_random_uuid()
 create extension if not exists "vector";     -- pgvector (semantic search)
