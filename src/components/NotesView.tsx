@@ -11,6 +11,7 @@ import {
   EditableTitle,
   Skeleton,
 } from "./UIComponents";
+import PageHeader from "./PageHeader";
 import { encryptText, decryptText } from "../lib/crypto";
 import {
   Trash2,
@@ -1230,6 +1231,9 @@ export default function NotesView({
   onAddPage,
   activePageId,
   allPages = [] as any[],
+  page,
+  onIconChange,
+  minimalChrome = false,
 }) {
   const { t, tWith } = useLanguage();
   if (loading) {
@@ -1529,13 +1533,9 @@ export default function NotesView({
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto h-full flex flex-col gap-4 pb-8"
     >
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+      {/* Header: icona + titolo inline (Notion-style). Cromature nascoste in minimal. */}
+      {!minimalChrome && (
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {/* Publish */}
           <button
             onClick={togglePublish}
@@ -1572,7 +1572,18 @@ export default function NotesView({
           >
             <LucideIcons.Save size={12} />{t("views.notesSaveVersion")}</button>
         </div>
-      </div>
+      )}
+
+      {/* Titolo inline con icona. In modalità `minimalChrome` (pagina vuota) il
+          dashboard NON rende il proprio header, quindi questo è l'unico header. */}
+      {minimalChrome && onRename && page && (
+        <PageHeader
+          page={page}
+          title={title}
+          onRename={(next) => onRename(next)}
+          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+        />
+      )}
 
       {/* Version history drawer */}
       <AnimatePresence>

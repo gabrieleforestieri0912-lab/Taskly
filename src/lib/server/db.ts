@@ -779,12 +779,17 @@ function pageRowFromPayload(userId: string, page: any, order: number) {
   PAGE_META_KEYS.forEach((k) => {
     if (page[k] !== undefined) meta[k] = page[k];
   });
+  // Icona: "" = rimossa di proposito → salva NULL (nessuna icona).
+  // undefined/null = non specificata → lascia il default esistente in update,
+  // "layout-dashboard" in insert. MAI forzare un fallback che resuscita l'icona.
+  const iconValue =
+    page.icon === "" ? null : (page.icon ?? "layout-dashboard");
   return {
     id: String(page.id),
     user_id: userId,
     type: page.type,
     label: page.label == null ? "" : String(page.label),
-    icon: page.icon || "layout-dashboard",
+    icon: iconValue,
     icon_color: page.iconColor || "text-gray-400",
     parent_id: page.parentId == null ? null : String(page.parentId),
     purpose: page.purpose == null ? null : page.purpose,
@@ -863,26 +868,38 @@ async function createPageRow(userId: string, page: any) {
 
 async function updatePageRow(userId: string, id: string, patch: any) {
   const supabase = getSupabase();
-  const current = pageRowFromPayload(userId, { ...patch, id }, 0);
+  // PATCH reale: aggiorna SOLO i campi presenti in `patch`.
+  // La vecchia versione ricostruiva l'intera riga da patch → label/type/data
+  // diventavano undefined e il cambio icona veniva "perso" (sovrascritto).
+  const updates: Record<string, any> = {
+    updated_at: new Date().toISOString(),
+  };
+  if (patch.type !== undefined) updates.type = patch.type;
+  if (patch.label !== undefined)
+    updates.label = patch.label == null ? "" : String(patch.label);
+  if (patch.icon !== undefined)
+    updates.icon = patch.icon === "" ? null : patch.icon;
+  if (patch.iconColor !== undefined)
+    updates.icon_color = patch.iconColor || "text-gray-400";
+  if (patch.parentId !== undefined)
+    updates.parent_id =
+      patch.parentId == null ? null : String(patch.parentId);
+  if (patch.purpose !== undefined)
+    updates.purpose = patch.purpose == null ? null : patch.purpose;
+  if (patch.isTemplate !== undefined)
+    updates.is_template = Boolean(patch.isTemplate);
+  if (patch.data !== undefined)
+    updates.data = patch.data == null ? null : patch.data;
+  const meta: Record<string, any> = {};
+  PAGE_META_KEYS.forEach((k) => {
+    if (patch[k] !== undefined) meta[k] = patch[k];
+  });
+  if (Object.keys(meta).length > 0) updates.meta = meta;
+  if (patch.sortOrder !== undefined) updates.sort_order = patch.sortOrder;
+  else if (patch.order !== undefined) updates.sort_order = patch.order;
   const { data, error } = await supabase
     .from("pages")
-    .update({
-      type: current.type,
-      label: current.label,
-      icon: current.icon,
-      icon_color: current.icon_color,
-      parent_id: current.parent_id,
-      purpose: current.purpose,
-      is_template: current.is_template,
-      data: current.data,
-      meta: current.meta,
-      ...(patch.sortOrder !== undefined
-        ? { sort_order: patch.sortOrder }
-        : patch.order !== undefined
-          ? { sort_order: patch.order }
-          : {}),
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq("user_id", userId)
     .eq("id", String(id))
     .select("*")

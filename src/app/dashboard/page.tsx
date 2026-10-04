@@ -57,6 +57,8 @@ import AIPanel from "../../components/AIPanel";
 import NotificationBell from "../../components/NotificationBell";
 import { useUserData } from "../../hooks/useUserData";
 import { apiFetch } from "../../lib/api";
+import { normalizeIconKey, resolvePageIcon } from "../../lib/pageIcons";
+import { getCatalogIcon } from "../../lib/lucideCatalog";
 import { useLanguage } from "../../lib/LanguageContext";
 import { applyTheme, readTheme } from "../../lib/theme";
 import { PageTemplate, saveCustomTemplate } from "../../lib/templates";
@@ -191,22 +193,6 @@ function DashboardContent() {
   const [hoverIcon, setHoverIcon] = useState<string | null>(null);
   // Allow applying color without closing menu
   const [pendingIconColor, setPendingIconColor] = useState<string | null>(null);
-
-  const ICON_MAP = {
-    "layout-dashboard": LayoutDashboard,
-    "list-todo": ListTodo,
-    target: Target,
-    calendar: Calendar,
-    "file-text": FileText,
-    lightbulb: Lightbulb,
-    "briefcase-business": BriefcaseBusiness,
-    users: Users,
-    layers: Layers,
-    "book-open": BookOpen,
-    "clipboard-list": ClipboardList,
-    rocket: Rocket,
-  };
-  const ICON_OPTIONS = Object.keys(ICON_MAP);
   // Manual category mapping for common lucide icon names. If an icon
   // isn't present here we fall back to the heuristic regexes used before.
   const ICON_CATEGORY_MAP = {
@@ -336,12 +322,11 @@ function DashboardContent() {
   }, []);
 
   // Resolve an icon name to a component, with a safe fallback for unknown names.
+  // Accetta sia kebab-case ("file-text") sia PascalCase ("FileText") grazie al
+  // catalogo completo in lib/lucideCatalog.
   const renderIcon = (name, props) => {
-    const Comp = typeof name === "string" ? LucideIcons[name] : null;
-    const isComponent =
-      typeof Comp === "function" ||
-      (Comp && typeof Comp === "object" && (Comp as any).render);
-    return React.createElement(isComponent ? Comp : LayoutDashboard, props);
+    const Comp = getCatalogIcon(name);
+    return React.createElement(Comp || LayoutDashboard, props);
   };
 
   const COLOR_OPTIONS = [
@@ -442,7 +427,12 @@ function DashboardContent() {
       id: newPageId,
       type: pageType,
       label: pageLabel,
-      icon: pageConfig.iconName || pageConfig.icon || "layout-dashboard",
+      // Per la pagina vuota NON impostiamo un'icona di default: così il
+      // PageHeader mostra il placeholder neutro e l'utente sceglie la sua.
+      icon:
+        pageConfig.iconName ||
+        pageConfig.icon ||
+        (pageType === "empty" ? "" : "layout-dashboard"),
       parentId: pageConfig.parentId || null,
       order: pages.filter((p) => !p.parentId).length,
       purpose: pageConfig.purpose || null,
@@ -891,11 +881,8 @@ function DashboardContent() {
                   >
                     <span className="flex items-center gap-2">
                       {(() => {
-                        const rawIcon = c.icon;
                         const IconComp =
-                          (typeof rawIcon === "string" && rawIcon
-                            ? LucideIcons[rawIcon] || ICON_MAP[rawIcon]
-                            : null) || LayoutDashboard;
+                          resolvePageIcon(c) || LayoutDashboard;
                         return (
                           <IconComp
                             size={14}
@@ -1001,6 +988,13 @@ function DashboardContent() {
             onAddPage={addPage}
             activePageId={effectivePage.id}
             allPages={pages}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
           />,
         );
       }
@@ -1053,6 +1047,13 @@ function DashboardContent() {
             activePageId={effectivePage.id}
             allPages={pages}
             loading={loading}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
           />,
         );
       }
@@ -1505,7 +1506,16 @@ const ensureTab = React.useCallback((page: any) => {
 
         </div>
         <div className={`p-3 md:p-6 ${activePage?.font && activePage.font !== "system-ui" ? activePage.font === "serif" ? "font-serif" : activePage.font === "monospace" ? "font-mono" : "font-serif" : ""}`}>
-          {activePageId && activePage && !loading && (
+          {/*
+            Header del dashboard (icona + breadcrumbs + titolo + menu azioni).
+            NASCOSTO per la pagina vuota ("empty"): quella vista ora ha un
+            header proprio (PageHeader: icona+titolo inline) e l'utente non
+            vuole le cromature/impostazioni sopra al foglio.
+          */}
+          {activePageId &&
+            activePage &&
+            !loading &&
+            (activePage.type || activeType || "tasks") !== "empty" && (
             <div className="mb-6 flex items-start gap-4 group relative">
               <div className="relative">
                 <button
@@ -1520,18 +1530,10 @@ const ensureTab = React.useCallback((page: any) => {
                     // instead of handing React an invalid element type.
                     if (React.isValidElement(rawIcon)) return rawIcon;
 
-                    const name = typeof rawIcon === "string" ? rawIcon : "";
-                    const looked = name
-                      ? LucideIcons[name] || ICON_MAP[name]
-                      : null;
-                    const isComponent =
-                      typeof looked === "function" ||
-                      (looked && typeof looked === "object" && (looked as any).render);
-
-                    return React.createElement(
-                      isComponent ? looked : LayoutDashboard,
-                      { size: 24 },
-                    );
+                    const Comp = getCatalogIcon(rawIcon);
+                    return React.createElement(Comp || LayoutDashboard, {
+                      size: 24,
+                    });
                   })()}
                 </button>
 
@@ -1635,12 +1637,18 @@ const ensureTab = React.useCallback((page: any) => {
                               onMouseEnter={() => setHoverIcon(iconName)}
                               onMouseLeave={() => setHoverIcon(null)}
                               onClick={() => {
-                                updatePage(activePage.id, { icon: iconName });
+                                // Salva SEMPRE la chiave kebab normalizzata:
+                                // prima veniva salvato il PascalCase ("FileText")
+                                // che non combaciava con ICON_MAP → icona persa.
+                                const key =
+                                  normalizeIconKey(iconName) ?? iconName;
+                                updatePage(activePage.id, { icon: key });
                                 setIsIconMenuOpen(false);
                               }}
                               title={iconName}
                               className={`h-12 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all text-xs p-2 ${
-                                String(activePage.icon) === iconName
+                                normalizeIconKey(activePage.icon) ===
+                                normalizeIconKey(iconName)
                                   ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600"
                                   : "border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                               }`}

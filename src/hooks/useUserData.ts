@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "../lib/api";
+import { normalizeIconKey } from "../lib/pageIcons";
 
 export function useUserData() {
   const [user, setUser] = useState<{
@@ -28,11 +29,20 @@ export function useUserData() {
         setGoals(data.goals || []);
         setIdeas(data.ideas || []);
         const rawPages = data.pages || [];
-        const sanitizedPages = rawPages.map((page: any) => ({
-          ...page,
-          icon:
-            typeof page.icon === "string" ? page.icon : "layout-dashboard",
-        }));
+        const sanitizedPages = rawPages.map((page: any) => {
+          // Icona: normalizza ma NON forzare un fallback.
+          // undefined = "nessuna icona scelta" → il renderer usa il fallback per tipo.
+          // "" esplicito = "icona rimossa" → mantieni "" così resta senza icona.
+          const rawIcon = page.icon;
+          const icon =
+            rawIcon === ""
+              ? ""
+              : (normalizeIconKey(rawIcon) ??
+                (typeof rawIcon === "string" && rawIcon.trim()
+                  ? rawIcon.trim()
+                  : undefined));
+          return { ...page, icon };
+        });
         setPages(sanitizedPages);
         setPlannerMeta(data.plannerMeta || {});
         setPlan(data.plan || null);

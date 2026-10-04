@@ -11,6 +11,8 @@ export default function EmptyPageView({
   activePageId,
   allPages = [] as any[],
   loading = false,
+  page,
+  onIconChange,
 }) {
   // If the page already uses the block format, pass through. Otherwise normalize.
   const normalized =
@@ -53,6 +55,9 @@ export default function EmptyPageView({
         activePageId={activePageId}
         allPages={allPages}
         loading={loading}
+        page={page}
+        onIconChange={onIconChange}
+        minimalChrome
       />
     </div>
   );
