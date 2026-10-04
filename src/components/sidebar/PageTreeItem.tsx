@@ -30,6 +30,7 @@ export interface PageTreeItemProps {
   onUpdatePage?: (id: string, updates: any) => void;
   onDuplicatePage?: (page: any) => void;
   onStartRename?: (page: any) => void;
+  onOpenPage?: (page: any) => void;
 }
 
 export function PageTreeItem({
@@ -45,9 +46,18 @@ export function PageTreeItem({
   onUpdatePage,
   onDuplicatePage,
   onStartRename,
+  onOpenPage,
 }: PageTreeItemProps) {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
+
+  // Notifica l'apertura PRIMA di navigare, così la scheda esiste già.
+  const goToPage = () => {
+    try {
+      onOpenPage && onOpenPage(page);
+    } catch {}
+    router.push(`/dashboard?page=${page.id}`);
+  };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -173,7 +183,7 @@ export function PageTreeItem({
     } else if (e.key === "Enter" || e.key === " ") {
       if ((e.target as HTMLElement).tagName !== "BUTTON" && !isEditing) {
         e.preventDefault();
-        router.push(`/dashboard?page=${page.id}`);
+        goToPage();
       }
     }
   };
@@ -296,6 +306,11 @@ export function PageTreeItem({
           <Link
             href={`/dashboard?page=${page.id}`}
             draggable
+            onClick={() => {
+              try {
+                onOpenPage && onOpenPage(page);
+              } catch {}
+            }}
             onDragStart={(e) => {
               e.dataTransfer.setData("text/plain", String(page.id));
               e.dataTransfer.effectAllowed = "move";

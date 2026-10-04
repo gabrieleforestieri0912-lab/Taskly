@@ -100,6 +100,7 @@ export default function Sidebar({
   isModalOpen = false,
   setIsModalOpen = (..._args: any[]) => {},
   onOpenTemplateGallery = () => {},
+  onOpenPage = (..._args: any[]) => {},
   isSidebarOpen,
   setIsSidebarOpen,
   theme,
@@ -109,6 +110,14 @@ export default function Sidebar({
   const router = useRouter();
   const pathname = usePathname();
   const { t, language, setLanguage } = useLanguage();
+
+  // Apri la scheda per la pagina di destinazione PRIMA di navigare, così la
+  // tab esiste già quando cambia l'URL (nessun "buco" visivo nell'header).
+  const goToPage = (page: any) => {
+    if (!page || page.id === undefined || page.id === null) return;
+    onOpenPage(page);
+    router.push(`/dashboard?page=${page.id}`);
+  };
   const [localUser, setLocalUser] = useState({
     name: "Utente",
     email: "utente@esempio.it",
@@ -1274,11 +1283,8 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                     setIsTranscriptionMode(false);
                     setIsAIActive(false);
                     const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
-                    if (calPage) {
-                      router.push(`/dashboard?page=${calPage.id}`);
-                    } else {
-                      router.push("/calendar");
-                    }
+                    if (calPage) goToPage(calPage);
+                    else router.push("/calendar");
                   },
                 },
               ]}
@@ -1291,11 +1297,8 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
               setIsTranscriptionMode(false);
               setIsAIActive(false);
               const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
-              if (calPage) {
-                router.push(`/dashboard?page=${calPage.id}`);
-              } else {
-                router.push("/calendar");
-              }
+              if (calPage) goToPage(calPage);
+              else router.push("/calendar");
             }}
           />
 
@@ -1415,6 +1418,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                       onDeletePage={(id) => setPendingDelete({ id })}
                       onUpdatePage={onUpdatePage}
                       onDuplicatePage={handleDuplicatePage}
+                      onOpenPage={onOpenPage}
                     />
                   ))}
                 </ul>
@@ -1591,7 +1595,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                             <button
                               key={page.id}
                               onClick={() => {
-                                router.push(`/dashboard?page=${page.id}`);
+                                goToPage(page);
                                 setIsSearchOpen(false);
                               }}
                               className="w-full flex items-center justify-between px-3 py-2 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"
@@ -1644,7 +1648,7 @@ if (isMoreOpen && moreRef.current && typeof document !== "undefined") {
                             <button
                               key={page.id}
                               onClick={() => {
-                                router.push(`/dashboard?page=${page.id}`);
+                                goToPage(page);
                                 setIsSearchOpen(false);
                               }}
                               className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-left hover:bg-cyan-50 dark:hover:bg-cyan-950/20 text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-xl transition-all duration-200 group"

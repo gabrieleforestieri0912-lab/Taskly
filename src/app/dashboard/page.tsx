@@ -1180,26 +1180,80 @@ function DashboardContent() {
     );
   };
 
-  useEffect(() => {
-    if (!activePage) return;
-    const timeout = setTimeout(() => {
-      setOpenTabs((prev) =>
-        prev.some((tab) => String(tab.id) === String(activePage.id))
-          ? prev
-          : [...prev, activePage],
-      );
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [activePage]);
+  // ── Tab aperte: derivazione + sincronizzazione ────────────────────────
+// FLUSSO:
+//  - `openTabs` è lo stato persistito (localStorage) delle schede.
+//  - `tabs` è la vista effettiva: union di openTabs + pagina attiva quando
+//    questa non è ancora stata registrata. In questo modo la scheda appare
+//    immediatamente al click, senza aspettare i setState asincroni.
+//
+// CORREZIONI:
+//  1. La tab si apre da [activePageId, activePage] invece che solo
+//     [activePage]: con Link client-side la pagina può non essere pronta al
+//     primo render, e prima il click non creava mai la scheda.
+//  2. Il filtro delle tab rimosse ignora i render con pages vuota: prima,
+//     su navigazione con dati non pronti, cancellava le tab persistite
+//     (URL con ?page= esistente ma scheda sparita dall'header).
+const tabEntryForPage = (page: any) =>
+  page && page.id !== undefined && page.id !== null
+    ? { id: page.id, type: page.type, label: page.label }
+    : null;
 
-  // Remove tabs whose page no longer exists. Gated on hasLoadedUserData because
-  // `pages` starts as [] during the initial fetch: without this gate the filter
-  // would run against an empty array and wipe every persisted tab.
+const openTabForPage = React.useCallback(() => {
+  if (!activePageId) return null;
+  if (activePage) return tabEntryForPage(activePage);
+  const fromTabs = openTabs.find(
+    (tab) => String(tab.id) === String(activePageId),
+  );
+  if (fromTabs) return tabEntryForPage(fromTabs);
+  const fromPages = (pages || []).find(
+    (page) => String(page.id) === String(activePageId),
+  );
+  return tabEntryForPage(fromPages);
+}, [activePageId, activePage, openTabs, pages]);
+
+const tabs = React.useMemo(() => {
+  const fallback = openTabForPage();
+  if (fallback && !openTabs.some((tab) => String(tab.id) === String(fallback.id))) {
+    return [...openTabs, fallback];
+  }
+  return openTabs;
+}, [openTabs, openTabForPage]);
+
+// Apre/aggiorna la scheda per una pagina. La Sidebar e le viste figlie la
+// chiamano PRIMA di navigare, così la scheda esiste già al cambio URL.
+const ensureTab = React.useCallback((page: any) => {
+  const entry = tabEntryForPage(page);
+  if (!entry) return;
+  setOpenTabs((prev) => {
+    const idx = prev.findIndex((tab) => String(tab.id) === String(entry.id));
+    if (idx === -1) return [...prev, entry];
+    // aggiorna label/tipo se la pagina è stata rinominata
+    if (prev[idx]?.label === entry.label && prev[idx]?.type === entry.type) return prev;
+    const next = [...prev];
+    next[idx] = { ...prev[idx], ...entry };
+    return next;
+  });
+}, []);
+
+// Sincronizza lo stato persistito con la pagina attiva.
+// Scatta ad ogni cambio di activePageId o activePage: con le navigazioni
+// client-side (Link/push) la pagina può non essere pronta al primo render,
+// quindi la chiave include entrambi.
+  useEffect(() => {
+    const entry = openTabForPage();
+    if (!entry) return;
+    ensureTab(entry);
+  }, [activePageId, openTabForPage, ensureTab]);
+
+  // Remove tabs whose page no longer exists. Oltre al gate su
+  // hasLoadedUserData, ignora i render con pages vuota: su navigazione con
+  // dati non pronti il filtro cancellerebbe le tab persistite.
   useEffect(() => {
     if (!hasLoadedUserData) return;
-    const knownIds = new Set(
-      (Array.isArray(pages) ? pages : []).map((page) => String(page.id)),
-    );
+    const cur = Array.isArray(pages) ? pages : [];
+    if (cur.length === 0) return;
+    const knownIds = new Set(cur.map((page) => String(page.id)));
     setOpenTabs((prev) => {
       const next = prev.filter((tab) => knownIds.has(String(tab.id)));
       // Keep the previous reference when nothing changed to avoid a re-render loop.
@@ -1363,6 +1417,7 @@ function DashboardContent() {
                 onAddPage={addPage}
                 onDeletePage={deletePage}
                 onUpdatePage={(id, updates) => updatePage(id, updates)}
+                onOpenPage={ensureTab}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 onOpenTemplateGallery={() => setIsTemplateGalleryOpen(true)}
@@ -1402,8 +1457,8 @@ function DashboardContent() {
               <LayoutDashboard size={14} className="shrink-0" />
               <span>Analitiche</span>
             </Link>
-            {mounted && openTabs.length > 0 ? (
-              openTabs.map((tab) => (
+            {mounted && tabs.length > 0 ? (
+              tabs.map((tab) => (
                 <Link
                   key={tab.id}
                   href={`/dashboard?page=${tab.id}`}
