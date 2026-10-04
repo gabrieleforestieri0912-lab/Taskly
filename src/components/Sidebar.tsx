@@ -46,6 +46,7 @@ import {
   Sliders,
   Download,
   Key,
+  Send,
 } from "lucide-react";
 import { SidebarSection } from "./sidebar/SidebarSection";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
