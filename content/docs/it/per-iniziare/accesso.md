@@ -9,7 +9,7 @@ status: "stable"
 updated: "2026-10-05"
 ---
 
-Taskly usa Supabase Auth per l'autenticazione. Il progetto documenta l'accesso con email e password e il provider Google; la schermata consente di registrarsi e accedere dalle route dedicate.
+La pagina di accesso invia email e password al servizio di autenticazione. Se Google è configurato nell'app, puoi anche accedere con Google.
 
 ## Dove trovi accesso e registrazione
 
@@ -19,27 +19,23 @@ Taskly usa Supabase Auth per l'autenticazione. Il progetto documenta l'accesso c
 ## Accedere a Taskly
 
 :::steps
-1. Apri la pagina di [accesso](/login).
-2. Usa il metodo disponibile nella schermata.
-3. Dopo l'accesso, apri la dashboard.
+1. Apri [`/login`](/login).
+2. Inserisci email e password e seleziona **Accedi**; se l'opzione Google è disponibile, puoi completare l'accesso da lì.
+3. Se la richiesta riesce, Taskly memorizza i token di sessione nel browser e apre la dashboard.
 :::
 
 :::callout warning
-{{DA VERIFICARE: verificare i campi, l'ordine del flusso, i messaggi di errore, la conferma email e il recupero password mostrati nella schermata attuale.}}
+Il link **Password dimenticata?** nella schermata punta attualmente a `#` e non avvia un flusso di recupero password.
 :::
 
 ## Creare un account
 
-:::steps
-1. Apri la pagina di [registrazione](/register).
-2. Completa i passaggi presentati dal modulo.
-3. Segui le eventuali indicazioni mostrate dopo l'invio.
-:::
+Per i passaggi dettagliati consulta [Registrarsi](/docs/per-iniziare/registrazione).
 
 :::callout note
-Il codice del progetto indica email/password e Google come metodi configurati. {{DA VERIFICARE: verificare quali metodi sono effettivamente esposti e attivi nell'interfaccia distribuita.}}
+La disponibilità del pulsante Google dipende dalla configurazione `NEXT_PUBLIC_GOOGLE_CLIENT_ID`; il server può inoltre richiedere la conferma dell'email.
 :::
 
 ## Problemi comuni
 
-Se il login segnala che l'email non è stata confermata, l'API suggerisce di controllare la casella di posta. Le opzioni di conferma dipendono dalla configurazione del progetto Supabase.
+Se l'accesso fallisce, la schermata mostra il messaggio restituito dal servizio oppure un messaggio generico. Se viene richiesta la conferma dell'email, controlla la casella di posta. {{DA VERIFICARE: criteri password e conferma email variano con la configurazione server.}}

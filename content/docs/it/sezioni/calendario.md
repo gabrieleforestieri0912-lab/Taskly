@@ -29,5 +29,5 @@ Il Calendario è disponibile come pagina di tipo Calendario nella dashboard e tr
 Puoi contrassegnare gli elementi come completati, aggiornarli o eliminarli. La pagina include inoltre aree di focus e note giornaliere.
 
 :::callout warning
-La scheda Google Calendar nella sidebar offre un punto d'accesso all'integrazione. {{DA VERIFICARE: confermare quali operazioni sincronizzano eventi con il provider esterno; la vista di calendario locale non prova da sola la sincronizzazione.}}
+La vista Calendario salva gli elementi nel contenuto della pagina locale. La scheda Google Calendar nella sidebar è un collegamento all'integrazione: il codice di questa vista non sincronizza automaticamente le scadenze con Google Calendar. Per collegare un account consulta [Collegare le integrazioni](/docs/sezioni/integrazioni).
 :::

@@ -29,7 +29,7 @@ come certi senza ulteriore controllo della schermata o del backend.
 | `/privacy` | `src/app/privacy/page.tsx` | Informativa privacy | Pagina legale. |
 | `/terms` | `src/app/terms/page.tsx` | Termini di servizio | Pagina legale. |
 | `/workspace/[id]` | `src/app/workspace/[id]/page.tsx` | Workspace dinamico per identificatore | `{{DA VERIFICARE: accesso, azioni, ruoli e differenze rispetto alle pagine private della dashboard.}}` |
-| `/workspace/[id]/board` | `src/app/workspace/[id]/board/page.tsx` | Board dinamica del workspace | `{{DA VERIFICARE: operazioni board effettivamente disponibili.}}` |
+| `/workspace/[id]/board` | `src/app/workspace/[id]/board/page.tsx` | Board dinamica del workspace | Elenca, crea e aggiorna lo stato dei task tramite API; accesso richiesto. |
 | `/workspace/[id]/doc/[slug]` | `src/app/workspace/[id]/doc/[slug]/page.tsx` | Documento dinamico nel workspace | Il README segnala documenti con backlinks; `{{DA VERIFICARE: azioni dell'editor e comportamento dei backlinks dalla UI.}}` |
 
 ### Route non-pagina
@@ -143,8 +143,8 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 |---|---|---|---|---|
 | Introduzione | Panoramica Taskly | `/` | `content/docs/it/overview/cose-taskly.md` | Coperta |
 | Introduzione | Glossario | Concettuale | `content/docs/it/overview/glossario.md` | Coperta |
-| Per iniziare | Registrazione | `/register` | `content/docs/it/per-iniziare/registrazione.md` | Coperta; verifiche Supabase marcate |
-| Per iniziare | Accesso | `/login` | `content/docs/it/per-iniziare/accesso.md` | Coperta; verifiche provider marcate |
+| Per iniziare | Registrazione | `/register` | `content/docs/it/per-iniziare/registrazione.md` | Coperta; policy lato server da verificare |
+| Per iniziare | Accesso | `/login` | `content/docs/it/per-iniziare/accesso.md` | Coperta; recupero password non disponibile nella UI |
 | Per iniziare | Primo accesso e onboarding | `/dashboard` | `content/docs/it/per-iniziare/primo-accesso.md` | Coperta |
 | Workspace | Pagine private e sottopagine | `/dashboard` | `content/docs/it/workspace/pagine-private.md` | Coperta |
 | Workspace | Ricerca veloce | `/dashboard` | `content/docs/it/workspace/ricerca.md` | Coperta; risultati da verificare |
@@ -153,8 +153,8 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 | Dashboard | Inbox | `/dashboard?view=inbox` | `content/docs/it/sezioni/inbox.md` | Coming soon / comportamento da verificare |
 | Dashboard | Pagine Task | `/tasks`, pagina di tipo Task | `content/docs/it/sezioni/task.md` | Coperta |
 | Dashboard | Obiettivi | Pagina di tipo Obiettivi | `content/docs/it/sezioni/obiettivi.md` | Coperta |
-| Dashboard | Calendario | `/calendar`, pagina di tipo Calendario | `content/docs/it/sezioni/calendario.md` | Coperta; sincronizzazione Google da verificare |
-| Dashboard | Note | `/notes`, pagina di tipo Note | `content/docs/it/sezioni/note.md` | Coperta; pubblicazione/blocco da verificare |
+| Dashboard | Calendario | `/calendar`, pagina di tipo Calendario | `content/docs/it/sezioni/calendario.md` | Coperta; vista locale, nessuna sincronizzazione automatica rilevata |
+| Dashboard | Note | `/notes`, pagina di tipo Note | `content/docs/it/sezioni/note.md` | Coperta; pubblicazione locale, cifratura dei blocchi lato client |
 | Dashboard | Brain Dump | Pagina di tipo Brain Dump | `content/docs/it/sezioni/brain-dump.md` | Coperta |
 | Dashboard | Pagina vuota | Pagina di tipo Pagina vuota | `content/docs/it/sezioni/pagina-vuota.md` | Coperta |
 | Dashboard | Home e Analitiche | `/dashboard` | `content/docs/it/sezioni/home-analitiche.md` | Coperta; metriche/widget marcati |
@@ -168,7 +168,7 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 | Integrazioni | Hub integrazioni | `/integrations` | `content/docs/it/sezioni/integrazioni.md` | Coperta; configurazione server richiesta per OAuth |
 | Team | Gestione membri e ruoli | `/team` | `content/docs/it/sezioni/team-workspace.md` | Coperta |
 | Workspace | Aprire un workspace | `/workspace/[id]` | `content/docs/it/sezioni/workspace.md` | Coperta; accesso diretto da verificare |
-| Workspace | Board workspace | `/workspace/[id]/board` | `content/docs/it/sezioni/board-workspace.md` | Coming soon: vista attualmente solo lettura |
+| Workspace | Board workspace | `/workspace/[id]/board` | `content/docs/it/sezioni/board-workspace.md` | Coperta; crea task e aggiorna lo stato |
 | Workspace | Documento workspace | `/workspace/[id]/doc/[slug]` | `content/docs/it/sezioni/documenti-workspace.md` | Coperta; backlink/permessi da verificare |
 | Riferimenti | FAQ | Concettuale | `content/docs/it/overview/faq.md` | Coperta |
 | Riferimenti | Scorciatoie | `/dashboard` | `content/docs/it/riferimenti/scorciatoie.md` | Coperta con combinazioni verificate |
@@ -181,10 +181,9 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 ### Elementi `coming-soon` e verifiche aperte
 
 - `Inbox`: la route è presente nella sidebar, ma non è stata verificata una vista dedicata nel dispatcher dashboard.
-- Board dei workspace: elenca i task per stato ma non offre controlli di modifica nella schermata esaminata.
 - `/terms`: la pagina contiene testo d'esempio e non termini effettivi.
 - Novità: non è stato trovato un changelog utente nel codice.
-- Restano marcati `{{DA VERIFICARE: ...}}` i comportamenti per autenticazione e registrazione, onboarding/preset, ricerca, cestino, task assegnati, calendario e sincronizzazione, pubblicazione/blocco Note, widget e metriche, cronologia attività, billing, workspace e documenti. L'elenco puntuale è nei file guida relativi.
+- Restano marcati `{{DA VERIFICARE: ...}}` i comportamenti per policy auth lato server, onboarding/preset, ricerca, cestino, task assegnati, notifiche, widget e metriche, cronologia attività, billing, membership/accesso workspace e backlink documenti. L'elenco puntuale è nei file guida relativi.
 
 ### Decisioni approvate in Fase 2
 

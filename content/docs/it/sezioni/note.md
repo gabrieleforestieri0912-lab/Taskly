@@ -27,14 +27,14 @@ Le pagine di tipo **Note** offrono un editor a blocchi. La route `/notes` apre u
 - Il menu dei comandi permette di creare anche pagine correlate (per esempio lista Task o Obiettivi).
 - Per i riferimenti a pagine, digita `[[` e cerca una pagina esistente.
 - Puoi usare **Versioni** per salvare uno snapshot manuale, ripristinare una versione o eliminarla.
-- Il controllo **Pubblica** e **Copia link** sono presenti nell'editor.
+- **Pubblica** memorizza un flag nei dati della pagina e registra un evento di attività; **Copia link** copia un URL interno `/dashboard?page=…`, non un link pubblico autonomo.
 
 :::callout warning
-{{DA VERIFICARE: modalità di accesso ai link pubblicati, requisiti di autenticazione e sincronizzazione dei contenuti pubblici.}}
+Il codice esaminato non crea una route pubblica per la nota: il link copiato apre la dashboard e può richiedere l'accesso all'account. Non considerare il flag **Pubblica** come condivisione pubblica verificata.
 :::
 
 :::callout note
-L'editor include un controllo di blocco e un campo password. {{DA VERIFICARE: verificare il modello di protezione e il recupero di una nota bloccata prima di consigliare il blocco come protezione di dati sensibili.}}
+L'editor può cifrare i blocchi sul client con una password e richiede la stessa password per sbloccarli. Se la password viene dimenticata, il componente non espone un flusso di recupero; conserva la password in modo sicuro prima di attivare la cifratura. La cifratura riguarda i contenuti dei blocchi, non prova che metadati o altre copie siano cifrati.
 :::
 
 ## Pagina Note vuota

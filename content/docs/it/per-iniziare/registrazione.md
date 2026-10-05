@@ -41,4 +41,4 @@ Quando il provider è disponibile nella schermata, seleziona l'opzione Google e 
 
 ## Problemi comuni
 
-Se appare un errore, ricontrolla l'indirizzo email e riprova. `{{DA VERIFICARE: criteri password, verifica dell'indirizzo email e passaggi successivi all'invio dipendono dalla configurazione Supabase e non sono determinabili solo dal modulo client.}}`
+Se appare un errore, ricontrolla l'indirizzo email e riprova. Il modulo non mostra regole locali di complessità della password; eventuali criteri e la conferma email dipendono dal servizio di autenticazione. {{DA VERIFICARE: requisiti effettivi del server in produzione.}}
