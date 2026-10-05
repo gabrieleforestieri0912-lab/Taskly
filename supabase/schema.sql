@@ -205,6 +205,9 @@ create index if not exists workspace_comments_entity_idx
 create index if not exists workspace_comments_mentions_idx
   on public.workspace_comments using gin (mention_ids);
 
+revoke all on public.workspace_comments from public, anon, authenticated;
+grant all on public.workspace_comments to service_role;
+
 create table if not exists public.workspace_document_mentions (
   document_id  uuid not null references public.documents(id) on delete cascade,
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
