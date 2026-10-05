@@ -1,5 +1,69 @@
 [
   {
+    "title": "Impostazioni, profilo e preferenze",
+    "description": "Esplora le schede delle impostazioni per profilo, aspetto, lingua, notifiche, workflow e dati.",
+    "section": "account",
+    "order": 10,
+    "route": "/settings",
+    "tags": [
+      "impostazioni",
+      "profilo",
+      "tema",
+      "lingua",
+      "preferenze"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "account/impostazioni",
+    "headings": [
+      {
+        "id": "profilo",
+        "text": "Profilo",
+        "depth": 2
+      },
+      {
+        "id": "aspetto-e-lingua",
+        "text": "Aspetto e lingua",
+        "depth": 2
+      },
+      {
+        "id": "notifiche-e-workflow",
+        "text": "Notifiche e workflow",
+        "depth": 2
+      },
+      {
+        "id": "dati-e-sicurezza",
+        "text": "Dati e sicurezza",
+        "depth": 2
+      }
+    ],
+    "searchText": "Impostazioni, profilo e preferenze Esplora le schede delle impostazioni per profilo, aspetto, lingua, notifiche, workflow e dati. impostazioni profilo tema lingua preferenze Profilo Aspetto e lingua Notifiche e workflow Dati e sicurezza La pagina Impostazioni raccoglie schede per Profilo, Aspetto, Lingua, Notifiche, Workflow, Integrazioni, Dati, Sicurezza e Fatturazione. Apri una scheda dal menu laterale della pagina; il parametro tab nell'URL può selezionare direttamente alcune schede, ad esempio /settings?tab=appearance. Profilo Puoi modificare nome, email, ruolo/professione e biografia, quindi selezionare Salva Profilo . La schermata salva questi campi nel localStorage del browser: il salvataggio non dimostra una modifica dell'indirizzo email o dei dati account sul server. Aspetto e lingua Cambia tema chiaro/scuro; la scelta viene applicata immediatamente. Scegli un colore d'accento e un font; la schermata salva subito queste preferenze nel browser. Scegli la densità dell'interfaccia e salva le preferenze con il pulsante principale. Imposta una delle lingue mostrate: Italiano, English, Español o Deutsch. Scegli formato orario 12/24 ore e primo giorno della settimana. Notifiche e workflow Le schede mostrano interruttori per promemoria scadenze, digest email, suoni e avvisi riunioni. Nella scheda Workflow puoi impostare la vista predefinita, la durata del focus e della pausa e i suggerimenti proattivi AI. Seleziona Salva preferenze per memorizzare le opzioni supportate nel browser. :::callout warning La UI espone opzioni di notifica e workflow; non tutte corrispondono a servizi di notifica attivi. {{DA VERIFICARE: quali preferenze sono applicate dall'app e se digest email, avvisi riunioni e promemoria vengono effettivamente inviati.}} ::: Dati e sicurezza La scheda Dati offre Scarica Backup JSON e Svuota Cache . Il backup generato nel codice include data di esportazione, dati profilo, tema, schede aperte e pagine espanse; non include tutte le pagine, task e note dichiarati dal testo promozionale. La scheda Sicurezza mostra campi password e pulsanti per aggiornare la password o attivare 2FA, ma i pulsanti producono solo messaggi locali e non eseguono un flusso di sicurezza verificato. :::callout danger Non usare i controlli password/2FA come prova di una modifica delle credenziali o dell'attivazione dell'autenticazione a due fattori. {{DA VERIFICARE: i flussi di sicurezza reali e l'eventuale cancellazione dell'account.}} ::: Per gestire il piano, consulta Piano e fatturazione."
+  },
+  {
+    "title": "Piano e fatturazione",
+    "description": "Consulta il piano mostrato nelle impostazioni e apri il portale di fatturazione Stripe.",
+    "section": "account",
+    "order": 20,
+    "route": "/settings?tab=billing",
+    "tags": [
+      "piano",
+      "abbonamento",
+      "fatturazione",
+      "Stripe"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "account/fatturazione",
+    "headings": [
+      {
+        "id": "aprire-la-fatturazione",
+        "text": "Aprire la fatturazione",
+        "depth": 2
+      }
+    ],
+    "searchText": "Piano e fatturazione Consulta il piano mostrato nelle impostazioni e apri il portale di fatturazione Stripe. piano abbonamento fatturazione Stripe Aprire la fatturazione La scheda Abbonamento & Fatturazione mostra il piano ricevuto dal servizio di sottoscrizione e permette di aprire il portale Stripe. Aprire la fatturazione 1. Vai a /settings?tab=billing. 2. Controlla il nome del piano mostrato nella scheda. 3. Seleziona Gestisci su Stripe per aprire il portale, quando la sessione di fatturazione è disponibile. 4. Seleziona Vedi Tabella Prezzi per aprire la sezione prezzi della landing page. Se il portale non è disponibile, la pagina mostra un messaggio di errore. Il codice dell'interfaccia espone i nomi Starter e Pro nella scheda; prezzi e condizioni possono cambiare e devono essere verificati nella schermata aggiornata prima di prendere decisioni di acquisto. :::callout note La dashboard può limitare il numero di pagine in base al piano, ma questa guida non riporta soglie o prezzi. Controlla la pagina del piano nell'app per le informazioni correnti. ::: {{DA VERIFICARE: operazioni disponibili nel portale Stripe (upgrade, downgrade, cancellazione, fatture e ricevute) e corrispondenza dei dettagli piano con la pagina pubblica dei prezzi.}}"
+  },
+  {
     "title": "Documentazione Taskly",
     "description": "Guide per orientarti nelle pagine, nelle sezioni e negli strumenti di Taskly.",
     "section": "overview",
