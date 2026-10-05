@@ -101,7 +101,7 @@ function DocsSidebar({
           pathname === "/docs"
             ? "bg-[#7b39fc]/10 text-[#7b39fc] dark:text-[#a67cff]"
             : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
-        }`}
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]`}
       >
         <BookOpen size={16} />
         Inizia dalla documentazione
@@ -141,7 +141,7 @@ function DocsSidebar({
                         isActive
                           ? "bg-[#7b39fc]/10 font-semibold text-[#7b39fc] dark:text-[#a67cff]"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
-                      }`}
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]`}
                     >
                       {doc.title}
                     </Link>
@@ -261,7 +261,7 @@ export default function DocsShell({
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Cerca pagine, argomenti e parole chiave"
-                  className="h-14 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
+                  className="h-14 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7b39fc]"
                 />
                 <button
                   type="button"

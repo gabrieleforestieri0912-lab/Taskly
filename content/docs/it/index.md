@@ -3,7 +3,7 @@ title: "Documentazione Taskly"
 description: "Guide per orientarti nelle pagine, nelle sezioni e negli strumenti di Taskly."
 section: "overview"
 order: 0
-route: ""
+route: "/docs"
 tags: ["documentazione", "guide", "Taskly"]
 status: "stable"
 updated: "2026-10-05"
