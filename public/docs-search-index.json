@@ -23,6 +23,113 @@
     "searchText": "Documentazione Taskly Guide per orientarti nelle pagine, nelle sezioni e negli strumenti di Taskly. documentazione guide Taskly Esplora le guide Questa documentazione raccoglie guide d'uso per le funzioni individuate nell'applicazione. I contenuti vengono caricati dai file in content/docs/it/: ogni guida aggiunta entra automaticamente nella navigazione. Esplora le guide Scegli una sezione dal menu laterale o usa la ricerca per trovare una pagina, un argomento o una parola chiave. :::callout note La documentazione iniziale copre solo flussi riscontrati nel codice. Dove il comportamento non è stato verificato, la guida lo segnala esplicitamente. ::: :::screenshot alt=\"Indice della documentazione Taskly\" caption=\"L'indice e la navigazione vengono composti automaticamente dai file delle guide.\" :::"
   },
   {
+    "title": "Che cos'è Taskly",
+    "description": "Panoramica delle pagine, delle attività e degli strumenti disponibili in Taskly.",
+    "section": "overview",
+    "order": 10,
+    "route": "/",
+    "tags": [
+      "introduzione",
+      "workspace",
+      "task",
+      "pagine"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "overview/cose-taskly",
+    "headings": [
+      {
+        "id": "le-aree-principali",
+        "text": "Le aree principali",
+        "depth": 2
+      },
+      {
+        "id": "da-dove-iniziare",
+        "text": "Da dove iniziare",
+        "depth": 2
+      },
+      {
+        "id": "guide-correlate",
+        "text": "Guide correlate",
+        "depth": 2
+      }
+    ],
+    "searchText": "Che cos'è Taskly Panoramica delle pagine, delle attività e degli strumenti disponibili in Taskly. introduzione workspace task pagine Le aree principali Da dove iniziare Guide correlate Taskly è un'applicazione per organizzare attività, note, obiettivi, idee e riunioni. Dalla dashboard puoi lavorare nella Home o creare pagine private di diversi tipi; le route dei workspace includono inoltre board e documenti. Le aree principali Dashboard : Home, Task, Inbox, pagine private, onboarding e accesso agli strumenti della sidebar. Pagine private : contenitori personali organizzabili in una gerarchia di pagine e sottopagine. Task : le pagine di tipo Task espongono viste per organizzare attività; Taskly include anche una vista Task personale. Note : pagine a blocchi per contenuti strutturati. Altri strumenti : obiettivi, calendario, Brain Dump, riunioni, trascrizione, template e attività recenti. Workspace : area raggiungibile tramite identificatore con collegamenti a una board e a un documento. :::callout note La presenza di un link o di un controllo nell'interfaccia non garantisce che ogni flusso sia attivo. Le guide segnalano esplicitamente le aree per cui il codice non conferma un comportamento completo. ::: Da dove iniziare 1. Se non hai un account, apri Registrati; se ne hai già uno, vai ad Accedi. 2. Nella dashboard segui i passaggi di Inizia da qui . 3. Crea una pagina dall'area Privato oppure aggiungi un task alla vista personale. Guide correlate Creare un account e accedere Gestire pagine private e sottopagine Aggiungere e organizzare task"
+  },
+  {
+    "title": "Glossario",
+    "description": "Significato dei termini usati nell'interfaccia e nelle guide Taskly.",
+    "section": "overview",
+    "order": 20,
+    "route": "",
+    "tags": [
+      "glossario",
+      "termini",
+      "workspace",
+      "pagine"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "overview/glossario",
+    "headings": [
+      {
+        "id": "termini-dellinterfaccia",
+        "text": "Termini dell'interfaccia",
+        "depth": 2
+      }
+    ],
+    "searchText": "Glossario Significato dei termini usati nell'interfaccia e nelle guide Taskly. glossario termini workspace pagine Termini dell'interfaccia Termini dell'interfaccia Termine Significato in queste guide Dashboard Pagina di lavoro principale raggiungibile dalla route /dashboard. Privato Sezione della sidebar con l'albero delle pagine dell'utente. Pagina Elemento personale creato con un tipo specifico, ad esempio Task, Note o Calendario. Sottopagina Pagina annidata sotto un'altra pagina nell'albero Privato . Task Attività mostrata in una lista o in una board di task. Workspace Area identificata da un ID, con collegamenti a board e documenti. Template Modello selezionabile nella galleria o salvato da una pagina. Cestino Area per ripristinare o eliminare definitivamente pagine rimosse. :::callout warning {{DA VERIFICARE: il termine \"workspace\" viene usato in più contesti nel prodotto; verificare se l'area Workspace condivisa e le pagine private hanno identità, permessi e modelli dati distinti prima di descrivere relazioni o condivisioni.}} :::"
+  },
+  {
+    "title": "Domande frequenti",
+    "description": "Risposte essenziali su navigazione, pagine, accesso e guide Taskly.",
+    "section": "overview",
+    "order": 30,
+    "route": "",
+    "tags": [
+      "faq",
+      "aiuto",
+      "accesso",
+      "pagine"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "overview/faq",
+    "headings": [
+      {
+        "id": "come-creo-una-pagina",
+        "text": "Come creo una pagina?",
+        "depth": 2
+      },
+      {
+        "id": "posso-annidare-le-pagine",
+        "text": "Posso annidare le pagine?",
+        "depth": 2
+      },
+      {
+        "id": "come-cerco-le-guide",
+        "text": "Come cerco le guide?",
+        "depth": 2
+      },
+      {
+        "id": "come-contatto-il-supporto",
+        "text": "Come contatto il supporto?",
+        "depth": 2
+      },
+      {
+        "id": "la-documentazione-spiega-una-funzione-che-non-vedo",
+        "text": "La documentazione spiega una funzione che non vedo",
+        "depth": 2
+      },
+      {
+        "id": "ho-trovato-una-pagina-vuota-o-un-link-non-funzionante",
+        "text": "Ho trovato una pagina vuota o un link non funzionante",
+        "depth": 2
+      }
+    ],
+    "searchText": "Domande frequenti Risposte essenziali su navigazione, pagine, accesso e guide Taskly. faq aiuto accesso pagine Come creo una pagina? Posso annidare le pagine? Come cerco le guide? Come contatto il supporto? La documentazione spiega una funzione che non vedo Ho trovato una pagina vuota o un link non funzionante Come creo una pagina? Apri la dashboard e usa il pulsante + accanto a Privato . Il selettore permette di scegliere un tipo di pagina o un template. Per i passaggi dettagliati, consulta Gestire pagine private e sottopagine. Posso annidare le pagine? Sì. Usa Aggiungi sottopagina dal pulsante + di una pagina o dal suo menu, oppure trascina una pagina su quella che dovrà contenerla. Come cerco le guide? Apri Cerca nella documentazione nella barra in alto oppure premi Ctrl+K o Cmd+K mentre sei nella documentazione. La ricerca considera titolo, descrizione, parole chiave e testo indicizzato delle guide. Come contatto il supporto? Apri Supporto e invia il modulo con un messaggio. Nome ed email sono campi presenti nel modulo; il messaggio è obbligatorio. La documentazione spiega una funzione che non vedo Controlla se la guida riporta Presto disponibile o {{DA VERIFICARE: ...}}. La prima etichetta identifica contenuti relativi a una UI non completa; il secondo marcatore indica una verifica ancora necessaria. Ho trovato una pagina vuota o un link non funzionante Apri Supporto e descrivi la route, i passaggi seguiti e il risultato visualizzato. Evita di includere password o altri dati sensibili."
+  },
+  {
     "title": "Creare un account e accedere",
     "description": "Informazioni verificate nel progetto sulle route di registrazione e accesso a Taskly.",
     "section": "per-iniziare",
