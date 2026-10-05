@@ -245,6 +245,254 @@
     "searchText": "Il primo accesso e la dashboard Orientati nella dashboard e usa la guida Inizia da qui per configurare il tuo spazio. primo accesso dashboard onboarding sidebar Dove la trovi Seguire “Inizia da qui” Personalizzare la Home Guide correlate Dopo l'accesso, la dashboard è il punto di partenza per la Home, le attività e le pagine private. La guida Inizia da qui propone azioni pratiche e aggiorna l'avanzamento in base all'uso dell'app. Dove la trovi Apri /dashboard. La sidebar contiene ricerca veloce, accessi rapidi e sezione Privato . Seguire “Inizia da qui” La checklist può suggerire di creare una pagina o un task, completare un task, usare un template, creare una sottopagina, cercare o personalizzare la Home. L'ordine dei passaggi varia in base al caso d'uso scelto. 1. Leggi il passaggio evidenziato Prossimo . 2. Seleziona Vai sul passaggio per aprire l'azione corrispondente. 3. Completa l'azione nell'app: la guida aggiorna lo stato quando rileva l'attività. 4. Usa i controlli della guida per ridurla o nasconderla. :::callout note Quando i passaggi sono completati, la guida segnala il completamento e può scomparire dopo alcuni secondi. Puoi riaprirla solo se lo stato del tuo onboarding lo consente. {{DA VERIFICARE: modalità per riattivare una guida nascosta o completata.}} ::: Personalizzare la Home La Home include widget. In modalità modifica puoi cambiare la disposizione, la visibilità e applicare le configurazioni predefinite offerte dalla dashboard. La persistenza delle preferenze può dipendere dalle impostazioni locali del browser. :::callout warning {{DA VERIFICARE: inventariare i widget disponibili e i preset della Home in base allo stato corrente dell'app, prima di elencarli uno per uno.}} ::: Guide correlate Aggiungere e organizzare task Gestire pagine private e sottopagine Usare la ricerca veloce"
   },
   {
+    "title": "Aggiungere e organizzare task",
+    "description": "Crea task, imposta priorità e ricorrenza e scegli una vista lista, Kanban o Timeline.",
+    "section": "sezioni",
+    "order": 10,
+    "route": "/tasks",
+    "tags": [
+      "task",
+      "kanban",
+      "lista",
+      "timeline",
+      "priorità"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/task",
+    "headings": [
+      {
+        "id": "dove-trovi-i-task",
+        "text": "Dove trovi i task",
+        "depth": 2
+      },
+      {
+        "id": "aggiungere-un-task-a-una-pagina-task",
+        "text": "Aggiungere un task a una pagina Task",
+        "depth": 2
+      },
+      {
+        "id": "organizzare-e-aggiornare",
+        "text": "Organizzare e aggiornare",
+        "depth": 2
+      },
+      {
+        "id": "guida-correlata",
+        "text": "Guida correlata",
+        "depth": 2
+      }
+    ],
+    "searchText": "Aggiungere e organizzare task Crea task, imposta priorità e ricorrenza e scegli una vista lista, Kanban o Timeline. task kanban lista timeline priorità Dove trovi i task Aggiungere un task a una pagina Task Organizzare e aggiornare Guida correlata Taskly offre una vista Task personale e pagine di tipo Task collegate alle tue pagine private. In una pagina Task puoi inserire attività, assegnare priorità, aggiungere ricorrenze e alternare tra Lista, Kanban e Timeline. Dove trovi i task Apri Task per la board associata allo spazio personale. Dalla dashboard seleziona Task nella sidebar per aprire I miei task . Crea una pagina di tipo Task da Privato per mantenere un elenco separato. Aggiungere un task a una pagina Task 1. Apri una pagina Task e, nella vista Lista , scrivi il titolo nel campo “Cosa devi fare oggi?”. 2. Seleziona una priorità: Bassa , Media o Alta . 3. Facoltativamente imposta una ricorrenza o un assegnatario. 4. Seleziona Aggiungi ; puoi anche premere Invio nel campo del titolo. Nella vista Kanban , aggiungi un task usando il campo della colonna: il nuovo task riceve lo stato di quella colonna. Trascina una scheda per spostarla tra gli stati. Organizzare e aggiornare Alterna Lista , Kanban e Timeline con il selettore di vista. In Kanban gli stati predefiniti sono Da Fare , In Corso e Completato . Aggiungi sottotask e aggiorna la loro casella di completamento. Aggiungi commenti e collega il task a una pagina quando i controlli corrispondenti sono disponibili. Cerca i task per titolo. Puoi aggiungere colonne personalizzate; sono salvate localmente nel browser. Azione Dove Nota Impostare priorità Modulo nuovo task o dettaglio task Valori visibili: Bassa, Media, Alta. Impostare ricorrenza Modulo nuovo task o modifica del task La lista include attività non ricorrenti, giornaliere, settimanali, mensili e annuali. Impostare scadenza Dettaglio task La Timeline mostra i task con scadenza. Completare Controllo di stato della scheda Completare un task ricorrente crea la ricorrenza successiva. Aggiungere sottotask/commenti Dettaglio task Puoi modificare o rimuovere le sottotask; i commenti sono aggiunti alla scheda. :::callout warning Il campo assegnatario nella pagina Task suggerisce “Utente” e “Team”, ma non equivale a una gestione di membri o permessi condivisi. {{DA VERIFICARE: quali assegnatari sono supportati nell'account e come vengono salvati.}} ::: Guida correlata Gestire Task personali"
+  },
+  {
+    "title": "Gestire I miei task",
+    "description": "Aggiungi, cerca, filtra e raggruppa i task personali dalla dashboard.",
+    "section": "sezioni",
+    "order": 20,
+    "route": "/dashboard?view=mytasks",
+    "tags": [
+      "task personali",
+      "scadenze",
+      "filtri",
+      "priorità",
+      "progetti"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/i-miei-task",
+    "headings": [
+      {
+        "id": "dove-la-trovi",
+        "text": "Dove la trovi",
+        "depth": 2
+      },
+      {
+        "id": "creare-e-completare-un-task",
+        "text": "Creare e completare un task",
+        "depth": 2
+      },
+      {
+        "id": "trovare-e-ordinare-i-task",
+        "text": "Trovare e ordinare i task",
+        "depth": 2
+      },
+      {
+        "id": "scorciatoia",
+        "text": "Scorciatoia",
+        "depth": 2
+      },
+      {
+        "id": "problemi-comuni",
+        "text": "Problemi comuni",
+        "depth": 2
+      }
+    ],
+    "searchText": "Gestire I miei task Aggiungi, cerca, filtra e raggruppa i task personali dalla dashboard. task personali scadenze filtri priorità progetti Dove la trovi Creare e completare un task Trovare e ordinare i task Scorciatoia Problemi comuni I miei task raccoglie una vista personale delle attività. Puoi creare task rapidamente, cercarli, raggrupparli e restringere l'elenco con filtri per stato, priorità e progetto. Dove la trovi Nella sidebar della dashboard seleziona Task , oppure apri /dashboard?view=mytasks. Creare e completare un task 1. Scrivi il titolo nel campo Aggiungi un nuovo task . 2. Se nel titolo inserisci una data comprensibile, la vista mostra l'anteprima della scadenza interpretata. 3. Premi Invio o seleziona Crea . 4. Seleziona il controllo di stato nella riga del task per completarlo o riaprirlo. 5. Apri il task per modificarne dettagli, tag e sottotask. Trovare e ordinare i task Cerca per titolo o tag. Raggruppa per Scadenza , Progetto , Priorità o Stato . Filtra per task attivi/completati, priorità e progetto. Ordina per scadenza, priorità, titolo o data di creazione e inverti la direzione. Seleziona un gruppo per comprimerlo o espanderlo. Scorciatoia Premi N fuori da un campo di testo per portare il focus al campo di creazione rapida. Problemi comuni Se vedi Nessun task trovato , controlla i filtri correnti prima di concludere che i task siano stati eliminati. Il messaggio propone anche N per avviare una nuova attività. :::callout note La disponibilità dei progetti nei filtri dipende dalle pagine riconosciute come progetti dalla vista. {{DA VERIFICARE: criteri usati per identificare un progetto nella lista.}} :::"
+  },
+  {
+    "title": "Impostare obiettivi",
+    "description": "Crea una visione annuale, articolala in sotto-obiettivi e monitora i progressi.",
+    "section": "sezioni",
+    "order": 30,
+    "route": "/dashboard",
+    "tags": [
+      "obiettivi",
+      "sotto-obiettivi",
+      "scadenze",
+      "progresso"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/obiettivi",
+    "headings": [
+      {
+        "id": "creare-e-organizzare",
+        "text": "Creare e organizzare",
+        "depth": 2
+      },
+      {
+        "id": "monitorare-il-progresso",
+        "text": "Monitorare il progresso",
+        "depth": 2
+      }
+    ],
+    "searchText": "Impostare obiettivi Crea una visione annuale, articolala in sotto-obiettivi e monitora i progressi. obiettivi sotto-obiettivi scadenze progresso Creare e organizzare Monitorare il progresso Una pagina di tipo Obiettivi organizza una visione in livelli: Annuale , Trimestre , Mese e Settimana . Puoi segnare gli obiettivi come completati, assegnare una scadenza e aggiungere sotto obiettivi. Creare e organizzare 1. Crea una pagina di tipo Obiettivi dall'area Privato . 2. Inserisci il titolo della visione nel campo annuale e seleziona Crea visione . 3. Facoltativamente inserisci un'etichetta nel campo categoria. 4. Usa + su un obiettivo per creare il livello successivo; inserisci il titolo e conferma con Invio. 5. Espandi o comprimi un obiettivo per visualizzarne i discendenti. Monitorare il progresso Seleziona la casella accanto a un obiettivo per contrassegnarlo come completato. Ogni obiettivo di primo livello mostra una percentuale calcolata dai sotto obiettivi diretti completati; un obiettivo completato mostra il 100%. Puoi aggiornare la scadenza dal campo data e rimuovere un obiettivo con il pulsante Cestino. :::callout note La percentuale considera solo i sotto obiettivi immediati dell'obiettivo visualizzato. Non somma automaticamente percentuali di tutti i livelli annidati. :::"
+  },
+  {
+    "title": "Usare il Calendario",
+    "description": "Consulta e aggiorna gli elementi per settimana, mese o agenda e crea elementi con priorità e ricorrenza.",
+    "section": "sezioni",
+    "order": 40,
+    "route": "/calendar",
+    "tags": [
+      "calendario",
+      "agenda",
+      "scadenze",
+      "ricorrenza"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/calendario",
+    "headings": [
+      {
+        "id": "navigare-il-calendario",
+        "text": "Navigare il calendario",
+        "depth": 2
+      },
+      {
+        "id": "aggiungere-un-elemento",
+        "text": "Aggiungere un elemento",
+        "depth": 2
+      }
+    ],
+    "searchText": "Usare il Calendario Consulta e aggiorna gli elementi per settimana, mese o agenda e crea elementi con priorità e ricorrenza. calendario agenda scadenze ricorrenza Navigare il calendario Aggiungere un elemento Il Calendario è disponibile come pagina di tipo Calendario nella dashboard e tramite la route /calendar. Se esiste già una pagina Calendario, la route dedicata prova ad aprire quella pagina. Navigare il calendario 1. Usa le frecce per spostarti avanti o indietro nel periodo. 2. Seleziona Oggi per tornare alla data corrente. 3. Scegli la vista Settimana , Mese o Agenda . 4. Seleziona un giorno per aprire le azioni relative alla data. Aggiungere un elemento 1. Apri il modulo con il pulsante di aggiunta nel giorno desiderato. 2. Inserisci il titolo. 3. Seleziona una priorità ( Bassa , Media o Alta ). 4. Facoltativamente scegli una ricorrenza giornaliera, settimanale o mensile. 5. Conferma con Aggiungi al calendario . Puoi contrassegnare gli elementi come completati, aggiornarli o eliminarli. La pagina include inoltre aree di focus e note giornaliere. :::callout warning La scheda Google Calendar nella sidebar offre un punto d'accesso all'integrazione. {{DA VERIFICARE: confermare quali operazioni sincronizzano eventi con il provider esterno; la vista di calendario locale non prova da sola la sincronizzazione.}} :::"
+  },
+  {
+    "title": "Scrivere e organizzare Note",
+    "description": "Usa blocchi, comandi rapidi, tag e versioni per organizzare il contenuto di una pagina Note.",
+    "section": "sezioni",
+    "order": 50,
+    "route": "/notes",
+    "tags": [
+      "note",
+      "blocchi",
+      "editor",
+      "versioni",
+      "tag"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/note",
+    "headings": [
+      {
+        "id": "modificare-una-nota",
+        "text": "Modificare una nota",
+        "depth": 2
+      },
+      {
+        "id": "strumenti-disponibili",
+        "text": "Strumenti disponibili",
+        "depth": 2
+      },
+      {
+        "id": "pagina-note-vuota",
+        "text": "Pagina Note vuota",
+        "depth": 2
+      }
+    ],
+    "searchText": "Scrivere e organizzare Note Usa blocchi, comandi rapidi, tag e versioni per organizzare il contenuto di una pagina Note. note blocchi editor versioni tag Modificare una nota Strumenti disponibili Pagina Note vuota Le pagine di tipo Note offrono un editor a blocchi. La route /notes apre una pagina Note esistente se la trova; se non ne esiste una, propone di tornare alla dashboard. Modificare una nota 1. Crea o apri una pagina di tipo Note . 2. Scrivi nel blocco. Digita / per aprire il menu dei blocchi. 3. Seleziona una tipologia: testo, titoli, checkbox, elenchi, toggle, calendario task, habit tracker, codice, video YouTube, file/documento o divisore. 4. Riordina o rimuovi blocchi usando i controlli del blocco. 5. Aggiungi tag dalla sezione tag della pagina. Strumenti disponibili I blocchi checkbox possono essere completati. I blocchi toggle possono contenere righe annidate. Puoi cambiare colore del testo per un blocco. Il menu dei comandi permette di creare anche pagine correlate (per esempio lista Task o Obiettivi). Per i riferimenti a pagine, digita [ e cerca una pagina esistente. Puoi usare Versioni per salvare uno snapshot manuale, ripristinare una versione o eliminarla. Il controllo Pubblica e Copia link sono presenti nell'editor. :::callout warning {{DA VERIFICARE: modalità di accesso ai link pubblicati, requisiti di autenticazione e sincronizzazione dei contenuti pubblici.}} ::: :::callout note L'editor include un controllo di blocco e un campo password. {{DA VERIFICARE: verificare il modello di protezione e il recupero di una nota bloccata prima di consigliare il blocco come protezione di dati sensibili.}} ::: Pagina Note vuota Se non hai ancora una pagina Note, apri la [dashboard e creane una dal selettore Privato ."
+  },
+  {
+    "title": "Catturare idee con Brain Dump",
+    "description": "Annota idee al volo, organizzale per categoria e convertile in task.",
+    "section": "sezioni",
+    "order": 60,
+    "route": "/dashboard",
+    "tags": [
+      "idee",
+      "brain dump",
+      "categorie",
+      "task"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/brain-dump",
+    "headings": [
+      {
+        "id": "catturare-unidea",
+        "text": "Catturare un'idea",
+        "depth": 2
+      },
+      {
+        "id": "convertire-unidea-in-task",
+        "text": "Convertire un'idea in task",
+        "depth": 2
+      }
+    ],
+    "searchText": "Catturare idee con Brain Dump Annota idee al volo, organizzale per categoria e convertile in task. idee brain dump categorie task Catturare un'idea Convertire un'idea in task Una pagina di tipo Brain Dump raccoglie idee in schede. Ogni idea può avere una categoria e può essere convertita in un task di una pagina Task. Catturare un'idea 1. Crea una pagina di tipo Brain Dump o aprine una esistente. 2. Scrivi l'idea nel campo di testo. 3. Seleziona una categoria: Generale , Lavoro , Personale , Creatività o Studio . 4. Seleziona Cattura oppure premi Invio. Le schede mostrano la categoria e la data di creazione. Puoi eliminare un'idea con l'icona del Cestino. Convertire un'idea in task Nella scheda dell'idea scegli dal menu una pagina di tipo Task. Quando selezioni una destinazione, l'idea viene convertita e rimossa dall'elenco Brain Dump. :::callout note Il menu destinazione mostra le pagine il cui tipo è Task. Se non hai una pagina Task, creane una dall'area Privato . :::"
+  },
+  {
+    "title": "Personalizzare Home e Analitiche",
+    "description": "Organizza i widget della dashboard, scegli un preset e ripristina la disposizione iniziale.",
+    "section": "sezioni",
+    "order": 70,
+    "route": "/dashboard",
+    "tags": [
+      "dashboard",
+      "analitiche",
+      "widget",
+      "home"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/home-analitiche",
+    "headings": [
+      {
+        "id": "personalizzare-la-vista",
+        "text": "Personalizzare la vista",
+        "depth": 2
+      }
+    ],
+    "searchText": "Personalizzare Home e Analitiche Organizza i widget della dashboard, scegli un preset e ripristina la disposizione iniziale. dashboard analitiche widget home Personalizzare la vista La Home mostra una panoramica delle attività e delle analitiche tramite widget. Puoi attivare la modalità di personalizzazione per modificare la disposizione e la visibilità dei widget. Personalizzare la vista 1. Nella dashboard seleziona Personalizza Analitiche . 2. Trascina o usa i controlli dei widget per spostarli, mostrarli o nasconderli. 3. Apri Gestisci Widget per alternare la visibilità. 4. Seleziona un preset: Tutto , Analitiche , Focus o Minimale . 5. Seleziona Fatto o Salva ed Esci per uscire dalla modalità di personalizzazione. Puoi usare Ripristina per tornare al layout predefinito. La dashboard segnala metriche relative a produttività, scadenze e obiettivi. :::callout warning {{DA VERIFICARE: elenco completo dei widget e dati esatti inclusi in ciascuno; non interpretare metriche o grafici come dati in tempo reale senza verifica del comportamento di aggiornamento.}} :::"
+  },
+  {
+    "title": "Inbox",
+    "description": "La sidebar mostra un accesso Inbox, ma la vista dedicata richiede verifica prima di essere usata.",
+    "section": "sezioni",
+    "order": 80,
+    "route": "/dashboard?view=inbox",
+    "tags": [
+      "inbox",
+      "dashboard",
+      "sidebar"
+    ],
+    "status": "coming-soon",
+    "updated": "2026-10-05",
+    "slug": "sezioni/inbox",
+    "headings": [],
+    "searchText": "Inbox La sidebar mostra un accesso Inbox, ma la vista dedicata richiede verifica prima di essere usata. inbox dashboard sidebar La sidebar include una voce Inbox . Nell'implementazione esaminata la voce cambia lo stato attivo e la query dell'URL, ma la dashboard non mostra una vista Inbox separata nel dispatcher verificato. :::callout warning {{DA VERIFICARE: la voce Inbox potrebbe essere una funzione incompleta o gestita altrove. Non fare affidamento su questa route come vista dedicata finché il comportamento non viene confermato.}} :::"
+  },
+  {
     "title": "Gestire pagine private e sottopagine",
     "description": "Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar.",
     "section": "workspace",
