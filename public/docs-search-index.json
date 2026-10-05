@@ -1,0 +1,107 @@
+[
+  {
+    "title": "Documentazione Taskly",
+    "description": "Guide per orientarti nelle pagine, nelle sezioni e negli strumenti di Taskly.",
+    "section": "overview",
+    "order": 0,
+    "route": "",
+    "tags": [
+      "documentazione",
+      "guide",
+      "Taskly"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "",
+    "headings": [
+      {
+        "id": "esplora-le-guide",
+        "text": "Esplora le guide",
+        "depth": 2
+      }
+    ],
+    "searchText": "Documentazione Taskly Guide per orientarti nelle pagine, nelle sezioni e negli strumenti di Taskly. documentazione guide Taskly Esplora le guide Questa documentazione raccoglie guide d'uso per le funzioni individuate nell'applicazione. I contenuti vengono caricati dai file in content/docs/it/: ogni guida aggiunta entra automaticamente nella navigazione. Esplora le guide Scegli una sezione dal menu laterale o usa la ricerca per trovare una pagina, un argomento o una parola chiave. :::callout note La documentazione iniziale copre solo flussi riscontrati nel codice. Dove il comportamento non è stato verificato, la guida lo segnala esplicitamente. ::: :::screenshot alt=\"Indice della documentazione Taskly\" caption=\"L'indice e la navigazione vengono composti automaticamente dai file delle guide.\" :::"
+  },
+  {
+    "title": "Creare un account e accedere",
+    "description": "Informazioni verificate nel progetto sulle route di registrazione e accesso a Taskly.",
+    "section": "per-iniziare",
+    "order": 10,
+    "route": "/login",
+    "tags": [
+      "account",
+      "accesso",
+      "registrazione"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "per-iniziare/accesso",
+    "headings": [
+      {
+        "id": "dove-trovi-accesso-e-registrazione",
+        "text": "Dove trovi accesso e registrazione",
+        "depth": 2
+      },
+      {
+        "id": "accedere-a-taskly",
+        "text": "Accedere a Taskly",
+        "depth": 2
+      },
+      {
+        "id": "creare-un-account",
+        "text": "Creare un account",
+        "depth": 2
+      },
+      {
+        "id": "problemi-comuni",
+        "text": "Problemi comuni",
+        "depth": 2
+      }
+    ],
+    "searchText": "Creare un account e accedere Informazioni verificate nel progetto sulle route di registrazione e accesso a Taskly. account accesso registrazione Dove trovi accesso e registrazione Accedere a Taskly Creare un account Problemi comuni Taskly usa Supabase Auth per l'autenticazione. Il progetto documenta l'accesso con email e password e il provider Google; la schermata consente di registrarsi e accedere dalle route dedicate. Dove trovi accesso e registrazione Accesso: /login. Registrazione: /register. Accedere a Taskly :::steps 1. Apri la pagina di accesso. 2. Usa il metodo disponibile nella schermata. 3. Dopo l'accesso, apri la dashboard. ::: :::callout warning {{DA VERIFICARE: verificare i campi, l'ordine del flusso, i messaggi di errore, la conferma email e il recupero password mostrati nella schermata attuale.}} ::: Creare un account :::steps 1. Apri la pagina di registrazione. 2. Completa i passaggi presentati dal modulo. 3. Segui le eventuali indicazioni mostrate dopo l'invio. ::: :::callout note Il codice del progetto indica email/password e Google come metodi configurati. {{DA VERIFICARE: verificare quali metodi sono effettivamente esposti e attivi nell'interfaccia distribuita.}} ::: Problemi comuni Se il login segnala che l'email non è stata confermata, l'API suggerisce di controllare la casella di posta. Le opzioni di conferma dipendono dalla configurazione del progetto Supabase."
+  },
+  {
+    "title": "Gestire pagine private e sottopagine",
+    "description": "Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar.",
+    "section": "workspace",
+    "order": 10,
+    "route": "/dashboard",
+    "tags": [
+      "sidebar",
+      "pagine",
+      "sottopagine",
+      "template"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "workspace/pagine-private",
+    "headings": [
+      {
+        "id": "dove-la-trovi",
+        "text": "Dove la trovi",
+        "depth": 2
+      },
+      {
+        "id": "creare-una-pagina",
+        "text": "Creare una pagina",
+        "depth": 2
+      },
+      {
+        "id": "organizzare-lalbero-delle-pagine",
+        "text": "Organizzare l'albero delle pagine",
+        "depth": 2
+      },
+      {
+        "id": "scorciatoie-da-tastiera",
+        "text": "Scorciatoie da tastiera",
+        "depth": 2
+      },
+      {
+        "id": "problemi-comuni",
+        "text": "Problemi comuni",
+        "depth": 2
+      }
+    ],
+    "searchText": "Gestire pagine private e sottopagine Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar. sidebar pagine sottopagine template Dove la trovi Creare una pagina Organizzare l'albero delle pagine Scorciatoie da tastiera Problemi comuni La sezione Privato della sidebar mostra le pagine personali in una struttura ad albero. Puoi creare una pagina dalla sezione, scegliere un tipo o un template nel selettore e annidare pagine. Dove la trovi Apri la dashboard. La sezione Privato si trova nella sidebar principale. Creare una pagina :::steps 1. Seleziona + accanto a Privato , oppure Crea una pagina quando l'elenco è vuoto. 2. Nel selettore, scegli un tipo di pagina o un template disponibile. 3. Apri la nuova pagina dall'area Privato . ::: Organizzare l'albero delle pagine Seleziona la freccia accanto a una pagina per espandere o comprimere le sottopagine. Usa Aggiungi sottopagina dal pulsante + della pagina o dal suo menu …. Trascina una pagina su un'altra per annidarla; trascinala nell'area radice per riportarla al primo livello. Usa il menu … per rinominare, duplicare o eliminare la pagina. Per rinominare, puoi anche avviare la modifica inline e confermare con Invio. Azione Come si fa Nota Creare una pagina Seleziona + accanto a Privato e scegli nel selettore. Selezionare un tipo o un template dipende dalle voci mostrate dal selettore. Aggiungere una sottopagina Seleziona + sulla riga della pagina o Aggiungi sottopagina nel menu …. La nuova pagina viene inserita sotto la pagina scelta. Rinominare Apri il menu … e seleziona Rinomina . Invio conferma; Esc annulla la modifica in corso. Duplicare Apri il menu … e seleziona Duplica . Viene creata una copia della pagina. Eliminare Apri il menu …, seleziona Elimina e conferma. Puoi annullare l'eliminazione dal Cestino. Spostare o annidare Trascina la pagina su un'altra pagina o sulla radice dell'albero. La struttura viene aggiornata dalla sidebar. Scorciatoie da tastiera ↑ e ↓: spostano il focus tra le pagine dell'albero. → espande una pagina o porta alla prima sottopagina; ← comprime o porta alla pagina genitore. F2: avvia la rinomina della pagina selezionata. Invio o Spazio: apre la pagina selezionata. Esc: chiude il menu contestuale. :::callout tip Espandi la pagina genitore per trovare le sottopagine; quando apri una pagina annidata, la sidebar espande automaticamente i suoi antenati. ::: Problemi comuni Se una pagina appena creata non compare, controlla l'area Privato e verifica che il caricamento iniziale sia terminato. La dashboard mostra un avviso se hai raggiunto il limite di pagine del piano corrente; il numero del limite dipende dal piano associato all'account."
+  }
+]
