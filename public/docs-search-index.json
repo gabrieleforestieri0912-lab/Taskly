@@ -605,6 +605,110 @@
     "searchText": "Consultare le attività recenti La pagina Attività mostra gli eventi recenti recuperati dal servizio dell'app. attività cronologia eventi Consultare l'elenco La pagina Attività mostra gli eventi recenti recuperati dal servizio dell'app. Per ogni elemento sono visualizzati un titolo (o il tipo di evento), il testo descrittivo e la data. Consultare l'elenco 1. Apri /activity. 2. Scorri gli elementi visualizzati in ordine restituito dal servizio. 3. Se l'elenco è vuoto, la pagina mostra il messaggio di stato vuoto. La pagina richiede al backend fino a 200 attività recenti. Non presenta controlli per filtrare, modificare o eliminare gli eventi. :::callout note {{DA VERIFICARE: quali eventi vengono registrati e come il backend ordina l'elenco; la pagina non mostra filtri o controlli di paginazione.}} :::"
   },
   {
+    "title": "Collegare le integrazioni",
+    "description": "Collega Google Calendar o un webhook Slack dall'Hub Integrazioni.",
+    "section": "sezioni",
+    "order": 130,
+    "route": "/integrations",
+    "tags": [
+      "integrazioni",
+      "Google Calendar",
+      "Slack",
+      "webhook"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/integrazioni",
+    "headings": [
+      {
+        "id": "google-calendar",
+        "text": "Google Calendar",
+        "depth": 2
+      },
+      {
+        "id": "slack",
+        "text": "Slack",
+        "depth": 2
+      }
+    ],
+    "searchText": "Collegare le integrazioni Collega Google Calendar o un webhook Slack dall'Hub Integrazioni. integrazioni Google Calendar Slack webhook Google Calendar Slack L'Hub Integrazioni permette di collegare Google Calendar e Slack. L'interfaccia include anche una sezione informativa per il webhook API Taskly. Google Calendar 1. Apri /integrations. 2. Seleziona Connetti nella scheda Google Calendar. 3. Completa l'autorizzazione Google se il provider è configurato sul server. 4. Per scollegare un account già connesso, seleziona Scollega . Se il server non restituisce un URL di autorizzazione, la pagina mostra un messaggio che segnala la configurazione Google mancante. Slack 1. Incolla l'URL del webhook Slack. 2. Seleziona Collega webhook . 3. Dopo il collegamento, puoi inserire un messaggio facoltativo e selezionare Invia test . 4. Per rimuovere la connessione, seleziona Disconnetti . La scheda Webhook API mostra il percorso di esempio POST /api/webhooks/taskly; questa documentazione utente non descrive la configurazione tecnica del servizio. :::callout warning La scheda Integrazioni nelle Impostazioni contiene etichette e descrizioni promozionali, ma il collegamento operativo è nell'Hub /integrations. Non dare per attiva la sincronizzazione automatica delle scadenze solo perché è descritta nella scheda Impostazioni. ::: :::callout note Zoom e Google Meet sono mostrati nel flusso di importazione delle riunioni e sono distinti dall'Hub Integrazioni. Per questi provider consulta Trascrivere o importare una riunione. :::"
+  },
+  {
+    "title": "Gestire Team e Workspace",
+    "description": "Crea workspace, aggiungi membri e assegna ruoli dalla pagina Team & Workspaces.",
+    "section": "sezioni",
+    "order": 140,
+    "route": "/team",
+    "tags": [
+      "team",
+      "workspace",
+      "membri",
+      "ruoli",
+      "collaborazione"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/team-workspace",
+    "headings": [
+      {
+        "id": "creare-un-workspace",
+        "text": "Creare un workspace",
+        "depth": 2
+      },
+      {
+        "id": "aggiungere-membri-e-cambiare-ruoli",
+        "text": "Aggiungere membri e cambiare ruoli",
+        "depth": 2
+      },
+      {
+        "id": "board-e-documenti-workspace",
+        "text": "Board e documenti workspace",
+        "depth": 2
+      }
+    ],
+    "searchText": "Gestire Team e Workspace Crea workspace, aggiungi membri e assegna ruoli dalla pagina Team & Workspaces. team workspace membri ruoli collaborazione Creare un workspace Aggiungere membri e cambiare ruoli Board e documenti workspace La pagina Team & Workspaces consente di creare workspace e gestire i membri associati. La gestione richiede l'accesso; la schermata mostra un messaggio se l'utente non è autenticato. Creare un workspace 1. Apri /team. 2. Seleziona Nuovo Workspace . 3. Inserisci un nome e seleziona Crea . 4. Espandi la scheda del workspace per vedere i membri. Aggiungere membri e cambiare ruoli 1. Espandi il workspace. 2. Inserisci l'indirizzo email della persona. 3. Seleziona Membro , Admin o Viewer . 4. Seleziona Invita . 5. Per aggiornare un ruolo, usa il menu accanto al membro. Il proprietario è mostrato come tale e non ha un selettore di ruolo. La schermata mostra messaggi in caso di permessi insufficienti, utente non trovato o errori di rete. I ruoli disponibili nel selettore sono owner, admin, member e viewer; il menu di aggiunta propone member, admin e viewer. :::callout warning La presenza della gestione workspace e dei ruoli non implica collaborazione realtime. Il progetto ha rimosso la collaborazione live con cursori remoti e aggiornamenti Socket.IO. ::: Board e documenti workspace Apri un workspace per trovare i collegamenti alla board e al documento home. La board workspace mostra attualmente colonne di stato e task restituiti dal backend; i controlli per modificare o creare task non sono presenti nella pagina esaminata."
+  },
+  {
+    "title": "Aprire un workspace",
+    "description": "La pagina workspace raccoglie i collegamenti alla board e al documento home.",
+    "section": "sezioni",
+    "order": 150,
+    "route": "/workspace/[id]",
+    "tags": [
+      "workspace",
+      "board",
+      "documenti"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/workspace",
+    "headings": [
+      {
+        "id": "aprire-le-sezioni",
+        "text": "Aprire le sezioni",
+        "depth": 2
+      }
+    ],
+    "searchText": "Aprire un workspace La pagina workspace raccoglie i collegamenti alla board e al documento home. workspace board documenti Aprire le sezioni Un workspace si apre con un identificatore nel percorso, ad esempio /workspace/<id . La pagina mostra il nome e due collegamenti: Board e Documento . Aprire le sezioni 1. Vai a /team e individua un workspace accessibile. 2. Apri il workspace tramite il collegamento previsto nell'interfaccia. 3. Seleziona Board per aprire /workspace/<id /board. 4. Seleziona Documento per aprire il documento home del workspace. :::callout warning La schermata principale non espone azioni per rinominare o cancellare il workspace. {{DA VERIFICARE: modalità di navigazione diretta ai workspace e controlli d'accesso applicati ai percorsi dinamici.}} :::"
+  },
+  {
+    "title": "Consultare la board del workspace",
+    "description": "La board mostra i task del workspace in colonne Da fare, In corso e Completato.",
+    "section": "sezioni",
+    "order": 160,
+    "route": "/workspace/[id]/board",
+    "tags": [
+      "board",
+      "workspace",
+      "task"
+    ],
+    "status": "coming-soon",
+    "updated": "2026-10-05",
+    "slug": "sezioni/board-workspace",
+    "headings": [],
+    "searchText": "Consultare la board del workspace La board mostra i task del workspace in colonne Da fare, In corso e Completato. board workspace task La board del workspace carica i task associati al workspace e li raggruppa in colonne con stato todo, inprogress e done. :::callout warning Nella schermata attuale la board mostra i titoli dei task ma non espone controlli per crearli, modificarli, spostarli o completarli. La gestione dei task workspace è quindi documentata come incompleta. ::: Per i task personali, consulta Aggiungere e organizzare task."
+  },
+  {
     "title": "Gestire pagine private e sottopagine",
     "description": "Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar.",
     "section": "workspace",
