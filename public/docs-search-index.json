@@ -366,6 +366,40 @@
     "searchText": "Termini di servizio La route Termini è presente, ma il contenuto visualizzato è ancora una pagina di esempio. termini condizioni legale La route /terms è raggiungibile dall'app, ma il contenuto nel codice è dichiaratamente un esempio con testo segnaposto. Non usarla come fonte di condizioni contrattuali o termini effettivi del servizio. :::callout warning {{DA VERIFICARE: pubblicare e revisionare i termini di servizio prima di presentarli come documento legale definitivo.}} :::"
   },
   {
+    "title": "Scorciatoie da tastiera",
+    "description": "Elenco delle scorciatoie verificate per ricerca e navigazione dell'albero delle pagine.",
+    "section": "riferimenti",
+    "order": 40,
+    "route": "/dashboard",
+    "tags": [
+      "scorciatoie",
+      "tastiera",
+      "ricerca",
+      "accessibilità"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "riferimenti/scorciatoie",
+    "headings": [],
+    "searchText": "Scorciatoie da tastiera Elenco delle scorciatoie verificate per ricerca e navigazione dell'albero delle pagine. scorciatoie tastiera ricerca accessibilità Taskly supporta alcune scorciatoie per raggiungere la ricerca e navigare le pagine private. I gesti da tastiera per la sidebar funzionano quando il treeview ha il focus. Tasti Azione Ctrl+K / Cmd+K Sposta il focus al campo di ricerca disponibile. Ctrl+? / Cmd+? Mostra un avviso con la scorciatoia di ricerca. ↑ / ↓ Sposta il focus tra le voci del treeview. → / ← Espande/comprime una pagina o si sposta tra genitore e sottopagina. F2 Avvia la rinomina della pagina selezionata. Invio / Spazio Apre la pagina selezionata. Esc Chiude il menu contestuale della pagina o i menu/dialog che supportano la chiusura. N Nella vista I miei task , fuori da un campo di testo, porta il focus alla creazione rapida. :::callout note La scorciatoia globale di ricerca sposta il focus a un input: non garantisce da sola che si apra un pannello di ricerca. Per i dettagli consulta Usare la ricerca veloce. ::: Non sono state documentate altre combinazioni perché non risultano verificate nel codice esaminato."
+  },
+  {
+    "title": "Novità",
+    "description": "Una pagina di novità è prevista, ma il progetto non contiene ancora un changelog utente verificabile.",
+    "section": "riferimenti",
+    "order": 50,
+    "route": "",
+    "tags": [
+      "novità",
+      "changelog"
+    ],
+    "status": "coming-soon",
+    "updated": "2026-10-05",
+    "slug": "riferimenti/novita",
+    "headings": [],
+    "searchText": "Novità Una pagina di novità è prevista, ma il progetto non contiene ancora un changelog utente verificabile. novità changelog Questa pagina è riservata alle novità di Taskly. Nel codice esaminato non è presente un changelog utente con voci e date verificabili; per questo non vengono elencati aggiornamenti non confermati. :::callout note {{DA VERIFICARE: quale canale e processo usare per mantenere il changelog pubblico.}} :::"
+  },
+  {
     "title": "Aggiungere e organizzare task",
     "description": "Crea task, imposta priorità e ricorrenza e scegli una vista lista, Kanban o Timeline.",
     "section": "sezioni",
