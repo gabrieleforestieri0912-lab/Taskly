@@ -133,56 +133,62 @@ Fonte: `src/app/dashboard/page.tsx` e componenti importati.
 | Collaborazione realtime | README dice che Socket.IO e cursori/aggiornamenti live sono stati rimossi. | Non documentare come disponibile. |
 | API docs | La pagina placeholder presenta un riquadro “API”, senza contenuto documentale verificato. | Non presentare come reference API esistente. |
 
-## Mappa documentazione proposta
+## Mappa documentazione e copertura Fase 4
 
-La route collegata indica il punto dell'app a cui la guida sarebbe pertinente.
-Le pagine sono proposte, non ancora approvate; si documenteranno solo flussi
-verificati e gli elementi incerti resteranno marcati.
+La mappa è stata approvata in Fase 2 e realizzata con contenuti Markdown file-based.
+Ogni file è disponibile nella navigazione e nella ricerca generate dal registro.
 
-| Sezione | Pagina proposta | Route app collegata | Copertura |
-|---|---|---|---|
-| Introduzione | Panoramica di Taskly e glossario dei termini UI | `/` | Concettuale; limitare il glossario a termini riscontrati. |
-| Per iniziare | Creare un account e accedere | `/register`, `/login` | `{{DA VERIFICARE: flussi e messaggi.}}` |
-| Per iniziare | Completare “Inizia da qui” | `/dashboard` | Passi verificabili in `OnboardingChecklist`. |
-| Workspace e sidebar | Navigare Home, Task, Inbox e pagine private | `/dashboard` | Voci presenti nella sidebar. |
-| Workspace e sidebar | Creare, rinominare, duplicare e organizzare pagine | `/dashboard` | Include sottopagine e drag-and-drop. |
-| Workspace e sidebar | Gestire il Cestino | `/dashboard?trash=1` | Ripristino/eliminazione; verificare la retention e i tipi di record esposti dalla vista. |
-| Sezioni dashboard | Gestire i task personali | `/dashboard?view=mytasks` | `MyTasksView`; azioni specifiche `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Usare Inbox | `/dashboard?view=inbox` | `{{DA VERIFICARE: vista e azioni.}}` |
-| Sezioni dashboard | Creare e gestire pagine Task | `/dashboard?page=…` | `ItemList`, viste e azioni `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Gestire obiettivi | `/dashboard?page=…` | `GoalsView`; azioni `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Usare il Calendario | `/dashboard?page=…`, `/calendar` | `CalendarView` e integrazione Google Calendar da verificare. |
-| Sezioni dashboard | Scrivere e organizzare Note | `/dashboard?page=…`, `/notes` | `NotesView`; dettagli editor `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Catturare idee con Brain Dump | `/dashboard?page=…` | `BrainDumpView`; azioni `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Usare la pagina vuota | `/dashboard?page=…` | `EmptyPageView`; `{{DA VERIFICARE: contenuto e salvataggio.}}` |
-| Sezioni dashboard | Personalizzare la Home | `/dashboard` | Widget e ordinamento; verificare preferenze salvate. |
-| Sezioni dashboard | Usare la chat AI | `/dashboard?ai=1` | Azioni AI e limiti `{{DA VERIFICARE}}`. |
-| Sezioni dashboard | Gestire riunioni e recap | `/meetings` | `{{DA VERIFICARE: import e provider supportati.}}` |
-| Sezioni dashboard | Trascrivere audio | `/transcription` | `{{DA VERIFICARE: sorgenti e flusso.}}` |
-| Sezioni dashboard | Consultare attività recenti | `/activity` | `{{DA VERIFICARE: contenuto e azioni.}}` |
-| Sezioni dashboard | Usare template | `/templates`, `/dashboard` | Galleria e salvataggio custom; selezione/uso da verificare. |
-| Account e impostazioni | Modificare profilo e preferenze | `/settings` | Suddivisione in tab dedotta dai link sidebar; dettagli da verificare. |
-| Piani e fatturazione | Consultare abbonamento e fatturazione | `/settings?tab=billing` | Limite pagine osservato; dettagli commerciali da verificare. |
-| Integrazioni | Collegare Google, Google Calendar e Slack | `/integrations`, `/calendar` | Stato dei flussi da verificare. |
-| Workspace | Aprire workspace e documenti | `/workspace/[id]` | Ruoli, permessi e contenuti da verificare. |
-| Workspace | Usare board | `/workspace/[id]/board` | `{{DA VERIFICARE: funzionalità.}}` |
-| Workspace | Modificare documenti | `/workspace/[id]/doc/[slug]` | Editor/backlinks da verificare. |
-| Aiuto | Consultare la documentazione e contattare il supporto | `/docs`, `/support` | Canale di supporto da verificare. |
-| Riferimenti | Scorciatoie da tastiera | `/dashboard` | Documentare solo quelle elencate nell'inventario. |
-| Riferimenti | FAQ | `/` | FAQ landing; verificare che risposte e prodotto siano attuali. |
-| Riferimenti | Risoluzione problemi e Novità | `/dashboard` | Novità non individuata; pagina manuale solo se approvata in Fase 2. |
+| Sezione | Guida | Route app collegata | File contenuto | Stato |
+|---|---|---|---|---|
+| Introduzione | Panoramica Taskly | `/` | `content/docs/it/overview/cose-taskly.md` | Coperta |
+| Introduzione | Glossario | Concettuale | `content/docs/it/overview/glossario.md` | Coperta |
+| Per iniziare | Registrazione | `/register` | `content/docs/it/per-iniziare/registrazione.md` | Coperta; verifiche Supabase marcate |
+| Per iniziare | Accesso | `/login` | `content/docs/it/per-iniziare/accesso.md` | Coperta; verifiche provider marcate |
+| Per iniziare | Primo accesso e onboarding | `/dashboard` | `content/docs/it/per-iniziare/primo-accesso.md` | Coperta |
+| Workspace | Pagine private e sottopagine | `/dashboard` | `content/docs/it/workspace/pagine-private.md` | Coperta |
+| Workspace | Ricerca veloce | `/dashboard` | `content/docs/it/workspace/ricerca.md` | Coperta; risultati da verificare |
+| Workspace | Cestino | `/dashboard?trash=1` | `content/docs/it/workspace/cestino.md` | Coperta; tipi ripristinabili da verificare |
+| Dashboard | I miei task | `/dashboard?view=mytasks` | `content/docs/it/sezioni/i-miei-task.md` | Coperta |
+| Dashboard | Inbox | `/dashboard?view=inbox` | `content/docs/it/sezioni/inbox.md` | Coming soon / comportamento da verificare |
+| Dashboard | Pagine Task | `/tasks`, pagina di tipo Task | `content/docs/it/sezioni/task.md` | Coperta |
+| Dashboard | Obiettivi | Pagina di tipo Obiettivi | `content/docs/it/sezioni/obiettivi.md` | Coperta |
+| Dashboard | Calendario | `/calendar`, pagina di tipo Calendario | `content/docs/it/sezioni/calendario.md` | Coperta; sincronizzazione Google da verificare |
+| Dashboard | Note | `/notes`, pagina di tipo Note | `content/docs/it/sezioni/note.md` | Coperta; pubblicazione/blocco da verificare |
+| Dashboard | Brain Dump | Pagina di tipo Brain Dump | `content/docs/it/sezioni/brain-dump.md` | Coperta |
+| Dashboard | Pagina vuota | Pagina di tipo Pagina vuota | `content/docs/it/sezioni/pagina-vuota.md` | Coperta |
+| Dashboard | Home e Analitiche | `/dashboard` | `content/docs/it/sezioni/home-analitiche.md` | Coperta; metriche/widget marcati |
+| Dashboard | Chat AI | `/dashboard?ai=1` | `content/docs/it/sezioni/chat-ai.md` | Coperta; risposte dipendono dal servizio AI |
+| Dashboard | Riunioni | `/meetings` | `content/docs/it/sezioni/riunioni.md` | Coperta |
+| Dashboard | Trascrizioni | `/transcription` | `content/docs/it/sezioni/trascrizioni.md` | Coperta; supporto browser/provider indicato |
+| Dashboard | Attività recenti | `/activity` | `content/docs/it/sezioni/attivita-recenti.md` | Coperta; eventi backend da verificare |
+| Dashboard | Template | `/templates` | `content/docs/it/sezioni/template.md` | Coperta; galleria copia testo negli appunti |
+| Account | Impostazioni | `/settings` | `content/docs/it/account/impostazioni.md` | Coperta; opzioni stub esplicitate |
+| Account | Piano e fatturazione | `/settings?tab=billing` | `content/docs/it/account/fatturazione.md` | Coperta; portale/dettagli da verificare |
+| Integrazioni | Hub integrazioni | `/integrations` | `content/docs/it/sezioni/integrazioni.md` | Coperta; configurazione server richiesta per OAuth |
+| Team | Gestione membri e ruoli | `/team` | `content/docs/it/sezioni/team-workspace.md` | Coperta |
+| Workspace | Aprire un workspace | `/workspace/[id]` | `content/docs/it/sezioni/workspace.md` | Coperta; accesso diretto da verificare |
+| Workspace | Board workspace | `/workspace/[id]/board` | `content/docs/it/sezioni/board-workspace.md` | Coming soon: vista attualmente solo lettura |
+| Workspace | Documento workspace | `/workspace/[id]/doc/[slug]` | `content/docs/it/sezioni/documenti-workspace.md` | Coperta; backlink/permessi da verificare |
+| Riferimenti | FAQ | Concettuale | `content/docs/it/overview/faq.md` | Coperta |
+| Riferimenti | Scorciatoie | `/dashboard` | `content/docs/it/riferimenti/scorciatoie.md` | Coperta con combinazioni verificate |
+| Riferimenti | Supporto | `/support` | `content/docs/it/riferimenti/supporto.md` | Coperta |
+| Riferimenti | Privacy | `/privacy` | `content/docs/it/riferimenti/privacy.md` | Coperta; rimanda al testo legale |
+| Riferimenti | Termini | `/terms` | `content/docs/it/riferimenti/termini.md` | Coming soon: route contiene testo d'esempio |
+| Riferimenti | Novità | Concettuale | `content/docs/it/riferimenti/novita.md` | Coming soon: changelog non presente |
+| Documentazione | Indice e navigazione | `/docs` | `content/docs/it/index.md` | Coperta dal motore dinamico Fase 3 |
 
-## Decisioni da riesaminare prima della Fase 2
+### Elementi `coming-soon` e verifiche aperte
 
-1. Il prompt propone MDX con `gray-matter` e `next-mdx-remote/rsc`, ricerca client
-   side e catch-all. La route `/docs` esistente è oggi un Client Component con
-   layout metadata dedicato: la migrazione richiederà sostituire la pagina e
-   rivedere quel layout.
-2. Il prompt richiede copertura automatica per ogni route app, ma route API,
-   authentication callback, legal e pagine interne workspace non sono tutte
-   necessariamente utili come guide pubbliche. Approvare una allowlist esplicita.
-3. `getDocForRoute(pathname)` non è richiesto dal comportamento corrente e
-   implicherebbe aggiungere un helper; nessuna UI esistente va modificata senza
-   approvazione.
-4. Valutare se il report inventario finale debba rimanere in root (`docs-inventory.md`)
-   o essere spostato sotto `docs/`.
+- `Inbox`: la route è presente nella sidebar, ma non è stata verificata una vista dedicata nel dispatcher dashboard.
+- Board dei workspace: elenca i task per stato ma non offre controlli di modifica nella schermata esaminata.
+- `/terms`: la pagina contiene testo d'esempio e non termini effettivi.
+- Novità: non è stato trovato un changelog utente nel codice.
+- Restano marcati `{{DA VERIFICARE: ...}}` i comportamenti per autenticazione e registrazione, onboarding/preset, ricerca, cestino, task assegnati, calendario e sincronizzazione, pubblicazione/blocco Note, widget e metriche, cronologia attività, billing, workspace e documenti. L'elenco puntuale è nei file guida relativi.
+
+### Decisioni approvate in Fase 2
+
+1. Route `/docs` nella stessa app Next.js, contenuti pubblici in italiano sotto `content/docs/it/`.
+2. Markdown file-based con frontmatter validato dal registro; non è stato introdotto MDX.
+3. Sidebar, breadcrumb, TOC, navigazione precedente/successivo e ricerca derivati dai file; indice JSON rigenerato con `npx tsx scripts/build-docs-index.mts`.
+4. Screenshot reali non generati; nessuna integrazione UI aggiunta all'app esistente e nessun helper route-to-doc collegato.
+5. I contenuti documentano soltanto comportamenti verificati; le funzioni parziali o incerte sono indicate nel frontmatter o con `{{DA VERIFICARE: ...}}`.
