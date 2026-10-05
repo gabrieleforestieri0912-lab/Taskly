@@ -493,6 +493,72 @@
     "searchText": "Inbox La sidebar mostra un accesso Inbox, ma la vista dedicata richiede verifica prima di essere usata. inbox dashboard sidebar La sidebar include una voce Inbox . Nell'implementazione esaminata la voce cambia lo stato attivo e la query dell'URL, ma la dashboard non mostra una vista Inbox separata nel dispatcher verificato. :::callout warning {{DA VERIFICARE: la voce Inbox potrebbe essere una funzione incompleta o gestita altrove. Non fare affidamento su questa route come vista dedicata finché il comportamento non viene confermato.}} :::"
   },
   {
+    "title": "Consultare Riunioni e recap",
+    "description": "Cerca le riunioni salvate, filtra l'archivio e genera un recap dalla trascrizione.",
+    "section": "sezioni",
+    "order": 90,
+    "route": "/meetings",
+    "tags": [
+      "riunioni",
+      "trascrizione",
+      "recap",
+      "Zoom",
+      "Google Meet"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/riunioni",
+    "headings": [
+      {
+        "id": "aggiungere-una-riunione",
+        "text": "Aggiungere una riunione",
+        "depth": 2
+      },
+      {
+        "id": "cercare-e-consultare",
+        "text": "Cercare e consultare",
+        "depth": 2
+      },
+      {
+        "id": "generare-o-aggiornare-un-recap",
+        "text": "Generare o aggiornare un recap",
+        "depth": 2
+      }
+    ],
+    "searchText": "Consultare Riunioni e recap Cerca le riunioni salvate, filtra l'archivio e genera un recap dalla trascrizione. riunioni trascrizione recap Zoom Google Meet Aggiungere una riunione Cercare e consultare Generare o aggiornare un recap La pagina Riunioni raccoglie trascrizioni e recap. Puoi cercare per titolo o testo di anteprima, filtrare per categoria, espandere una scheda, riprodurre l'audio quando disponibile ed eliminare una riunione. Aggiungere una riunione Seleziona Nuova trascrizione per aprire /transcription. Da lì puoi registrare dal microfono o passare alla scheda di importazione. Cercare e consultare 1. Usa il campo di ricerca per filtrare titolo o anteprima della trascrizione. 2. Seleziona una categoria per restringere l'elenco. 3. Seleziona una riunione per espanderne i dettagli. 4. Se è disponibile un recap, apri la scheda Riepiloghi per individuare quelle con un riepilogo. 5. Usa il controllo di riproduzione se la riunione ha un audio associato. Le riunioni registrate vengono salvate nel browser; per gli utenti autenticati l'app tenta anche la sincronizzazione con il server. Generare o aggiornare un recap Apri una riunione con trascrizione e seleziona il controllo per generare il recap. Il testo viene inviato al servizio recap; per gli utenti autenticati l'app richiede di salvarlo sul server. :::callout warning Il recap AI può dipendere dalla disponibilità della configurazione server. Verifica la trascrizione originale prima di riutilizzare decisioni o azioni estratte. ::: Per registrare o importare una nuova trascrizione, consulta Trascrivere o importare una riunione."
+  },
+  {
+    "title": "Trascrivere o importare una riunione",
+    "description": "Registra dal microfono con trascrizione del browser oppure importa appunti e file VTT, TXT o SRT.",
+    "section": "sezioni",
+    "order": 100,
+    "route": "/transcription",
+    "tags": [
+      "trascrizione",
+      "microfono",
+      "Zoom",
+      "Google Meet",
+      "VTT",
+      "SRT"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "sezioni/trascrizioni",
+    "headings": [
+      {
+        "id": "registrare-dal-microfono",
+        "text": "Registrare dal microfono",
+        "depth": 2
+      },
+      {
+        "id": "importare-una-trascrizione",
+        "text": "Importare una trascrizione",
+        "depth": 2
+      }
+    ],
+    "searchText": "Trascrivere o importare una riunione Registra dal microfono con trascrizione del browser oppure importa appunti e file VTT, TXT o SRT. trascrizione microfono Zoom Google Meet VTT SRT Registrare dal microfono Importare una trascrizione La pagina Trascrizione permette di registrare audio dal microfono, visualizzare il testo riconosciuto dal browser, generare un recap e salvare la riunione. Puoi anche importare appunti o trascrizioni da file. Registrare dal microfono 1. Apri /transcription e consenti l'accesso al microfono quando il browser lo richiede. 2. Seleziona Avvia registrazione . 3. Metti in pausa o riprendi quando necessario; seleziona Stop per concludere. 4. Ascolta la registrazione con il player audio. 5. Inserisci un titolo facoltativo, genera un recap se desideri e seleziona Salva trascrizione . La trascrizione live dipende dal supporto Speech Recognition del browser. Se non è disponibile, la registrazione audio può essere completata, ma la UI avvisa che la trascrizione live non è disponibile. Importare una trascrizione 1. Seleziona la scheda Importa . 2. Scegli Zoom , Meet o File . 3. Per File, carica .vtt, .txt o .srt, oppure incolla il testo. 4. Inserisci un titolo e, se necessario, l'URL della riunione o l'ID Zoom. 5. Facoltativamente seleziona Genera recap . 6. Seleziona Importa riunione . Per Zoom e Google Meet è disponibile un pulsante di connessione OAuth; i provider devono essere configurati sul server. La UI permette di inserire i dati della trascrizione e importare; la disponibilità di recupero automatico di registrazioni o trascrizioni dipende dall'integrazione configurata. :::callout warning La registrazione richiede un browser che supporti MediaRecorder e l'autorizzazione al microfono. La trascrizione live usa il riconoscimento vocale integrato nel browser, impostato su italiano; non è garantita su tutti i browser. ::: :::callout note Il salvataggio conserva una copia locale e prova a sincronizzare la riunione col server per gli utenti autenticati. L'app torna poi all'archivio Riunioni. :::"
+  },
+  {
     "title": "Gestire pagine private e sottopagine",
     "description": "Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar.",
     "section": "workspace",
