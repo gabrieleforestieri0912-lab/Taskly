@@ -287,5 +287,63 @@
       }
     ],
     "searchText": "Gestire pagine private e sottopagine Crea pagine, apri i relativi menu e organizza la gerarchia nell'area Privato della sidebar. sidebar pagine sottopagine template Dove la trovi Creare una pagina Organizzare l'albero delle pagine Scorciatoie da tastiera Problemi comuni La sezione Privato della sidebar mostra le pagine personali in una struttura ad albero. Puoi creare una pagina dalla sezione, scegliere un tipo o un template nel selettore e annidare pagine. Dove la trovi Apri la dashboard. La sezione Privato si trova nella sidebar principale. Creare una pagina :::steps 1. Seleziona + accanto a Privato , oppure Crea una pagina quando l'elenco è vuoto. 2. Nel selettore, scegli un tipo di pagina o un template disponibile. 3. Apri la nuova pagina dall'area Privato . ::: Organizzare l'albero delle pagine Seleziona la freccia accanto a una pagina per espandere o comprimere le sottopagine. Usa Aggiungi sottopagina dal pulsante + della pagina o dal suo menu …. Trascina una pagina su un'altra per annidarla; trascinala nell'area radice per riportarla al primo livello. Usa il menu … per rinominare, duplicare o eliminare la pagina. Per rinominare, puoi anche avviare la modifica inline e confermare con Invio. Azione Come si fa Nota Creare una pagina Seleziona + accanto a Privato e scegli nel selettore. Selezionare un tipo o un template dipende dalle voci mostrate dal selettore. Aggiungere una sottopagina Seleziona + sulla riga della pagina o Aggiungi sottopagina nel menu …. La nuova pagina viene inserita sotto la pagina scelta. Rinominare Apri il menu … e seleziona Rinomina . Invio conferma; Esc annulla la modifica in corso. Duplicare Apri il menu … e seleziona Duplica . Viene creata una copia della pagina. Eliminare Apri il menu …, seleziona Elimina e conferma. Puoi annullare l'eliminazione dal Cestino. Spostare o annidare Trascina la pagina su un'altra pagina o sulla radice dell'albero. La struttura viene aggiornata dalla sidebar. Scorciatoie da tastiera ↑ e ↓: spostano il focus tra le pagine dell'albero. → espande una pagina o porta alla prima sottopagina; ← comprime o porta alla pagina genitore. F2: avvia la rinomina della pagina selezionata. Invio o Spazio: apre la pagina selezionata. Esc: chiude il menu contestuale. :::callout tip Espandi la pagina genitore per trovare le sottopagine; quando apri una pagina annidata, la sidebar espande automaticamente i suoi antenati. ::: Problemi comuni Se una pagina appena creata non compare, controlla l'area Privato e verifica che il caricamento iniziale sia terminato. La dashboard mostra un avviso se hai raggiunto il limite di pagine del piano corrente; il numero del limite dipende dal piano associato all'account."
+  },
+  {
+    "title": "Usare la ricerca veloce",
+    "description": "Apri la ricerca dalla sidebar e usa la scorciatoia disponibile per spostare il focus alla ricerca.",
+    "section": "workspace",
+    "order": 20,
+    "route": "/dashboard",
+    "tags": [
+      "ricerca",
+      "sidebar",
+      "scorciatoie",
+      "task"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "workspace/ricerca",
+    "headings": [
+      {
+        "id": "dove-la-trovi",
+        "text": "Dove la trovi",
+        "depth": 2
+      },
+      {
+        "id": "usare-la-scorciatoia",
+        "text": "Usare la scorciatoia",
+        "depth": 2
+      }
+    ],
+    "searchText": "Usare la ricerca veloce Apri la ricerca dalla sidebar e usa la scorciatoia disponibile per spostare il focus alla ricerca. ricerca sidebar scorciatoie task Dove la trovi Usare la scorciatoia La sidebar della dashboard include il pulsante Ricerca . Taskly registra anche Ctrl+K o Cmd+K come scorciatoia per portare il focus al campo di ricerca disponibile. Dove la trovi Apri la dashboard e seleziona Ricerca nella sidebar. Il tooltip della sidebar descrive la ricerca di pagine, task e azioni. Usare la scorciatoia 1. Premi Ctrl+K su Windows/Linux oppure Cmd+K su macOS. 2. Scrivi nel campo che riceve il focus, se è disponibile nella schermata. La scorciatoia globale in KeyboardShortcuts sposta il focus al primo input con ruolo search; se non ne trova uno, usa il primo input della pagina. :::callout warning {{DA VERIFICARE: verificare quali categorie e risultati restituisce il pannello aperto dal pulsante Ricerca della sidebar; il gestore della scorciatoia non implementa direttamente un motore di ricerca.}} :::"
+  },
+  {
+    "title": "Gestire il Cestino",
+    "description": "Trova pagine rimosse, ripristinale oppure eliminale definitivamente.",
+    "section": "workspace",
+    "order": 30,
+    "route": "/dashboard?trash=1",
+    "tags": [
+      "cestino",
+      "pagine",
+      "ripristino",
+      "eliminazione"
+    ],
+    "status": "stable",
+    "updated": "2026-10-05",
+    "slug": "workspace/cestino",
+    "headings": [
+      {
+        "id": "dove-lo-trovi",
+        "text": "Dove lo trovi",
+        "depth": 2
+      },
+      {
+        "id": "cercare-e-gestire-gli-elementi",
+        "text": "Cercare e gestire gli elementi",
+        "depth": 2
+      }
+    ],
+    "searchText": "Gestire il Cestino Trova pagine rimosse, ripristinale oppure eliminale definitivamente. cestino pagine ripristino eliminazione Dove lo trovi Cercare e gestire gli elementi Quando elimini una pagina dall'albero Privato , la dashboard la contrassegna come eliminata invece di rimuoverla subito. Puoi aprire il Cestino dal menu Altro della sidebar per trovare elementi eliminati. Dove lo trovi Apri il menu Altro nella parte inferiore della sidebar e seleziona Cestino . La dashboard supporta anche la vista trash=1. Cercare e gestire gli elementi 1. Apri il Cestino. 2. Inserisci una parte del nome nel campo di ricerca per filtrare gli elementi visualizzati. 3. Seleziona Ripristina per recuperare una pagina. 4. Seleziona Elimina per rimuoverla definitivamente. Azione Risultato Cercare Filtra gli elementi eliminati in base all'etichetta. Ripristinare una pagina Rimuove il contrassegno di eliminazione. Eliminare definitivamente una pagina Rimuove la pagina e le sottopagine correlate. :::callout warning La dashboard elimina automaticamente le pagine che sono nel Cestino da oltre 30 giorni. Prima di eliminare definitivamente una pagina, verifica di non averne più bisogno. ::: :::callout note Il menu laterale mostra anche elementi eliminati di tipo Task e Obiettivo, ma il ripristino usa dati locali del browser. {{DA VERIFICARE: verificare coerenza tra questi elementi e la vista Cestino principale della dashboard.}} :::"
   }
 ]
