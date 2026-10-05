@@ -26,7 +26,7 @@ function Hero({ onStart, onDiscover }) {
   ];
 
   return (
-    <section className="landing-section-surface relative isolate flex min-h-[100vh] flex-col items-center justify-center overflow-hidden px-6 pt-32 pb-20">
+    <section className="landing-section-surface relative isolate flex min-h-[calc(100svh-3.5rem)] flex-col items-center justify-center overflow-hidden px-6 pt-8 pb-16 sm:min-h-[calc(100svh-4rem)] sm:pt-12 sm:pb-20">
       {/* ── Sfondo: aurora + griglia + luce calda ──────────────────
           Tre strati sovrapposti danno profondità senza sporcare il
           bianco: aurora viola in alto, griglia tecnica al centro,

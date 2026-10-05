@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
 function SiteLogo({ size = 28 }: { size?: number }) {
@@ -57,6 +57,7 @@ export default function Navbar({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const isLanding = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
@@ -250,14 +251,11 @@ export default function Navbar({
     setMobileMenuOpen(false);
   };
 
-  /* ── Landing floating navbar ─────────────────────────────────── */
+  /* ── Landing navbar ──────────────────────────────────────────── */
   if (isLanding && !isDashboard) {
-    // PILLOLA centrata che galleggia sopra il contenuto: sfondo bianco/neutro,
-    // bordo sottile, ombra molto leggera e sfumata. `sticky` + no padding-top
-    // sulla landing, come da scelta di design.
     const barSurface = scrolled
-      ? "border-gray-200 bg-white/80 shadow-lg backdrop-blur-md dark:border-gray-800/80 dark:bg-black/80 dark:backdrop-blur-md"
-      : "border-gray-100 bg-white/70 shadow-sm backdrop-blur-sm dark:border-gray-900/80 dark:bg-black/70 dark:backdrop-blur-sm";
+      ? "border-gray-200 bg-white/95 shadow-md dark:border-gray-800 dark:bg-black/95"
+      : "border-transparent bg-white dark:border-transparent dark:bg-black";
 
     const menuItem =
       "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white";
@@ -267,9 +265,19 @@ export default function Navbar({
 
     return (
       <>
-        <header className="pointer-events-none sticky top-0 z-50 w-full px-3 pt-3 sm:px-5 sm:pt-4">
+        <motion.header
+          initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.45,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className={`sticky top-0 z-50 w-full border-b transition-[background-color,border-color,box-shadow] duration-300 ${barSurface}`}
+        >
           <nav
-            className={`pointer-events-auto mx-auto flex h-14 w-full max-w-[720px] items-center justify-between rounded-2xl border bg-white/80 px-4 shadow-lg shadow-black/3 dark:border-white/10 dark:bg-black/80 dark:shadow-black/10 backdrop-blur-lg transition-all duration-300 ease-out sm:h-16 sm:px-5 ${barSurface}`}
+            className={`mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 transition-[height] duration-300 sm:px-6 lg:px-10 ${
+              scrolled ? "h-12 sm:h-14" : "h-14 sm:h-16"
+            }`}
           >
             {/* Logo */}
             <Link
@@ -283,7 +291,7 @@ export default function Navbar({
             </Link>
 
             {/* Desktop nav links */}
-            <div className="hidden flex-1 items-center justify-center gap-1 lg:flex min-w-0">
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">
               {landingNavLinks.map((link) => (
                 <div
                   key={link.key}
@@ -361,7 +369,7 @@ export default function Navbar({
             </div>
 
             {/* Desktop actions */}
-            <div className="hidden shrink-0 items-center gap-2 lg:flex">
+            <div className="hidden shrink-0 items-center gap-2 xl:flex">
               {user ? (
                 <div className="flex items-center gap-2">
                   <Link
@@ -445,13 +453,13 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition-colors hover:bg-[#7b39fc]/10 lg:hidden dark:text-white dark:hover:bg-white/10"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition-colors hover:bg-[#7b39fc]/10 xl:hidden dark:text-white dark:hover:bg-white/10"
               aria-label={t("land.demoMenu")}
             >
               <Menu size={22} />
             </button>
           </nav>
-        </header>
+        </motion.header>
 
         {/* Full-screen mobile menu */}
         <AnimatePresence>
@@ -461,7 +469,7 @@ export default function Navbar({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-50 flex flex-col bg-white/90 backdrop-blur-xl px-6 py-6 lg:hidden dark:bg-black/90 dark:backdrop-blur-xl"
+              className="fixed inset-0 z-50 flex flex-col bg-white/90 px-6 py-6 backdrop-blur-xl xl:hidden dark:bg-black/90 dark:backdrop-blur-xl"
             >
               <div className="flex items-center justify-between">
                 <Link
