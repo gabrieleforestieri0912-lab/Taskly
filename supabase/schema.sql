@@ -190,6 +190,154 @@ create table if not exists public.notifications (
 );
 create index if not exists notifications_user_idx on public.notifications (user_id, created_at desc);
 
+create table if not exists public.workspace_comments (
+  id          uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  entity_type text not null check (entity_type in ('task', 'document')),
+  entity_id   text not null,
+  author_id   uuid not null references auth.users(id) on delete cascade,
+  body        text not null check (char_length(body) between 1 and 5000),
+  mention_ids uuid[] not null default '{}',
+  created_at  timestamptz not null default now()
+);
+create index if not exists workspace_comments_entity_idx
+  on public.workspace_comments (workspace_id, entity_type, entity_id, created_at);
+create index if not exists workspace_comments_mentions_idx
+  on public.workspace_comments using gin (mention_ids);
+
+create table if not exists public.workspace_document_mentions (
+  document_id  uuid not null references public.documents(id) on delete cascade,
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  primary key (document_id, user_id)
+);
+alter table public.workspace_document_mentions enable row level security;
+revoke all on public.workspace_document_mentions from public, anon, authenticated;
+grant all on public.workspace_document_mentions to service_role;
+
+alter table public.workspace_comments enable row level security;
+drop policy if exists workspace_comments_member_read on public.workspace_comments;
+create policy workspace_comments_member_read on public.workspace_comments
+  for select to authenticated
+  using (exists (
+    select 1 from public.workspace_members wm
+    where wm.workspace_id = workspace_comments.workspace_id
+      and wm.user_id = auth.uid()
+  ));
+drop policy if exists workspace_comments_member_insert on public.workspace_comments;
+create policy workspace_comments_member_insert on public.workspace_comments
+  for insert to authenticated
+  with check (
+    author_id = auth.uid()
+    and exists (
+      select 1 from public.workspace_members wm
+      where wm.workspace_id = workspace_comments.workspace_id
+        and wm.user_id = auth.uid()
+        and wm.role <> 'viewer'
+    )
+  );
+
+create or replace function public.create_workspace_comment_with_mentions(
+  p_workspace_id uuid,
+  p_entity_type text,
+  p_entity_id text,
+  p_author_id uuid,
+  p_author_name text,
+  p_body text,
+  p_mention_ids uuid[]
+) returns public.workspace_comments
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  inserted_comment public.workspace_comments;
+begin
+  insert into public.workspace_comments (
+    workspace_id, entity_type, entity_id, author_id, body, mention_ids
+  ) values (
+    p_workspace_id, p_entity_type, p_entity_id, p_author_id, p_body,
+    coalesce(p_mention_ids, '{}'::uuid[])
+  )
+  returning * into inserted_comment;
+
+  insert into public.notifications (
+    workspace_id, user_id, title, body, read, meta
+  )
+  select
+    p_workspace_id::text,
+    mentions.user_id,
+    'Sei stato menzionato da ' || p_author_name,
+    left(p_body, 240),
+    false,
+    jsonb_build_object(
+      'type', 'mention',
+      'entityType', p_entity_type,
+      'entityId', p_entity_id,
+      'commentId', inserted_comment.id
+    )
+  from unnest(coalesce(p_mention_ids, '{}'::uuid[])) as mentions(user_id)
+  where mentions.user_id <> p_author_id;
+
+  return inserted_comment;
+end;
+$$;
+revoke all on function public.create_workspace_comment_with_mentions(
+  uuid, text, text, uuid, text, text, uuid[]
+) from public, anon, authenticated;
+grant execute on function public.create_workspace_comment_with_mentions(
+  uuid, text, text, uuid, text, text, uuid[]
+) to service_role;
+
+create or replace function public.sync_workspace_document_mentions(
+  p_document_id uuid,
+  p_workspace_id uuid,
+  p_entity_id text,
+  p_author_id uuid,
+  p_author_name text,
+  p_mention_ids uuid[]
+) returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  delete from public.workspace_document_mentions
+  where document_id = p_document_id
+    and user_id <> all(coalesce(p_mention_ids, '{}'::uuid[]));
+
+  with new_mentions as (
+    insert into public.workspace_document_mentions (document_id, workspace_id, user_id)
+    select p_document_id, p_workspace_id, mentions.user_id
+    from unnest(coalesce(p_mention_ids, '{}'::uuid[])) as mentions(user_id)
+    where mentions.user_id <> p_author_id
+    on conflict (document_id, user_id) do nothing
+    returning user_id
+  )
+  insert into public.notifications (
+    workspace_id, user_id, title, body, read, meta
+  )
+  select
+    p_workspace_id::text,
+    new_mentions.user_id,
+    'Sei stato menzionato in un documento da ' || p_author_name,
+    'Sei stato menzionato nel documento "' || p_entity_id || '".',
+    false,
+    jsonb_build_object(
+      'type', 'mention',
+      'entityType', 'document',
+      'entityId', p_entity_id
+    )
+  from new_mentions;
+end;
+$$;
+revoke all on function public.sync_workspace_document_mentions(
+  uuid, uuid, text, uuid, text, uuid[]
+) from public, anon, authenticated;
+grant execute on function public.sync_workspace_document_mentions(
+  uuid, uuid, text, uuid, text, uuid[]
+) to service_role;
+
 create table if not exists public.activity (
   id         uuid primary key default gen_random_uuid(),
   type       text not null,

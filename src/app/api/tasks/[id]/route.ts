@@ -40,6 +40,9 @@ export async function PUT(
     if (!t) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json(t);
   } catch (e) {
+    if (e instanceof Error && e.message === "workspace_read_only") {
+      return NextResponse.json({ error: "workspace_read_only" }, { status: 403 });
+    }
     console.error(e);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
@@ -55,9 +58,16 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await deleteTask(user.id, id);
+    const deleted = await deleteTask(user.id, id);
+    if (!deleted) return NextResponse.json({ error: "not_found" }, { status: 404 });
     return NextResponse.json({ ok: true });
   } catch (e) {
+    if (e instanceof Error && e.message === "workspace_delete_forbidden") {
+      return NextResponse.json({ error: "workspace_delete_forbidden" }, { status: 403 });
+    }
+    if (e instanceof Error && e.message === "workspace_read_only") {
+      return NextResponse.json({ error: "workspace_read_only" }, { status: 403 });
+    }
     console.error(e);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }

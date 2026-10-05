@@ -34,4 +34,6 @@ La presenza della gestione workspace e dei ruoli non implica collaborazione real
 
 ## Board e documenti workspace
 
-Apri un workspace per trovare i collegamenti alla board e al documento `home`. La [board workspace](/docs/sezioni/board-workspace) mostra attualmente colonne di stato e task restituiti dal backend; i controlli per modificare o creare task non sono presenti nella pagina esaminata.
+Apri un workspace per trovare i collegamenti alla board e al documento `home`. La [board workspace](/docs/sezioni/board-workspace) permette ai membri di aggiungere task, aggiornare lo stato e collaborare nei commenti. I membri con ruolo **Viewer** possono consultare i contenuti in sola lettura.
+
+Task e documenti associati a un workspace sono condivisi con i suoi membri. **Owner**, **Admin** e **Membro** possono modificarli; **Viewer** può consultarli. Le menzioni selezionate nei commenti e quelle inserite nell'editor dei documenti inviano una notifica alla persona menzionata nell'[Inbox](/docs/sezioni/inbox).

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useLanguage } from "../lib/LanguageContext";
 import { apiFetch } from "../lib/api";
+import { MessageSquare } from "lucide-react";
+import WorkspaceComments from "./WorkspaceComments";
 
 type TaskStatus = "todo" | "in_progress" | "done";
 
@@ -43,29 +45,45 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [workspaceRole, setWorkspaceRole] = useState<string | null>(null);
+  const [openCommentsTaskId, setOpenCommentsTaskId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const loadTasks = useCallback(async () => {
     if (!workspace) return;
     setLoading(true);
+    setWorkspaceRole(null);
     setError("");
     try {
-      const response = await apiFetch(
-        `/tasks?workspace=${encodeURIComponent(workspace)}&limit=100`,
-      );
-      const data = await response.json();
+      const [response, membersResponse] = await Promise.all([
+        apiFetch(`/tasks?workspace=${encodeURIComponent(workspace)}&limit=100`),
+        apiFetch(`/workspaces/${encodeURIComponent(workspace)}/members`),
+      ]);
+      const [data, membersData] = await Promise.all([
+        response.json(),
+        membersResponse.json(),
+      ]);
       if (!response.ok) {
         throw new Error(
-          data?.message ||
+          data?.error ||
+            data?.message ||
             (response.status === 401
               ? "Accedi per visualizzare i task del workspace."
               : "Impossibile caricare i task del workspace."),
         );
       }
+      if (!membersResponse.ok || typeof membersData?.role !== "string") {
+        throw new Error("Impossibile verificare i permessi del workspace.");
+      }
       if (!Array.isArray(data) || !data.every(isWorkspaceTask)) {
         throw new Error("Il servizio ha restituito un elenco di task non valido.");
       }
       setTasks(data);
+      setWorkspaceRole(membersData.role);
+      const requestedTask = new URLSearchParams(window.location.search).get("task");
+      if (requestedTask && data.some((task: WorkspaceTask) => task._id === requestedTask)) {
+        setOpenCommentsTaskId(requestedTask);
+      }
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -76,6 +94,8 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
       setLoading(false);
     }
   }, [workspace]);
+
+  const canEdit = Boolean(workspaceRole && workspaceRole !== "viewer");
 
   useEffect(() => {
     void loadTasks();
@@ -156,6 +176,7 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
     <div className="space-y-5">
       <h3 className="text-xl font-bold">{t("misc.tasks")}</h3>
 
+      {canEdit && (
       <form onSubmit={createTask} className="flex gap-2">
         <label className="sr-only" htmlFor="workspace-task-title">
           Titolo del task
@@ -176,6 +197,7 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
           {saving ? "Salvataggio…" : "Aggiungi"}
         </button>
       </form>
+      )}
 
       {error && (
         <div
@@ -221,7 +243,7 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
                       className="rounded-xl border border-gray-200 bg-white p-3 text-sm dark:border-gray-800 dark:bg-gray-950"
                     >
                       <p className="break-words font-medium">{task.title}</p>
-                      <label className="mt-3 block">
+                      {canEdit && <label className="mt-3 block">
                         <span className="sr-only">Stato di {task.title}</span>
                         <select
                           value={task.status}
@@ -238,7 +260,27 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
                             </option>
                           ))}
                         </select>
-                      </label>
+                      </label>}
+                      <button
+                        type="button"
+                        aria-expanded={openCommentsTaskId === task._id}
+                        onClick={() =>
+                          setOpenCommentsTaskId((current) =>
+                            current === task._id ? null : task._id,
+                          )
+                        }
+                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-violet-700 hover:underline dark:text-violet-300"
+                      >
+                        <MessageSquare size={14} aria-hidden="true" />
+                        Commenti
+                      </button>
+                      {openCommentsTaskId === task._id && (
+                        <WorkspaceComments
+                          workspaceId={workspace}
+                          entityType="task"
+                          entityId={task._id}
+                        />
+                      )}
                     </article>
                   ))}
                   {!columnTasks.length && (

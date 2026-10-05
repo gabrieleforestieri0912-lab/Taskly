@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDoc } from "@/lib/server/db";
+import { getDoc, getWorkspaceRole } from "@/lib/server/db";
 import { getAuthUser } from "@/lib/server/auth";
 import { unauthorized } from "@/lib/server/http";
 
@@ -12,13 +12,18 @@ export async function GET(
 
   try {
     const { id: workspace, slug } = await params;
+    const role = await getWorkspaceRole(user.id, workspace);
+    if (!role) return NextResponse.json({ error: "not_found" }, { status: 404 });
     const doc = await getDoc({
       userId: user.id,
       workspaceId: workspace,
       slug,
     });
-    if (!doc) return NextResponse.json({ error: "not_found" }, { status: 404 });
-    return NextResponse.json(doc);
+    return NextResponse.json(
+      doc
+        ? { ...doc, canEdit: role !== "viewer" }
+        : { blocks: [], canEdit: role !== "viewer" },
+    );
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "server_error" }, { status: 500 });

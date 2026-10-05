@@ -632,20 +632,47 @@
   },
   {
     "title": "Inbox",
-    "description": "La sidebar mostra un accesso Inbox, ma la vista dedicata richiede verifica prima di essere usata.",
+    "description": "Rivedi le notifiche quando un membro ti menziona in un commento o in un documento workspace.",
     "section": "sezioni",
     "order": 80,
     "route": "/dashboard?view=inbox",
     "tags": [
       "inbox",
       "dashboard",
-      "sidebar"
+      "sidebar",
+      "menzioni"
     ],
-    "status": "coming-soon",
+    "status": "stable",
     "updated": "2026-10-05",
     "slug": "sezioni/inbox",
-    "headings": [],
-    "searchText": "Inbox La sidebar mostra un accesso Inbox, ma la vista dedicata richiede verifica prima di essere usata. inbox dashboard sidebar La sidebar include una voce Inbox . Nell'implementazione esaminata la voce cambia lo stato attivo e la query dell'URL, ma la dashboard non mostra una vista Inbox separata nel dispatcher verificato. :::callout warning {{DA VERIFICARE: la voce Inbox potrebbe essere una funzione incompleta o gestita altrove. Non fare affidamento su questa route come vista dedicata finché il comportamento non viene confermato.}} :::"
+    "headings": [
+      {
+        "id": "dove-la-trovi",
+        "text": "Dove la trovi",
+        "depth": 2
+      },
+      {
+        "id": "come-si-usa",
+        "text": "Come si usa",
+        "depth": 2
+      },
+      {
+        "id": "come-ricevere-una-notifica",
+        "text": "Come ricevere una notifica",
+        "depth": 2
+      },
+      {
+        "id": "problemi-comuni",
+        "text": "Problemi comuni",
+        "depth": 2
+      },
+      {
+        "id": "vedi-anche",
+        "text": "Vedi anche",
+        "depth": 2
+      }
+    ],
+    "searchText": "Inbox Rivedi le notifiche quando un membro ti menziona in un commento o in un documento workspace. inbox dashboard sidebar menzioni Dove la trovi Come si usa Come ricevere una notifica Problemi comuni Vedi anche L' Inbox raccoglie le notifiche personali generate dalle menzioni nei workspace. Puoi aprire il task o il documento collegato e segnare le notifiche come lette. Dove la trovi Seleziona Inbox nella sidebar oppure apri /dashboard?view=inbox. Per ricevere una notifica devi appartenere al workspace in cui vieni menzionato. Come si usa 1. Apri l'Inbox per vedere le notifiche, con le più recenti in alto. 2. Seleziona Apri per raggiungere il task o il documento. Se la notifica riguarda un commento, la pagina evidenzia il commento. 3. Seleziona Segna come letta per aggiornare lo stato senza aprire la risorsa. 4. Se l'elenco non si carica, usa Riprova . Come ricevere una notifica In un commento di un task o di un documento, seleziona un membro nel menu Menziona un membro e aggiungilo al testo prima di pubblicare. Nell'editor di un documento workspace, digita @ e scegli un membro dal suggerimento. Le notifiche sono inviate ai membri selezionati, non a tutte le persone del workspace. Chi ha il ruolo Viewer può leggere l'Inbox e i commenti, ma non può pubblicare commenti, modificare documenti o aggiornare i task. La collaborazione non è in tempo reale: la pagina dell'Inbox carica le notifiche quando viene aperta o aggiornata. :::callout note @ seleziona un membro del workspace; [ cerca e collega un altro documento. Sono due azioni distinte. ::: Problemi comuni Non vedi una notifica: controlla che la menzione sia stata selezionata nel menu e che l'utente faccia ancora parte del workspace. Non puoi commentare o modificare: il ruolo Viewer è in sola lettura. Vedi anche [Gestire Team e Workspace Consultare la board del workspace Modificare un documento workspace"
   },
   {
     "title": "Consultare Riunioni e recap",
@@ -821,7 +848,7 @@
         "depth": 2
       }
     ],
-    "searchText": "Gestire Team e Workspace Crea workspace, aggiungi membri e assegna ruoli dalla pagina Team & Workspaces. team workspace membri ruoli collaborazione Creare un workspace Aggiungere membri e cambiare ruoli Board e documenti workspace La pagina Team & Workspaces consente di creare workspace e gestire i membri associati. La gestione richiede l'accesso; la schermata mostra un messaggio se l'utente non è autenticato. Creare un workspace 1. Apri /team. 2. Seleziona Nuovo Workspace . 3. Inserisci un nome e seleziona Crea . 4. Espandi la scheda del workspace per vedere i membri. Aggiungere membri e cambiare ruoli 1. Espandi il workspace. 2. Inserisci l'indirizzo email della persona. 3. Seleziona Membro , Admin o Viewer . 4. Seleziona Invita . 5. Per aggiornare un ruolo, usa il menu accanto al membro. Il proprietario è mostrato come tale e non ha un selettore di ruolo. La schermata mostra messaggi in caso di permessi insufficienti, utente non trovato o errori di rete. I ruoli disponibili nel selettore sono owner, admin, member e viewer; il menu di aggiunta propone member, admin e viewer. :::callout warning La presenza della gestione workspace e dei ruoli non implica collaborazione realtime. Il progetto ha rimosso la collaborazione live con cursori remoti e aggiornamenti Socket.IO. ::: Board e documenti workspace Apri un workspace per trovare i collegamenti alla board e al documento home. La board workspace mostra attualmente colonne di stato e task restituiti dal backend; i controlli per modificare o creare task non sono presenti nella pagina esaminata."
+    "searchText": "Gestire Team e Workspace Crea workspace, aggiungi membri e assegna ruoli dalla pagina Team & Workspaces. team workspace membri ruoli collaborazione Creare un workspace Aggiungere membri e cambiare ruoli Board e documenti workspace La pagina Team & Workspaces consente di creare workspace e gestire i membri associati. La gestione richiede l'accesso; la schermata mostra un messaggio se l'utente non è autenticato. Creare un workspace 1. Apri /team. 2. Seleziona Nuovo Workspace . 3. Inserisci un nome e seleziona Crea . 4. Espandi la scheda del workspace per vedere i membri. Aggiungere membri e cambiare ruoli 1. Espandi il workspace. 2. Inserisci l'indirizzo email della persona. 3. Seleziona Membro , Admin o Viewer . 4. Seleziona Invita . 5. Per aggiornare un ruolo, usa il menu accanto al membro. Il proprietario è mostrato come tale e non ha un selettore di ruolo. La schermata mostra messaggi in caso di permessi insufficienti, utente non trovato o errori di rete. I ruoli disponibili nel selettore sono owner, admin, member e viewer; il menu di aggiunta propone member, admin e viewer. :::callout warning La presenza della gestione workspace e dei ruoli non implica collaborazione realtime. Il progetto ha rimosso la collaborazione live con cursori remoti e aggiornamenti Socket.IO. ::: Board e documenti workspace Apri un workspace per trovare i collegamenti alla board e al documento home. La board workspace permette ai membri di aggiungere task, aggiornare lo stato e collaborare nei commenti. I membri con ruolo Viewer possono consultare i contenuti in sola lettura. Task e documenti associati a un workspace sono condivisi con i suoi membri. Owner , Admin e Membro possono modificarli; Viewer può consultarli. Le menzioni selezionate nei commenti e quelle inserite nell'editor dei documenti inviano una notifica alla persona menzionata nell'Inbox."
   },
   {
     "title": "Aprire un workspace",
@@ -848,14 +875,15 @@
   },
   {
     "title": "Consultare la board del workspace",
-    "description": "La board mostra i task del workspace in colonne Da fare, In corso e Completato.",
+    "description": "Crea task, aggiorna lo stato e collabora nei commenti della board del workspace.",
     "section": "sezioni",
     "order": 160,
     "route": "/workspace/[id]/board",
     "tags": [
       "board",
       "workspace",
-      "task"
+      "task",
+      "commenti"
     ],
     "status": "stable",
     "updated": "2026-10-05",
@@ -867,7 +895,7 @@
         "depth": 2
       }
     ],
-    "searchText": "Consultare la board del workspace La board mostra i task del workspace in colonne Da fare, In corso e Completato. board workspace task Aggiungere e aggiornare task La board del workspace carica i task associati al workspace e li raggruppa nelle colonne Da fare , In corso e Completato . Aggiungere e aggiornare task 1. Inserisci il titolo nel campo Aggiungi un task al workspace e seleziona Aggiungi . 2. Il task viene creato nella colonna Da fare . 3. Usa il menu Stato sulla scheda per spostare il task tra le tre colonne. Le modifiche vengono inviate al servizio task del workspace. Per visualizzare o modificare i task devi aver effettuato l'accesso. La board non espone controlli per eliminare task o modificare descrizioni e altri dettagli. Per i task personali, consulta Aggiungere e organizzare task."
+    "searchText": "Consultare la board del workspace Crea task, aggiorna lo stato e collabora nei commenti della board del workspace. board workspace task commenti Aggiungere e aggiornare task La board del workspace carica i task associati al workspace e li raggruppa nelle colonne Da fare , In corso e Completato . Aggiungere e aggiornare task 1. Inserisci il titolo nel campo Aggiungi un task al workspace e seleziona Aggiungi . 2. Il task viene creato nella colonna Da fare . 3. Usa il menu Stato sulla scheda per spostare il task tra le tre colonne. Le modifiche vengono salvate nel workspace. Tutti i membri possono visualizzare i task; i ruoli Owner , Admin e Membro possono crearli, aggiornare lo stato e commentare. Viewer può leggere task e commenti in sola lettura. Seleziona Commenti sulla scheda di un task per leggere o aggiungere commenti. Nel menu Menziona un membro puoi selezionare le persone a cui inviare una notifica nell'Inbox. La board non espone controlli per eliminare task o modificare descrizioni e altri dettagli. Per i task personali, consulta Aggiungere e organizzare task."
   },
   {
     "title": "Usare la chat AI",
@@ -929,7 +957,7 @@
   },
   {
     "title": "Modificare un documento workspace",
-    "description": "Scrivi contenuti strutturati, formatta il testo e salva un documento nel workspace.",
+    "description": "Modifica documenti condivisi, menziona membri e collabora con i commenti workspace.",
     "section": "sezioni",
     "order": 190,
     "route": "/workspace/[id]/doc/[slug]",
@@ -937,7 +965,8 @@
       "documento",
       "workspace",
       "editor",
-      "backlink"
+      "menzioni",
+      "commenti"
     ],
     "status": "stable",
     "updated": "2026-10-05",
@@ -949,7 +978,7 @@
         "depth": 2
       }
     ],
-    "searchText": "Modificare un documento workspace Scrivi contenuti strutturati, formatta il testo e salva un documento nel workspace. documento workspace editor backlink Modificare e salvare Un documento workspace è accessibile all'indirizzo /workspace/<id /doc/<slug . L'editor consente di modificare il contenuto strutturato e salvarlo nel workspace. Modificare e salvare 1. Apri un workspace e il collegamento Documento , oppure visita il percorso del documento. 2. Scrivi nel corpo del documento. 3. Usa la barra strumenti per applicare titoli, elenchi puntati o numerati, citazioni, blocchi di codice, divisori, toggle, callout e liste attività. 4. Seleziona Salva per salvare manualmente; l'editor esegue anche un salvataggio automatico dopo le modifiche. 5. Per aggiungere un collegamento, usa lo strumento link e inserisci un URL o un percorso workspace. 6. Digita [[ per cercare un altro documento del workspace e inserirne il riferimento. :::callout note L'editor carica e salva il documento tramite i servizi documentali dell'app. La disponibilità dipende dall'accesso al workspace e dal servizio server. ::: {{DA VERIFICARE: visibilità e destinazione dei backlink/riferimenti inseriti, inclusi permessi di lettura e comportamento di collaborazione.}}"
+    "searchText": "Modificare un documento workspace Modifica documenti condivisi, menziona membri e collabora con i commenti workspace. documento workspace editor menzioni commenti Modificare e salvare Un documento workspace è accessibile all'indirizzo /workspace/<id /doc/<slug . L'editor consente di modificare il contenuto strutturato e salvarlo nel workspace. Modificare e salvare 1. Apri un workspace e il collegamento Documento , oppure visita il percorso del documento. Per leggere o modificare il contenuto devi appartenere al workspace. 2. Scrivi nel corpo del documento. 3. Usa la barra strumenti per applicare titoli, elenchi puntati o numerati, citazioni, blocchi di codice, divisori, toggle, callout e liste attività. 4. Seleziona Salva per salvare manualmente; l'editor esegue anche un salvataggio automatico dopo le modifiche. 5. Per aggiungere un collegamento, usa lo strumento link e inserisci un URL o un percorso workspace. 6. Digita @ e seleziona un membro per menzionarlo. Digita [[ per cercare un altro documento del workspace e inserirne il riferimento. 7. Scorri sotto l'editor per leggere o aggiungere commenti. Seleziona Menziona un membro per inviare una notifica Inbox a una persona specifica. I ruoli Owner , Admin e Membro possono modificare il documento e commentare. Viewer può leggere il documento e i commenti, ma non modificarli. :::callout note @ è per i membri; [[ è per i collegamenti ad altri documenti. Le modifiche non vengono sincronizzate in tempo reale tra gli utenti. :::"
   },
   {
     "title": "Gestire pagine private e sottopagine",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   getWorkspaceForUser,
   getWorkspaceMembers,
+  listWorkspaceMentionTargets,
   upsertWorkspaceMember,
   getProfileByEmail,
 } from "@/lib/server/db";
@@ -14,6 +15,24 @@ function canManage(
 ): boolean {
   const member = members.find((m) => String(m.userId) === String(userId));
   return ["owner", "admin"].includes(member?.role || "");
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const user = getAuthUser(request);
+  if (!user) return unauthorized();
+
+  try {
+    const { id } = await params;
+    const data = await listWorkspaceMentionTargets(user.id, id);
+    if (!data) return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return NextResponse.json({ ...data, currentUserId: user.id });
+  } catch (error) {
+    console.error("Workspace members error:", error);
+    return NextResponse.json({ error: "server_error" }, { status: 500 });
+  }
 }
 
 export async function POST(

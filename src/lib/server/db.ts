@@ -290,7 +290,10 @@ async function listTasks({
       (sb: any) =>
         sb
           .from("tasks")
-          .eq("user_id", userId)
+          .eq(
+            workspaceId === "personal" ? "user_id" : "workspace_id",
+            workspaceId === "personal" ? userId : workspaceId,
+          )
           .eq("workspace_id", workspaceId)
           .order("created_at", { ascending: false }),
       "*",
@@ -302,10 +305,10 @@ async function listTasks({
   let query = supabase
     .from("tasks")
     .select("*")
-    .eq("user_id", userId)
     .eq("workspace_id", workspaceId)
     .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit - 1);
+  if (workspaceId === "personal") query = query.eq("user_id", userId);
   if (status) query = query.eq("status", status);
   const { data, error } = await query;
   if (error) throw error;
@@ -318,9 +321,14 @@ async function getTask(userId: string, taskId: string) {
     .from("tasks")
     .select("*")
     .eq("id", taskId)
-    .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
+  if (!data) return null;
+  if (data.workspace_id === "personal") {
+    if (String(data.user_id) !== String(userId)) return null;
+  } else if (!(await getWorkspaceRole(userId, data.workspace_id))) {
+    return null;
+  }
   return mapTask(data);
 }
 
@@ -345,10 +353,22 @@ function taskRowFromPayload(userId: string, body: any) {
 }
 
 async function createTask(userId: string, body: any) {
+  const workspaceId = body.workspaceId || body.workspace || "personal";
+  if (workspaceId !== "personal") {
+    const role = await getWorkspaceRole(userId, workspaceId);
+    if (!role) return null;
+    if (role === "viewer") throw new Error("workspace_read_only");
+  }
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from("tasks")
-    .insert(taskRowFromPayload(userId, body))
+    .insert(
+      taskRowFromPayload(userId, {
+        ...body,
+        workspaceId,
+        createdBy: userId,
+      }),
+    )
     .select("*")
     .maybeSingle();
   if (error) throw error;
@@ -359,27 +379,48 @@ async function updateTask(userId: string, taskId: string, body: any) {
   const supabase = getSupabase();
   const existing = await getTask(userId, taskId);
   if (!existing) return null;
+  if (
+    existing.workspaceId !== "personal" &&
+    (await getWorkspaceRole(userId, existing.workspaceId)) === "viewer"
+  ) {
+    throw new Error("workspace_read_only");
+  }
   const next: any = taskRowFromPayload(userId, { ...existing, ...body });
+  next.user_id = existing.userId;
+  next.workspace_id = existing.workspaceId;
+  next.created_by = existing.createdBy;
   next.updated_at = new Date().toISOString();
   delete next.created_at;
-  const { data, error } = await supabase
-    .from("tasks")
-    .update(next)
-    .eq("id", taskId)
-    .eq("user_id", userId)
-    .select("*")
-    .maybeSingle();
+  let query = supabase.from("tasks").update(next).eq("id", taskId);
+  if (existing.workspaceId === "personal") query = query.eq("user_id", userId);
+  const { data, error } = await query.select("*").maybeSingle();
   if (error) throw error;
   return mapTask(data);
 }
 
 async function deleteTask(userId: string, taskId: string) {
   const supabase = getSupabase();
-  const { error } = await supabase
-    .from("tasks")
-    .delete()
-    .eq("id", taskId)
-    .eq("user_id", userId);
+  const task = await getTask(userId, taskId);
+  if (!task) return false;
+  if (
+    task.workspaceId !== "personal" &&
+    (await getWorkspaceRole(userId, task.workspaceId)) === "viewer"
+  ) {
+    throw new Error("workspace_read_only");
+  }
+  if (
+    task.workspaceId !== "personal" &&
+    String(task.userId) !== String(userId) &&
+    String(task.createdBy) !== String(userId) &&
+    !(["owner", "admin"].includes(
+      (await getWorkspaceRole(userId, task.workspaceId)) || "",
+    ))
+  ) {
+    throw new Error("workspace_delete_forbidden");
+  }
+  let query = supabase.from("tasks").delete().eq("id", taskId);
+  if (task.workspaceId === "personal") query = query.eq("user_id", userId);
+  const { error } = await query;
   if (error) throw error;
   return true;
 }
@@ -525,6 +566,169 @@ async function getWorkspaceMembers(workspaceId: string) {
   }));
 }
 
+async function getWorkspaceRole(userId: string, workspaceId: string) {
+  if (!isUuid(workspaceId)) return null;
+  const workspace = await getWorkspaceForUser(userId, workspaceId);
+  return (
+    workspace?.members.find(
+      (member) => String(member.userId) === String(userId),
+    )?.role || null
+  );
+}
+
+async function listWorkspaceMentionTargets(userId: string, workspaceId: string) {
+  const workspace = await getWorkspaceForUser(userId, workspaceId);
+  if (!workspace) return null;
+  const supabase = getSupabase();
+  const memberIds = workspace.members.map((member) => String(member.userId));
+  if (memberIds.length === 0) return { role: null, members: [] };
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, name, email, picture")
+    .in("id", memberIds);
+  if (error) throw error;
+  const profiles = new Map<string, any>(
+    (data || []).map((profile: any): [string, any] => [
+      String(profile.id),
+      profile,
+    ]),
+  );
+  return {
+    role:
+      workspace.members.find(
+        (member) => String(member.userId) === String(userId),
+      )?.role || null,
+    members: workspace.members.map((member) => {
+      const profile: any = profiles.get(member.userId);
+      return {
+        id: member.userId,
+        name: profile?.name || profile?.email || "Membro",
+        email: profile?.email || "",
+        role: member.role,
+      };
+    }),
+  };
+}
+
+async function listWorkspaceComments(
+  userId: string,
+  workspaceId: string,
+  entityType: string,
+  entityId: string,
+) {
+  if (!(await getWorkspaceRole(userId, workspaceId))) return null;
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("workspace_comments")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .eq("entity_type", entityType)
+    .eq("entity_id", entityId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  const rows = data || [];
+  const authorIds = Array.from(
+    new Set(rows.map((row: any) => String(row.author_id))),
+  );
+  const { data: profiles, error: profilesError } = authorIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, name, email, picture")
+        .in("id", authorIds)
+    : { data: [], error: null };
+  if (profilesError) throw profilesError;
+  const profileById = new Map<string, any>(
+    (profiles || []).map((profile: any): [string, any] => [
+      String(profile.id),
+      profile,
+    ]),
+  );
+  return rows.map((row: any) => {
+    const author: any = profileById.get(String(row.author_id));
+    return {
+      id: row.id,
+      workspaceId: row.workspace_id,
+      entityType: row.entity_type,
+      entityId: row.entity_id,
+      authorId: row.author_id,
+      authorName: author?.name || author?.email || "Membro",
+      body: row.body,
+      mentions: row.mention_ids || [],
+      createdAt: row.created_at,
+    };
+  });
+}
+
+async function createWorkspaceComment(
+  userId: string,
+  workspaceId: string,
+  entityType: string,
+  entityId: string,
+  body: string,
+  mentions: string[],
+) {
+  const workspace = await getWorkspaceForUser(userId, workspaceId);
+  if (!workspace) return null;
+  const authorMembership = workspace.members.find(
+    (member) => String(member.userId) === String(userId),
+  );
+  if (!authorMembership || authorMembership.role === "viewer") {
+    throw new Error("workspace_read_only");
+  }
+
+  const supabase = getSupabase();
+  const resourceTable = entityType === "task" ? "tasks" : "documents";
+  let resourceQuery = supabase
+    .from(resourceTable)
+    .select("id")
+    .eq("workspace_id", workspaceId);
+  resourceQuery =
+    entityType === "task"
+      ? resourceQuery.eq("id", entityId)
+      : resourceQuery.eq("slug", entityId);
+  const { data: resource, error: resourceError } =
+    await resourceQuery.limit(1).maybeSingle();
+  if (resourceError) throw resourceError;
+  if (!resource) return null;
+
+  const memberIds = new Set(
+    workspace.members.map((member) => String(member.userId)),
+  );
+  const mentionedUserIds = Array.from(new Set(mentions)).filter(
+    (id) => id !== userId,
+  );
+  if (mentionedUserIds.some((id) => !memberIds.has(id))) {
+    throw new Error("invalid_workspace_mention");
+  }
+  const profile = await getProfile(userId);
+  const { data, error } = await supabase.rpc(
+    "create_workspace_comment_with_mentions",
+    {
+      p_workspace_id: workspaceId,
+      p_entity_type: entityType,
+      p_entity_id: entityId,
+      p_author_id: userId,
+      p_author_name: profile?.name || profile?.email || "Un membro",
+      p_body: body,
+      p_mention_ids: mentionedUserIds,
+    },
+  );
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) throw new Error("workspace_comment_not_created");
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    entityType: row.entity_type,
+    entityId: row.entity_id,
+    authorId: row.author_id,
+    authorName: profile?.name || profile?.email || "Membro",
+    body: row.body,
+    mentions: row.mention_ids || [],
+    createdAt: row.created_at,
+  };
+}
+
 async function upsertWorkspaceMember(
   workspaceId: string,
   userId: string,
@@ -557,6 +761,7 @@ async function searchDocs({
   q: string;
   limit?: number;
 }) {
+  if (!(await getWorkspaceRole(userId, workspaceId))) return [];
   const supabase = getSupabase();
   const needle = `%${sanitizeSearchTerm(q)
     .replace(/%/g, "\\%")
@@ -564,7 +769,6 @@ async function searchDocs({
   const { data, error } = await supabase
     .from("documents")
     .select("id, title, slug")
-    .eq("user_id", userId)
     .eq("workspace_id", workspaceId)
     .or(`title.ilike.${needle},slug.ilike.${needle}`)
     .limit(limit);
@@ -586,15 +790,23 @@ async function getDoc({
   slug: string;
 }) {
   const supabase = getSupabase();
+  const role = await getWorkspaceRole(userId, workspaceId);
+  if (!role) return null;
   const { data, error } = await supabase
     .from("documents")
     .select("*")
-    .eq("user_id", userId)
     .eq("workspace_id", workspaceId)
     .eq("slug", slug)
-    .maybeSingle();
+    .order("updated_at", { ascending: false })
+    .limit(100);
   if (error) throw error;
-  return mapDocument(data);
+  const rows = data || [];
+  const row =
+    rows.find((item: any) => String(item.user_id) === String(userId)) ||
+    rows[0] ||
+    null;
+  const document = mapDocument(row);
+  return document ? { ...document, canEdit: role !== "viewer" } : null;
 }
 
 async function getDocById(userId: string, docId: string) {
@@ -603,9 +815,14 @@ async function getDocById(userId: string, docId: string) {
     .from("documents")
     .select("*")
     .eq("id", docId)
-    .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
+  if (!data) return null;
+  if (data.workspace_id === "personal") {
+    if (String(data.user_id) !== String(userId)) return null;
+  } else if (!(await getWorkspaceRole(userId, data.workspace_id))) {
+    return null;
+  }
   return mapDocument(data);
 }
 
@@ -655,6 +872,32 @@ function extractBacklinks(blocks: any[]): string[] {
   return Array.from(set);
 }
 
+function extractDocumentMentionIds(blocks: any[]): string[] {
+  const ids = new Set<string>();
+  const mentionTag = /<span\b[^>]*>/gi;
+  const idAttribute = /\bdata-id=["']([0-9a-f-]{36})["']/i;
+  const scan = (value: any): void => {
+    if (typeof value === "string") {
+      let match: RegExpExecArray | null;
+      while ((match = mentionTag.exec(value))) {
+        if (!/\bdata-type=["']mention["']/i.test(match[0])) continue;
+        const id = match[0].match(idAttribute)?.[1];
+        if (id && isUuid(id)) ids.add(id);
+      }
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach(scan);
+      return;
+    }
+    if (value && typeof value === "object") {
+      Object.values(value).forEach(scan);
+    }
+  };
+  scan(blocks);
+  return Array.from(ids);
+}
+
 async function saveDoc({
   userId,
   workspaceId,
@@ -671,6 +914,9 @@ async function saveDoc({
   author?: string;
 }) {
   const supabase = getSupabase();
+  const role = await getWorkspaceRole(userId, workspaceId);
+  if (!role) throw new Error("workspace_not_found");
+  if (role === "viewer") throw new Error("workspace_read_only");
   const existing = await getDoc({ userId, workspaceId, slug });
   const plainText = plainTextFromBlocks(blocks as any[]);
   const backlinks = extractBacklinks(blocks as any[]);
@@ -745,6 +991,27 @@ async function saveDoc({
     .select("*")
     .maybeSingle();
   if (vError) throw vError;
+
+  const workspace = await getWorkspaceForUser(userId, workspaceId);
+  if (!workspace) throw new Error("workspace_not_found");
+  const workspaceMemberIds = new Set(
+    workspace.members.map((member) => String(member.userId)),
+  );
+  const mentionIds = extractDocumentMentionIds(blocks || []).filter((id) =>
+    id !== userId && workspaceMemberIds.has(id),
+  );
+  const { error: mentionError } = await supabase.rpc(
+    "sync_workspace_document_mentions",
+    {
+      p_document_id: docId,
+      p_workspace_id: workspaceId,
+      p_entity_id: slug,
+      p_author_id: userId,
+      p_author_name: (await getProfile(userId))?.name || "Un membro",
+      p_mention_ids: mentionIds,
+    },
+  );
+  if (mentionError) throw mentionError;
 
   return { docId, version: versionRow.version, blocks: blocks || [] };
 }
@@ -1442,6 +1709,10 @@ export {
   createWorkspace,
   getWorkspaceForUser,
   getWorkspaceMembers,
+  getWorkspaceRole,
+  listWorkspaceMentionTargets,
+  listWorkspaceComments,
+  createWorkspaceComment,
   upsertWorkspaceMember,
   // documents
   searchDocs,

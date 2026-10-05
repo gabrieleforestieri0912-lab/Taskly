@@ -22,7 +22,7 @@ come certi senza ulteriore controllo della schermata o del backend.
 | `/activity` | `src/app/activity/page.tsx` | Attività recenti | `{{DA VERIFICARE: categorie mostrate e azioni disponibili.}}` |
 | `/integrations` | `src/app/integrations/page.tsx` | Integrazioni | Il codice mostra flussi per Google e Slack; `{{DA VERIFICARE: integrazioni effettivamente attivabili e relativi permessi.}}` |
 | `/templates` | `src/app/templates/page.tsx` | Galleria/area template | La dashboard permette di salvare un template personalizzato e aprire la galleria; `{{DA VERIFICARE: contenuto e azioni della route autonoma.}}` |
-| `/team` | `src/app/team/page.tsx` | Area Team | `{{DA VERIFICARE: membri, ruoli e collaborazione realmente funzionanti.}}` |
+| `/team` | `src/app/team/page.tsx` | Area Team | Gestisce membri e ruoli; le funzionalità collaborative workspace sono descritte nelle guide dedicate. |
 | `/settings` | `src/app/settings/page.tsx` | Impostazioni | La sidebar collega alle schede profilo, aspetto, notifiche, workflow, dati, sicurezza e fatturazione; `{{DA VERIFICARE: quali schede sono operative e quali preferenze salvano.}}` |
 | `/docs` | `src/app/docs/[[...slug]]/page.tsx`, `src/app/docs/layout.tsx` | Portale pubblico di documentazione | Route catch-all dinamica; contenuti Markdown file-based in `content/docs/it/`. |
 | `/support` | `src/app/support/page.tsx`, `src/app/support/SupportForm.tsx` | Supporto | Modulo di supporto; `{{DA VERIFICARE: campi, validazioni, canale di invio e messaggi.}}` |
@@ -30,13 +30,13 @@ come certi senza ulteriore controllo della schermata o del backend.
 | `/terms` | `src/app/terms/page.tsx` | Termini di servizio | Pagina legale. |
 | `/workspace/[id]` | `src/app/workspace/[id]/page.tsx` | Workspace dinamico per identificatore | `{{DA VERIFICARE: accesso, azioni, ruoli e differenze rispetto alle pagine private della dashboard.}}` |
 | `/workspace/[id]/board` | `src/app/workspace/[id]/board/page.tsx` | Board dinamica del workspace | Elenca, crea e aggiorna lo stato dei task tramite API; accesso richiesto. |
-| `/workspace/[id]/doc/[slug]` | `src/app/workspace/[id]/doc/[slug]/page.tsx` | Documento dinamico nel workspace | Il README segnala documenti con backlinks; `{{DA VERIFICARE: azioni dell'editor e comportamento dei backlinks dalla UI.}}` |
+| `/workspace/[id]/doc/[slug]` | `src/app/workspace/[id]/doc/[slug]/page.tsx` | Documento dinamico nel workspace | Editor condiviso con permessi in sola lettura per Viewer, menzioni `@membro`, collegamenti `[[documento]]` e commenti. |
 
 ### Route non-pagina
 
 - `src/app/robots.ts` e `src/app/sitemap.ts` generano metadati per crawler.
 - Sono presenti API Route sotto `src/app/api/**/route.ts`; non sono pagine di navigazione utente.
-- Raggruppamento delle API individuate: autenticazione (`auth/*`), dati utente e abbonamento (`user/*`), task (`tasks/*`), risorse pagina/idee/obiettivi (`resources/*`), documenti e ricerca (`doc/*`, `search/vector`), workspace e membri (`workspaces/*`), template (`templates/*`), riunioni (`meetings/*`), integrazioni (`integrations/*`), notifiche (`notifications/*`), attività (`activity/*`), analytics (`analytics/*`), supporto (`support`), AI (`ai/chat`), billing (`billing/*`) e health (`health`).
+- Raggruppamento delle API individuate: autenticazione (`auth/*`), dati utente e abbonamento (`user/*`), task (`tasks/*`), risorse pagina/idee/obiettivi (`resources/*`), documenti e ricerca (`doc/*`, `search/vector`), workspace, membri e commenti (`workspaces/*`), template (`templates/*`), riunioni (`meetings/*`), integrazioni (`integrations/*`), notifiche (`notifications/*`), attività (`activity/*`), analytics (`analytics/*`), supporto (`support`), AI (`ai/chat`), billing (`billing/*`) e health (`health`).
 - `src/proxy.ts` tratta le API con rate limiting e audit logging, secondo il README.
 
 ## Sidebar della dashboard
@@ -47,7 +47,7 @@ File guida: `src/components/Sidebar.tsx`, `src/components/sidebar/PageTreeItem.t
 ### Azioni rapide e navigazione
 
 - Ricerca veloce; tooltip indica `Ctrl+K` e la ricerca di pagine, task e azioni.
-- Home (`/dashboard`), Task (`/dashboard?view=mytasks`), Inbox (`/dashboard?view=inbox`).
+- Home (`/dashboard`), Task (`/dashboard?view=mytasks`), Inbox (`/dashboard?view=inbox`), dove rivedere le notifiche di menzione, aprire la risorsa collegata o segnare la notifica come letta.
 - Creazione rapida di Pagina vuota e Chat; Trascrizione; Riunioni (`/meetings`); Calendario, che apre una pagina di calendario esistente o `/calendar`.
 - Scheda Google Calendar nella sidebar.
 - Sezione `Privato`, con pagine in albero. Il pulsante `+` della sezione e il CTA nello stato vuoto aprono `AddPageModal`; da qui si può scegliere una tipologia o un template.
@@ -113,15 +113,18 @@ Fonte: `src/app/dashboard/page.tsx` e componenti importati.
 - Integrazioni: route e componenti menzionano Google Calendar, Google e Slack;
   le API includono callback Google e Zoom e webhook Slack. `{{DA VERIFICARE:
   provider disponibili nell'interfaccia e stato di ogni flusso.}}`
-- Notifiche: sono presenti API di lista e marcatura letta, `NotificationBell` e
-  impostazioni `Notifiche & Promemoria`. `{{DA VERIFICARE: eventi generati,
-  frequenza di polling e controlli utente.}}`
+- Notifiche: l'Inbox riceve notifiche per i membri selezionati in un commento
+  di task/documento o menzionati con `@` in un documento workspace. Si può
+  aprire la risorsa o segnare la notifica come letta. `NotificationBell`
+  continua a usare l'attività recente e non è il badge dell'Inbox.
 - Import/Export: UI di impostazioni etichetta `Dati, Backup & Esportazione`;
   dashboard include export PDF pagina. `{{DA VERIFICARE: formati e operazioni
   di backup/import/export effettivamente implementati.}}`
-- Team: route `/team`, workspace members API e invito sidebar sono presenti;
-  il README chiarisce che la collaborazione realtime è stata rimossa.
-  `{{DA VERIFICARE: flussi di invito e permessi attivi, se esistono.}}`
+- Team: `/team` crea workspace, invita utenti esistenti e assegna ruoli tramite
+  API. I task e i documenti workspace sono condivisi tra i membri; Owner,
+  Admin e Membro possono contribuire, Viewer è in sola lettura. Il menu
+  `Invita membri` della sidebar resta un flusso separato e solo locale.
+  Il README chiarisce che la collaborazione realtime è stata rimossa.
 
 ## Stub e contenuti da verificare
 
@@ -150,7 +153,7 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 | Workspace | Ricerca veloce | `/dashboard` | `content/docs/it/workspace/ricerca.md` | Coperta; risultati da verificare |
 | Workspace | Cestino | `/dashboard?trash=1` | `content/docs/it/workspace/cestino.md` | Coperta; tipi ripristinabili da verificare |
 | Dashboard | I miei task | `/dashboard?view=mytasks` | `content/docs/it/sezioni/i-miei-task.md` | Coperta |
-| Dashboard | Inbox | `/dashboard?view=inbox` | `content/docs/it/sezioni/inbox.md` | Coming soon / comportamento da verificare |
+| Dashboard | Inbox | `/dashboard?view=inbox` | `content/docs/it/sezioni/inbox.md` | Coperta; notifiche per menzioni workspace |
 | Dashboard | Pagine Task | `/tasks`, pagina di tipo Task | `content/docs/it/sezioni/task.md` | Coperta |
 | Dashboard | Obiettivi | Pagina di tipo Obiettivi | `content/docs/it/sezioni/obiettivi.md` | Coperta |
 | Dashboard | Calendario | `/calendar`, pagina di tipo Calendario | `content/docs/it/sezioni/calendario.md` | Coperta; vista locale, nessuna sincronizzazione automatica rilevata |
@@ -168,8 +171,8 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 | Integrazioni | Hub integrazioni | `/integrations` | `content/docs/it/sezioni/integrazioni.md` | Coperta; configurazione server richiesta per OAuth |
 | Team | Gestione membri e ruoli | `/team` | `content/docs/it/sezioni/team-workspace.md` | Coperta |
 | Workspace | Aprire un workspace | `/workspace/[id]` | `content/docs/it/sezioni/workspace.md` | Coperta; accesso diretto da verificare |
-| Workspace | Board workspace | `/workspace/[id]/board` | `content/docs/it/sezioni/board-workspace.md` | Coperta; crea task e aggiorna lo stato |
-| Workspace | Documento workspace | `/workspace/[id]/doc/[slug]` | `content/docs/it/sezioni/documenti-workspace.md` | Coperta; backlink/permessi da verificare |
+| Workspace | Board workspace | `/workspace/[id]/board` | `content/docs/it/sezioni/board-workspace.md` | Coperta; crea task, aggiorna stato e ospita commenti |
+| Workspace | Documento workspace | `/workspace/[id]/doc/[slug]` | `content/docs/it/sezioni/documenti-workspace.md` | Coperta; editor condiviso, menzioni, commenti e Viewer in sola lettura |
 | Riferimenti | FAQ | Concettuale | `content/docs/it/overview/faq.md` | Coperta |
 | Riferimenti | Scorciatoie | `/dashboard` | `content/docs/it/riferimenti/scorciatoie.md` | Coperta con combinazioni verificate |
 | Riferimenti | Supporto | `/support` | `content/docs/it/riferimenti/supporto.md` | Coperta |
@@ -180,10 +183,9 @@ Ogni file è disponibile nella navigazione e nella ricerca generate dal registro
 
 ### Elementi `coming-soon` e verifiche aperte
 
-- `Inbox`: la route è presente nella sidebar, ma non è stata verificata una vista dedicata nel dispatcher dashboard.
 - `/terms`: la pagina contiene testo d'esempio e non termini effettivi.
 - Novità: non è stato trovato un changelog utente nel codice.
-- Restano marcati `{{DA VERIFICARE: ...}}` i comportamenti per policy auth lato server, onboarding/preset, ricerca, cestino, task assegnati, notifiche, widget e metriche, cronologia attività, billing, membership/accesso workspace e backlink documenti. L'elenco puntuale è nei file guida relativi.
+- Restano marcati `{{DA VERIFICARE: ...}}` i comportamenti per policy auth lato server, onboarding/preset, ricerca, cestino, task assegnati, widget e metriche, cronologia attività, billing e gli aspetti di accesso diretto ai workspace non coperti dalle API collaborative. L'elenco puntuale è nei file guida relativi.
 
 ### Decisioni approvate in Fase 2
 

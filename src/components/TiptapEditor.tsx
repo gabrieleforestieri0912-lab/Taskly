@@ -12,6 +12,7 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Suggestion from "@tiptap/suggestion";
 import { apiFetch } from "../lib/api";
+import WorkspaceComments from "./WorkspaceComments";
 import {
   Heading1,
   Heading2,
@@ -707,6 +708,9 @@ export default function TiptapEditor({ workspaceId, slug }) {
   const [bracketPos, setBracketPos] = useState({ left: 0, top: 0 });
   const bracketStartRef = useRef<number | null>(null);
   const [saveState, setSaveState] = useState("idle"); // idle | saving | saved | error
+  const [canEdit, setCanEdit] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const [mentionError, setMentionError] = useState("");
   const saveTimerRef = useRef<any>(null);
   const lastSavedJsonRef = useRef<string | null>(null);
   const [linkMode, setLinkMode] = useState(false);
@@ -714,6 +718,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
   const linkInputRef = useRef(null);
 
   const editor = useEditor({
+    editable: false,
     extensions: [
       StarterKit,
       Link.configure({
@@ -767,13 +772,28 @@ export default function TiptapEditor({ workspaceId, slug }) {
           startOfLine: false,
           items: async ({ query }) => {
             if (!workspaceId) return [];
-            const q = encodeURIComponent(query.replace(/^@/, ""));
             try {
-              const res = await apiFetch(`/doc/search?workspace=${workspaceId}&q=${q}`);
-              if (!res.ok) return [];
-              const items = await res.json();
-              return items.map((it) => ({ id: it.slug || it.id, label: it.title || it.slug, slug: it.slug }));
+              const res = await apiFetch(
+                `/workspaces/${encodeURIComponent(workspaceId)}/members`,
+              );
+              if (!res.ok) {
+                setMentionError("Impossibile caricare i membri da menzionare.");
+                return [];
+              }
+              const data = await res.json();
+              setMentionError("");
+              const needle = query.trim().toLocaleLowerCase();
+              return (data.members || [])
+                .filter(
+                  (member) =>
+                    member.id !== data.currentUserId &&
+                    `${member.name} ${member.email}`
+                      .toLocaleLowerCase()
+                      .includes(needle),
+                )
+                .map((member) => ({ id: member.id, label: member.name }));
             } catch (e) {
+              setMentionError("Impossibile caricare i membri da menzionare.");
               return [];
             }
           },
@@ -806,7 +826,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
               if (items.length === 0) {
                 const empty = document.createElement("div");
                 empty.className = "tl-suggestion-empty";
-                empty.textContent = "Nessun documento trovato";
+                empty.textContent = "Nessun membro trovato";
                 el.appendChild(empty);
                 return;
               }
@@ -814,12 +834,10 @@ export default function TiptapEditor({ workspaceId, slug }) {
                 const row = document.createElement("button");
                 row.type = "button";
                 row.className = "tl-suggestion-item";
-                row.innerHTML =
-                  `<span class="tl-suggestion-icon">📄</span>` +
-                  `<span class="tl-suggestion-meta"><span class="tl-suggestion-title">${esc(item.label)}</span></span>`;
+                row.textContent = `@${item.label}`;
                 row.onmousedown = (e) => {
                   e.preventDefault();
-                  props.command({ id: item.id, label: item.label, slug: item.slug });
+                  props.command({ id: item.id, label: item.label });
                 };
                 el.appendChild(row);
               });
@@ -837,7 +855,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
   });
 
   const save = useCallback(async () => {
-    if (!editor) return;
+    if (!editor || !canEdit) return;
     const blocks = serializeBlocks(editor.state.doc);
     const json = JSON.stringify(blocks);
     if (json === lastSavedJsonRef.current) return;
@@ -859,20 +877,42 @@ export default function TiptapEditor({ workspaceId, slug }) {
       console.error("save error", e);
       setSaveState("error");
     }
-  }, [editor, workspaceId, slug]);
+  }, [canEdit, editor, workspaceId, slug]);
 
   // Load document content from API
   useEffect(() => {
     if (!workspaceId || !slug || !editor) return;
-    apiFetch(`/doc/${workspaceId}/${slug}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!data) return;
+    let cancelled = false;
+    const loadDocument = async () => {
+      try {
+        const response = await apiFetch(
+          `/doc/${encodeURIComponent(workspaceId)}/${encodeURIComponent(slug)}`,
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || "Impossibile caricare il documento.");
+        }
+        if (cancelled) return;
+        const editable = data.canEdit === true;
+        editor.setEditable(editable);
+        setCanEdit(editable);
+        setLoadError("");
         const html = blocksToHtml(data.blocks || []);
         editor.commands.setContent(html || "<p></p>");
         lastSavedJsonRef.current = JSON.stringify(serializeBlocks(editor.state.doc));
-      })
-      .catch(() => {});
+      } catch (cause) {
+        if (cancelled) return;
+        editor.setEditable(false);
+        setCanEdit(false);
+        setLoadError(
+          cause instanceof Error ? cause.message : "Impossibile caricare il documento.",
+        );
+      }
+    };
+    void loadDocument();
+    return () => {
+      cancelled = true;
+    };
   }, [workspaceId, slug, editor]);
 
   // Debounced autosave
@@ -1046,6 +1086,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
   return (
     <div className="tl-editor-shell">
       {/* ── Toolbar ─────────────────────────────────────────────── */}
+      {canEdit ? (
       <div className="tl-toolbar">
         <ToolButton title={t("views.blockH1")} active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}>
           <Heading1 size={16} />
@@ -1097,6 +1138,9 @@ export default function TiptapEditor({ workspaceId, slug }) {
           <span>{saveLabel}</span>
         </button>
       </div>
+      ) : (
+        <p className="px-3 py-2 text-sm text-gray-500">Modalità di sola lettura</p>
+      )}
 
       <div className="tl-editor">
         {/* ── Bubble menu (bold/italic/strike/link) ────────────── */}
@@ -1180,9 +1224,32 @@ export default function TiptapEditor({ workspaceId, slug }) {
         <EditorContent editor={editor} />
 
         <p className="tl-hint">
-          Premi <kbd>/</kbd> per i comandi · <kbd>[[</kbd> per collegare una pagina ·{" "}
-          <kbd>@</kbd> per menzionare · <kbd>Ctrl/⌘+S</kbd> per salvare
+          {canEdit ? (
+            <>
+              Premi <kbd>/</kbd> per i comandi · <kbd>[[</kbd> per collegare un documento ·{" "}
+              <kbd>@</kbd> per menzionare un membro · <kbd>Ctrl/⌘+S</kbd> per salvare
+            </>
+          ) : (
+            "Documento condiviso in sola lettura."
+          )}
         </p>
+        {mentionError && (
+          <p role="status" className="px-2 pb-2 text-xs text-red-600 dark:text-red-400">
+            {mentionError}
+          </p>
+        )}
+      </div>
+      {loadError && (
+        <p role="alert" className="mx-auto mt-4 max-w-3xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+          {loadError}
+        </p>
+      )}
+      <div className="mx-auto max-w-3xl px-4 pb-8">
+        <WorkspaceComments
+          workspaceId={workspaceId}
+          entityType="document"
+          entityId={slug}
+        />
       </div>
 
       {/* ── Bracket [[ popup ───────────────────────────────────── */}

@@ -48,6 +48,7 @@ import CalendarView from "../../components/CalendarView";
 import BrainDumpView from "../../components/BrainDumpView";
 import EmptyPageView from "../../components/EmptyPageView";
 import MyTasksView from "../../components/MyTasksView";
+import WorkspaceInbox from "../../components/WorkspaceInbox";
 import TrashView from "../../components/TrashView";
 import TemplateGalleryModal from "../../components/TemplateGalleryModal";
 import OnboardingModal from "../../components/OnboardingModal";
@@ -813,6 +814,9 @@ function DashboardContent() {
   const shouldShowSidebar = isSidebarOpen || isSidebarPeekOpen;
 
   const breadcrumbs = React.useMemo(() => {
+    if (searchParams.get("view") === "inbox") {
+      return [{ id: "inbox", label: "Inbox" }];
+    }
     if (searchParams.get("view") === "mytasks") {
       return [{ id: "mytasks", label: "I miei task" }];
     }
@@ -827,6 +831,9 @@ function DashboardContent() {
   }, [activePage, pages, searchParams]);
 
   const renderActiveView = () => {
+    if (searchParams.get("view") === "inbox") {
+      return <WorkspaceInbox />;
+    }
     // If view query param is mytasks, show MyTasksView
     if (searchParams.get("view") === "mytasks") {
       return (
