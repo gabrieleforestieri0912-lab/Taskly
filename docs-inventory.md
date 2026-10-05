@@ -1,9 +1,10 @@
 # Inventario documentazione Taskly
 
-Fase 1 — inventario iniziale derivato dalle route e dai componenti esaminati.
-La mappa è una proposta da revisionare prima di implementare la documentazione.
-Le voci `{{DA VERIFICARE: ...}}` indicano comportamenti che non è corretto
-descrivere come certi senza ulteriore controllo della schermata o del backend.
+Inventario iniziale da Fase 1, mantenuto come base code-derived. La mappa finale
+route→guida, aggiornata a fine Fase 4, si trova nella sezione
+“Mappa documentazione e copertura Fase 4” in fondo al file. Le voci
+`{{DA VERIFICARE: ...}}` indicano comportamenti che non è corretto descrivere
+come certi senza ulteriore controllo della schermata o del backend.
 
 ## Route dell'app
 
@@ -23,7 +24,7 @@ descrivere come certi senza ulteriore controllo della schermata o del backend.
 | `/templates` | `src/app/templates/page.tsx` | Galleria/area template | La dashboard permette di salvare un template personalizzato e aprire la galleria; `{{DA VERIFICARE: contenuto e azioni della route autonoma.}}` |
 | `/team` | `src/app/team/page.tsx` | Area Team | `{{DA VERIFICARE: membri, ruoli e collaborazione realmente funzionanti.}}` |
 | `/settings` | `src/app/settings/page.tsx` | Impostazioni | La sidebar collega alle schede profilo, aspetto, notifiche, workflow, dati, sicurezza e fatturazione; `{{DA VERIFICARE: quali schede sono operative e quali preferenze salvano.}}` |
-| `/docs` | `src/app/docs/page.tsx`, `src/app/docs/layout.tsx` | Pagina di documentazione attuale | Placeholder semplice: titolo, intro e tre riquadri informativi, senza contenuti navigabili. |
+| `/docs` | `src/app/docs/[[...slug]]/page.tsx`, `src/app/docs/layout.tsx` | Portale pubblico di documentazione | Route catch-all dinamica; contenuti Markdown file-based in `content/docs/it/`. |
 | `/support` | `src/app/support/page.tsx`, `src/app/support/SupportForm.tsx` | Supporto | Modulo di supporto; `{{DA VERIFICARE: campi, validazioni, canale di invio e messaggi.}}` |
 | `/privacy` | `src/app/privacy/page.tsx` | Informativa privacy | Pagina legale. |
 | `/terms` | `src/app/terms/page.tsx` | Termini di servizio | Pagina legale. |
