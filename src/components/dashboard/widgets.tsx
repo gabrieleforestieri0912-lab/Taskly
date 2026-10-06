@@ -502,7 +502,7 @@ export function CriticalTasksWidget({
           ))
         ) : (
           <div className={`${CARD_ROUNDED} overflow-hidden`}>
-            <EmptyState icon={Flame} label={emptyLabel} iconClass="text-orange-400 dark:text-orange-500/60" />
+            <EmptyState icon={Flame} label={emptyLabel} iconColor="text-orange-400 dark:text-orange-500/60" />
           </div>
         )}
       </div>
@@ -562,7 +562,7 @@ export function RecentIdeasWidget({
           ))
         ) : (
           <div className={`${CARD_ROUNDED} overflow-hidden`}>
-            <EmptyState icon={Lightbulb} label={emptyLabel} iconClass="text-amber-400 dark:text-amber-500/60" />
+            <EmptyState icon={Lightbulb} label={emptyLabel} iconColor="text-amber-400 dark:text-amber-500/60" />
           </div>
         )}
       </div>
