@@ -1234,15 +1234,37 @@ export default function Sidebar({
             </span>
           </Link>
 
-          {/* Close sidebar button on mobile */}
-          <button
-            type="button"
-            onClick={() => setIsSidebarOpen(false)}
-            aria-label="Chiudi barra laterale"
-            className="md:hidden p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
-          >
-            <ChevronLeft size={16} aria-hidden="true" />
-          </button>
+          {/* Inbox — allineata col logo, separata da un divisore */}
+          <div className="ml-auto flex items-center gap-1">
+            <Link
+              href="/dashboard?view=inbox"
+              id="sidebar-inbox-btn"
+              title={t("nav.inbox", "Inbox")}
+              aria-label={t("nav.inbox", "Inbox")}
+              aria-current={activeView === "inbox" ? "page" : undefined}
+              onClick={() => {
+                setIsTranscriptionMode(false);
+                setIsAIActive(false);
+              }}
+              className={`p-1.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${
+                activeView === "inbox"
+                  ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400"
+                  : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+            >
+              <Inbox size={15} aria-hidden="true" />
+            </Link>
+
+            {/* Close sidebar button on mobile */}
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label="Chiudi barra laterale"
+              className="md:hidden p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+            >
+              <ChevronLeft size={16} aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* ── Scrollable nav body ────────────────────────────────────────────── */}
@@ -1251,7 +1273,7 @@ export default function Sidebar({
           style={{ scrollbarWidth: "thin" }}
           aria-label="Navigazione principale"
         >
-          {/* ── Quick actions (barra orizzontale) ───────────────────────── */}
+          {/* ── Quick actions (solo 3 sotto la ricerca) ────────────────── */}
           <div className="relative" role="list" aria-label="Azioni rapide">
             <OneTimeTooltip
               id="tip-sidebar-search"
@@ -1272,30 +1294,7 @@ export default function Sidebar({
                   icon: LayoutDashboard,
                   label: t("nav.home", "Home"),
                   href: "/dashboard",
-                  isActive: !isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive,
-                  onClick: () => {
-                    setIsTranscriptionMode(false);
-                    setIsAIActive(false);
-                  },
-                },
-                {
-                  id: "sidebar-mytasks-btn",
-                  icon: CheckSquare,
-                  label: "Task",
-                  href: "/dashboard?view=mytasks",
-                  badge: activeTasksCount > 0 ? activeTasksCount : undefined,
-                  isActive: !isTranscriptionMode && !isAIActive && isMyTasksActive,
-                  onClick: () => {
-                    setIsTranscriptionMode(false);
-                    setIsAIActive(false);
-                  },
-                },
-                {
-                  id: "sidebar-inbox-btn",
-                  icon: Inbox,
-                  label: t("nav.inbox", "Inbox"),
-                  href: "/dashboard?view=inbox",
-                  isActive: !isTranscriptionMode && !isAIActive && activeView === "inbox",
+                  isActive: !isTranscriptionMode && !isAIActive && !activePageId && !isMyTasksActive && activeView !== "inbox",
                   onClick: () => {
                     setIsTranscriptionMode(false);
                     setIsAIActive(false);
@@ -1308,46 +1307,13 @@ export default function Sidebar({
                   onClick: () => handleOpenQuickPage("new-empty-page"),
                 },
                 {
-                  id: "sidebar-transcription-btn",
-                  icon: Mic,
-                  label: t("nav.transcription", "Trascrizione"),
-                  isActive: isTranscriptionMode,
+                  id: "sidebar-trash-btn",
+                  icon: Trash2,
+                  label: t("land.sideTrash", "Cestino"),
+                  badge: deletedCounts.pages > 0 ? deletedCounts.pages : undefined,
                   onClick: () => {
-                    setIsTranscriptionMode(true);
-                    setIsAIActive(false);
-                  },
-                },
-                {
-                  id: "sidebar-chat-btn",
-                  icon: Send,
-                  label: t("nav.chat", "Chat"),
-                  onClick: () => handleOpenQuickPage("new-chat-page"),
-                },
-                {
-                  id: "sidebar-meetings-btn",
-                  icon: Mic,
-                  label: t("nav.meetings", "Riunioni"),
-                  isActive: isTranscriptionMode,
-                  onClick: () => {
-                    setIsTranscriptionMode(true);
-                    setIsAIActive(false);
-                    router.push("/meetings");
-                  },
-                },
-                {
-                  id: "sidebar-calendar-nav-btn",
-                  icon: Calendar,
-                  label: t("nav.calendar", "Calendario"),
-                  isActive:
-                    !isTranscriptionMode &&
-                    !isAIActive &&
-                    pages.some((p) => String(p.id) === String(activePageId) && p.type === "calendar"),
-                  onClick: () => {
-                    setIsTranscriptionMode(false);
-                    setIsAIActive(false);
-                    const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
-                    if (calPage) goToPage(calPage);
-                    else router.push("/calendar");
+                    setTrashSearch("");
+                    setIsTrashOpen((s) => !s);
                   },
                 },
               ]}
