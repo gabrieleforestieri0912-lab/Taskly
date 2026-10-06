@@ -23,6 +23,7 @@ import {
   X,
   PanelLeftOpen,
   PanelLeftClose,
+  ChevronRight,
   MoreVertical,
   MoreHorizontal,
   Share2,
@@ -1549,251 +1550,313 @@ const ensureTab = React.useCallback((page: any) => {
 
             <div className="h-4 w-px bg-gray-200 dark:bg-gray-800 shrink-0 mx-0.5" />
 
-            {activePage ? (
-              <div className="flex items-center gap-2 min-w-0">
-                {/* Icona Pagina + Popover */}
-                <div className="relative shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => !activePage.locked && setIsIconMenuOpen(!isIconMenuOpen)}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                      activePage.iconColor || "text-gray-500"
-                    } hover:bg-gray-100 dark:hover:bg-gray-800 ${
-                      activePage.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                    }`}
-                    title={activePage.locked ? "Pagina bloccata" : "Cambia icona e colore"}
-                  >
-                    {(() => {
-                      const rawIcon = activePage.icon;
-                      if (React.isValidElement(rawIcon)) return rawIcon;
-                      const Comp = getCatalogIcon(rawIcon);
-                      return React.createElement(Comp || LayoutDashboard, {
-                        size: 18,
-                      });
-                    })()}
-                  </button>
+            {/* Route Breadcrumb Path Navigator */}
+            <nav
+              aria-label="Percorso di navigazione"
+              className="flex items-center gap-1 min-w-0 flex-1 overflow-x-auto scrollbar-hide py-1 text-xs"
+            >
+              {/* Radice: Ambiente di lavoro */}
+              <Link
+                href="/dashboard"
+                title="Torna all'Ambiente di lavoro principale"
+                className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg font-semibold transition-colors shrink-0 ${
+                  !activePageId && !searchParams.get("view") && !searchParams.get("trash")
+                    ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/60"
+                }`}
+              >
+                <LayoutDashboard
+                  size={14}
+                  className="text-cyan-600 dark:text-cyan-400 shrink-0"
+                />
+                <span className="whitespace-nowrap">Ambiente di lavoro</span>
+              </Link>
 
-                  <AnimatePresence>
-                    {isIconMenuOpen && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-100"
-                          onClick={() => setIsIconMenuOpen(false)}
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute top-full mt-2 left-0 z-110 w-72 sm:w-80 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-[2rem] shadow-2xl p-4"
-                        >
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">
-                            {t("pg.selectIcon")}
-                          </p>
-                          <div className="mb-3 flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={iconSearch}
-                              onChange={(e) => setIconSearch(e.target.value)}
-                              placeholder={t("pg.searchIcons")}
-                              className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none"
+              {/* Viste speciali */}
+              {searchParams.get("view") === "mytasks" && (
+                <>
+                  <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg font-semibold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 whitespace-nowrap shrink-0">
+                    <ListTodo size={14} className="text-cyan-500 shrink-0" />
+                    <span>I miei task</span>
+                  </span>
+                </>
+              )}
+
+              {searchParams.get("trash") === "1" && (
+                <>
+                  <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg font-semibold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 whitespace-nowrap shrink-0">
+                    <Trash2 size={14} className="text-red-500 shrink-0" />
+                    <span>Cestino</span>
+                  </span>
+                </>
+              )}
+
+              {searchParams.get("view") === "inbox" && (
+                <>
+                  <ChevronRight size={13} className="text-gray-300 dark:text-gray-600 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg font-semibold text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 whitespace-nowrap shrink-0">
+                    <span>Inbox</span>
+                  </span>
+                </>
+              )}
+
+              {/* Se siamo su una pagina */}
+              {activePage && (
+                <>
+                  {/* Antenati cliccabili (se annidata) */}
+                  {breadcrumbs &&
+                    breadcrumbs.length > 1 &&
+                    breadcrumbs.slice(0, -1).map((crumb) => {
+                      const CrumbIconComp =
+                        resolvePageIcon(crumb) || LayoutDashboard;
+                      return (
+                        <React.Fragment key={crumb.id}>
+                          <ChevronRight
+                            size={13}
+                            className="text-gray-300 dark:text-gray-600 shrink-0"
+                          />
+                          <Link
+                            href={`/dashboard?page=${crumb.id}`}
+                            title={`Vai a ${crumb.label || "Pagina"}`}
+                            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/60 transition-colors whitespace-nowrap shrink-0 max-w-[150px] truncate"
+                          >
+                            <CrumbIconComp
+                              size={13}
+                              className={`${crumb.iconColor || "text-gray-400"} shrink-0`}
                             />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                updatePage(activePage.id, { icon: "" });
-                                setIsIconMenuOpen(false);
-                              }}
-                              className="px-2.5 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 text-xs font-bold"
+                            <span className="truncate">
+                              {crumb.label || "Senza titolo"}
+                            </span>
+                          </Link>
+                        </React.Fragment>
+                      );
+                    })}
+
+                  {/* Separatore verso la pagina corrente */}
+                  <ChevronRight
+                    size={13}
+                    className="text-gray-300 dark:text-gray-600 shrink-0"
+                  />
+
+                  {/* Pagina Corrente: Icona cliccabile + Titolo inline + Badge */}
+                  <div className="inline-flex items-center gap-1 shrink-0">
+                    {/* Icon Picker Popover */}
+                    <div className="relative shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          !activePage.locked &&
+                          setIsIconMenuOpen(!isIconMenuOpen)
+                        }
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+                          activePage.iconColor || "text-gray-500"
+                        } hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                          activePage.locked
+                            ? "opacity-60 cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`}
+                        title={
+                          activePage.locked
+                            ? "Pagina bloccata"
+                            : "Cambia icona e colore"
+                        }
+                      >
+                        {(() => {
+                          const rawIcon = activePage.icon;
+                          if (React.isValidElement(rawIcon)) return rawIcon;
+                          const Comp = getCatalogIcon(rawIcon);
+                          return React.createElement(Comp || LayoutDashboard, {
+                            size: 16,
+                          });
+                        })()}
+                      </button>
+
+                      <AnimatePresence>
+                        {isIconMenuOpen && (
+                          <>
+                            <div
+                              className="fixed inset-0 z-100"
+                              onClick={() => setIsIconMenuOpen(false)}
+                            />
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              className="absolute top-full mt-2 left-0 z-110 w-72 sm:w-80 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-[2rem] shadow-2xl p-4"
                             >
-                              {t("pg.removeIcon")}
-                            </button>
-                          </div>
-
-                          {/* Categorie */}
-                          <div className="flex gap-1.5 mb-3 overflow-x-auto scrollbar-hide pb-1">
-                            {[
-                              "All",
-                              "Arrows",
-                              "Media",
-                              "Files",
-                              "Editors",
-                              "Users",
-                              "Interface",
-                              "Logos",
-                              "Other",
-                            ].map((cat) => (
-                              <button
-                                key={cat}
-                                type="button"
-                                onClick={() => setIconCategory(cat)}
-                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                                  iconCategory === cat
-                                    ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
-                                    : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100"
-                                }`}
-                              >
-                                {cat}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Griglia Icone */}
-                          <div className="grid grid-cols-6 gap-1.5 mb-4 max-h-56 overflow-y-auto">
-                            {ICON_NAMES.filter((name) => {
-                              const lower = name.toLowerCase();
-                              const needle = iconSearch.trim().toLowerCase();
-                              if (needle && !lower.includes(needle)) return false;
-                              if (iconCategory === "All") return true;
-                              const mapped =
-                                FULL_ICON_CATEGORY_MAP[name] ||
-                                FULL_ICON_CATEGORY_MAP[lower];
-                              if (mapped) return mapped === iconCategory;
-                              if (iconCategory === "Arrows")
-                                return /arrow|chev|triangle|corner/.test(lower);
-                              if (iconCategory === "Media")
-                                return /video|play|pause|camera|mic|volume|music|film|picture|image/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Files")
-                                return /file|folder|document|clipboard|filetext/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Editors")
-                                return /edit|pen|type|code|filetext|heading|list|check/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Users")
-                                return /user|person|people/.test(lower);
-                              if (iconCategory === "Interface")
-                                return /menu|more|settings|search|plus|minus|x|check|close|open|panel|layout|moon|sun/.test(
-                                  lower,
-                                );
-                              if (iconCategory === "Logos")
-                                return /github|gitlab|twitter|facebook|instagram|linkedin|youtube|npm|docker|mastodon/.test(
-                                  lower,
-                                );
-                              return true;
-                            })
-                              .sort()
-                              .map((iconName) => (
+                              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">
+                                {t("pg.selectIcon")}
+                              </p>
+                              <div className="mb-3 flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={iconSearch}
+                                  onChange={(e) => setIconSearch(e.target.value)}
+                                  placeholder={t("pg.searchIcons")}
+                                  className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none"
+                                />
                                 <button
-                                  key={iconName}
                                   type="button"
-                                  onMouseEnter={() => setHoverIcon(iconName)}
-                                  onMouseLeave={() => setHoverIcon(null)}
                                   onClick={() => {
-                                    const key =
-                                      normalizeIconKey(iconName) ?? iconName;
-                                    updatePage(activePage.id, { icon: key });
+                                    updatePage(activePage.id, { icon: "" });
                                     setIsIconMenuOpen(false);
                                   }}
-                                  title={iconName}
-                                  className={`h-10 rounded-xl border flex flex-col items-center justify-center transition-all text-xs p-1 ${
-                                    normalizeIconKey(activePage.icon) ===
-                                    normalizeIconKey(iconName)
-                                      ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600"
-                                      : "border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                                  }`}
+                                  className="px-2.5 py-1.5 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-100 text-xs font-bold"
                                 >
-                                  {renderIcon(iconName, { size: 16 })}
+                                  {t("pg.removeIcon")}
                                 </button>
-                              ))}
-                          </div>
+                              </div>
 
-                          {/* Selettore Colore */}
-                          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">
-                            {t("pg.selectColor")}
-                          </p>
-                          <div className="flex flex-wrap gap-2 px-1">
-                            {COLOR_OPTIONS.map((c) => (
-                              <button
-                                key={c.value}
-                                type="button"
-                                onMouseEnter={() => setPendingIconColor(c.value)}
-                                onMouseLeave={() => setPendingIconColor(null)}
-                                onClick={() => {
-                                  updatePage(activePage.id, { iconColor: c.value });
-                                }}
-                                className={`w-5 h-5 rounded-full ${c.bg} transition-all hover:scale-125 ${
-                                  activePage.iconColor === c.value
-                                    ? "ring-2 ring-cyan-500 ring-offset-2 dark:ring-offset-gray-900"
-                                    : ""
-                                }`}
-                                title={c.label}
-                              />
-                            ))}
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
+                              {/* Categorie */}
+                              <div className="flex gap-1.5 mb-3 overflow-x-auto scrollbar-hide pb-1">
+                                {[
+                                  "All",
+                                  "Arrows",
+                                  "Media",
+                                  "Files",
+                                  "Editors",
+                                  "Users",
+                                  "Interface",
+                                  "Logos",
+                                  "Other",
+                                ].map((cat) => (
+                                  <button
+                                    key={cat}
+                                    type="button"
+                                    onClick={() => setIconCategory(cat)}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                                      iconCategory === cat
+                                        ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
+                                        : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100"
+                                    }`}
+                                  >
+                                    {cat}
+                                  </button>
+                                ))}
+                              </div>
 
-                {/* Breadcrumbs genitore (se annidata) */}
-                {breadcrumbs && breadcrumbs.length > 1 && (
-                  <span className="hidden xl:inline-flex items-center text-xs text-gray-400 dark:text-gray-500 shrink-0">
-                    {breadcrumbs.slice(0, -1).map((b) => (
-                      <span key={b.id} className="inline-flex items-center">
-                        <Link
-                          href={`/dashboard?page=${b.id}`}
-                          className="hover:underline hover:text-gray-700 dark:hover:text-gray-300 max-w-[80px] truncate"
-                        >
-                          {b.label || "Pagina"}
-                        </Link>
-                        <span className="mx-1 text-gray-300 dark:text-gray-600">/</span>
+                              {/* Griglia Icone */}
+                              <div className="grid grid-cols-6 gap-1.5 mb-4 max-h-56 overflow-y-auto">
+                                {ICON_NAMES.filter((name) => {
+                                  const lower = name.toLowerCase();
+                                  const needle = iconSearch.trim().toLowerCase();
+                                  if (needle && !lower.includes(needle)) return false;
+                                  if (iconCategory === "All") return true;
+                                  const mapped =
+                                    FULL_ICON_CATEGORY_MAP[name] ||
+                                    FULL_ICON_CATEGORY_MAP[lower];
+                                  if (mapped) return mapped === iconCategory;
+                                  if (iconCategory === "Arrows")
+                                    return /arrow|chev|triangle|corner/.test(lower);
+                                  if (iconCategory === "Media")
+                                    return /video|play|pause|camera|mic|volume|music|film|picture|image/.test(
+                                      lower,
+                                    );
+                                  if (iconCategory === "Files")
+                                    return /file|folder|document|clipboard|filetext/.test(
+                                      lower,
+                                    );
+                                  if (iconCategory === "Editors")
+                                    return /edit|pen|type|code|filetext|heading|list|check/.test(
+                                      lower,
+                                    );
+                                  if (iconCategory === "Users")
+                                    return /user|person|people/.test(lower);
+                                  if (iconCategory === "Interface")
+                                    return /menu|more|settings|search|plus|minus|x|check|close|open|panel|layout|moon|sun/.test(
+                                      lower,
+                                    );
+                                  if (iconCategory === "Logos")
+                                    return /github|gitlab|twitter|facebook|instagram|linkedin|youtube|npm|docker|mastodon/.test(
+                                      lower,
+                                    );
+                                  return true;
+                                })
+                                  .sort()
+                                  .map((iconName) => (
+                                    <button
+                                      key={iconName}
+                                      type="button"
+                                      onMouseEnter={() => setHoverIcon(iconName)}
+                                      onMouseLeave={() => setHoverIcon(null)}
+                                      onClick={() => {
+                                        const key =
+                                          normalizeIconKey(iconName) ?? iconName;
+                                        updatePage(activePage.id, { icon: key });
+                                        setIsIconMenuOpen(false);
+                                      }}
+                                      title={iconName}
+                                      className={`h-10 rounded-xl border flex flex-col items-center justify-center transition-all text-xs p-1 ${
+                                        normalizeIconKey(activePage.icon) ===
+                                        normalizeIconKey(iconName)
+                                          ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600"
+                                          : "border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                      }`}
+                                    >
+                                      {renderIcon(iconName, { size: 16 })}
+                                    </button>
+                                  ))}
+                              </div>
+
+                              {/* Selettore Colore */}
+                              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">
+                                {t("pg.selectColor")}
+                              </p>
+                              <div className="flex flex-wrap gap-2 px-1">
+                                {COLOR_OPTIONS.map((c) => (
+                                  <button
+                                    key={c.value}
+                                    type="button"
+                                    onMouseEnter={() => setPendingIconColor(c.value)}
+                                    onMouseLeave={() => setPendingIconColor(null)}
+                                    onClick={() => {
+                                      updatePage(activePage.id, { iconColor: c.value });
+                                    }}
+                                    className={`w-5 h-5 rounded-full ${c.bg} transition-all hover:scale-125 ${
+                                      activePage.iconColor === c.value
+                                        ? "ring-2 ring-cyan-500 ring-offset-2 dark:ring-offset-gray-900"
+                                        : ""
+                                    }`}
+                                    title={c.label}
+                                  />
+                                ))}
+                              </div>
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Titolo Pagina Corrente */}
+                    <div className="min-w-0 truncate">
+                      <CompactEditableTitle
+                        title={activePage.label}
+                        onSave={(nextTitle) =>
+                          updatePage(activePage.id, { label: nextTitle })
+                        }
+                        locked={activePage.locked}
+                        placeholder="Senza titolo"
+                      />
+                    </div>
+
+                    {/* Badge Stato / Privacy */}
+                    {activePage.locked ? (
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/40 px-1.5 py-0.5 rounded-md shrink-0">
+                        <Lock size={10} />
+                        <span>Bloccata</span>
                       </span>
-                    ))}
-                  </span>
-                )}
-
-                {/* Titolo Pagina / Ambiente di lavoro */}
-                <div className="min-w-0 truncate">
-                  <CompactEditableTitle
-                    title={activePage.label}
-                    onSave={(nextTitle) =>
-                      updatePage(activePage.id, { label: nextTitle })
-                    }
-                    locked={activePage.locked}
-                    placeholder="Ambiente di lavoro"
-                  />
-                </div>
-
-                {/* Badge Stato / Privacy */}
-                {activePage.locked ? (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/40 px-2 py-0.5 rounded-md shrink-0">
-                    <Lock size={10} />
-                    <span>Bloccata</span>
-                  </span>
-                ) : (
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100/80 dark:bg-gray-800/60 px-2 py-0.5 rounded-md shrink-0">
-                    <Lock size={10} />
-                    <span>Privato</span>
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0">
-                  {searchParams.get("view") === "mytasks" ? (
-                    <ListTodo size={18} />
-                  ) : searchParams.get("trash") === "1" ? (
-                    <Trash2 size={18} />
-                  ) : (
-                    <LayoutDashboard size={18} />
-                  )}
-                </div>
-                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-                  {searchParams.get("view") === "mytasks"
-                    ? "I miei task"
-                    : searchParams.get("trash") === "1"
-                      ? "Cestino"
-                      : "Ambiente di lavoro"}
-                </span>
-                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100/80 dark:bg-gray-800/60 px-2 py-0.5 rounded-md shrink-0">
-                  Spazio di lavoro
-                </span>
-              </div>
-            )}
+                    ) : (
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100/80 dark:bg-gray-800/60 px-1.5 py-0.5 rounded-md shrink-0">
+                        <Lock size={10} />
+                        <span>Privato</span>
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+            </nav>
           </div>
 
           {/* Destra: Modificato di recente + Condividi + Link + Stella + Tre puntini + Notifiche */}
