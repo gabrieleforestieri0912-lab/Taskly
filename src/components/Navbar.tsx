@@ -266,7 +266,12 @@ export default function Navbar({
     return (
       <>
         <motion.header
-          initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
+          /* `initial={false}` perche' useReducedMotion() restituisce valori
+             diversi fra server e client: scegliere l'`initial` in base a
+             quell'hook produceva due HTML diversi e React segnalava un
+             hydration mismatch. Il fade-in parte da `animate`, quindi
+             l'effetto visivo e' identico. */
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: shouldReduceMotion ? 0 : 0.45,

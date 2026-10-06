@@ -12,11 +12,20 @@ function Hero({ onStart, onDiscover }) {
 
   // Stessa easing usata da ScrollReveal: l'ingresso del Hero deve
   // avere lo stesso ritmo del resto della pagina.
+  //
+  // `initial={false}`: useReducedMotion() restituisce valori diversi fra
+  // server e client, quindi scegliere l'`initial` in base a quell'hook
+  // faceva rendere al server un HTML diverso da quello del client
+  // (hydration mismatch). L'ingresso animato ora parte da `animate`.
   const ease = [0.16, 1, 0.3, 1];
   const fadeUp = (delay = 0) => ({
-    initial: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 },
+    initial: false as const,
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.7, delay, ease },
+    transition: {
+      duration: shouldReduceMotion ? 0 : 0.7,
+      delay: shouldReduceMotion ? 0 : delay,
+      ease,
+    },
   });
 
   const badges = [

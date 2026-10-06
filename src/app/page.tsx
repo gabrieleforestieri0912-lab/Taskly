@@ -95,22 +95,26 @@ export default function Home() {
         </section>
       </ScrollReveal>
 
+      {/* HowItWorks, Pricing e FAQ emettono gia' il proprio <section id=...>
+          dentro il componente. Avvolgerli qui in un altro <section id=...>
+          produceva due elementi con lo stesso id (HTML non valido e link ad
+          ancore ambigui), quindi per questi tre il wrapper resta un div. */}
       <ScrollReveal>
-        <section id="features" className="landing-section">
+        <div>
           <HowItWorks />
-        </section>
+        </div>
       </ScrollReveal>
 
       <ScrollReveal>
-        <section id="pricing" className="landing-section">
+        <div>
           <Pricing />
-        </section>
+        </div>
       </ScrollReveal>
 
       <ScrollReveal>
-        <section id="faq" className="landing-section">
+        <div>
           <FAQ />
-        </section>
+        </div>
       </ScrollReveal>
 
       <CtaBanner />

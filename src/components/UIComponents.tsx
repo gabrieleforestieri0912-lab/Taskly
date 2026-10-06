@@ -232,9 +232,14 @@ export const ScrollReveal = ({
     return <div>{children}</div>;
   }
 
+  /* `initial={false}` perche' il valore animato di `initial` finiva
+     serializzato nell'HTML del server come stringa ("0", "translateY(40px)")
+     mentre il client lo ricalcolava come numero: React segnalava un
+     hydration mismatch su ogni sezione della landing. L'entrata animata
+     avviene comunque, tramite `whileInView`. */
   return (
     <motion.div
-      initial={variants[direction] ?? variants.up}
+      initial={false}
       whileInView={{ x: 0, y: 0, opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration, delay, ease: [0.16, 1, 0.3, 1] }}

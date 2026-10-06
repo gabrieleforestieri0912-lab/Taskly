@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useMemo, useSyncExternalStore } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   CheckSquare,
@@ -102,8 +103,49 @@ const BODY: Record<FloaterId, () => React.ReactElement> = {
   chat: TaskRows,
 };
 
+/* Sottoscrizione vuota: serve solo a far cambiare il valore restituito da
+   useSyncExternalStore al mount del client. */
+const subscribe = () => () => {};
+
 export function FloatingWorkspace() {
   const shouldReduceMotion = useReducedMotion();
+
+  /* Le animazioni di galleggiamento partono solo lato client. Sul server
+     useReducedMotion() restituisce sempre `true` (non c'è `window`), quindi
+     se anche `animate` cambiasse in base a quell'hook il server e il client
+     produrrebbero due HTML diversi: hydration mismatch sui `style`.
+     Qui si rende sempre lo stesso markup e si applica `style` solo dopo il
+     mount. Il contenuto e' decorativo (aria-hidden), quindi l'assenza di
+     animazioni nel markup server non si vede. */
+  /* `useSyncExternalStore` con un `getServerSnapshot` che restituisce sempre
+     `false`: durante l'hydration il valore e' identico a quello del server,
+     quindi il markup combacia, e il client si aggiorna subito dopo. Non
+     serve nessun setState in un effetto. */
+  const isClient = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const canAnimate = isClient && !shouldReduceMotion;
+
+  const floatTransition = useMemo(
+    () => ({
+      opacity: { duration: 0.8, delay: 0 },
+      y: {
+        duration: 6,
+        repeat: Infinity,
+        repeatType: "mirror" as const,
+        ease: "easeInOut" as const,
+      },
+      rotate: {
+        duration: 6,
+        repeat: Infinity,
+        repeatType: "mirror" as const,
+        ease: "easeInOut" as const,
+      },
+    }),
+    [],
+  );
 
   return (
     <div
@@ -119,21 +161,21 @@ export function FloatingWorkspace() {
             key={f.id}
             className={`absolute ${f.width}`}
             style={{ left: f.x, top: f.y }}
-            initial={shouldReduceMotion ? { opacity: 0.45 } : { opacity: 0, y: 18, rotate: f.rotate }}
+            initial={false}
             animate={
-              shouldReduceMotion
-                ? { opacity: 0.45 }
-                : {
+              canAnimate
+                ? {
                     opacity: 0.45,
                     y: 0,
                     rotate: f.rotate,
                     transition: {
-                      opacity: { duration: 0.8, delay: f.delay },
-                      // ciclo infinito "mirror": sale e scende senza scatti
-                      y: { duration: f.duration, delay: f.delay, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
-                      rotate: { duration: f.duration, delay: f.delay, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+                      ...floatTransition,
+                      opacity: { ...floatTransition.opacity, delay: f.delay },
+                      y: { ...floatTransition.y, delay: f.delay },
+                      rotate: { ...floatTransition.rotate, delay: f.delay },
                     },
                   }
+                : { opacity: 0.45 }
             }
           >
             {/* pastiglia vetrosa: leggera, non domina il contenuto */}
