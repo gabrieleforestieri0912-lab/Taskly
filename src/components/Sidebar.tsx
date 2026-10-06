@@ -1481,73 +1481,137 @@ export default function Sidebar({
           <div className="flex-1" />
         </nav>
 
-        {/* ── Account + menu "Altro" ───────────────────────────────────────────
-            L'account è in fondo alla sidebar; accanto a lui un bottone
-            "Altro" raccoglie le voci secondarie che prima occupavano
-            quattro righe verticali (Impostazioni, Cestino, Aiuto, Invita). */}
+        {/* ── Account + personalizzazione ──────────────────────────────────────
+            Row compatta: avatar + nome + ChevronUp (apre profileMenuPortal)
+            + bottone ⋯ (apre moreMenuPortal).
+            Sotto: mini-strip con toggle tema e lingua, sempre visibili. */}
         <div
-          className="border-t border-gray-100 dark:border-gray-800 px-2 py-2 flex items-center gap-1.5"
+          className="border-t border-gray-100 dark:border-gray-800 px-2 pt-1.5 pb-1"
           ref={profileRef}
         >
-          {/* Account trigger */}
-          <button
-            type="button"
-            onClick={(e) => {
-              const rect = profileRef.current?.getBoundingClientRect();
-              if (rect) {
-                // il menu si apre sopra l'account, non sotto: resterebbe
-                // tagliato dal bordo inferiore della sidebar.
-                setProfileMenuPos({ top: rect.top - 8, left: rect.left });
-              }
-              setIsMoreOpen(false);
-              setIsProfileOpen((s) => !s);
-            }}
-            aria-expanded={isProfileOpen}
-            aria-haspopup="menu"
-            aria-label="Menu account"
-            className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 min-w-0"
-          >
-            {user.picture ? (
-              <img
-                src={user.picture}
-                alt=""
-                className="w-6 h-6 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
-                referrerPolicy="no-referrer"
+          {/* Account row */}
+          <div className="flex items-center gap-1 mb-1">
+            <button
+              type="button"
+              onClick={() => {
+                const rect = profileRef.current?.getBoundingClientRect();
+                if (rect) {
+                  setProfileMenuPos({ top: rect.top - 8, left: rect.left });
+                }
+                setIsMoreOpen(false);
+                setIsProfileOpen((s) => !s);
+              }}
+              aria-expanded={isProfileOpen}
+              aria-haspopup="menu"
+              aria-label="Menu account"
+              className="flex flex-1 items-center gap-1.5 px-1.5 py-1 rounded-lg hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 min-w-0"
+            >
+              {user.picture ? (
+                <img
+                  src={user.picture}
+                  alt=""
+                  className="w-5 h-5 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-5 h-5 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
+                  <User size={11} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
+                </div>
+              )}
+              <span className="flex-1 text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
+                {user.name || "Account"}
+              </span>
+              <ChevronUp
+                size={12}
+                aria-hidden="true"
+                className={`text-gray-400 shrink-0 transition-transform duration-200 ${
+                  isProfileOpen ? "" : "rotate-180"
+                }`}
               />
-            ) : (
-              <div className="w-6 h-6 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
-                <User size={13} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
-              </div>
-            )}
-            <span className="flex-1 text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
-              {user.name || "Account"}
-            </span>
-            <ChevronUp
-              size={14}
-              aria-hidden="true"
-              className={`text-gray-400 shrink-0 transition-transform duration-200 ${
-                isProfileOpen ? "" : "rotate-180"
-              }`}
-            />
-          </button>
+            </button>
 
-          {/* Menu "Altro" */}
-          <button
-            ref={moreRef}
-            type="button"
-            onClick={() => {
-              setIsProfileOpen(false);
-              setIsMoreOpen((s) => !s);
-            }}
-            aria-expanded={isMoreOpen}
-            aria-haspopup="menu"
-            aria-label={t("nav.more", "Altro")}
-            title={t("nav.more", "Altro")}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-800 dark:hover:text-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
-          >
-            <Sliders size={16} aria-hidden="true" className="shrink-0" />
-            <span className="text-xs font-semibold">{t("nav.more", "Altro")}</span>
-          </button>
+            {/* ⋯ more menu trigger */}
+            <button
+              ref={moreRef}
+              type="button"
+              onClick={() => {
+                setIsProfileOpen(false);
+                setIsMoreOpen((s) => !s);
+              }}
+              aria-expanded={isMoreOpen}
+              aria-haspopup="menu"
+              aria-label={t("nav.more", "Altro")}
+              title={t("nav.more", "Altro")}
+              className="flex items-center justify-center w-6 h-6 rounded-md text-gray-400 dark:text-gray-500 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-700 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 shrink-0"
+            >
+              <Sliders size={13} aria-hidden="true" />
+            </button>
+          </div>
+
+          {/* ── Personalizzazione inline ────────────────────────────────────── */}
+          <div className="flex items-center gap-1.5 px-0.5 pb-0.5">
+            {/* Theme toggle */}
+            <div className="flex flex-1 items-center bg-gray-100 dark:bg-gray-800/80 rounded-md p-0.5 gap-0.5">
+              <button
+                type="button"
+                onClick={() => theme !== "light" && toggleTheme()}
+                title="Tema chiaro"
+                aria-label="Tema chiaro"
+                className={`flex flex-1 items-center justify-center gap-1 py-0.5 rounded-sm text-[10px] font-semibold transition-all ${
+                  theme === "light"
+                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
+                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                }`}
+              >
+                <Sun size={10} aria-hidden="true" />
+                <span>{language === "it" ? "Chiaro" : "Light"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => theme !== "dark" && toggleTheme()}
+                title="Tema scuro"
+                aria-label="Tema scuro"
+                className={`flex flex-1 items-center justify-center gap-1 py-0.5 rounded-sm text-[10px] font-semibold transition-all ${
+                  theme === "dark"
+                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
+                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                }`}
+              >
+                <Moon size={10} aria-hidden="true" />
+                <span>{language === "it" ? "Scuro" : "Dark"}</span>
+              </button>
+            </div>
+
+            {/* Language toggle */}
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800/80 rounded-md p-0.5 gap-0.5">
+              <button
+                type="button"
+                onClick={() => setLanguage("it")}
+                title="Italiano"
+                aria-label="Italiano"
+                className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold transition-all ${
+                  language === "it"
+                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
+                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                }`}
+              >
+                IT
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                title="English"
+                aria-label="English"
+                className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold transition-all ${
+                  language === "en"
+                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
+                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                }`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
         </div>
 
         <AddPageModal
