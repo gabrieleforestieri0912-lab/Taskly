@@ -39,28 +39,30 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-/* App-pages dark surfaces → brand purple tones.
+/* App-pages dark surfaces.
    Tailwind v4 utilities resolve var(--color-*), so overriding these
-   variables inside .dark retints every legacy neutral dark surface
-   (page shells, cards, inputs, borders) to the Taskly palette without
-   touching light mode. Text colors are unaffected because all dark-mode
-   text already uses explicit dark:text-* overrides.
+   variables inside .dark retints every legacy neutral dark surface.
 
-   The steps MUST stay ordered by lightness:
-     950 (page bg) < 900 (card) < 850 (raised) < 800 (input/hover) < 700 (border)
-   Collapsing several of them onto the same value made every panel the
-   same black and the UI unreadable — that is what this scale fixes.
-   It also keeps borders lighter than the surface they sit on. */
+   Hierarchy (lightest = most elevated):
+     950  page/shell background  →  deep purple-tinted dark
+     900  card surface            →  neutral dark (clearly above page bg)
+     850  raised/hover surface    →  slightly lighter neutral
+     800  input / active          →  lighter still
+     700  borders                 →  visible but not harsh
+
+   Cards use dark:bg-gray-900 (#1e1e24) which sits 4-5 shades above
+   the page background (#0e0b14), giving a clear panel lift effect.
+   Old values were all purple-tinted and collapsed into a single muddy dark. */
 .dark {
-  --color-black: #05030c;
-  --color-gray-950: #0b0714;
-  --color-gray-900: #14101f;
-  --color-gray-850: #1c1729;
-  --color-gray-800: #241e33;
-  --color-gray-700: #322a47;
-  --color-zinc-950: #0b0714;
-  --color-zinc-900: #14101f;
-  --color-zinc-800: #241e33;
+  --color-black:     #08060f;   /* deepest shadow */
+  --color-gray-950:  #0e0b14;   /* page / shell background — purple-dark */
+  --color-gray-900:  #1e1e24;   /* card surface — neutral dark, clearly above bg */
+  --color-gray-850:  #26262d;   /* raised card / hover */
+  --color-gray-800:  #2f2f38;   /* input background */
+  --color-gray-700:  #3e3e4a;   /* border — visible but not harsh */
+  --color-zinc-950:  #0e0b14;
+  --color-zinc-900:  #1e1e24;
+  --color-zinc-800:  #2f2f38;
 }
 
 @layer base {

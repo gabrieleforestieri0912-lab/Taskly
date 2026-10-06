@@ -24,10 +24,37 @@ import {
   Zap,
   ListTodo,
   RotateCcw,
+  BarChart3,
 } from "lucide-react";
 import { Card, CardContent, Badge, Button } from "../UIComponents";
 
-/* ── Tipi condivisi ───────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design tokens centralizzati
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Superficie card unificata — chiaro / scuro.
+ *
+ * Luce:  bianco pieno + ombra leggera viola
+ * Scuro: gray-900 (#111827) solido — nessuna trasparenza, nessun viola
+ *        hardcoded che rischiava di confondersi con lo sfondo della pagina.
+ */
+const CARD_BASE =
+  "bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm";
+
+/** Card con angoli standard */
+const CARD_ROUNDED = `${CARD_BASE} rounded-2xl`;
+
+/** Card con angoli grandi (sezioni principali) */
+const CARD_ROUNDED_LG = `${CARD_BASE} rounded-3xl`;
+
+/** Accent viola coerente */
+const ACCENT = "#7b39fc";
+const ACCENT_LIGHT = "#a67cff";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tipi condivisi
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export type WidgetId =
   | "quick_stats"
@@ -116,7 +143,32 @@ export const ALL_WIDGET_DEFS: WidgetMeta[] = [
 
 export const DEFAULT_WIDGET_ORDER: WidgetId[] = ALL_WIDGET_DEFS.map((w) => w.id);
 
-/* ── Widget: statistiche rapide ───────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Componente di empty state riutilizzabile
+   ─────────────────────────────────────────────────────────────────────────── */
+
+function EmptyState({
+  icon: Icon,
+  label,
+  iconColor = "text-gray-300 dark:text-gray-600",
+}: {
+  icon: React.ElementType;
+  label: string;
+  iconColor?: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-8 gap-3">
+      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-gray-800/60 ${iconColor}`}>
+        <Icon size={20} />
+      </div>
+      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium text-center max-w-[200px]">{label}</p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: statistiche rapide
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export interface QuickStat {
   label: string;
@@ -128,40 +180,40 @@ export interface QuickStat {
 
 export function QuickStatsWidget({ stats }: { stats: QuickStat[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       {stats.map((s, idx) => (
         <motion.div
           key={idx}
-          whileHover={{ y: -4 }}
-          transition={{ type: "spring", stiffness: 300 }}
+          whileHover={{ y: -3 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <Card className="h-full rounded-2xl border border-[#7b39fc]/10 bg-white/70 shadow-lg shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#17103a]/60">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3.5">
-                <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-[#7b39fc]/10"}`}>
-                  {s.icon}
-                </div>
-                <div>
-                  <p className="text-base font-bold text-gray-800 dark:text-white">
-                    {s.value}
-                  </p>
-                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-widest">
-                    {s.label}
-                  </p>
-                  <span className="text-[9px] font-semibold text-gray-500 dark:text-gray-400">
-                    {s.sub}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className={`${CARD_ROUNDED} p-4 flex items-center gap-3.5 h-full`}>
+            <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-[#7b39fc]/10"} shrink-0`}>
+              {s.icon}
+            </div>
+            <div className="min-w-0">
+              <p className="text-lg font-black text-gray-900 dark:text-white leading-none">
+                {s.value}
+              </p>
+              <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5 truncate">
+                {s.label}
+              </p>
+              {s.sub && (
+                <span className="text-[9px] font-semibold text-gray-400 dark:text-gray-500">
+                  {s.sub}
+                </span>
+              )}
+            </div>
+          </div>
         </motion.div>
       ))}
     </div>
   );
 }
 
-/* ── Widget: focus di oggi ────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: focus di oggi
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function TodayFocusWidget({
   focus,
@@ -187,63 +239,50 @@ export function TodayFocusWidget({
   gradientId?: string;
 }) {
   return (
-    <Card className="relative overflow-hidden rounded-2xl border border-[#7b39fc]/15 bg-white/70 shadow-xl shadow-[#7b39fc]/10 backdrop-blur-xl dark:bg-[#1d1630]/60">
-      <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#7b39fc] to-[#a67cff]" />
-      <CardContent className="p-5">
+    <div className={`${CARD_ROUNDED_LG} relative overflow-hidden`}>
+      {/* Accent left border */}
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7b39fc] to-[#a67cff] rounded-l-3xl" />
+      <div className="p-5 pl-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-[#7b39fc] dark:text-[#a67cff]">
-              <Zap size={18} />
-              <span className="text-xs font-bold uppercase tracking-[0.2em]">
+              <Zap size={16} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">
                 {labels.focus}
               </span>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-snug">
               {focus}
             </h3>
-            <div className="flex flex-wrap gap-3">
-              <Badge
-                variant="default"
-                className="bg-[#7b39fc]/10 text-[#7b39fc] border-none dark:bg-[#7b39fc]/25 dark:text-[#a67cff]"
-              >
+            <div className="flex flex-wrap gap-2">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
                 {criticalCount} {labels.critical}
-              </Badge>
-              <Badge
-                variant="default"
-                className="bg-[#a67cff]/10 text-[#8b4dff] border-none dark:bg-[#a67cff]/20 dark:text-[#a67cff]"
-              >
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300">
                 {activeGoalsCount} {labels.activeGoals}
-              </Badge>
-              <Badge
-                variant="default"
-                className="bg-emerald-500/10 text-emerald-600 border-none dark:bg-emerald-500/20 dark:text-emerald-400"
-              >
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
                 {completedCount} {labels.done}
-              </Badge>
+              </span>
             </div>
           </div>
+
+          {/* Circular progress */}
           <div className="shrink-0 flex items-center justify-center">
             <div className="relative w-28 h-28 flex items-center justify-center">
-              <svg
-                viewBox="0 0 100 100"
-                className="w-full h-full transform -rotate-90 drop-shadow-sm"
-              >
+              <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                 <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
+                  cx="50" cy="50" r="42"
                   fill="transparent"
                   stroke="currentColor"
-                  strokeWidth="8"
-                  className="text-gray-100 dark:text-gray-700/50"
+                  strokeWidth="7"
+                  className="text-gray-100 dark:text-gray-800"
                 />
                 <circle
-                  cx="50"
-                  cy="50"
-                  r="42"
+                  cx="50" cy="50" r="42"
                   fill="transparent"
                   stroke={`url(#${gradientId})`}
-                  strokeWidth="10"
+                  strokeWidth="9"
                   strokeDasharray="263.9"
                   strokeDashoffset={263.9 - (263.9 * completionRate) / 100}
                   strokeLinecap="round"
@@ -251,8 +290,8 @@ export function TodayFocusWidget({
                 />
                 <defs>
                   <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#7b39fc" />
-                    <stop offset="100%" stopColor="#a67cff" />
+                    <stop offset="0%" stopColor={ACCENT} />
+                    <stop offset="100%" stopColor={ACCENT_LIGHT} />
                   </linearGradient>
                 </defs>
               </svg>
@@ -260,24 +299,26 @@ export function TodayFocusWidget({
                 <span className="text-xl font-black text-gray-900 dark:text-white leading-none">
                   {completionRate}%
                 </span>
-                <span className="text-[8px] font-black uppercase tracking-tighter text-gray-400 mt-1">
+                <span className="text-[8px] font-black uppercase tracking-tighter text-gray-400 dark:text-gray-500 mt-0.5">
                   {labels.completed}
                 </span>
               </div>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-/* ── Widget: trend settimanale ────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: trend settimanale — vuoto se non ci sono dati reali
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export interface TrendPoint {
   day: string;
-  val: number;
-  count: number;
+  val: number;   // 0-100 percentuale attività
+  count: number; // n. task completati
 }
 
 export function WeeklyTrendWidget({
@@ -291,58 +332,71 @@ export function WeeklyTrendWidget({
   subtitle: string;
   statusLabel: string;
 }) {
+  const hasData = data.some((d) => d.count > 0);
+  const maxVal = Math.max(...data.map((d) => d.val), 1);
+
   return (
-    <Card className="rounded-[2rem] border border-[#7b39fc]/15 bg-white/70 shadow-xl shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#1a1528]/50">
-      <CardContent className="p-6">
+    <div className={CARD_ROUNDED_LG}>
+      <div className="p-6">
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] dark:text-[#a67cff]">
-              <TrendingUp size={18} />
+            <div className="p-2.5 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/15">
+              <TrendingUp size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
             </div>
             <div>
-              <h4 className="text-sm font-black uppercase tracking-widest text-gray-800 dark:text-gray-100">
+              <h4 className="text-sm font-black text-gray-800 dark:text-gray-100">
                 {title}
               </h4>
-              <p className="text-xs text-gray-400">{subtitle}</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{subtitle}</p>
             </div>
           </div>
-          <Badge
-            variant="default"
-            className="bg-[#7b39fc]/10 text-[#7b39fc] border-none text-[10px] font-black uppercase"
-          >
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff]">
             {statusLabel}
-          </Badge>
+          </span>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 items-end h-32 pt-4">
-          {data.map((d, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center gap-2 h-full justify-end group"
-            >
-              <span className="text-[10px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {d.val}%
-              </span>
-              <div className="w-full max-w-[28px] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden h-20 flex flex-col justify-end p-0.5">
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${d.val}%` }}
-                  transition={{ duration: 0.8, delay: i * 0.05 }}
-                  className="w-full rounded-lg bg-gradient-to-t from-[#7b39fc] to-[#a67cff]"
-                />
-              </div>
-              <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                {d.day}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        {/* Chart or empty state */}
+        {hasData ? (
+          <div className="grid grid-cols-7 gap-2 items-end h-32">
+            {data.map((d, i) => {
+              const pct = maxVal > 0 ? (d.val / maxVal) * 100 : 0;
+              return (
+                <div key={i} className="flex flex-col items-center gap-2 h-full justify-end group">
+                  <span className="text-[9px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {d.count > 0 ? `${d.count}` : "—"}
+                  </span>
+                  <div className="w-full max-w-[28px] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden h-20 flex flex-col justify-end p-0.5">
+                    {pct > 0 ? (
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${pct}%` }}
+                        transition={{ duration: 0.7, delay: i * 0.05, ease: "easeOut" }}
+                        className="w-full rounded-lg bg-gradient-to-t from-[#7b39fc] to-[#a67cff]"
+                      />
+                    ) : (
+                      <div className="w-full h-[4%] rounded-lg bg-gray-200 dark:bg-gray-700" />
+                    )}
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500">{d.day}</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState
+            icon={BarChart3}
+            label="Nessuna attività registrata questa settimana. Completa i tuoi task per vedere il trend."
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
-/* ── Link decorativo: naviga solo se riceve un href ───────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Link decorativo
+   ─────────────────────────────────────────────────────────────────────────── */
 
 function DecorativeLink({
   href,
@@ -353,17 +407,50 @@ function DecorativeLink({
   className: string;
   children: React.ReactNode;
 }) {
-  if (href) {
-    return (
-      <Link href={href} className={className}>
-        {children}
-      </Link>
-    );
-  }
+  if (href) return <Link href={href} className={className}>{children}</Link>;
   return <span className={className}>{children}</span>;
 }
 
-/* ── Widget: task ad alta priorità ────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget section header (riutilizzabile)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+function SectionHeader({
+  icon: Icon,
+  iconClass,
+  title,
+  actionLabel,
+  actionHref,
+  actionClass,
+}: {
+  icon: React.ElementType;
+  iconClass: string;
+  title: string;
+  actionLabel?: string;
+  actionHref?: string;
+  actionClass?: string;
+}) {
+  return (
+    <div className="flex items-center justify-between px-1 mb-3">
+      <h4 className={`text-xs font-black uppercase tracking-widest flex items-center gap-2 text-gray-500 dark:text-gray-400`}>
+        <Icon size={14} className={iconClass} />
+        {title}
+      </h4>
+      {actionLabel && (
+        <DecorativeLink
+          href={actionHref}
+          className={actionClass || "text-[10px] font-black uppercase tracking-wider hover:underline text-[#7b39fc]"}
+        >
+          {actionLabel}
+        </DecorativeLink>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: task ad alta priorità
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export interface CriticalTask {
   id: any;
@@ -385,51 +472,47 @@ export function CriticalTasksWidget({
   emptyLabel: string;
 }) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between px-2">
-        <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
-          <Flame size={16} className="text-orange-500" /> {title}
-        </h4>
-        <DecorativeLink
-          href={seeAllHref}
-          className="text-[10px] font-black text-[#7b39fc] uppercase tracking-wider hover:underline"
-        >
-          {seeAllLabel}
-        </DecorativeLink>
-      </div>
-      <div className="space-y-3">
+    <div className="space-y-3">
+      <SectionHeader
+        icon={Flame}
+        iconClass="text-orange-500"
+        title={title}
+        actionLabel={seeAllLabel}
+        actionHref={seeAllHref}
+        actionClass="text-[10px] font-black text-[#7b39fc] dark:text-[#a67cff] uppercase tracking-wider hover:underline"
+      />
+      <div className="space-y-2">
         {tasks.length > 0 ? (
           tasks.map((task) => (
-            <Card
+            <div
               key={task.id}
-              className="rounded-2xl border border-[#7b39fc]/10 bg-white/70 shadow-lg shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#1a1528]/40 hover:scale-[1.01] transition-transform"
+              className={`${CARD_ROUNDED} px-4 py-3 flex items-center gap-3 hover:scale-[1.01] transition-transform`}
             >
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-lg shadow-red-500/40 shrink-0" />
-                <span className="text-sm font-bold truncate flex-1 text-gray-800 dark:text-gray-100">
-                  {task.title}
+              <div className="w-2 h-2 rounded-full bg-red-500 shadow-sm shadow-red-500/40 shrink-0" />
+              <span className="text-sm font-semibold truncate flex-1 text-gray-800 dark:text-gray-100">
+                {task.title}
+              </span>
+              {task.deadline && (
+                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1 shrink-0">
+                  <Clock size={10} />
+                  {task.deadline}
                 </span>
-                {task.deadline && (
-                  <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1 shrink-0">
-                    <Clock size={11} /> {task.deadline}
-                  </span>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </div>
           ))
         ) : (
-          <Card className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5">
-            <CardContent className="p-6 text-center text-xs text-gray-400 font-medium">
-              {emptyLabel}
-            </CardContent>
-          </Card>
+          <div className={`${CARD_ROUNDED} overflow-hidden`}>
+            <EmptyState icon={Flame} label={emptyLabel} iconClass="text-orange-400 dark:text-orange-500/60" />
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-/* ── Widget: brain dump ───────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: brain dump
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export interface IdeaItem {
   id: any;
@@ -453,48 +536,43 @@ export function RecentIdeasWidget({
   defaultCategory: string;
 }) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between px-2">
-        <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
-          <Lightbulb size={16} className="text-amber-500" /> {title}
-        </h4>
-        <DecorativeLink
-          href={linkHref}
-          className="text-[10px] font-black text-amber-500 uppercase tracking-wider hover:underline"
-        >
-          {linkLabel}
-        </DecorativeLink>
-      </div>
-      <div className="space-y-3">
+    <div className="space-y-3">
+      <SectionHeader
+        icon={Lightbulb}
+        iconClass="text-amber-500"
+        title={title}
+        actionLabel={linkLabel}
+        actionHref={linkHref}
+        actionClass="text-[10px] font-black text-amber-500 dark:text-amber-400 uppercase tracking-wider hover:underline"
+      />
+      <div className="space-y-2">
         {ideas.length > 0 ? (
           ideas.map((idea) => (
-            <Card
+            <div
               key={idea.id}
-              className="rounded-2xl border-l-4 border-l-amber-400 bg-amber-50/40 dark:bg-amber-900/10 border-gray-100 dark:border-gray-800/40"
+              className={`${CARD_ROUNDED} border-l-4 border-l-amber-400 px-4 py-3`}
             >
-              <CardContent className="p-4">
-                <p className="text-sm font-bold text-amber-900 dark:text-amber-200">
-                  &quot;{idea.title}&quot;
-                </p>
-                <p className="text-[9px] font-black text-amber-600/70 uppercase mt-2">
-                  {idea.category || defaultCategory}
-                </p>
-              </CardContent>
-            </Card>
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-1">
+                &ldquo;{idea.title}&rdquo;
+              </p>
+              <p className="text-[9px] font-black text-amber-600/70 dark:text-amber-400/60 uppercase mt-1.5 tracking-wider">
+                {idea.category || defaultCategory}
+              </p>
+            </div>
           ))
         ) : (
-          <Card className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white/40 dark:bg-white/5">
-            <CardContent className="p-6 text-center text-xs text-gray-400 font-medium">
-              {emptyLabel}
-            </CardContent>
-          </Card>
+          <div className={`${CARD_ROUNDED} overflow-hidden`}>
+            <EmptyState icon={Lightbulb} label={emptyLabel} iconClass="text-amber-400 dark:text-amber-500/60" />
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-/* ── Widget: avanzamento obiettivi ────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: avanzamento obiettivi
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export interface GoalLike {
   id: any;
@@ -513,12 +591,16 @@ export function GoalProgressWidget({
   emptyLabel: string;
 }) {
   return (
-    <Card className="rounded-[2rem] border-none bg-linear-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/25">
-      <CardContent className="p-6">
-        <h4 className="text-sm font-black uppercase tracking-widest opacity-90 mb-6 flex items-center gap-2">
-          <Target size={16} /> {title}
+    <div
+      className="rounded-3xl text-white overflow-hidden"
+      style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)` }}
+    >
+      <div className="p-6">
+        <h4 className="text-xs font-black uppercase tracking-widest opacity-80 mb-5 flex items-center gap-2">
+          <Target size={14} />
+          {title}
         </h4>
-        <div className="space-y-6">
+        <div className="space-y-5">
           {goals.length > 0 ? (
             goals.map((goal) => {
               const subGoals = goal.subGoals || [];
@@ -526,35 +608,40 @@ export function GoalProgressWidget({
               const pct =
                 subGoals.length > 0
                   ? Math.round((completed / subGoals.length) * 100)
-                  : goal.completed
-                    ? 100
-                    : 0;
+                  : goal.completed ? 100 : 0;
 
               return (
-                <div key={goal.id} className="space-y-2">
+                <div key={goal.id} className="space-y-1.5">
                   <div className="flex justify-between items-center text-[11px] font-bold">
-                    <span className="truncate pr-4">{goal.title}</span>
-                    <span>{pct}%</span>
+                    <span className="truncate pr-4 opacity-90">{goal.title}</span>
+                    <span className="opacity-80 shrink-0">{pct}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-white rounded-full transition-all duration-1000"
-                      style={{ width: `${pct}%` }}
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full bg-white rounded-full"
                     />
                   </div>
                 </div>
               );
             })
           ) : (
-            <p className="text-xs opacity-75">{emptyLabel}</p>
+            <div className="flex flex-col items-center py-4 gap-2 opacity-70">
+              <Target size={24} className="opacity-50" />
+              <p className="text-xs text-center opacity-80">{emptyLabel}</p>
+            </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-/* ── Widget: azioni rapide ────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: azioni rapide
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function QuickNavWidget({
   labels,
@@ -562,37 +649,43 @@ export function QuickNavWidget({
   labels: { title: string; newProject: string; newIdea: string };
 }) {
   return (
-    <Card className="rounded-[2rem] border border-[#7b39fc]/10 bg-white/70 shadow-xl shadow-[#7b39fc]/10 backdrop-blur-xl dark:bg-[#1a1528]/50">
-      <CardContent className="p-6">
-        <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">
+    <div className={CARD_ROUNDED_LG}>
+      <div className="p-5">
+        <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
           {labels.title}
         </h4>
         <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="ghost"
-            className="h-auto py-4 flex flex-col items-center gap-2 border border-[#7b39fc]/15 rounded-2xl hover:bg-[#7b39fc]/10 dark:hover:bg-[#7b39fc]/15 transition-all"
+          <button
+            type="button"
+            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-[#7b39fc]/20 dark:border-[#7b39fc]/30 hover:bg-[#7b39fc]/8 dark:hover:bg-[#7b39fc]/15 transition-all text-center"
           >
-            <Plus size={20} className="text-[#7b39fc]" />
-            <span className="text-[9px] font-black uppercase tracking-widest">
+            <div className="w-8 h-8 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center">
+              <Plus size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300">
               {labels.newProject}
             </span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="h-auto py-4 flex flex-col items-center gap-2 border border-amber-500/20 rounded-2xl hover:bg-amber-500/10 dark:hover:bg-amber-500/15 transition-all"
+          </button>
+          <button
+            type="button"
+            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-amber-500/20 dark:border-amber-500/30 hover:bg-amber-500/8 dark:hover:bg-amber-500/10 transition-all text-center"
           >
-            <Lightbulb size={20} className="text-amber-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center">
+              <Lightbulb size={16} className="text-amber-500" />
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300">
               {labels.newIdea}
             </span>
-          </Button>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-/* ── Widget: analisi AI ───────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: analisi AI
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function AiInsightsWidget({
   text,
@@ -604,23 +697,29 @@ export function AiInsightsWidget({
   onAction?: () => void;
 }) {
   return (
-    <Card className="rounded-[2rem] border-2 border-[#7b39fc]/20 bg-[#7b39fc]/5 dark:bg-[#7b39fc]/10">
-      <CardContent className="p-6 text-center space-y-4">
-        <Sparkles className="mx-auto text-[#a67cff]" size={32} />
-        <p className="text-xs font-bold text-gray-700 dark:text-gray-200">{text}</p>
+    <div className={`${CARD_ROUNDED_LG} overflow-hidden`}>
+      {/* Sottile gradient top bar */}
+      <div className="h-0.5 bg-gradient-to-r from-[#7b39fc] via-[#a67cff] to-[#7b39fc]" />
+      <div className="p-6 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center mx-auto">
+          <Sparkles size={22} className="text-[#7b39fc] dark:text-[#a67cff]" />
+        </div>
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{text}</p>
         <button
           type="button"
           onClick={onAction}
-          className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-[#7b39fc] text-white shadow-lg shadow-[#7b39fc]/25 transition-colors hover:bg-[#8b4dff] active:translate-y-0 cursor-pointer"
+          className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white shadow-md shadow-[#7b39fc]/20 transition-colors cursor-pointer"
         >
           {actionLabel}
         </button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-/* ── Widget: strumenti ────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Widget: strumenti & risorse
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function ToolsResourcesWidget({
   title,
@@ -630,28 +729,28 @@ export function ToolsResourcesWidget({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-4">
-      <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 px-2 flex items-center gap-2">
-        <Wrench size={16} className="text-[#7b39fc]" /> {title}
-      </h4>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">{children}</div>
+    <div className="space-y-3">
+      <SectionHeader
+        icon={Wrench}
+        iconClass="text-[#7b39fc] dark:text-[#a67cff]"
+        title={title}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{children}</div>
     </div>
   );
 }
 
-export function ToolsPanel({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ToolsPanel({ children }: { children: React.ReactNode }) {
   return (
-    <Card className="rounded-[2rem] border border-[#7b39fc]/10 bg-white/70 shadow-xl shadow-[#7b39fc]/5 backdrop-blur-xl dark:bg-[#1a1528]/50 hover:shadow-[#7b39fc]/10 transition-all group overflow-hidden">
-      <CardContent className="p-0">{children}</CardContent>
-    </Card>
+    <div className={`${CARD_ROUNDED_LG} overflow-hidden hover:shadow-md transition-shadow`}>
+      <div className="p-0">{children}</div>
+    </div>
   );
 }
 
-/* ── Toolbar e menù di personalizzazione ──────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Toolbar e menù di personalizzazione
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function WidgetEditToolbar({
   label,
@@ -673,9 +772,9 @@ export function WidgetEditToolbar({
   hiddenLabel: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 px-4 py-2 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 border-b border-[#7b39fc]/20 rounded-t-3xl text-xs font-bold text-[#7b39fc] dark:text-[#a67cff]">
+    <div className="flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-700/60 rounded-t-3xl text-xs font-bold text-gray-500 dark:text-gray-400">
       <div className="flex items-center gap-2">
-        <GripVertical size={14} className="opacity-60" />
+        <GripVertical size={13} className="opacity-50" />
         <span className="font-extrabold uppercase tracking-wider text-[10px]">{label}</span>
         {!isVisible && (
           <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[9px] font-black uppercase">
@@ -688,19 +787,19 @@ export function WidgetEditToolbar({
           type="button"
           onClick={onMoveUp}
           disabled={isFirst}
-          className="p-1 rounded-lg hover:bg-[#7b39fc]/20 disabled:opacity-30 transition-colors"
+          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
           title="Sposta su"
         >
-          <ArrowUp size={14} />
+          <ArrowUp size={13} />
         </button>
         <button
           type="button"
           onClick={onMoveDown}
           disabled={isLast}
-          className="p-1 rounded-lg hover:bg-[#7b39fc]/20 disabled:opacity-30 transition-colors"
+          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
           title="Sposta giù"
         >
-          <ArrowDown size={14} />
+          <ArrowDown size={13} />
         </button>
         <button
           type="button"
@@ -713,13 +812,9 @@ export function WidgetEditToolbar({
           title={isVisible ? "Nascondi widget" : "Mostra widget"}
         >
           {isVisible ? (
-            <>
-              <EyeOff size={12} /> Nascondi
-            </>
+            <><EyeOff size={11} /> Nascondi</>
           ) : (
-            <>
-              <Eye size={12} /> Mostra
-            </>
+            <><Eye size={11} /> Mostra</>
           )}
         </button>
       </div>
@@ -748,20 +843,20 @@ export function WidgetManagerMenu({
   };
 }) {
   return (
-    <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-50 space-y-2">
-      <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-2 mb-2">
-        <span className="text-xs font-black uppercase tracking-wider text-gray-500">
+    <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl z-50 space-y-2">
+      <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">
           {labels.title}
         </span>
         <button
           type="button"
           onClick={onClose}
-          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400"
+          className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
         >
-          <X size={14} />
+          <X size={13} />
         </button>
       </div>
-      <div className="space-y-1 max-h-60 overflow-y-auto">
+      <div className="space-y-0.5 max-h-60 overflow-y-auto">
         {ALL_WIDGET_DEFS.map((w) => {
           const IconComp = ICONS[w.icon] || Layers;
           const isVis = visibility[w.id] !== false;
@@ -770,17 +865,17 @@ export function WidgetManagerMenu({
               key={w.id}
               type="button"
               onClick={() => onToggle(w.id)}
-              className="w-full flex items-center justify-between p-2 rounded-xl text-left hover:bg-gray-50 dark:hover:bg-zinc-900 text-xs font-semibold transition-colors"
+              className="w-full flex items-center justify-between p-2.5 rounded-xl text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold transition-colors text-gray-700 dark:text-gray-300"
             >
               <span className="flex items-center gap-2 truncate">
-                <IconComp size={14} className="text-[#7b39fc] shrink-0" />
+                <IconComp size={13} className="text-[#7b39fc] dark:text-[#a67cff] shrink-0" />
                 <span className="truncate">{w.label}</span>
               </span>
               <span
-                className={`w-4 h-4 rounded flex items-center justify-center text-[10px] ${
+                className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${
                   isVis
                     ? "bg-[#7b39fc] text-white"
-                    : "border border-gray-300 dark:border-zinc-700"
+                    : "border border-gray-300 dark:border-gray-700"
                 }`}
               >
                 {isVis && <Check size={10} />}
@@ -790,8 +885,8 @@ export function WidgetManagerMenu({
         })}
       </div>
 
-      <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 space-y-1">
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-1">
+      <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-1">
+        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 px-1">
           {labels.presets}
         </p>
         <div className="grid grid-cols-2 gap-1">
@@ -807,7 +902,7 @@ export function WidgetManagerMenu({
               key={key}
               type="button"
               onClick={() => onPreset(key)}
-              className="px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-zinc-900 hover:bg-[#7b39fc]/10 text-[10px] font-bold text-gray-700 dark:text-gray-300 text-center"
+              className="px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-[#7b39fc]/10 dark:hover:bg-[#7b39fc]/15 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center transition-colors"
             >
               {label}
             </button>
@@ -818,7 +913,7 @@ export function WidgetManagerMenu({
   );
 }
 
-/* Registry icone per il menu widget (le definizioni restano serializzabili) */
+/* Registry icone per il menu widget */
 const ICONS: Record<string, any> = {
   ListTodo,
   Zap,
@@ -831,7 +926,9 @@ const ICONS: Record<string, any> = {
   Wrench,
 };
 
-/* ── Header della dashboard ───────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Header della dashboard
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function DashboardHeader({
   eyebrow,
@@ -855,57 +952,53 @@ export function DashboardHeader({
       <div className="flex items-start gap-4">
         <motion.div
           whileHover={{ scale: 1.05, rotate: -3 }}
-          className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center shrink-0 shadow-lg shadow-[#7b39fc]/25"
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-[#7b39fc]/20"
+          style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)` }}
         >
-          <Sparkles size={22} className="text-white/90" />
+          <Sparkles size={20} className="text-white/90" />
         </motion.div>
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
+            <span className="h-px w-5 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
               {eyebrow}
             </span>
           </div>
-          <h2 className="font-inter font-extrabold text-3xl md:text-4xl lg:text-5xl leading-[1.1] tracking-[-0.025em] text-gray-900 dark:text-white drop-shadow-[0_2px_20px_rgba(123,57,252,0.18)]">
+          <h2 className="font-extrabold text-2xl md:text-3xl leading-tight tracking-tight text-gray-900 dark:text-white">
             {title}
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">
+          <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-sm">
             {subtitle}
           </p>
         </div>
       </div>
 
       {showCustomize && onToggleEdit && (
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            id="customize-analytics-btn"
-            onClick={onToggleEdit}
-            className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-lg cursor-pointer ${
-              isEditing
-                ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25"
-                : "bg-gradient-to-r from-[#7b39fc] to-[#a67cff] hover:brightness-110 text-white shadow-[#7b39fc]/25"
-            }`}
-          >
-            {isEditing ? (
-              <>
-                <Check size={16} />
-                <span>{customizeLabel}</span>
-              </>
-            ) : (
-              <>
-                <SlidersHorizontal size={16} />
-                <span>{customizeLabel}</span>
-              </>
-            )}
-          </button>
-        </div>
+        <button
+          type="button"
+          id="customize-analytics-btn"
+          onClick={onToggleEdit}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md cursor-pointer ${
+            isEditing
+              ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20"
+              : "bg-gradient-to-r from-[#7b39fc] to-[#a67cff] hover:brightness-110 text-white shadow-[#7b39fc]/20"
+          }`}
+        >
+          {isEditing ? (
+            <><Check size={14} /><span>{customizeLabel}</span></>
+          ) : (
+            <><SlidersHorizontal size={14} /><span>{customizeLabel}</span></>
+          )}
+        </button>
       )}
     </div>
   );
 }
 
-/* ── Banner di personalizzazione ──────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Banner di personalizzazione
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function EditModeBanner({
   title,
@@ -925,15 +1018,15 @@ export function EditModeBanner({
   manager: React.ReactNode;
 }) {
   return (
-    <div className="p-4 md:p-5 rounded-3xl bg-gradient-to-r from-[#7b39fc]/10 via-[#a67cff]/10 to-[#7b39fc]/5 border-2 border-[#7b39fc]/30 backdrop-blur-xl shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="p-4 md:p-5 rounded-3xl bg-[#7b39fc]/8 dark:bg-[#7b39fc]/12 border border-[#7b39fc]/20 dark:border-[#7b39fc]/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-xs font-black uppercase tracking-widest text-[#7b39fc] dark:text-[#a67cff]">
             {title}
           </span>
         </div>
-        <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400">{description}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -941,9 +1034,9 @@ export function EditModeBanner({
           <button
             type="button"
             onClick={onManage}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-gray-900 border border-[#7b39fc]/20 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            <Layers size={14} className="text-[#7b39fc]" />
+            <Layers size={13} className="text-[#7b39fc] dark:text-[#a67cff]" />
             <span>{labels.manage}</span>
           </button>
           {manager}
@@ -952,19 +1045,19 @@ export function EditModeBanner({
         <button
           type="button"
           onClick={onReset}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           title="Ripristina layout predefinito"
         >
-          <RotateCcw size={13} />
+          <RotateCcw size={12} />
           <span>{labels.reset}</span>
         </button>
 
         <button
           type="button"
           onClick={onDone}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-black uppercase tracking-wider transition-colors shadow-lg shadow-[#7b39fc]/20"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-black uppercase tracking-wider transition-colors shadow-md shadow-[#7b39fc]/20"
         >
-          <Check size={14} />
+          <Check size={13} />
           <span>{labels.done}</span>
         </button>
       </div>
@@ -972,7 +1065,9 @@ export function EditModeBanner({
   );
 }
 
-/* ── Banner quota piano ───────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Banner quota piano
+   ─────────────────────────────────────────────────────────────────────────── */
 
 export function PlanQuotaBanner({
   planName,
@@ -995,15 +1090,15 @@ export function PlanQuotaBanner({
 }) {
   const isFull = used >= max;
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[#7b39fc]/15 bg-white/60 dark:bg-white/5 px-4 py-3">
-      <div className="w-10 h-10 rounded-xl bg-[#7b39fc]/10 flex items-center justify-center shrink-0">
-        <Zap size={18} className="text-[#a67cff]" />
+    <div className={`${CARD_ROUNDED} flex items-center gap-3 px-4 py-3`}>
+      <div className="w-9 h-9 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center shrink-0">
+        <Zap size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-bold text-gray-600 dark:text-gray-300">
             {label}{" "}
-            <span className="font-black uppercase tracking-widest text-[#7b39fc]">
+            <span className="font-black uppercase tracking-widest text-[#7b39fc] dark:text-[#a67cff]">
               {planName}
             </span>{" "}
             · {used} / {max} {word}
@@ -1022,15 +1117,18 @@ export function PlanQuotaBanner({
               </span>
             )
           ) : (
-            <span className="shrink-0 text-[9px] font-black uppercase tracking-widest text-emerald-500">
+            <span className="shrink-0 text-[9px] font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-400">
               {nextUpLabel} {max - used}
             </span>
           )}
         </div>
-        <div className="mt-2 h-1.5 w-full bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div className="mt-2 h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-linear-to-r from-[#7b39fc] to-[#a67cff] rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, (used / max) * 100)}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${Math.min(100, (used / max) * 100)}%`,
+              background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_LIGHT})`,
+            }}
           />
         </div>
       </div>

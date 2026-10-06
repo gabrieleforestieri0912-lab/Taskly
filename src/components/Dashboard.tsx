@@ -330,17 +330,33 @@ export default function Dashboard({
     },
   ];
 
-  // Calculated weekly trend (last 7 days activity)
-  const weekdays = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-  const trendData = [
-    { day: "Lun", val: 80, count: 4 },
-    { day: "Mar", val: 100, count: 6 },
-    { day: "Mer", val: 45, count: 2 },
-    { day: "Gio", val: 90, count: 5 },
-    { day: "Ven", val: completionRate || 75, count: completedTasks || 3 },
-    { day: "Sab", val: 30, count: 1 },
-    { day: "Dom", val: 60, count: 2 },
-  ];
+  // Real weekly trend — based on actual task completedAt or createdAt in the last 7 days.
+  // If there is no data at all, every bar stays at 0 and WeeklyTrendWidget shows an empty state.
+  const DAY_LABELS = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+  const trendData = (() => {
+    const now = new Date();
+    // Build an array of the last 7 days (today = index 6)
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - (6 - i));
+      return d;
+    });
+    return days.map((day) => {
+      const dayStr = day.toISOString().split("T")[0];
+      const dayLabel = DAY_LABELS[day.getDay()];
+      const count = safeTasks.filter((task) => {
+        if (!task) return false;
+        // Count tasks completed on this day
+        const dateStr = (task.completedAt || task.updatedAt || task.createdAt || "").slice(0, 10);
+        return dateStr === dayStr && (task.status === "done" || task.completed);
+      }).length;
+      return {
+        day: dayLabel,
+        val: count,   // raw count — WeeklyTrendWidget normalises to max
+        count,
+      };
+    });
+  })();
 
   // Render individual widget component by ID
   const renderWidget = (widgetId: WidgetId, index: number) => {
