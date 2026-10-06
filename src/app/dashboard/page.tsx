@@ -140,6 +140,7 @@ function DashboardContent() {
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isPageMenuOpen, setIsPageMenuOpen] = useState(false);
   const [templateToast, setTemplateToast] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [pageLinkCopied, setPageLinkCopied] = useState(false);
 
   const handleCopyPageLink = (pageId: string) => {
@@ -1129,6 +1130,17 @@ function DashboardContent() {
     }
     return (
       <>
+        {saveError && (
+          <div className="mb-4 max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3 rounded-2xl bg-red-500/10 border border-red-500/25 text-sm font-bold text-red-500">
+            <span>{saveError}</span>
+            <button
+              onClick={() => setSaveError(null)}
+              className="text-red-400 hover:text-red-200 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
         {planNotice && (
           <div className="mb-4 max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3 rounded-2xl bg-[#a67cff]/10 border border-[#a67cff]/25 text-sm font-bold text-[#a67cff]">
             <span>{planNotice}</span>
@@ -1316,31 +1328,46 @@ const ensureTab = React.useCallback((page: any) => {
 
         // Upsert every known page via structured CRUD
         const headers = { "Content-Type": "application/json" };
-        cur.forEach((p) => {
-          const id = String(p.id);
-          const prev = snapshot[id];
-          if (!prev) {
-            apiFetch("/resources/pages", {
-              method: "POST",
-              headers,
-              body: JSON.stringify(p),
-            })
-              .then((r) => {
-                if (r.ok) snapshot[id] = { deleted: Boolean(p.deleted) };
-              })
-              .catch(() => {});
-          } else {
-            apiFetch(`/resources/pages/${id}`, {
-              method: "PUT",
-              headers,
-              body: JSON.stringify(p),
-            })
-              .then((r) => {
-                if (r.ok) snapshot[id] = { deleted: Boolean(p.deleted) };
-              })
-              .catch(() => {});
-          }
-        });
+        await Promise.all(
+          cur.map(async (p) => {
+            const id = String(p.id);
+            const prev = snapshot[id];
+            try {
+              const r = prev
+                ? await apiFetch(`/resources/pages/${id}`, {
+                    method: "PUT",
+                    headers,
+                    body: JSON.stringify(p),
+                  })
+                : await apiFetch("/resources/pages", {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(p),
+                  });
+              if (r.ok) {
+                snapshot[id] = { deleted: Boolean(p.deleted) };
+              } else {
+                // Body non-JSON o status non-2xx: il create/update e' fallito.
+                // Prima veniva ignorato e la pagina spariva al reload.
+                setSaveError(
+                  `Salvataggio pagina fallito (${r.status})${
+                    prev ? "" : " durante la creazione"
+                  }: ${p.label || "senza titolo"}`,
+                );
+                console.error(
+                  `Persist page ${id} failed (${prev ? "PUT" : "POST"})`,
+                  r.status,
+                  await r.text().catch(() => ""),
+                );
+              }
+            } catch (e) {
+              setSaveError(
+                `Salvataggio pagina fallito: ${p.label || "senza titolo"}`,
+              );
+              console.error(`Persist page ${id} threw`, e);
+            }
+          }),
+        );
       } catch (error) {
         console.error("Error persisting pages:", error);
       }

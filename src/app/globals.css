@@ -44,16 +44,23 @@
    variables inside .dark retints every legacy neutral dark surface
    (page shells, cards, inputs, borders) to the Taskly palette without
    touching light mode. Text colors are unaffected because all dark-mode
-   text already uses explicit dark:text-* overrides. */
+   text already uses explicit dark:text-* overrides.
+
+   The steps MUST stay ordered by lightness:
+     950 (page bg) < 900 (card) < 850 (raised) < 800 (input/hover) < 700 (border)
+   Collapsing several of them onto the same value made every panel the
+   same black and the UI unreadable — that is what this scale fixes.
+   It also keeps borders lighter than the surface they sit on. */
 .dark {
-  --color-black: #000000;
-  --color-gray-950: #000000;
-  --color-gray-900: #0a0a0a;
-  --color-gray-850: #000000;
-  --color-gray-800: #0a0a0a;
-  --color-zinc-950: #000000;
-  --color-zinc-900: #0a0a0a;
-  --color-zinc-800: #0a0a0a;
+  --color-black: #05030c;
+  --color-gray-950: #0b0714;
+  --color-gray-900: #14101f;
+  --color-gray-850: #1c1729;
+  --color-gray-800: #241e33;
+  --color-gray-700: #322a47;
+  --color-zinc-950: #0b0714;
+  --color-zinc-900: #14101f;
+  --color-zinc-800: #241e33;
 }
 
 @layer base {

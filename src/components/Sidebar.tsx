@@ -1460,6 +1460,7 @@ export default function Sidebar({
               label={t("yourPages", "Privato")}
               onAdd={() => setIsModalOpen(true)}
               addLabel={t("newPage", "Nuova pagina")}
+              addTourId="add-page"
             >
               {loading ? (
                 <div className="px-2 space-y-1 mt-1">

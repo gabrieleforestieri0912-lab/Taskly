@@ -140,6 +140,12 @@ create table if not exists public.pages (
 );
 create index if not exists pages_order_idx on public.pages (user_id, sort_order);
 
+-- `icon` deve poter essere NULL: una pagina vuota nasce senza icona e
+-- l'utente puo' rimuoverla. Scrivere '' -> NULL su una colonna NOT NULL
+-- faceva fallire insert/update con not_null_violation (500) e la pagina
+-- non veniva mai persistita. Idempotente.
+alter table public.pages alter column icon drop not null;
+
 -- ============================================================================
 -- ideas / goals — client-generated text ids
 -- ============================================================================

@@ -106,11 +106,14 @@ export const BUILTIN_TEMPLATES: PageTemplate[] = [
     iconColor: "text-orange-500",
     type: "tasks",
     data: [
+      // status/priority devono usare i valori di ItemList.tsx (todo|doing|done,
+      // Bassa|Media|Alta). Con i valori inglesi (in_progress/high) i task non
+      // finivano in nessun gruppo e restavano senza badge priorita'.
       {
         id: "pr-1",
         title: "Fase 1: Ricerca e Definizione Requisiti",
         status: "done",
-        priority: "high",
+        priority: "Alta",
         deadline: new Date(Date.now() - 86400000 * 7).toISOString().split("T")[0],
         subtasks: [
           { id: "prs-1", title: "Interviste utenti e competitor analysis", done: true },
@@ -120,11 +123,11 @@ export const BUILTIN_TEMPLATES: PageTemplate[] = [
       {
         id: "pr-2",
         title: "Fase 2: Prototipazione UI/UX su Figma",
-        status: "in_progress",
-        priority: "high",
+        status: "doing",
+        priority: "Alta",
         deadline: new Date(Date.now() + 86400000 * 3).toISOString().split("T")[0],
         subtasks: [
-          { id: "prs-3", title: "Wireframe a bassa fedeltà", done: true },
+          { id: "prs-3", title: "Wireframe a bassa fedelta'", done: true },
           { id: "prs-4", title: "Component library e design system", done: false },
         ],
       },
@@ -132,7 +135,7 @@ export const BUILTIN_TEMPLATES: PageTemplate[] = [
         id: "pr-3",
         title: "Fase 3: Sviluppo Frontend & Backend",
         status: "todo",
-        priority: "urgent",
+        priority: "Alta",
         deadline: new Date(Date.now() + 86400000 * 14).toISOString().split("T")[0],
         subtasks: [
           { id: "prs-5", title: "Setup ambiente e architettura dati", done: false },
@@ -143,7 +146,7 @@ export const BUILTIN_TEMPLATES: PageTemplate[] = [
         id: "pr-4",
         title: "Fase 4: Testing, QA e Lancio Pubblico",
         status: "todo",
-        priority: "medium",
+        priority: "Media",
         deadline: new Date(Date.now() + 86400000 * 30).toISOString().split("T")[0],
         subtasks: [],
       },

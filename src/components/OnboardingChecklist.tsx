@@ -96,6 +96,7 @@ export default function OnboardingChecklist(props: Props) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8, scale: 0.99 }}
       transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: "easeOut" }}
+      data-tour="checklist"
       className="mb-6 rounded-3xl border border-[#7b39fc]/20 p-5 shadow-sm bg-gradient-to-r from-[#7b39fc]/5 via-white/80 to-[#a67cff]/5 dark:from-[#7b39fc]/10 dark:via-gray-900/90 dark:to-transparent"
     >
       <div className="flex items-center justify-between gap-3">
