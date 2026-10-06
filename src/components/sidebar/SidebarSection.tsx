@@ -10,6 +10,8 @@ interface SidebarSectionProps {
   onAdd?: () => void;
   /** Accessible label for the "+" button */
   addLabel?: string;
+  /** Optional id forwarded as data-tour-id to the "+" button for product tours */
+  addTourId?: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -24,6 +26,7 @@ export function SidebarSection({
   label,
   onAdd,
   addLabel = "Crea nuova pagina",
+  addTourId,
   children,
   className = "",
 }: SidebarSectionProps) {
@@ -47,6 +50,7 @@ export function SidebarSection({
             }}
             aria-label={addLabel}
             title={addLabel}
+            data-tour-id={addTourId}
             className="opacity-0 group-hover/section:opacity-100 focus-visible:opacity-100 transition-opacity duration-150 p-0.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-cyan-500"
           >
             <Plus size={14} aria-hidden="true" />
