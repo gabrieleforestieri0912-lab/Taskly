@@ -465,8 +465,79 @@ export default function Sidebar({
         }}
         role="menu"
         aria-label={t("nav.more", "Altro")}
-        className="w-58 p-1.5 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
+        className="w-64 p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
       >
+        {/* Quick Settings: Tema & Lingua */}
+        <div className="p-2 mb-1.5 rounded-xl bg-gray-50/80 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 space-y-1.5">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[9px] font-black uppercase tracking-wider text-gray-400">
+              {t("quickSettings", "Aspetto & Lingua")}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            {/* Theme Toggle */}
+            <div className="flex items-center bg-white dark:bg-gray-900 rounded-lg p-0.5 border border-gray-200/60 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => {
+                  if (theme !== "light" && toggleTheme) toggleTheme();
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-md text-xs font-bold transition-all ${
+                  theme === "light"
+                    ? "bg-[#7b39fc] text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+                title="Tema Chiaro"
+              >
+                <Sun size={11} />
+                <span className="text-[10px]">Chiaro</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (theme !== "dark" && toggleTheme) toggleTheme();
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-md text-xs font-bold transition-all ${
+                  theme === "dark"
+                    ? "bg-[#7b39fc] text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+                title="Tema Scuro"
+              >
+                <Moon size={11} />
+                <span className="text-[10px]">Scuro</span>
+              </button>
+            </div>
+
+            {/* Language Toggle */}
+            <div className="flex items-center bg-white dark:bg-gray-900 rounded-lg p-0.5 border border-gray-200/60 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => setLanguage("it")}
+                className={`flex-1 flex items-center justify-center py-1 rounded-md text-xs font-bold transition-all ${
+                  language === "it"
+                    ? "bg-cyan-600 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                <span className="text-[10px]">IT</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`flex-1 flex items-center justify-center py-1 rounded-md text-xs font-bold transition-all ${
+                  language === "en"
+                    ? "bg-cyan-600 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                <span className="text-[10px]">EN</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <button
           type="button"
           role="menuitem"
@@ -706,15 +777,15 @@ export default function Sidebar({
           </Link>
 
           <Link
-            href="/settings?tab=notifications"
+            href="/dashboard?view=inbox"
             onClick={() => setIsProfileOpen(false)}
             className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
           >
             <div className="flex items-center gap-2.5">
-              <div className="p-1 rounded-lg bg-amber-500/10 text-amber-500">
-                <Bell size={13} />
+              <div className="p-1 rounded-lg bg-cyan-500/10 text-cyan-500">
+                <Inbox size={13} />
               </div>
-              <span>Notifiche & Promemoria</span>
+              <span>Inbox dello Spazio</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -1321,17 +1392,19 @@ export default function Sidebar({
           </div>
 
           {/* ── Google Calendar Integration Card & Connection Message ─────── */}
-          <GoogleCalendarSidebarCard
-            onNavigateToCalendar={() => {
-              setIsTranscriptionMode(false);
-              setIsAIActive(false);
-              const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
-              if (calPage) goToPage(calPage);
-              else router.push("/calendar");
-            }}
-          />
+          <div className="py-1">
+            <GoogleCalendarSidebarCard
+              onNavigateToCalendar={() => {
+                setIsTranscriptionMode(false);
+                setIsAIActive(false);
+                const calPage = pages.find((p) => !p.deleted && p.type === "calendar");
+                if (calPage) goToPage(calPage);
+                else router.push("/calendar");
+              }}
+            />
+          </div>
 
-          <div className="my-2 border-t border-gray-100 dark:border-gray-800" />
+          <div className="my-2.5 border-t border-gray-100 dark:border-gray-800/80" />
 
           {/* ── Private pages section ───────────────────────────────────────── */}
           {isAIActive ? (
@@ -1546,71 +1619,6 @@ export default function Sidebar({
             >
               <Sliders size={13} aria-hidden="true" />
             </button>
-          </div>
-
-          {/* ── Personalizzazione inline ────────────────────────────────────── */}
-          <div className="flex items-center gap-1.5 px-0.5 pb-0.5">
-            {/* Theme toggle */}
-            <div className="flex flex-1 items-center bg-gray-100 dark:bg-gray-800/80 rounded-md p-0.5 gap-0.5">
-              <button
-                type="button"
-                onClick={() => theme !== "light" && toggleTheme()}
-                title="Tema chiaro"
-                aria-label="Tema chiaro"
-                className={`flex flex-1 items-center justify-center gap-1 py-0.5 rounded-sm text-[10px] font-semibold transition-all ${
-                  theme === "light"
-                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
-                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-                }`}
-              >
-                <Sun size={10} aria-hidden="true" />
-                <span>{language === "it" ? "Chiaro" : "Light"}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => theme !== "dark" && toggleTheme()}
-                title="Tema scuro"
-                aria-label="Tema scuro"
-                className={`flex flex-1 items-center justify-center gap-1 py-0.5 rounded-sm text-[10px] font-semibold transition-all ${
-                  theme === "dark"
-                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
-                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-                }`}
-              >
-                <Moon size={10} aria-hidden="true" />
-                <span>{language === "it" ? "Scuro" : "Dark"}</span>
-              </button>
-            </div>
-
-            {/* Language toggle */}
-            <div className="flex items-center bg-gray-100 dark:bg-gray-800/80 rounded-md p-0.5 gap-0.5">
-              <button
-                type="button"
-                onClick={() => setLanguage("it")}
-                title="Italiano"
-                aria-label="Italiano"
-                className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold transition-all ${
-                  language === "it"
-                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
-                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-                }`}
-              >
-                IT
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                title="English"
-                aria-label="English"
-                className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold transition-all ${
-                  language === "en"
-                    ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm"
-                    : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
-                }`}
-              >
-                EN
-              </button>
-            </div>
           </div>
         </div>
 

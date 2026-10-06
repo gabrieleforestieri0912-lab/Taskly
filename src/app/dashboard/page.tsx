@@ -60,7 +60,6 @@ import OnboardingModal from "../../components/OnboardingModal";
 import OnboardingChecklist from "../../components/OnboardingChecklist";
 import { motion, AnimatePresence } from "framer-motion";
 import AIPanel from "../../components/AIPanel";
-import NotificationBell from "../../components/NotificationBell";
 import { useUserData } from "../../hooks/useUserData";
 import { apiFetch } from "../../lib/api";
 import { normalizeIconKey, resolvePageIcon } from "../../lib/pageIcons";
@@ -2118,10 +2117,6 @@ const ensureTab = React.useCallback((page: any) => {
               </>
             )}
 
-            {/* Notification Bell */}
-            <div className="shrink-0 ml-1">
-              <NotificationBell />
-            </div>
           </div>
         </div>
 

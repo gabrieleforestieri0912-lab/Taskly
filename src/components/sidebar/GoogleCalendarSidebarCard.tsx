@@ -15,32 +15,48 @@ import {
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
 
-/** Google Calendar official "31" icon (compact) */
+/** Google Calendar official icon */
 function GoogleCalendarIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg
       className={className}
-      viewBox="0 0 48 48"
+      viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect width="48" height="48" rx="10" fill="#FFFFFF" />
+      <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="#FFFFFF" />
+      {/* Top red header */}
       <path
-        d="M38 14H10C7.79086 14 6 15.7909 6 18V38C6 40.2091 7.79086 42 10 42H38C40.2091 42 42 40.2091 42 38V18C42 15.7909 40.2091 14 38 14Z"
-        fill="#4285F4"
+        d="M17.5 2.5H6.5C4.29086 2.5 2.5 4.29086 2.5 6.5V8.5H21.5V6.5C21.5 4.29086 19.7091 2.5 17.5 2.5Z"
+        fill="#EA4335"
       />
+      {/* Right blue border */}
+      <path d="M21.5 8.5H18.5V18.5H21.5V8.5Z" fill="#4285F4" />
+      {/* Bottom green bar */}
       <path
-        d="M38 18H10V38C10 39.1046 10.8954 40 12 40H36C37.1046 40 38 39.1046 38 38V18Z"
-        fill="#FFFFFF"
+        d="M18.5 18.5H5.5V21.5H17.5C19.7091 21.5 21.5 19.7091 21.5 17.5V18.5Z"
+        fill="#34A853"
       />
-      <path d="M10 18H38V22H10V18Z" fill="#1A73E8" />
+      {/* Left yellow bar */}
+      <path d="M2.5 8.5H5.5V18.5H2.5V8.5Z" fill="#FBBC05" />
+      {/* Bottom-left corner green overlap */}
       <path
-        d="M20.5 33H18.5V28.2L16.2 29.3V27.5L20.2 25.5H20.5V33ZM29.8 29.4C29.8 30.5 29.3 31.4 28.5 32.1C27.6 32.7 26.5 33 25.1 33C24 33 23 32.8 22.1 32.3L22.7 30.6C23.5 31 24.3 31.2 25.1 31.2C25.9 31.2 26.5 31 27 30.6C27.4 30.2 27.6 29.7 27.6 29.1C27.6 28.4 27.3 27.9 26.8 27.5C26.3 27.1 25.5 26.9 24.5 26.9H23.5V25.3H24.4C25.3 25.3 26 25.1 26.5 24.7C27 24.3 27.2 23.8 27.2 23.3C27.2 22.8 27 22.4 26.6 22.1C26.2 21.8 25.6 21.6 24.9 21.6C24.1 21.6 23.4 21.8 22.7 22.2L22.1 20.6C23 20.1 24 19.8 25.1 19.8C26.4 19.8 27.4 20.1 28.1 20.6C28.8 21.2 29.2 22 29.2 23C29.2 23.8 28.9 24.4 28.4 24.9C27.9 25.4 27.3 25.7 26.6 25.8V25.9C27.6 26.1 28.4 26.5 29 27.1C29.5 27.7 29.8 28.5 29.8 29.4Z"
+        d="M5.5 18.5H2.5C2.5 19.5 3 21.5 5.5 21.5V18.5Z"
+        fill="#188038"
+      />
+      {/* "31" in Google Blue */}
+      <text
+        x="12"
+        y="16.2"
         fill="#1A73E8"
-      />
-      <rect x="13" y="10" width="4" height="7" rx="2" fill="#EA4335" />
-      <rect x="31" y="10" width="4" height="7" rx="2" fill="#34A853" />
+        fontSize="8.5"
+        fontWeight="800"
+        fontFamily="Google Sans, Roboto, system-ui, sans-serif"
+        textAnchor="middle"
+      >
+        31
+      </text>
     </svg>
   );
 }
@@ -133,14 +149,14 @@ export function GoogleCalendarSidebarCard({
   return (
     <div
       id="sidebar-google-calendar-card"
-      className="px-2 select-none"
+      className="px-2 my-2.5 select-none"
       aria-label="Integrazione Google Calendar"
     >
-      {/* ── Compact single-row layout ─────────────────────────────────── */}
-      <div className="group flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-gray-100/70 dark:hover:bg-white/5 transition-colors cursor-default">
-        {/* Icon */}
-        <div className="w-6 h-6 rounded-md bg-white dark:bg-zinc-800 shadow-xs border border-black/8 dark:border-white/10 flex items-center justify-center shrink-0">
-          <GoogleCalendarIcon className="w-3.5 h-3.5" />
+      {/* ── Card layout distanziato e rifinito ─────────────────────────── */}
+      <div className="group flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-gray-50/90 dark:bg-white/[0.03] border border-gray-200/60 dark:border-white/10 hover:border-blue-400/40 dark:hover:border-blue-500/30 transition-all cursor-default shadow-xs">
+        {/* Logo Originale Google Calendar */}
+        <div className="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 shadow-xs border border-black/8 dark:border-white/10 flex items-center justify-center shrink-0 p-0.5">
+          <GoogleCalendarIcon className="w-5 h-5" />
         </div>
 
         {/* Text */}

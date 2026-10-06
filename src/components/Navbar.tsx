@@ -24,7 +24,6 @@ import {
   Users,
   X,
 } from "lucide-react";
-import NotificationBell from "./NotificationBell";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 
@@ -795,11 +794,6 @@ export default function Navbar({
         )}
 
         <div className="flex items-center gap-1.5">
-          {isDashboard && (
-            <div className="shrink-0">
-              <NotificationBell />
-            </div>
-          )}
 
           {!user && (
             <div className="hidden items-center gap-1.5 sm:flex">
