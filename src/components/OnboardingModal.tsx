@@ -13,7 +13,7 @@ import {
   Rocket,
   CheckCircle2,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BUILTIN_TEMPLATES, PageTemplate, loadAllTemplates } from "../lib/templates";
 import { trackOnboardingEvent, type UseCase } from "../hooks/useOnboarding";
 
@@ -36,14 +36,21 @@ const RECOMMENDED: Record<UseCase, string[]> = {
 };
 
 export default function OnboardingModal({ userName = "", liveStats, onComplete }: OnboardingModalProps) {
+  const shouldReduceMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [direction, setDirection] = useState(1);
 
   // Form state
   const [name, setName] = useState(userName || "");
   const [useCase, setUseCase] = useState<UseCase>("personal");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("weekly-planner");
   const [firstTaskTitle, setFirstTaskTitle] = useState("Esplorare le funzionalità di Taskly");
+
+  const navigateToStep = (nextStep: 1 | 2 | 3) => {
+    setDirection(nextStep > step ? 1 : -1);
+    setStep(nextStep);
+  };
 
   useEffect(() => {
     try {
@@ -84,8 +91,6 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
     if (recommendedTemplates.length > 0) setSelectedTemplateId(recommendedTemplates[0].id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useCase]);
-
-  if (!isOpen) return null;
 
   const handleSkip = () => {
     try {
@@ -137,34 +142,44 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <AnimatePresence>
+    {isOpen && (
+    <motion.div
+      key="onboarding-modal"
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={shouldReduceMotion ? undefined : { opacity: 0 }}
         className="fixed inset-0 bg-black/50 backdrop-blur-md"
       />
 
       {/* Modal Dialog */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.97, y: 10 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeOut" }}
         className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-2xl p-6 sm:p-8 z-10 flex flex-col justify-between overflow-hidden"
       >
         {/* Step indicator & Skip */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-1.5">
             {[1, 2, 3].map((s) => (
-              <div
+              <motion.div
                 key={s}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  s === step
-                    ? "w-8 bg-[#7b39fc]"
-                    : s < step
-                    ? "w-4 bg-emerald-500"
-                    : "w-4 bg-gray-200 dark:bg-gray-700"
+                animate={{
+                  width: s === step ? 32 : 16,
+                  backgroundColor: s < step ? "#10b981" : s === step ? "#7b39fc" : undefined,
+                }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
+                className={`h-1.5 rounded-full ${
+                  s > step ? "bg-gray-200 dark:bg-gray-700" : ""
                 }`}
               />
             ))}
@@ -179,14 +194,22 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
         </div>
 
         {/* ── Step 1: Profilo e Caso d'uso ───────────────────────────────── */}
+        <AnimatePresence mode="wait" initial={false}>
         {step === 1 && (
-          <div className="space-y-6">
+          <motion.div
+            key="step-1"
+            initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 18 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, x: direction * -18 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
+            className="space-y-6"
+          >
             <div>
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7b39fc] to-[#a67cff] text-white flex items-center justify-center mb-3 shadow-md shadow-[#7b39fc]/20">
                 <Sparkles size={24} />
               </div>
               <h2 className="text-xl font-black text-gray-900 dark:text-white">
-                Benvenuto in Taskly!
+                {name.trim() ? `Benvenuto, ${name.trim()}!` : "Benvenuto in Taskly!"}
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Personalizziamo il tuo spazio di lavoro per iniziare al meglio in meno di due minuti.
@@ -220,10 +243,12 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                     const Icon = item.icon;
                     const isSelected = useCase === item.id;
                     return (
-                      <button
+                      <motion.button
                         key={item.id}
                         type="button"
                         onClick={() => setUseCase(item.id)}
+                        whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+                        whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                         className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all ${
                           isSelected
                             ? "bg-[#7b39fc]/10 border-[#7b39fc] text-[#7b39fc] shadow-xs"
@@ -235,7 +260,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                           <div className="font-bold text-xs">{item.label}</div>
                           <div className="text-[10px] text-gray-400 mt-0.5">{item.desc}</div>
                         </div>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -245,19 +270,26 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
             <div className="pt-2 flex justify-end">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => navigateToStep(2)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:brightness-110 shadow-md shadow-[#7b39fc]/20 transition-all"
               >
                 <span>Continua</span>
                 <ArrowRight size={14} />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* ── Step 2: Scelta del punto di partenza ────────────────────────── */}
         {step === 2 && (
-          <div className="space-y-6">
+          <motion.div
+            key="step-2"
+            initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 18 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, x: direction * -18 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
+            className="space-y-6"
+          >
             <div>
               <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-3">
                 <FileText size={24} />
@@ -266,7 +298,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                 Scegli il tuo punto di partenza
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Abbiamo selezionato per te i modelli ideali per l'uso {useCase === "personal" ? "personale" : useCase === "work" ? "lavorativo" : "di studio"}.
+                Abbiamo selezionato per te i modelli ideali per l&apos;uso {useCase === "personal" ? "personale" : useCase === "work" ? "lavorativo" : "di studio"}.
               </p>
             </div>
 
@@ -274,10 +306,13 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
               {recommendedTemplates.map((tmpl) => {
                 const isSelected = selectedTemplateId === tmpl.id;
                 return (
-                  <div
+                  <motion.button
                     key={tmpl.id}
+                    type="button"
                     onClick={() => setSelectedTemplateId(tmpl.id)}
-                    className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all ${
+                    whileHover={shouldReduceMotion ? undefined : { x: 3 }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
+                    className={`w-full text-left p-3.5 rounded-2xl border flex items-center justify-between transition-all ${
                       isSelected
                         ? "bg-[#7b39fc]/5 border-[#7b39fc] shadow-xs"
                         : "bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/60 hover:border-gray-300"
@@ -306,7 +341,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                     >
                       {isSelected && <Check size={12} strokeWidth={3} />}
                     </div>
-                  </div>
+                  </motion.button>
                 );
               })}
             </div>
@@ -314,26 +349,33 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
             <div className="pt-2 flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => navigateToStep(1)}
                 className="px-4 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 Indietro
               </button>
               <button
                 type="button"
-                onClick={() => setStep(3)}
+                onClick={() => navigateToStep(3)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:brightness-110 shadow-md shadow-[#7b39fc]/20 transition-all"
               >
                 <span>Continua</span>
                 <ArrowRight size={14} />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* ── Step 3: dinamico — se ha gia' task, mostra riepilogo invece del form ── */}
         {step === 3 && (
-          <div className="space-y-6">
+          <motion.div
+            key="step-3"
+            initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 18 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, x: direction * -18 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: "easeOut" }}
+            className="space-y-6"
+          >
             <div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-3">
                 <CheckCircle2 size={24} />
@@ -365,7 +407,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                   />
                 </div>
                 <p className="text-[11px] text-gray-400">
-                  💡 Suggerimento: Taskly riconosce scadenze naturali come "domani" o "venerdì"!
+                  💡 Suggerimento: Taskly riconosce scadenze naturali come &quot;domani&quot; o &quot;venerdì&quot;!
                 </p>
               </div>
             )}
@@ -373,7 +415,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
             <div className="pt-2 flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => navigateToStep(2)}
                 className="px-4 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 Indietro
@@ -387,9 +429,12 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                 <Sparkles size={14} />
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </motion.div>
-    </div>
+    </motion.div>
+    )}
+    </AnimatePresence>
   );
 }

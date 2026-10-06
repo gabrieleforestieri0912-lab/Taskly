@@ -399,7 +399,7 @@ function DashboardContent() {
     applyTheme(newTheme, true);
   };
 
-  const addPage = (pageConfig) => {
+  const addPage = (pageConfig: any = {}) => {
     const pageType = pageConfig.type || "tasks";
     const curPages = Array.isArray(pages) ? pages : [];
     const maxPages = plan && plan.maxPages;
@@ -435,7 +435,7 @@ function DashboardContent() {
         pageConfig.icon ||
         (pageType === "empty" ? "" : "layout-dashboard"),
       parentId: pageConfig.parentId || null,
-      order: pages.filter((p) => !p.parentId).length,
+      order: curPages.filter((p) => !p.parentId).length,
       purpose: pageConfig.purpose || null,
       isTemplate: Boolean(pageConfig.isTemplate),
       initialData: pageConfig.initialData || null,
@@ -485,7 +485,7 @@ function DashboardContent() {
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
       return cur.map((page) =>
-        page.id === id ? { ...page, ...updates } : page,
+        String(page.id) === String(id) ? { ...page, ...updates } : page,
       );
     });
   };
@@ -494,7 +494,7 @@ function DashboardContent() {
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
       return cur.map((page) =>
-        page.id === id ? { ...page, data: nextData } : page,
+        String(page.id) === String(id) ? { ...page, data: nextData } : page,
       );
     });
   };
@@ -676,7 +676,9 @@ function DashboardContent() {
     if (action.type === "update_page") {
       const targetId = action.payload?.id;
       const updates = action.payload?.updates || {};
-      const target = pages.find((page) => page.id === targetId);
+      const target = pages.find(
+        (page) => String(page.id) === String(targetId),
+      );
 
       if (!target) {
         return { ok: false, message: "Pagina da aggiornare non trovata." };
@@ -710,7 +712,7 @@ function DashboardContent() {
       const { blockType, content, targetPageId, targetPageLabel } =
         action.payload;
       const targetPage = targetPageId
-        ? pages.find((p) => p.id === targetPageId)
+        ? pages.find((p) => String(p.id) === String(targetPageId))
         : null;
 
       if (!targetPage) {
@@ -757,7 +759,7 @@ function DashboardContent() {
 
     if (action.type === "update_page_content") {
       const { id, content } = action.payload;
-      const targetPage = pages.find((p) => p.id === id);
+      const targetPage = pages.find((p) => String(p.id) === String(id));
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
@@ -784,7 +786,7 @@ function DashboardContent() {
 
     if (action.type === "insert_page_text") {
       const { id, text } = action.payload;
-      const targetPage = pages.find((p) => p.id === id);
+      const targetPage = pages.find((p) => String(p.id) === String(id));
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
@@ -1875,14 +1877,11 @@ const ensureTab = React.useCallback((page: any) => {
           )}
         </div>
       </main>
-      {searchParams.get("ai") === "1" && (
-        <AIPanel
-          variant="page"
-          pages={pages}
-          onAction={handleAIAction}
-          isSidebarOpen={shouldShowSidebar}
-        />
-      )}
+      <AIPanel
+        pages={pages}
+        onAction={handleAIAction}
+        isSidebarOpen={shouldShowSidebar}
+      />
 
       {/* Onboarding Wizard dinamico */}
       <OnboardingModal

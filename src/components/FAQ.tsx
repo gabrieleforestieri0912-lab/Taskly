@@ -53,7 +53,7 @@ export default function FAQ() {
         <div className="text-center mb-10">
           <div className="landing-eyebrow">
             <HelpCircle size={13} />{t("land.faqEyebrow")}</div>
-          <h2 className="landing-heading-lg tracking-tight">{t("land.faqTitle")}</h2>
+          <h2 className="landing-heading-lg">{t("land.faqTitle")}</h2>
           <p className="landing-body mt-3 text-sm md:text-base">{t("land.faqSubtitle")}</p>
         </div>
 

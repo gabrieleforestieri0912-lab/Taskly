@@ -218,7 +218,7 @@ function Pricing() {
         <div className="landing-eyebrow">
           <Star size={12} fill="currentColor" />{t("land.prEyebrow")}</div>
         
-        <h2 className="landing-heading-lg leading-tight mb-5">{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
+        <h2 className="landing-heading-lg mb-5">{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
         </h2>
 
         {/* Toggle Switch */}

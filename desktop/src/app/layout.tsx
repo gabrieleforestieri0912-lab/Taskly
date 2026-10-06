@@ -1,10 +1,12 @@
 
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import GoogleAuthProvider from "../components/GoogleAuthProvider";
 import { LanguageProvider } from "../lib/LanguageContext";
 import Analytics from "../lib/analytics";
 import KeyboardShortcuts from '../components/KeyboardShortcuts';
+import DesktopMiniChatHost from "../components/DesktopMiniChatHost";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -44,6 +46,9 @@ export default function RootLayout({ children }) {
               }}
             />
             <KeyboardShortcuts />
+            <Suspense fallback={null}>
+              <DesktopMiniChatHost />
+            </Suspense>
             {children}
           </LanguageProvider>
         </GoogleAuthProvider>
@@ -51,5 +56,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
 

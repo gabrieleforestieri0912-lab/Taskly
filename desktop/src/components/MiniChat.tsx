@@ -15,6 +15,13 @@ export type MiniChatProps = {
 };
 
 const STORAGE_OPEN_PREFIX = "taskly_minichat_open_";
+const SUGGESTED_PROMPTS = [
+  "Riassumi le mie note",
+  "Crea un piano settimanale",
+  "Trova task scaduti",
+  "Organizza i miei progetti",
+];
+
 function storageKey(workspaceId?: string): string {
   return `${STORAGE_OPEN_PREFIX}${workspaceId ?? "global"}`;
 }
@@ -56,7 +63,7 @@ function MessageBubble({ msg }: { msg: AIChatMessage }): React.JSX.Element {
 export default function MiniChat({ pages = [], workspaceId, enabled = true, defaultOpen = false }: MiniChatProps): React.JSX.Element | null {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
-  const [forcedFull, setForcedFull] = useState<boolean>(false);
+  const [fullScreenPath, setFullScreenPath] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -70,6 +77,8 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey(workspaceId));
+      // Sync the UI with persisted state after hydration.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw !== null) setIsOpen(raw === "1");
     } catch { /* ignore */ }
   }, [workspaceId]);
@@ -79,14 +88,8 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
     } catch { /* ignore */ }
   }, [isOpen, workspaceId]);
   useEffect(() => {
-    // On route change inside the workspace: exit full-page mode but keep the
-    // toggle state (persisted per workspace) so the minichat follows the user.
-    setForcedFull(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-  useEffect(() => {
-    if (isOpen || forcedFull) setTimeout(() => inputRef.current?.focus(), 200);
-  }, [isOpen, forcedFull]);
+    if (isOpen || fullScreenPath === pathname) setTimeout(() => inputRef.current?.focus(), 200);
+  }, [isOpen, fullScreenPath, pathname]);
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
@@ -95,7 +98,7 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
     const onOpen = (): void => setIsOpen(true);
     const onClose = (): void => {
       setIsOpen(false);
-      setForcedFull(false);
+      setFullScreenPath(null);
     };
     window.addEventListener(EVT_TOGGLE, onToggle);
     window.addEventListener(EVT_OPEN, onOpen);
@@ -107,7 +110,7 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
     };
   }, []);
   if (!enabled) return null;
-  const isPageVariant = forcedFull;
+  const isPageVariant = fullScreenPath !== null && fullScreenPath === pathname;
   const isEmptyState = messages.length === 0 && !isStreaming;
   const handleSend = (override?: string): void => {
     const text = (override ?? input).trim();
@@ -146,7 +149,7 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
   };
   const handleClose = (): void => {
     setIsOpen(false);
-    setForcedFull(false);
+    setFullScreenPath(null);
   };
   const fab = !isPageVariant ? (
     <div className="fixed bottom-6 right-6 z-[120] flex flex-col items-end gap-2">
@@ -183,7 +186,7 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
               </div>
               <div className="flex items-center gap-1">
                 {!isPageVariant && (
-                  <button onClick={() => setForcedFull(true)} className="p-1.5 rounded-lg text-gray-400" aria-label="Apri a schermo intero">
+                  <button onClick={() => setFullScreenPath(pathname)} className="p-1.5 rounded-lg text-gray-400" aria-label="Apri a schermo intero">
                     <Maximize2 size={14} />
                   </button>
                 )}
@@ -226,6 +229,25 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
                   </button>
                 )}
               </div>
+              {isEmptyState && (
+                <div className="mt-3 flex flex-wrap gap-2" role="list" aria-label="Suggerimenti">
+                  {SUGGESTED_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => {
+                        setInput(prompt);
+                        inputRef.current?.focus();
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
+                      role="listitem"
+                    >
+                      <Sparkles size={11} className="text-[#7b39fc]" />
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -233,4 +255,3 @@ export default function MiniChat({ pages = [], workspaceId, enabled = true, defa
     </>
   );
 }
-

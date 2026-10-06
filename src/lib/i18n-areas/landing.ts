@@ -19,6 +19,9 @@ export const landingIt: Record<string, string> = {
   "land.showcaseEyebrow": "Una dashboard, tutto il tuo lavoro",
   "land.showcaseTitlePrefix": "Il tuo workspace,",
   "land.showcaseTitleAccent": "in tempo reale",
+  "land.showcaseBody":
+    "Task, obiettivi, calendario e note vivono nella stessa pagina. Ecco un'anteprima illustrativa di come sarà la tua dashboard.",
+  "land.showcasePreviewBadge": "Anteprima illustrativa",
   "land.showcaseSubtitle":
     "Task, obiettivi, calendario e note vivono nella stessa pagina. Esplora la demo: spunta i task, cambia vista e parla con l'assistente AI.",
   "land.showcaseTabOverview": "Panoramica",
@@ -518,6 +521,9 @@ export const landingEn: Record<string, string> = {
   "land.showcaseEyebrow": "One dashboard, all your work",
   "land.showcaseTitlePrefix": "Your workspace,",
   "land.showcaseTitleAccent": "in real time",
+  "land.showcaseBody":
+    "Tasks, goals, calendar and notes live on the same page. Here is an illustrative preview of what your dashboard will look like.",
+  "land.showcasePreviewBadge": "Illustrative preview",
   "land.showcaseSubtitle":
     "Tasks, goals, calendar and notes live on the same page. Try the demo: check off tasks, switch views and chat with the AI assistant.",
   "land.showcaseTabOverview": "Overview",

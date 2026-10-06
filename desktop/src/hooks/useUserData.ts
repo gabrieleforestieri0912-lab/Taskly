@@ -28,7 +28,15 @@ export function useUserData() {
           ...page,
           icon: typeof page.icon === "string" ? page.icon : "layout-dashboard",
         }));
-        setPages(sanitizedPages);
+        setPages((currentPages) => {
+          const merged = new Map(
+            sanitizedPages.map((page) => [String(page.id), page]),
+          );
+          currentPages.forEach((page) => {
+            merged.set(String(page.id), page);
+          });
+          return Array.from(merged.values());
+        });
         setPlannerMeta(data.plannerMeta || {});
 
         if (data.name || data.email || data.picture) {
@@ -78,4 +86,3 @@ export function useUserData() {
     hasLoadedUserData
   };
 }
-

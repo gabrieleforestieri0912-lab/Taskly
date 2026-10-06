@@ -43,7 +43,15 @@ export function useUserData() {
                   : undefined));
           return { ...page, icon };
         });
-        setPages(sanitizedPages);
+        setPages((currentPages) => {
+          const merged = new Map(
+            sanitizedPages.map((page: any) => [String(page.id), page]),
+          );
+          currentPages.forEach((page) => {
+            merged.set(String(page.id), page);
+          });
+          return Array.from(merged.values());
+        });
         setPlannerMeta(data.plannerMeta || {});
         setPlan(data.plan || null);
         setSubscription(data.subscription || null);

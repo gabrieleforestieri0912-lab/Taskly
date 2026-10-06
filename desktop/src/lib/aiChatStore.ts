@@ -104,6 +104,10 @@ function getSnapshot(): AIChatSnapshot {
   return snapshot;
 }
 
+function getServerSnapshot(): AIChatSnapshot {
+  return snapshot;
+}
+
 if (typeof window !== "undefined") {
   window.addEventListener(EVT_SYNC, (e) => {
     const detail = (e as CustomEvent<AIChatMessage[]>).detail;
@@ -116,7 +120,7 @@ if (typeof window !== "undefined") {
 }
 
 export function useAIChat(): AIChatActions {
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
+  const snap = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   return {
     ...snap,
     pushMessage: (m: AIChatMessage) => {

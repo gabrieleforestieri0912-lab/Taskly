@@ -54,7 +54,7 @@ export default function CtaBanner() {
               {t("land.ctaBadge")}
             </div>
 
-            <h2 className="font-instrument-serif text-4xl leading-[1.08] tracking-[-0.02em] text-white md:text-6xl">
+            <h2 className="font-inter text-4xl font-extrabold leading-[1.06] tracking-[-0.03em] text-white md:text-6xl">
               {t("land.ctaTitlePrefix")}
               <br className="md:hidden" />
               <span className="text-white/90">{t("land.ctaTitleAccent")}</span>

@@ -103,6 +103,9 @@ function subscribe(listener: () => void) {
 function getSnapshot(): Snapshot {
   return snapshot;
 }
+function getServerSnapshot(): Snapshot {
+  return snapshot;
+}
 
 // Cross-instance sync (e.g. two providers on one page).
 if (typeof window !== "undefined") {
@@ -217,7 +220,7 @@ async function streamChat(text: string, context: string, signal: AbortSignal): P
 // ─── Public API ──────────────────────────────────────────────────────────
 
 function useAIChat(): Snapshot {
-  return useSyncExternalStore(subscribe, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export function createAIChatController(opts: {

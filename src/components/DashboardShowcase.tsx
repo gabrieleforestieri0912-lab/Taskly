@@ -1,921 +1,654 @@
 "use client";
 
-import { useLanguage } from "../lib/LanguageContext";
-import { useState, useEffect, useRef } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
+import React from "react";
 import Link from "next/link";
 import {
+  Bell,
+  ChevronLeft,
+  FileText,
   LayoutDashboard,
   ListTodo,
-  Target,
-  Calendar,
-  FileText,
   Lightbulb,
-  Search,
-  Bell,
-  Plus,
-  Sparkles,
-  Zap,
-  Flame,
-  CheckCircle2,
-  Circle,
-  Clock,
-  TrendingUp,
-  Bot,
+  Target,
   Send,
-  ChevronDown,
-  MoreHorizontal,
-  PanelLeft,
-  BarChart3,
+  Sliders,
+  User,
+  X,
+  Inbox,
+  CheckSquare,
+  Eye,
+  Mic,
+  Calendar,
+  Search,
+  Sparkles,
+  Upload,
   ArrowUpRight,
-  CalendarDays,
-  KanbanSquare,
-  ListChecks,
-  Users,
-  BookOpen,
-  Rocket,
+  Download,
   Globe,
-  ChevronRight,
 } from "lucide-react";
+import { Badge } from "./UIComponents";
+import { useLanguage } from "../lib/LanguageContext";
+import {
+  AiInsightsWidget,
+  CriticalTasksWidget,
+  DashboardHeader,
+  GoalProgressWidget,
+  QuickNavWidget,
+  QuickStatsWidget,
+  RecentIdeasWidget,
+  TodayFocusWidget,
+  ToolsPanel,
+  ToolsResourcesWidget,
+  WeeklyTrendWidget,
+} from "./dashboard/widgets";
 
-/* ── Shared bits ─────────────────────────────────────────────────────── */
+/* ── Dati di esempio ──────────────────────────────────────────────────── */
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: ListTodo, label: "Task" },
-  { icon: Target, label: "Obiettivi" },
-  { icon: Calendar, label: "Calendario" },
-  { icon: FileText, label: "Note" },
-  { icon: Lightbulb, label: "Idee" },
-];
-
-const SPACE_ITEMS = [
-  { icon: BookOpen, label: "Letture" },
-  { icon: Users, label: "Team Dev" },
-  { icon: Rocket, label: "Lancio v3.2" },
-];
-
-const STATS = [
+const DEMO_TASKS = [
   {
-    icon: CheckCircle2,
-    label: "Task completati",
-    value: 24,
-    suffix: "",
-    delta: "+12%",
-    color: "#7b39fc",
+    id: "d1",
+    title: "Rivedere proposta commerciale Alpha",
+    priority: "Alta",
+    status: "in_progress",
+    deadline: "Oggi",
   },
   {
-    icon: Flame,
-    label: "Sequenza giorni",
-    value: 12,
-    suffix: "",
-    delta: "🔥",
-    color: "#a67cff",
+    id: "d2",
+    title: "Invio preventivo a Beta Srl",
+    priority: "Alta",
+    status: "todo",
+    deadline: "Domani",
   },
   {
-    icon: Zap,
-    label: "Produttività",
-    value: 87,
-    suffix: "%",
-    delta: "+6%",
-    color: "#8b4dff",
+    id: "d3",
+    title: "Aggiornare landing v3.2",
+    priority: "Alta",
+    status: "todo",
+    deadline: "12 Mar",
   },
   {
-    icon: Clock,
-    label: "Ore focus",
-    value: 31,
-    suffix: "h",
-    delta: "sett. scorsa",
-    color: "#c4a6ff",
-  },
-];
-
-const TODOS = [
-  {
-    id: 1,
-    title: "Rivedere proposta cliente Alpha",
-    tag: "Lavoro",
-    tagColor: "#7b39fc",
-    time: "09:30",
-    done: false,
+    id: "d4",
+    title: "Refactor auth middleware",
+    priority: "Media",
+    status: "in_progress",
+    deadline: "14 Mar",
   },
   {
-    id: 2,
-    title: "Preparare slide demo prodotto",
-    tag: "Progetto",
-    tagColor: "#a67cff",
-    time: "11:00",
-    done: true,
+    id: "d5",
+    title: "Script snapshot DB",
+    priority: "Bassa",
+    status: "todo",
+    deadline: "18 Mar",
   },
   {
-    id: 3,
-    title: "Allenamento serale",
-    tag: "Salute",
-    tagColor: "#5a1fd4",
-    time: "18:00",
-    done: false,
+    id: "d6",
+    title: "Setup schema Supabase",
+    priority: "Media",
+    status: "done",
   },
   {
-    id: 4,
-    title: "Leggere 20 pagine di Deep Work",
-    tag: "Crescita",
-    tagColor: "#8b4dff",
-    time: "21:30",
-    done: false,
+    id: "d7",
+    title: "Test vitest core",
+    priority: "Media",
+    status: "done",
+  },
+  {
+    id: "d8",
+    title: "Briefing team lunedì",
+    priority: "Bassa",
+    status: "done",
   },
 ];
 
-const KANBAN = [
+const DEMO_GOALS = [
   {
-    column: "Da fare",
-    color: "#8b4dff",
-    cards: [
-      { title: "Definire roadmap Q4", tag: "Strategia", priority: "Alta" },
-      { title: "Rispondere ai ticket supporto", tag: "Supporto", priority: "Media" },
+    id: "g1",
+    title: "Lanciare la board Kanban",
+    completed: false,
+    subGoals: [
+      { completed: true },
+      { completed: true },
+      { completed: true },
+      { completed: false },
     ],
   },
   {
-    column: "In corso",
-    color: "#7b39fc",
-    cards: [
-      { title: "Nuova board Kanban", tag: "Sviluppo", priority: "Alta" },
-      { title: "Copy landing v3.2", tag: "Marketing", priority: "Media" },
-      { title: "Integrazione calendario", tag: "Sviluppo", priority: "Bassa" },
-    ],
+    id: "g2",
+    title: "Raggiungere 100 utenti attivi",
+    completed: false,
+    subGoals: [{ completed: true }, { completed: false }, { completed: false }],
   },
   {
-    column: "Revisione",
-    color: "#a67cff",
-    cards: [
-      { title: "Review design system", tag: "Design", priority: "Alta" },
-    ],
-  },
-  {
-    column: "Fatto",
-    color: "#22c55e",
-    cards: [
-      { title: "Onboarding nuovi utenti", tag: "Prodotto", priority: "Media" },
-      { title: "Piano marketing Q3", tag: "Marketing", priority: "Bassa" },
-    ],
+    id: "g3",
+    title: "Migrare su Taskly",
+    completed: true,
+    subGoals: [{ completed: true }, { completed: true }],
   },
 ];
 
-const CAL_WEEK = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-
-const WEEK_EVENTS = {
-  1: ["09:30 — Review proposta"],
-  3: ["11:00 — Standup team", "15:00 — Call cliente Alpha"],
-  5: ["09:00 — Design review"],
-  6: ["10:30 — Allenamento"],
-};
-
-const AI_SUGGESTIONS = [
-  "Riassumi le note di oggi",
-  "Pianifica la mia settimana",
-  "Crea una pagina obiettivo",
+const DEMO_IDEAS = [
+  { id: "i1", title: "Template per sprint retro", category: "Produttività" },
+  { id: "i2", title: "Sincronizza Google Calendar", category: "Integrazione" },
+  { id: "i3", title: "Weekly digest via email", category: "Comunicazione" },
 ];
 
-const AI_MESSAGES = [
-  { from: "ai", text: "Ciao Sofia! 👋 Oggi hai 3 task prioritari e 2 obiettivi vicini alla scadenza." },
-  { from: "user", text: "Organizza la mia giornata per priorità" },
-  { from: "ai", text: "Perfetto, ho pianificato la tua giornata: 1) Proposta Alpha alle 9:30, 2) Slide demo alle 11:00, 3) Allenamento alle 18:00. Vuoi che crei anche i blocchi sul calendario?" },
+const DEMO_PAGES = [
+  { id: "p1", label: "Roadmap Q4", icon: "rocket", iconColor: "text-[#7b39fc]" },
+  { id: "p2", label: "Riunioni", icon: "mic", iconColor: "text-cyan-600" },
+  { id: "p3", label: "Clienti", icon: "users", iconColor: "text-rose-500" },
+  { id: "p4", label: "Letture", icon: "book-open", iconColor: "text-amber-500" },
 ];
 
-/* ── Number counter ──────────────────────────────────────────────────── */
+const TREND = [
+  { day: "Lun", val: 80, count: 4 },
+  { day: "Mar", val: 100, count: 6 },
+  { day: "Mer", val: 45, count: 2 },
+  { day: "Gio", val: 90, count: 5 },
+  { day: "Ven", val: 63, count: 3 },
+  { day: "Sab", val: 30, count: 1 },
+  { day: "Dom", val: 60, count: 2 },
+];
 
-function CountUp({ value, suffix = "" }) {
-  const { t } = useLanguage();
-  const [display, setDisplay] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !started.current) {
-          started.current = true;
-          const duration = 1100;
-          const start = performance.now();
-          const tick = (now) => {
-            const p = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - p, 3);
-            setDisplay(Math.round(eased * value));
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.4 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [value]);
+function PreviewSidebar({ t }: { t: (k: string, f?: string) => string }) {
+  const quickItems = [
+    { icon: Search, label: t("search") },
+    { icon: LayoutDashboard, label: t("nav.home", "Home"), active: true },
+    { icon: CheckSquare, label: "Task", badge: 5 },
+    { icon: Inbox, label: t("nav.inbox", "Inbox"), badge: 3 },
+    { icon: FileText, label: t("nav.empty", "Pagina vuota") },
+    { icon: Mic, label: t("nav.transcription", "Trascrizione") },
+    { icon: Send, label: t("nav.chat", "Chat") },
+    { icon: Mic, label: t("nav.meetings", "Riunioni") },
+    { icon: Calendar, label: t("nav.calendar", "Calendario") },
+  ];
+
+  const shell = (active?: boolean) =>
+    [
+      "flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2",
+      active
+        ? "bg-cyan-50 text-cyan-600"
+        : "text-gray-600 hover:bg-gray-100/70",
+    ].join(" ");
 
   return (
-    <span ref={ref}>
-      {display.toLocaleString()}
-      {suffix}
-    </span>
-  );
-}
-
-/* ── Sidebar mock ────────────────────────────────────────────────────── */
-
-function MockSidebar() {
-  const { t, tWith } = useLanguage();
-  return (
-    <div className="hidden h-full w-56 shrink-0 flex-col border-r border-white/10 bg-black p-4 md:flex">
-      <div className="mb-6 flex items-center gap-2.5 px-1">
-        <svg viewBox="0 0 24 24" fill="#7b39fc" className="h-6 w-6">
-          <path d="M1.04356 6.35771L13.6437 0.666504L23.3335 6.35771V17.6423L13.6437 23.3335L1.04356 17.6423V6.35771ZM12.5 4.2L4.5 8.5V15.5L12.5 19.8L20.5 15.5V8.5L12.5 4.2Z" />
-        </svg>
-        <span className="font-inter text-[15px] font-bold tracking-tight text-white">{t("land.cmpHeaderTaskly")}</span>
-      </div>
-
-      <button className="mb-4 flex items-center justify-between rounded-xl border border-[#7b39fc]/25 bg-[#7b39fc]/10 px-3 py-2 text-left transition-colors hover:bg-[#7b39fc]/20">
-        <span className="flex items-center gap-2 text-[13px] font-semibold text-[#a67cff]">
-          <Plus size={14} />{t("views.uiNewPage")}</span>
-        <kbd className="rounded-md border border-white/15 bg-black px-1.5 py-0.5 text-[9px] font-bold text-[#a67cff]">
-          ⌘N
-        </kbd>
-      </button>
-
-      <div className="flex-1 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.label}
-              className={`flex cursor-default items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors ${
-                item.active
-                  ? "bg-[#7b39fc]/15 text-white shadow-[inset_2px_0_0_#7b39fc]"
-                  : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
-              }`}
-            >
-              <Icon size={15} className={item.active ? "text-[#a67cff]" : ""} />
-              {item.label}
-            </div>
-          );
-        })}
-
-        <div className="px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-600">{t("land.mockWorkspace")}</div>
-        {SPACE_ITEMS.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.label}
-              className="flex cursor-default items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium text-gray-400 transition-colors hover:bg-white/5 hover:text-gray-200"
-            >
-              <Icon size={15} />
-              {item.label}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 p-2.5">
-        <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#5a1fd4] text-xs font-bold text-white">
-          S
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[12px] font-semibold text-gray-200">
-            Sofia Rossi
-          </div>
-          <div className="text-[10px] text-gray-500">{t("land.mockPlanPro")}</div>
-        </div>
-        <ChevronDown size={14} className="text-gray-500" />
-      </div>
-    </div>
-  );
-}
-
-/* ── Stat card ───────────────────────────────────────────────────────── */
-
-function StatCard({ stat, index }) {
-  const Icon = stat.icon;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="group rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7b39fc]/40 hover:shadow-lg hover:shadow-[#7b39fc]/10"
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className="grid h-9 w-9 place-items-center rounded-xl"
-          style={{ background: `${stat.color}1f`, color: stat.color }}
-        >
-          <Icon size={17} />
-        </div>
-        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-          {stat.delta}
+    <aside className="relative w-64 shrink-0 flex flex-col bg-white border-r border-gray-200/50">
+      {/* Workspace header */}
+      <div className="flex items-center px-3 pt-3 pb-1 gap-1">
+        <span className="flex shrink-0 items-center gap-2 rounded-xl px-2.5 py-1.5">
+          {/* Logo: replica statica di /taskly.png per non dipendere da next/image */}
+          <span className="shrink-0 w-[26px] h-[26px] rounded-lg bg-gradient-to-br from-[#7b39fc] to-[#5a1fd4]" />
+          <span className="font-inter text-[11px] font-bold text-gray-800">Taskly</span>
+        </span>
+        <span className="md:hidden p-1.5 rounded-xl text-gray-400">
+          <ChevronLeft size={16} aria-hidden="true" />
         </span>
       </div>
-      <div className="mt-3 font-instrument-serif text-[26px] leading-none tracking-[-0.01em] text-white">
-        <CountUp value={stat.value} suffix={stat.suffix} />
-      </div>
-      <div className="mt-1 text-[11px] font-medium text-gray-500">
-        {stat.label}
-      </div>
-    </motion.div>
-  );
-}
 
-/* ── View: Dashboard (task list + AI panel) ──────────────────────────── */
-
-function TasksView() {
-  const { t, tWith } = useLanguage();
-  const [todos, setTodos] = useState(TODOS);
-
-  const toggle = (id) =>
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-    );
-
-  const doneCount = todos.filter((t) => t.done).length;
-
-  return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-      {/* Today's tasks */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("views.calToday")}</h4>
-            <p className="mt-0.5 text-[12px] text-gray-500">
-              {doneCount} di {todos.length} completati
-            </p>
+      {/* Nav body */}
+      <nav
+        className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden px-2 pb-2"
+        style={{ scrollbarWidth: "thin" }}
+        aria-label="Navigazione principale"
+      >
+        <div role="list" aria-label="Azioni rapide">
+          {/* Search row */}
+          <div className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600">
+            <Search size={16} aria-hidden="true" className="shrink-0" />
+            <span className="flex-1 truncate">{t("search")}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
-              <ListChecks size={14} />
-            </button>
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
-              <KanbanSquare size={14} />
-            </button>
-          </div>
-        </div>
 
-        {/* Progress bar */}
-        <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-white/10">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#7b39fc] to-[#a67cff]"
-            initial={{ width: 0 }}
-            whileInView={{ width: `${(doneCount / todos.length) * 100}%` }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          />
-        </div>
-
-        <div className="space-y-2">
-          {todos.map((todo) => (
-            <motion.button
-              key={todo.id}
-              type="button"
-              onClick={() => toggle(todo.id)}
-              initial={{ opacity: 0, x: -12 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35 }}
-              className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-all duration-200 ${
-                todo.done
-                  ? "border-white/10 bg-white/5 opacity-60"
-                  : "border-white/10 bg-black hover:border-[#7b39fc]/40 hover:bg-[#7b39fc]/10"
-              }`}
-            >
-              {todo.done ? (
-                <CheckCircle2 size={18} className="shrink-0 text-emerald-400" />
-              ) : (
-                <Circle
-                  size={18}
-                  className="shrink-0 text-gray-500 transition-colors group-hover:text-[#a67cff]"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <div
-                  className={`truncate text-[13px] font-medium text-gray-200 ${
-                    todo.done ? "line-through decoration-gray-600" : ""
-                  }`}
-                >
-                  {todo.title}
-                </div>
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span
-                    className="rounded-md px-1.5 py-0.5 text-[10px] font-bold"
-                    style={{
-                      background: `${todo.tagColor}1c`,
-                      color: todo.tagColor,
-                    }}
-                  >
-                    {todo.tag}
+          <div className="mt-2 grid grid-cols-3 gap-1" role="list" aria-label="Azioni rapide">
+            {quickItems.map((item) => {
+              const Icon = item.icon;
+              const inner = (
+                <>
+                  <span className="relative">
+                    <Icon size={17} aria-hidden="true" className="shrink-0" />
+                    {item.badge ? (
+                      <span className="absolute -right-2.5 -top-1.5 min-w-[15px] px-1 text-center text-[9px] font-black leading-[15px] tabular-nums rounded-full bg-cyan-100 text-cyan-600">
+                        {item.badge}
+                      </span>
+                    ) : null}
                   </span>
-                  <span className="text-[10px] text-gray-600">{todo.time}</span>
+                  <span className="w-full truncate text-center text-[10px] font-semibold leading-tight">
+                    {item.label}
+                  </span>
+                </>
+              );
+              return (
+                <div key={item.label} className={shell(item.active)} aria-current={item.active ? "page" : undefined}>
+                  {inner}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Google Calendar card */}
+        <div className="mt-2 mb-2 px-1 select-none">
+          <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-transparent p-3 backdrop-blur-sm shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-white shadow-xs flex items-center justify-center shrink-0 border border-black/5">
+                  <Calendar size={14} className="text-[#4285F4]" aria-hidden="true" />
+                </div>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-xs font-bold text-gray-900 truncate">Google Calendar</span>
+                  <span className="px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 text-[9px] font-black tracking-wider">
+                    Sync
+                  </span>
                 </div>
               </div>
-              <MoreHorizontal
-                size={15}
-                className="shrink-0 text-gray-600 opacity-0 transition-opacity group-hover:opacity-100"
-              />
-            </motion.button>
-          ))}
-        </div>
-
-        <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-2.5 text-[12px] font-semibold text-gray-500 transition-colors hover:border-[#7b39fc]/50 hover:text-[#a67cff]">
-          <Plus size={14} />{t("land.mockAddTask")}</button>
-      </div>
-
-      {/* AI panel */}
-      <div className="flex flex-col overflow-hidden rounded-2xl border border-[#7b39fc]/25 bg-black">
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-          <div className="grid h-7 w-7 place-items-center rounded-lg bg-[#7b39fc] text-white">
-            <Bot size={15} />
-          </div>
-          <div className="flex-1">
-            <div className="text-[12px] font-bold text-white">{t("views.aiTitle")}</div>
-            <div className="flex items-center gap-1 text-[10px] text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{t("land.mockAiOnline")}</div>
-          </div>
-          <Sparkles size={15} className="text-[#a67cff]" />
-        </div>
-
-        <div className="flex-1 space-y-3 p-4">
-          {AI_MESSAGES.map((msg, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 + i * 0.15 }}
-              className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[90%] rounded-2xl px-3 py-2 text-[12px] leading-relaxed ${
-                  msg.from === "user"
-                    ? "rounded-br-sm bg-[#7b39fc] text-white"
-                    : "rounded-bl-sm bg-white/10 text-gray-200"
-                }`}
-              >
-                {msg.text}
-              </div>
-            </motion.div>
-          ))}
-
-          <div className="space-y-1.5 pt-1">
-            {AI_SUGGESTIONS.map((s, i) => (
-              <motion.button
-                key={s}
-                type="button"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.9 + i * 0.12 }}
-                className="flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-[11px] font-medium text-gray-400 transition-all hover:border-[#7b39fc]/50 hover:text-[#a67cff]"
-              >
-                <Sparkles size={12} className="shrink-0 text-[#a67cff]" />
-                {s}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 p-3">
-          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-black px-3 py-2">
-            <input
-              readOnly
-              placeholder={t("land.mockAiPlaceholder")}
-              className="min-w-0 flex-1 bg-transparent text-[12px] text-gray-300 placeholder-gray-600 outline-none"
-            />
-            <Send size={14} className="text-[#a67cff]" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── View: Kanban ────────────────────────────────────────────────────── */
-
-function KanbanView() {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      {KANBAN.map((col, ci) => (
-        <motion.div
-          key={col.column}
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: ci * 0.08, duration: 0.4 }}
-          className="rounded-2xl border border-white/10 bg-black p-3"
-        >
-          <div className="mb-3 flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ background: col.color }}
-              />
-              <span className="text-[12px] font-bold text-gray-300">
-                {col.column}
-              </span>
-              <span className="rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-gray-500">
-                {col.cards.length}
+              <span className="text-gray-400">
+                <ChevronLeft size={14} className="rotate-90" aria-hidden="true" />
               </span>
             </div>
-            <Plus size={13} className="text-gray-600" />
+            <div className="mt-2.5 pt-2 border-t border-blue-500/10 space-y-2">
+              <p className="text-[11px] leading-relaxed text-gray-600 font-medium">
+                Collega il tuo Google Calendar per sincronizzare scadenze, riunioni ed
+                eventi direttamente nel tuo spazio di lavoro.
+              </p>
+              <div className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-sm">
+                <Calendar size={13} />
+                <span>Collega Google Calendar</span>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            {col.cards.map((card) => (
-              <motion.div
-                key={card.title}
-                whileHover={{ y: -3, scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                className="group cursor-default rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:border-[#7b39fc]/40"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-[12px] font-semibold leading-snug text-gray-200">
-                    {card.title}
-                  </span>
-                  <MoreHorizontal
-                    size={13}
-                    className="mt-0.5 shrink-0 text-gray-600 opacity-0 transition-opacity group-hover:opacity-100"
-                  />
-                </div>
-                <div className="mt-2.5 flex items-center justify-between">
-                  <span className="rounded-md bg-[#7b39fc]/12 px-1.5 py-0.5 text-[10px] font-bold text-[#a67cff]">
-                    {card.tag}
-                  </span>
-                  <span
-                    className={`text-[10px] font-semibold ${
-                      card.priority === "Alta"
-                        ? "text-rose-400"
-                        : card.priority === "Media"
-                          ? "text-amber-400"
-                          : "text-gray-500"
-                    }`}
-                  >
-                    {card.priority}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+        <div className="my-2 border-t border-gray-100" />
+
+        {/* Pages tree */}
+        <div className="mt-3">
+          <div className="flex items-center px-3 h-6 mb-0.5">
+            <span className="flex-1 text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 select-none">
+              {t("yourPages", "Privato")}
+            </span>
+            <span className="opacity-0 p-0.5 rounded-md text-gray-400">
+              <FileText size={12} />
+            </span>
           </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-/* ── View: Calendar ──────────────────────────────────────────────────── */
-
-function CalendarView() {
-  const { t, tWith } = useLanguage();
-  const today = 3; // Wednesday
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">{t("land.mockCalMonth")}</h4>
-          <p className="mt-0.5 text-[12px] text-gray-500">
-            La tua settimana, a colpo d&apos;occhio
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
-            <ChevronRight size={14} className="rotate-180" />
-          </button>
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
-            <ChevronRight size={14} />
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-7 gap-2">
-        {CAL_WEEK.map((day, i) => {
-          const events = WEEK_EVENTS[i + 1] || [];
-          const isToday = i + 1 === today;
-          return (
-            <motion.div
-              key={day}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className={`flex min-h-[110px] flex-col rounded-xl border p-2 transition-colors ${
-                isToday
-                  ? "border-[#7b39fc]/50 bg-[#7b39fc]/10"
-                  : "border-white/10 bg-black hover:border-[#7b39fc]/30"
-              }`}
-            >
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500">
-                  {day}
-                </span>
-                <span
-                  className={`grid h-5 w-5 place-items-center rounded-md text-[10px] font-bold ${
-                    isToday ? "bg-[#7b39fc] text-white" : "text-gray-400"
-                  }`}
+          <ul className="space-y-0.5" role="tree" aria-label="Pagine private">
+            {DEMO_PAGES.map((page) => (
+              <li key={page.id}>
+                <div
+                  className="group flex items-center rounded-lg transition-all text-sm font-medium relative h-7 select-none text-gray-600"
+                  style={{ paddingLeft: 6 }}
                 >
-                  {i + 1 + 7}
-                </span>
-              </div>
-              <div className="space-y-1 overflow-hidden">
-                {events.map((ev) => (
-                  <div
-                    key={ev}
-                    className="truncate rounded-md bg-[#7b39fc]/15 px-1.5 py-1 text-[9px] font-medium text-[#c9b0ff]"
-                  >
-                    {ev}
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 mr-0.5">
+                    <span className="text-gray-400 text-[10px]">›</span>
+                  </span>
+                  <span className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden">
+                    <FileText
+                      size={15}
+                      aria-hidden="true"
+                      className={`${page.iconColor} shrink-0`}
+                    />
+                    <span className="truncate text-xs">{page.label}</span>
+                  </span>
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pr-1.5 shrink-0">
+                    <span className="p-1 rounded text-gray-400">
+                      <X size={13} aria-hidden="true" />
+                    </span>
+                    <span className="p-1 rounded text-gray-400">
+                      <FileText size={13} aria-hidden="true" />
+                    </span>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          );
-        })}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex-1" />
+      </nav>
+
+      {/* Account row */}
+      <div className="border-t border-gray-100 px-2 py-2 flex items-center gap-1.5">
+        <div className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg min-w-0">
+          <div className="w-6 h-6 bg-[#7b39fc]/10 rounded-full flex items-center justify-center shrink-0">
+            <User size={13} aria-hidden="true" className="text-[#7b39fc]" />
+          </div>
+          <span className="flex-1 text-sm font-bold text-gray-800 truncate">Sofia Rossi</span>
+          <span className="text-gray-400 shrink-0">
+            <ChevronLeft size={14} className="rotate-180" aria-hidden="true" />
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-500">
+          <Sliders size={16} aria-hidden="true" className="shrink-0" />
+          <span className="text-xs font-semibold">{t("nav.more", "Altro")}</span>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+/* ── Topbar ───────────────────────────────────────────────────────────── */
+
+function PreviewTopbar() {
+  return (
+    <div className="sticky top-0 z-50 h-14 border-b border-gray-200/60 bg-white/80 backdrop-blur-xl px-3 flex items-center gap-3">
+      <span className="shrink-0 p-2 text-gray-500 rounded-lg">
+        <ChevronLeft size={18} className="rotate-180" aria-hidden="true" />
+      </span>
+      <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0">
+        <span className="inline-flex shrink-0 items-center gap-1.5 px-3 h-9 rounded-lg text-xs font-bold border border-cyan-200 bg-cyan-50 text-cyan-600">
+          <LayoutDashboard size={14} className="shrink-0" />
+          <span>Analitiche</span>
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-2 px-3 h-9 rounded-lg text-xs font-bold border border-gray-200 bg-white text-gray-600">
+          <span>Roadmap Q4</span>
+          <X size={12} className="shrink-0" />
+        </span>
+      </div>
+      <div className="shrink-0 mr-1 p-2.5 rounded-2xl hover:bg-gray-100 text-gray-500">
+        <Bell size={20} strokeWidth={2.5} aria-hidden="true" />
       </div>
     </div>
   );
 }
 
-/* ── Main showcase ───────────────────────────────────────────────────── */
+/* ── Pannelli strumenti (versioni statiche, non interattive) ───────────── */
 
-const TABS = [
-  { id: "overview", label: "Panoramica", icon: BarChart3 },
-  { id: "kanban", label: "Kanban", icon: KanbanSquare },
-  { id: "calendar", label: "Calendario", icon: CalendarDays },
-];
+function StaticFileUploader() {
+  return (
+    <div className="flex flex-col h-full min-h-80">
+      <div className="p-5 border-b border-gray-100">
+        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
+          <Upload size={16} className="text-cyan-500" />
+          Cloud File
+        </h3>
+      </div>
+      <div className="flex-1 p-5 overflow-hidden space-y-3">
+        <div className="h-full flex flex-col items-center justify-center text-center opacity-40 py-10">
+          <Upload size={32} className="mb-2" />
+          <p className="text-xs font-bold uppercase tracking-widest">Trascina qui i file</p>
+          <p className="text-[10px] mt-1">oppure seleziona da computer</p>
+        </div>
+      </div>
+      <div className="p-4 bg-gray-50/50 border-t border-gray-100">
+        <div className="w-full py-2.5 px-4 bg-white border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center gap-2">
+          <Upload size={14} className="text-gray-400" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+            Seleziona file
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StaticTemplateGallery() {
+  const templates = ["Meeting Notes", "Project Plan", "Daily Journal"];
+  return (
+    <div className="flex flex-col h-full min-h-80">
+      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
+          <LayoutDashboard size={16} className="text-gray-400" />
+          Template
+        </h3>
+        <Badge
+          variant="default"
+          className="bg-gray-100 text-gray-600 border-none"
+        >
+          4 disponibili
+        </Badge>
+      </div>
+      <div className="flex-1 p-4 space-y-2 overflow-hidden">
+        {templates.map((name) => (
+          <div
+            key={name}
+            className="p-3 bg-gray-50/50 border border-gray-100 rounded-2xl"
+          >
+            <div className="text-[11px] font-black text-gray-700 truncate">{name}</div>
+            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+              Usa template
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StaticImportExport() {
+  return (
+    <div className="flex flex-col h-full min-h-80">
+      <div className="p-5 border-b border-gray-100">
+        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
+          <FileText size={16} className="text-emerald-500" />
+          Importa / Esporta
+        </h3>
+      </div>
+      <div className="flex-1 p-5 flex flex-col gap-4">
+        <div className="flex-1 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-xs font-mono text-gray-400">
+          Incolla qui il contenuto Markdown…
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">
+            <Download size={14} />
+            Esporta
+          </div>
+          <div className="flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest">
+            <Upload size={14} />
+            Importa
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Sezione landing ──────────────────────────────────────────────────── */
 
 export default function DashboardShowcase() {
-  const { t, tWith } = useLanguage();
-  const [tab, setTab] = useState("overview");
+  const { t } = useLanguage();
 
-  const tiltRef = useRef<HTMLDivElement | null>(null);
-  const tiltX = useMotionValue(0);
-  const tiltY = useMotionValue(0);
-  const springTiltX = useSpring(tiltX, { stiffness: 160, damping: 20 });
-  const springTiltY = useSpring(tiltY, { stiffness: 160, damping: 20 });
-
-  const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = tiltRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width - 0.5;
-    const py = (e.clientY - rect.top) / rect.height - 0.5;
-    tiltY.set(px * 5);
-    tiltX.set(-py * 5);
-  };
-
-  const resetTilt = () => {
-    tiltX.set(0);
-    tiltY.set(0);
-  };
+  const quickStats = [
+    {
+      label: t("statActiveTasks", "Task Attivi"),
+      value: 5,
+      icon: <ListTodo className="text-[#7b39fc]" />,
+      bgClass: "bg-[#7b39fc]/10",
+      sub: t("statAwaiting", "In attesa"),
+    },
+    {
+      label: t("statGoals", "Obiettivi"),
+      value: 3,
+      icon: <Target className="text-rose-500" />,
+      bgClass: "bg-rose-500/10",
+      sub: `1 ${t("statGoalsAchieved", "Completati")}`,
+    },
+    {
+      label: t("statIdeas", "Idee / Spunti"),
+      value: 3,
+      icon: <Lightbulb className="text-amber-500" />,
+      bgClass: "bg-amber-500/10",
+      sub: t("statIdeasAwaiting", "Nel Brain Dump"),
+    },
+    {
+      label: t("statFocus", "Focus di Oggi"),
+      value: "Chiudere la...",
+      icon: <Sparkles className="text-[#a67cff]" />,
+      bgClass: "bg-[#a67cff]/10",
+      sub: t("statFocusSub", "Priorità chiave"),
+    },
+  ];
 
   return (
     <section className="landing-section relative overflow-hidden px-4 py-20 sm:px-6 sm:py-28">
       <div className="relative mx-auto max-w-6xl">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="landing-eyebrow"
-          >
-            <Sparkles size={13} />{t("land.showcaseEyebrow")}</motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.05 }}
-            className="landing-heading-lg mt-3"
-          >{t("land.showcaseTitlePrefix")}<span className="landing-display-accent">{t("land.showcaseTitleAccent")}</span>
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="landing-body mx-auto mt-4 max-w-xl"
-          >
-            Task, obiettivi, calendario e note vivono nella stessa pagina.
-            Esplora la demo: spunta i task, cambia vista e parla con l&apos;assistente AI.
-          </motion.p>
+          <div className="landing-eyebrow">
+            <Sparkles size={13} />
+            {t("land.showcaseEyebrow")}
+          </div>
+          <h2 className="landing-heading-lg mt-3">
+            {t("land.showcaseTitlePrefix")}
+            <span className="landing-display-accent">{t("land.showcaseTitleAccent")}</span>
+          </h2>
+          <p className="landing-body mx-auto mt-4 max-w-xl">
+            {t("land.showcaseBody")}
+          </p>
         </div>
 
         {/* Browser frame */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mt-12"
-          style={{ perspective: 1400 }}
-        >
-          {/* Glow behind frame */}
+        <div className="relative mt-12">
           <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-b from-[#7b39fc]/25 via-[#a67cff]/10 to-transparent blur-lg" />
 
-          <motion.div
-            ref={tiltRef}
-            onMouseMove={handleTilt}
-            onMouseLeave={resetTilt}
-            style={{
-              rotateX: springTiltX,
-              rotateY: springTiltY,
-              transformStyle: "preserve-3d",
-            }}
-            whileTap={{ scale: 0.995 }}
-          >
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl shadow-black/60">
+          <div className="relative overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-2xl shadow-[#7b39fc]/15">
             {/* Window chrome */}
-            <div className="flex items-center gap-3 border-b border-white/10 bg-black px-4 py-2.5">
+            <div className="flex items-center gap-3 border-b border-gray-200/70 bg-gray-50 px-4 py-2.5">
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
               </div>
-              <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg border border-white/10 bg-black px-3 py-1 text-[11px] text-gray-500">
+              <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1 text-[11px] text-gray-500">
                 <Globe size={11} className="shrink-0 text-[#7b39fc]" />
                 <span className="truncate">app.taskly.io/dashboard</span>
               </div>
               <div className="flex items-center gap-1.5" aria-hidden="true">
-                <Search size={13} className="text-gray-600" />
-                <Bell size={13} className="text-gray-600" />
+                <Search size={13} className="text-gray-400" />
+                <Bell size={13} className="text-gray-400" />
               </div>
             </div>
 
-            {/* App body */}
-            <div className="flex">
-              <MockSidebar />
+            {/* Badge: chiarisce che il mockup non è interattivo */}
+            <div className="pointer-events-none absolute right-4 top-16 z-10 inline-flex items-center gap-1.5 rounded-full border border-[#7b39fc]/25 bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-[#7b39fc] shadow-sm backdrop-blur-sm">
+              <Eye size={11} aria-hidden="true" />
+              {t("land.showcasePreviewBadge")}
+            </div>
 
-              <div className="flex min-w-0 flex-1 flex-col">
-                {/* App topbar */}
-                <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5 sm:px-5">
-                  <div className="flex items-center gap-2.5">
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] md:hidden">
-                      <PanelLeft size={14} />
-                    </button>
-                    <div>
-                      <div className="text-[13px] font-bold text-white">{t("land.mockGreeting")}</div>
-                      <div className="hidden text-[10px] text-gray-500 sm:block">{t("land.mockDateSub")}</div>
+            {/* App body: sidebar + main, esattamente come /dashboard.
+                È puramente rappresentativo: nessun puntatore, nessun focus,
+                nessuna semantica per gli screen reader. */}
+            <div
+              className="flex min-h-[720px] text-left select-none pointer-events-none"
+              aria-hidden="true"
+              inert
+            >
+              <PreviewSidebar t={t} />
+              <div className="flex min-w-0 flex-1 flex-col bg-zinc-50">
+                <PreviewTopbar />
+                <div className="p-3 md:p-6">
+                  <div className="max-w-7xl mx-auto space-y-6 pb-12">
+                    <DashboardHeader
+                      eyebrow={t("land.mockNavDashboard", "Dashboard & Analitiche")}
+                      title={t("dashboardTitle", "Panoramica Analitiche")}
+                      subtitle={t("dashboardSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
+                      customizeLabel={t("dash.customizeAnalytics", "Personalizza Analitiche")}
+                      showCustomize={false}
+                    />
+
+                    <div className="space-y-8">
+                      <QuickStatsWidget stats={quickStats} />
+
+                      <TodayFocusWidget
+                        focus={t("dash.demoFocus", "Chiudere la proposta Alpha entro venerdì")}
+                        completionRate={63}
+                        criticalCount={3}
+                        activeGoalsCount={2}
+                        completedCount={3}
+                        gradientId="showcaseProgressGradient"
+                        labels={{
+                          focus: t("dash.focusToday", "Focus di Oggi"),
+                          critical: t("criticalTasks", "Task Critici"),
+                          activeGoals: t("activeGoalsLabel", "Obiettivi Attivi"),
+                          done: t("done", "Completati"),
+                          completed: t("done", "Completato"),
+                        }}
+                      />
+
+                      <WeeklyTrendWidget
+                        data={TREND}
+                        title={t("dash.trendTitle", "Trend & Produttività Settimanale")}
+                        subtitle={t("dash.trendSub", "Attività e tasso di completamento ultimi 7 giorni")}
+                        statusLabel={t("dash.trendActive", "Attivo")}
+                      />
+
+                      <div className="grid lg:grid-cols-2 gap-8">
+                        <CriticalTasksWidget
+                          tasks={DEMO_TASKS.filter(
+                            (task) => task.priority === "Alta" && task.status !== "done",
+                          ).slice(0, 3)}
+                          title={t("priorityHigh", "Task ad Alta Priorità")}
+                          seeAllLabel={t("seeAll", "Vedi tutti")}
+                          emptyLabel={t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
+                        />
+                        <RecentIdeasWidget
+                          ideas={DEMO_IDEAS}
+                          title={t("recentIdeas", "Brain Dump & Idee")}
+                          linkLabel={t("dash.brainDump", "Brain Dump")}
+                          emptyLabel={t("noIdeas", "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!")}
+                          defaultCategory={t("dash.generalCategory", "Generale")}
+                        />
+                      </div>
+
+                      <div className="grid lg:grid-cols-2 gap-8">
+                        <GoalProgressWidget
+                          goals={DEMO_GOALS.filter((goal) => !goal.completed).slice(0, 2)}
+                          title={t("goalProgress", "Progresso Obiettivi")}
+                          emptyLabel={t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
+                        />
+                        <div className="space-y-8">
+                          <QuickNavWidget
+                            labels={{
+                              title: t("quickNav", "Azioni Rapide"),
+                              newProject: t("newProject", "Nuovo Progetto"),
+                              newIdea: t("newIdea", "Nuova Idea"),
+                            }}
+                          />
+                          <AiInsightsWidget
+                            text={t("aiAnalysis", "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale.")}
+                            actionLabel={t("aiAction", "Genera Piano Ottimale")}
+                          />
+                        </div>
+                      </div>
+
+                      <ToolsResourcesWidget title={t("resourcesTools", "Strumenti & Risorse")}>
+                        <ToolsPanel>
+                          <StaticFileUploader />
+                        </ToolsPanel>
+                        <ToolsPanel>
+                          <StaticTemplateGallery />
+                        </ToolsPanel>
+                        <ToolsPanel>
+                          <StaticImportExport />
+                        </ToolsPanel>
+                      </ToolsResourcesWidget>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="hidden items-center gap-2 rounded-lg border border-white/10 bg-black px-2.5 py-1.5 sm:flex">
-                      <Search size={12} className="text-gray-600" />
-                      <span className="text-[11px] text-gray-500">{t("land.mockSearchHint")}</span>
-                    </div>
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
-                      <Search size={14} />
-                    </button>
-                    <button className="relative grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
-                      <Bell size={14} />
-                      <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#7b39fc]" />
-                    </button>
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#5a1fd4] text-[11px] font-bold text-white">
-                      S
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 p-4 sm:p-5">
-                  {/* Stats */}
-                  <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                    {STATS.map((stat, i) => (
-                      <StatCard key={stat.label} stat={stat} index={i} />
-                    ))}
-                  </div>
-
-                  {/* Tab switcher */}
-                  <div className="mb-4 flex items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-1">
-                    {TABS.map((t) => {
-                      const Icon = t.icon;
-                      const active = tab === t.id;
-                      return (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => setTab(t.id)}
-                          className={`relative flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold transition-colors ${
-                            active
-                              ? "text-white"
-                              : "text-gray-500 hover:text-gray-300"
-                          }`}
-                        >
-                          {active && (
-                            <motion.span
-                              layoutId="showcase-tab"
-                              className="absolute inset-0 rounded-lg bg-[#7b39fc]/20"
-                              transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                            />
-                          )}
-                          <Icon size={13} className="relative z-10" />
-                          <span className="relative z-10 hidden sm:inline">
-                            {t.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Animated views */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={tab}
-                      initial={{ opacity: 0, y: 14, scale: 0.99 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.99 }}
-                      transition={{ type: "spring", stiffness: 340, damping: 30 }}
-                    >
-                      {tab === "overview" && <TasksView />}
-                      {tab === "kanban" && <KanbanView />}
-                      {tab === "calendar" && <CalendarView />}
-                    </motion.div>
-                  </AnimatePresence>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Floating badges */}
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-            className="absolute -right-3 top-24 hidden lg:block"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5, type: "spring", stiffness: 260, damping: 18 }}
-              className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
-            >
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500/15 text-emerald-400">
-                <TrendingUp size={17} />
-              </div>
-              <div>
-                <div className="text-[13px] font-bold text-white">{t("land.mockBadge1Title")}</div>
-                <div className="text-[10px] text-gray-500">{t("land.mockBadge1Sub")}</div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-            className="absolute -left-3 bottom-24 hidden lg:block"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.65, type: "spring", stiffness: 260, damping: 18 }}
-              className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black px-4 py-3 shadow-xl shadow-black/40 backdrop-blur"
-            >
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#7b39fc]/15 text-[#a67cff]">
-                <Sparkles size={17} />
-              </div>
-              <div>
-                <div className="text-[13px] font-bold text-white">{t("land.mockBadge2Title")}</div>
-                <div className="text-[10px] text-gray-500">{t("land.mockBadge2Sub")}</div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-        </motion.div>
+        </div>
 
         {/* CTA under the mockup */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mt-12 flex flex-col items-center gap-4 text-center"
-        >
+        <div className="mt-12 flex flex-col items-center gap-4 text-center">
           <p className="max-w-md text-sm text-gray-500">
-            Questa è solo un&apos;anteprima. Il tuo workspace è personale, sincronizzato e pronto in 30 secondi.
+            {t("land.showcasePreviewNote")}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href="/register" className="landing-btn-primary">{t("land.showcaseCtaPrimary")}<ArrowUpRight size={17} />
+            <Link href="/register" className="landing-btn-primary">
+              {t("land.showcaseCtaPrimary")}
+              <ArrowUpRight size={17} />
             </Link>
             <button
               type="button"
               onClick={() => {
-                document
-                  .getElementById("demo")
-                  ?.scrollIntoView({ behavior: "smooth" });
+                document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
               }}
               className="landing-btn-secondary"
-            >{t("land.showcaseCtaSecondary")}</button>
+            >
+              {t("land.showcaseCtaSecondary")}
+            </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

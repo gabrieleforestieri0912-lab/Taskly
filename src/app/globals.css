@@ -138,12 +138,15 @@
     backdrop-filter: blur(12px);
   }
 
+  /* Titoli di sezione: stesso stile del titolo hero (Hero.tsx:83) —
+     Inter extrabold, leading molto stretto, tracking negativo. Cambia
+     solo la scala, così la gerarchia visiva resta intatta. */
   .landing-heading {
-    @apply font-instrument-serif text-3xl md:text-4xl leading-[1.15] tracking-[-0.02em] text-gray-900 dark:text-white;
+    @apply font-inter font-extrabold text-2xl leading-[1.12] tracking-[-0.025em] text-gray-900 dark:text-white md:text-3xl lg:text-[40px];
   }
 
   .landing-heading-lg {
-    @apply font-instrument-serif text-4xl md:text-5xl leading-[1.08] tracking-[-0.025em] text-gray-900 dark:text-white;
+    @apply font-inter font-extrabold text-4xl leading-[1.06] tracking-[-0.03em] text-gray-900 dark:text-white md:text-5xl lg:text-[60px];
   }
 
   .landing-display-accent {

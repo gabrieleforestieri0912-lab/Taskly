@@ -193,31 +193,6 @@ const ChatInput = ({
 
   return (
     <div className="relative">
-      {showSuggestions && isEmptyState && (
-        <motion.div
-          ref={suggestionsRef}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.15, staggerChildren: 0.03 }}
-          className="mb-3 flex flex-wrap gap-2"
-          role="list"
-          aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}
-        >
-          {suggestedPrompts.map((prompt) => (
-            <motion.button
-              key={prompt}
-              onClick={() => insertSuggestion(prompt)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
-              role="listitem"
-            >
-              <Sparkles size={12} className="text-[#7b39fc]" />
-              {prompt}
-            </motion.button>
-          ))}
-        </motion.div>
-      )}
-
       <div
         className={`
           relative flex items-end gap-1.5
@@ -309,6 +284,33 @@ const ChatInput = ({
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {showSuggestions && isEmptyState && (
+          <motion.div
+            ref={suggestionsRef}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, staggerChildren: 0.03 }}
+            className="mt-3 flex flex-wrap gap-2"
+            role="list"
+            aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}
+          >
+            {suggestedPrompts.map((prompt) => (
+              <motion.button
+                key={prompt}
+                onClick={() => insertSuggestion(prompt)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
+                role="listitem"
+              >
+                <Sparkles size={12} className="text-[#7b39fc]" />
+                {prompt}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {textareaHeight > 80 && (
         <div

@@ -291,7 +291,10 @@ function DashboardContent() {
     // and we can enter edit mode immediately.
     const pageLabel =
       pageType === "empty" ? "" : pageConfig.label || "Nuova Pagina";
-    const newPageId = Date.now();
+    const newPageId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `pg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     const newPage = {
       id: newPageId,
@@ -385,7 +388,7 @@ function DashboardContent() {
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
       return cur.map((page) =>
-        page.id === id ? { ...page, ...updates } : page,
+        String(page.id) === String(id) ? { ...page, ...updates } : page,
       );
     });
   };
@@ -394,7 +397,7 @@ function DashboardContent() {
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
       return cur.map((page) =>
-        page.id === id ? { ...page, data: nextData } : page,
+        String(page.id) === String(id) ? { ...page, data: nextData } : page,
       );
     });
     if (socket) {
@@ -435,7 +438,9 @@ function DashboardContent() {
     if (action.type === "update_page") {
       const targetId = action.payload?.id;
       const updates = action.payload?.updates || {};
-      const target = pages.find((page) => page.id === targetId);
+      const target = pages.find(
+        (page) => String(page.id) === String(targetId),
+      );
 
       if (!target) {
         return { ok: false, message: "Pagina da aggiornare non trovata." };
@@ -469,7 +474,7 @@ function DashboardContent() {
       const { blockType, content, targetPageId, targetPageLabel } =
         action.payload;
       const targetPage = targetPageId
-        ? pages.find((p) => p.id === targetPageId)
+        ? pages.find((p) => String(p.id) === String(targetPageId))
         : null;
 
       if (!targetPage) {
@@ -513,7 +518,7 @@ function DashboardContent() {
 
     if (action.type === "update_page_content") {
       const { id, content } = action.payload;
-      const targetPage = pages.find((p) => p.id === id);
+      const targetPage = pages.find((p) => String(p.id) === String(id));
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
@@ -540,7 +545,7 @@ function DashboardContent() {
 
     if (action.type === "insert_page_text") {
       const { id, text } = action.payload;
-      const targetPage = pages.find((p) => p.id === id);
+      const targetPage = pages.find((p) => String(p.id) === String(id));
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
@@ -1384,6 +1389,4 @@ export default function DashboardPage() {
     </Suspense>
   );
 }
-
-
 

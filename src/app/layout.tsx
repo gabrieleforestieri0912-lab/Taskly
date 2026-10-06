@@ -1,9 +1,11 @@
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import ThemeSync from "../components/ThemeSync";
 import GoogleAuthProvider from "../components/GoogleAuthProvider";
 import { LanguageProvider } from "../lib/LanguageContext";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
+import AppMiniChat from "../components/AppMiniChat";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { themeBootstrapScript } from "../lib/theme";
 import { FAQ_ITEMS } from "../lib/faq";
@@ -151,6 +153,9 @@ export default function RootLayout({ children }) {
             />
             <KeyboardShortcuts />
             <ThemeSync />
+            <Suspense fallback={null}>
+              <AppMiniChat />
+            </Suspense>
             {children}
           </LanguageProvider>
         </GoogleAuthProvider>
