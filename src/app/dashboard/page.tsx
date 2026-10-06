@@ -77,7 +77,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const [theme, setTheme] = useState("light");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isSidebarPeekOpen, setIsSidebarPeekOpen] = useState(false);
+  const [isSidebarPeekOpen, setIsSidebarPeekOpen] = useState(false); // kept for future use, not used by hover
   const [planNotice, setPlanNotice] = useState<string | null>(null);
 
   const {
@@ -814,7 +814,7 @@ function DashboardContent() {
     return { ok: false, message: `Azione "${action.type}" non supportata.` };
   };
 
-  const shouldShowSidebar = isSidebarOpen || isSidebarPeekOpen;
+  const shouldShowSidebar = isSidebarOpen;
 
   const breadcrumbs = React.useMemo(() => {
     if (searchParams.get("view") === "inbox") {
@@ -1414,13 +1414,7 @@ const ensureTab = React.useCallback((page: any) => {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      {!isSidebarOpen && (
-        <div
-          onMouseEnter={() => setIsSidebarPeekOpen(true)}
-          className="fixed left-0 top-0 bottom-0 w-3 z-30"
-          aria-hidden="true"
-        />
-      )}
+
 
       <AnimatePresence mode="wait">
         {shouldShowSidebar && (
@@ -1440,9 +1434,6 @@ const ensureTab = React.useCallback((page: any) => {
               exit={{ x: -256, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="fixed left-0 top-0 bottom-0 w-64 z-40"
-              onMouseLeave={() => {
-                if (!isSidebarOpen) setIsSidebarPeekOpen(false);
-              }}
             >
               <Sidebar
                 user={user}

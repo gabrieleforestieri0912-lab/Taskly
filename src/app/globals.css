@@ -175,11 +175,11 @@
   }
 
   .landing-btn-primary {
-    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-[#7b39fc] px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-[#8b4dff];
+    @apply font-inter inline-flex h-[52px] min-w-[180px] items-center justify-center gap-2 rounded-[10px] bg-[#7b39fc] px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-[#8b4dff];
   }
 
   .landing-btn-secondary {
-    @apply font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-gray-900 px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200;
+    @apply font-inter inline-flex h-[52px] min-w-[180px] items-center justify-center gap-2 rounded-[10px] bg-gray-900 px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200;
   }
 
   .landing-stat-card {
