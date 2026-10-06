@@ -48,7 +48,7 @@ export type Page = {
   /** null = root page; non-null = child of the referenced page */
   parentId: string | null;
 
-  /** Always "private" for now; prepared for "shared" / "favorites" */
+  /** Always "private" for now; prepared for "shared" */
   section: PageSection;
 
   /**
@@ -62,6 +62,12 @@ export type Page = {
 
   /** Soft-delete flag — deleted pages appear in Trash */
   deleted?: boolean;
+
+  /**
+   * Starred in the sidebar "Preferiti" section.
+   * Persisted inside the DB `meta` jsonb column, not as a dedicated column.
+   */
+  isFavorite?: boolean;
 
   /** ISO timestamp set when `deleted` becomes true */
   deletedAt?: string;
@@ -282,6 +288,7 @@ export function normalizePage(raw: Record<string, unknown>): Page {
           ? raw.sort_order
           : 0,
     type: String(raw.type ?? "empty"),
+    isFavorite: Boolean(raw.isFavorite),
     deleted: Boolean(raw.deleted),
     deletedAt: (raw.deletedAt as string | undefined) ?? undefined,
     createdAt: (raw.createdAt as string | undefined) ?? undefined,

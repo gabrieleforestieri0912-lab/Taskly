@@ -21,6 +21,7 @@ import {
   purgeExpiredTasks,
   restoreTaskValue,
 } from "../lib/trashUtils";
+import { formatRelativeTime } from "../lib/formatRelative";
 
 interface TrashViewProps {
   pages: any[];
@@ -138,23 +139,8 @@ export default function TrashView({
   };
 
   // Helper for relative date
-  const formatRelativeTime = (iso?: string) => {
-    if (!iso) return "Data non disponibile";
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
-
-    const diffMs = Date.now() - d.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 2) return "Pochi istanti fa";
-    if (diffMins < 60) return `${diffMins} minuti fa`;
-    if (diffHours < 24) return `${diffHours} ore fa`;
-    if (diffDays === 1) return "Ieri";
-    if (diffDays < 30) return `${diffDays} giorni fa`;
-    return d.toLocaleDateString("it-IT");
-  };
+  const formatDeletedAt = (iso?: string) =>
+    formatRelativeTime(iso, "it", "Data non disponibile");
 
   const totalDeletedCount = counts.total;
 
@@ -303,7 +289,7 @@ export default function TrashView({
                   </div>
                   <div className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
                     <Clock size={11} />
-                    <span>Eliminato {formatRelativeTime(item.deletedAt)}</span>
+                    <span>Eliminato {formatDeletedAt(item.deletedAt)}</span>
                     {typeof item.daysLeft === "number" && (
                       <span className="ml-1 px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 font-bold">
                         {item.daysLeft}g rimasti

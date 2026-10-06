@@ -134,6 +134,9 @@ function mapPage(row: any) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     ...(row.meta || {}),
+    // `meta` wins on key clash, but normalise to a real boolean so callers
+    // never have to deal with the string "false" being truthy.
+    isFavorite: Boolean((row.meta || {}).isFavorite),
   };
 }
 
@@ -1039,7 +1042,10 @@ async function listDocVersions(userId: string, docId: string) {
 // ---------------------------------------------------------------------------
 // Pages (dashboard) — client-driven, upsert + prune-missing
 // ---------------------------------------------------------------------------
-const PAGE_META_KEYS = ["deleted", "deletedAt", "locked", "font"];
+// "isFavorite" lives in the `meta` jsonb column rather than in a dedicated
+// column: that keeps the schema untouched (no ALTER TABLE / backfill) and
+// rides along with the existing partial-patch logic below.
+const PAGE_META_KEYS = ["deleted", "deletedAt", "locked", "font", "isFavorite"];
 
 function pageRowFromPayload(userId: string, page: any, order: number) {
   const meta: Record<string, any> = {};

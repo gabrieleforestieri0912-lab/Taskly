@@ -12,10 +12,13 @@ import {
   Copy,
   Edit2,
   FileText,
+  Star,
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { resolvePageIcon } from "../../lib/pageIcons";
 import { isEmojiIcon } from "../../lib/pageTree";
+import { formatRelativeTime } from "../../lib/formatRelative";
+import { useLanguage } from "../../lib/LanguageContext";
 
 export interface PageTreeItemProps {
   page: any;
@@ -31,6 +34,8 @@ export interface PageTreeItemProps {
   onDuplicatePage?: (page: any) => void;
   onStartRename?: (page: any) => void;
   onOpenPage?: (page: any) => void;
+  /** Hide the "last modified" hint (used by the Preferiti list). */
+  showUpdatedAt?: boolean;
 }
 
 export function PageTreeItem({
@@ -47,9 +52,11 @@ export function PageTreeItem({
   onDuplicatePage,
   onStartRename,
   onOpenPage,
+  showUpdatedAt = true,
 }: PageTreeItemProps) {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
+  const { t, language } = useLanguage();
 
   // Notifica l'apertura PRIMA di navigare, così la scheda esiste già.
   const goToPage = () => {
@@ -123,6 +130,24 @@ export function PageTreeItem({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isMenuOpen]);
+
+  const isFavorite = Boolean(page.isFavorite);
+  const updatedLabel = formatRelativeTime(
+    page.updatedAt || page.createdAt,
+    language,
+    "",
+  );
+
+  // Called from both the row button and the context-menu item.
+  const toggleFavorite = () => {
+    onUpdatePage && onUpdatePage(page.id, { isFavorite: !isFavorite });
+  };
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite();
+  };
 
   const toggleMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -368,8 +393,49 @@ export function PageTreeItem({
           </Link>
         )}
 
-        {/* Hover action buttons (⋯ and +) */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pr-1.5 shrink-0">
+        {/* Last modification — replaced by the hover actions on hover so the
+            two never compete for the same horizontal space. */}
+        {showUpdatedAt && updatedLabel && !isEditing && (
+          <span className="shrink-0 pr-1.5 text-[9px] font-medium tabular-nums text-gray-400 dark:text-gray-500 opacity-0 transition-opacity group-hover:opacity-0 lg:group-hover:opacity-100">
+            {updatedLabel}
+          </span>
+        )}
+
+        {/* Hover action buttons (★, ⋯ and +) */}
+        <div
+          className={`flex items-center gap-0.5 transition-opacity pr-1.5 shrink-0 ${
+            showUpdatedAt && updatedLabel
+              ? "opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+              : "opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+          }`}
+        >
+          {/* Favourite toggle */}
+          <button
+            type="button"
+            onClick={handleToggleFavorite}
+            aria-pressed={isFavorite}
+            aria-label={
+              isFavorite
+                ? `Rimuovi ${page.label || "pagina"} dai preferiti`
+                : `Aggiungi ${page.label || "pagina"} ai preferiti`
+            }
+            title={t(
+              isFavorite ? "favRemove" : "favAdd",
+              isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti",
+            )}
+            className={`p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 ${
+              isFavorite
+                ? "text-amber-400 hover:text-amber-500"
+                : "text-gray-400 hover:text-amber-400 hover:bg-gray-200/70 dark:hover:bg-white/10"
+            }`}
+          >
+            <Star
+              size={13}
+              aria-hidden="true"
+              fill={isFavorite ? "currentColor" : "none"}
+            />
+          </button>
+
           {/* Context menu "⋯" */}
           <button
             ref={menuButtonRef}
@@ -429,6 +495,28 @@ export function PageTreeItem({
             >
               <Edit2 size={13} className="text-gray-400" />
               <span>Rinomina</span>
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsMenuOpen(false);
+                toggleFavorite();
+              }}
+              className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors text-left"
+            >
+              <Star
+                size={13}
+                className={isFavorite ? "text-amber-400" : "text-gray-400"}
+                fill={isFavorite ? "currentColor" : "none"}
+              />
+              <span>
+                {t(
+                  isFavorite ? "favRemove" : "favAdd",
+                  isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti",
+                )}
+              </span>
             </button>
 
             <button

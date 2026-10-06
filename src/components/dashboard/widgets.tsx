@@ -7,6 +7,7 @@ import {
   ArrowDown,
   ArrowUp,
   Check,
+  Clock,
   Eye,
   EyeOff,
   Flame,
@@ -21,7 +22,6 @@ import {
   Wrench,
   X,
   Zap,
-  Clock,
   ListTodo,
   RotateCcw,
 } from "lucide-react";

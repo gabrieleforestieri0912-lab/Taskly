@@ -36,6 +36,9 @@ export const coreTranslations: Translations = {
     newPage: "Nuova Pagina",
     newTranscription: "Nuova Trascrizione",
     yourPages: "Le tue pagine",
+    favorites: "Preferiti",
+    favAdd: "Aggiungi ai preferiti",
+    favRemove: "Rimuovi dai preferiti",
     meetingRecording: "Registrazione Riunioni",
     meetingRecordingDesc:
       "Registra audio ed ottieni trascrizioni istantanee e riassunti con l'AI.",
@@ -121,6 +124,9 @@ export const coreTranslations: Translations = {
     newPage: "New Page",
     newTranscription: "New Transcription",
     yourPages: "Your pages",
+    favorites: "Favorites",
+    favAdd: "Add to favorites",
+    favRemove: "Remove from favorites",
     meetingRecording: "Meeting Recording",
     meetingRecordingDesc:
       "Record audio and get instant transcriptions and summaries with AI.",

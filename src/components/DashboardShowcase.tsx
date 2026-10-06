@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import {
-  Bell,
   ChevronLeft,
   FileText,
   LayoutDashboard,
@@ -15,9 +14,12 @@ import {
   User,
   X,
   Inbox,
+  Plus,
   CheckSquare,
   Eye,
   Mic,
+  Star,
+  MoreHorizontal,
   Calendar,
   Search,
   Sparkles,
@@ -41,6 +43,7 @@ import {
   ToolsResourcesWidget,
   WeeklyTrendWidget,
 } from "./dashboard/widgets";
+import { formatRelativeTime } from "../lib/formatRelative";
 
 /* ── Dati di esempio ──────────────────────────────────────────────────── */
 
@@ -132,11 +135,46 @@ const DEMO_IDEAS = [
   { id: "i3", title: "Weekly digest via email", category: "Comunicazione" },
 ];
 
+// `demoUpdatedAt` is a fixed ISO instant chosen so the relative labels read
+// naturally ("4 min fa", "26 h fa", "6 g fa"). It is passed through the same
+// formatter the real sidebar uses, so the wording matches exactly.
+const DEMO_NOW = "2026-10-06T14:30:00.000Z";
+
+function demoUpdatedAt(minutesBefore: number) {
+  return new Date(
+    new Date(DEMO_NOW).getTime() - minutesBefore * 60_000,
+  ).toISOString();
+}
+
 const DEMO_PAGES = [
-  { id: "p1", label: "Roadmap Q4", icon: "rocket", iconColor: "text-[#7b39fc]" },
-  { id: "p2", label: "Riunioni", icon: "mic", iconColor: "text-cyan-600" },
-  { id: "p3", label: "Clienti", icon: "users", iconColor: "text-rose-500" },
-  { id: "p4", label: "Letture", icon: "book-open", iconColor: "text-amber-500" },
+  {
+    id: "p1",
+    label: "Roadmap Q4",
+    iconColor: "text-[#7b39fc]",
+    isFavorite: true,
+    demoUpdatedAt: demoUpdatedAt(4),
+  },
+  {
+    id: "p2",
+    label: "Riunioni",
+    iconColor: "text-cyan-600",
+    isFavorite: false,
+    demoUpdatedAt: demoUpdatedAt(95),
+  },
+  {
+    id: "p3",
+    label: "Clienti",
+    iconColor: "text-rose-500",
+    isFavorite: true,
+    demoUpdatedAt: demoUpdatedAt(60 * 26),
+  },
+  {
+    id: "p4",
+    label: "Letture",
+    iconColor: "text-amber-500",
+    isFavorite: false,
+    demoUpdatedAt: demoUpdatedAt(60 * 24 * 6),
+  },
 ];
 
 const TREND = [
@@ -151,12 +189,101 @@ const TREND = [
 
 /* ── Sidebar ──────────────────────────────────────────────────────────── */
 
-function PreviewSidebar({ t }: { t: (k: string, f?: string) => string }) {
+/**
+ * One page row, mirroring the real PageTreeItem: star + last-modified on
+ * hover, inline actions when the row is not hovered.
+ */
+function PreviewPageRow({
+  page,
+  language,
+}: {
+  page: (typeof DEMO_PAGES)[number];
+  language: string;
+}) {
+  // Fixed offsets rather than Date.now() at render time: this must stay a
+  // pure function of props, so the label never shifts between renders.
+  const updated = formatRelativeTime(
+    page.demoUpdatedAt,
+    language,
+    "",
+  );
+
+  return (
+    <div
+      className="group flex items-center rounded-lg text-sm font-medium relative h-7 select-none text-gray-600"
+      style={{ paddingLeft: 6 }}
+    >
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 mr-0.5">
+        <span className="text-gray-400 text-[10px]">›</span>
+      </span>
+
+      {/* Star: always visible once starred, as in the real sidebar */}
+      {page.isFavorite && (
+        <Star
+          size={12}
+          aria-hidden="true"
+          fill="currentColor"
+          className="shrink-0 mr-1 text-amber-400"
+        />
+      )}
+
+      <span className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden">
+        <FileText
+          size={15}
+          aria-hidden="true"
+          className={`${page.iconColor} shrink-0`}
+        />
+        <span className="truncate text-xs">{page.label}</span>
+      </span>
+
+      {/* Last modification, swapped out on hover like the real row */}
+      <span className="shrink-0 pr-1.5 text-[9px] font-medium tabular-nums text-gray-400 opacity-0 transition-opacity group-hover:opacity-0">
+        {updated}
+      </span>
+
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pr-1.5 shrink-0">
+        <span
+          className={`p-1 rounded ${
+            page.isFavorite
+              ? "text-amber-400"
+              : "text-gray-400"
+          }`}
+        >
+          <Star
+            size={13}
+            aria-hidden="true"
+            fill={page.isFavorite ? "currentColor" : "none"}
+          />
+        </span>
+        <span className="p-1 rounded text-gray-400">
+          <MoreHorizontal size={13} aria-hidden="true" />
+        </span>
+        <span className="p-1 rounded text-gray-400">
+          <Plus size={13} aria-hidden="true" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function PreviewSidebar({
+  t,
+  language,
+}: {
+  t: (k: string, f?: string) => string;
+  language: string;
+}) {
+  // Counts are derived from the DEMO_* arrays so the sidebar badges and the
+  // stat cards can never drift apart.
+  const activeTasks = DEMO_TASKS.filter((task) => task.status !== "done").length;
+  const inbox = 3;
+
+  // Mirrors SidebarQuickBar in the real sidebar (Sidebar.tsx).
   const quickItems = [
     { icon: Search, label: t("search") },
     { icon: LayoutDashboard, label: t("nav.home", "Home"), active: true },
-    { icon: CheckSquare, label: "Task", badge: 5 },
-    { icon: Inbox, label: t("nav.inbox", "Inbox"), badge: 3 },
+    { icon: CheckSquare, label: t("nav.tasks", "Task"), badge: activeTasks },
+    { icon: Inbox, label: t("nav.inbox", "Inbox"), badge: inbox },
     { icon: FileText, label: t("nav.empty", "Pagina vuota") },
     { icon: Mic, label: t("nav.transcription", "Trascrizione") },
     { icon: Send, label: t("nav.chat", "Chat") },
@@ -258,6 +385,23 @@ function PreviewSidebar({ t }: { t: (k: string, f?: string) => string }) {
           </div>
         </div>
 
+        {/* Preferiti — starred pages, most recently edited first */}
+        <div className="mt-2">
+          <div className="flex items-center px-3 h-6 mb-0.5">
+            <span className="flex-1 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 select-none">
+              <Star size={11} aria-hidden="true" className="text-amber-400" />
+              {t("favorites", "Preferiti")}
+            </span>
+          </div>
+          <ul className="space-y-0.5" role="list" aria-label={t("favorites", "Preferiti")}>
+            {DEMO_PAGES.filter((page) => page.isFavorite).map((page) => (
+              <li key={`fav-${page.id}`}>
+                <PreviewPageRow page={page} language={language} />
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="my-2 border-t border-gray-100" />
 
         {/* Pages tree */}
@@ -267,36 +411,13 @@ function PreviewSidebar({ t }: { t: (k: string, f?: string) => string }) {
               {t("yourPages", "Privato")}
             </span>
             <span className="opacity-0 p-0.5 rounded-md text-gray-400">
-              <FileText size={12} />
+              <Plus size={14} aria-hidden="true" />
             </span>
           </div>
           <ul className="space-y-0.5" role="tree" aria-label="Pagine private">
             {DEMO_PAGES.map((page) => (
               <li key={page.id}>
-                <div
-                  className="group flex items-center rounded-lg transition-all text-sm font-medium relative h-7 select-none text-gray-600"
-                  style={{ paddingLeft: 6 }}
-                >
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 mr-0.5">
-                    <span className="text-gray-400 text-[10px]">›</span>
-                  </span>
-                  <span className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden">
-                    <FileText
-                      size={15}
-                      aria-hidden="true"
-                      className={`${page.iconColor} shrink-0`}
-                    />
-                    <span className="truncate text-xs">{page.label}</span>
-                  </span>
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pr-1.5 shrink-0">
-                    <span className="p-1 rounded text-gray-400">
-                      <X size={13} aria-hidden="true" />
-                    </span>
-                    <span className="p-1 rounded text-gray-400">
-                      <FileText size={13} aria-hidden="true" />
-                    </span>
-                  </div>
-                </div>
+                <PreviewPageRow page={page} language={language} />
               </li>
             ))}
           </ul>
@@ -343,8 +464,11 @@ function PreviewTopbar() {
           <X size={12} className="shrink-0" />
         </span>
       </div>
-      <div className="shrink-0 mr-1 p-2.5 rounded-2xl hover:bg-gray-100 text-gray-500">
-        <Bell size={20} strokeWidth={2.5} aria-hidden="true" />
+      <div className="relative shrink-0 mr-1 p-2.5 rounded-2xl text-gray-500">
+        <Inbox size={20} strokeWidth={2.5} aria-hidden="true" />
+        <span className="absolute -right-0.5 -top-0.5 min-w-[16px] px-1 text-center text-[9px] font-black leading-4 tabular-nums rounded-full bg-cyan-100 text-cyan-600">
+          {3}
+        </span>
       </div>
     </div>
   );
@@ -444,26 +568,36 @@ function StaticImportExport() {
 /* ── Sezione landing ──────────────────────────────────────────────────── */
 
 export default function DashboardShowcase() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Every number below is derived from the DEMO_* arrays, so the sidebar
+  // badges, the stat cards and the widget lists can never drift apart.
+  const activeTasks = DEMO_TASKS.filter((task) => task.status !== "done");
+  const doneTasks = DEMO_TASKS.length - activeTasks.length;
+  const criticalTasks = DEMO_TASKS.filter(
+    (task) => task.priority === "Alta" && task.status !== "done",
+  );
+  const activeGoals = DEMO_GOALS.filter((goal) => !goal.completed);
+  const doneGoals = DEMO_GOALS.length - activeGoals.length;
 
   const quickStats = [
     {
       label: t("statActiveTasks", "Task Attivi"),
-      value: 5,
+      value: activeTasks.length,
       icon: <ListTodo className="text-[#7b39fc]" />,
       bgClass: "bg-[#7b39fc]/10",
       sub: t("statAwaiting", "In attesa"),
     },
     {
       label: t("statGoals", "Obiettivi"),
-      value: 3,
+      value: DEMO_GOALS.length,
       icon: <Target className="text-rose-500" />,
       bgClass: "bg-rose-500/10",
-      sub: `1 ${t("statGoalsAchieved", "Completati")}`,
+      sub: `${doneGoals} ${t("statGoalsAchieved", "Completati")}`,
     },
     {
       label: t("statIdeas", "Idee / Spunti"),
-      value: 3,
+      value: DEMO_IDEAS.length,
       icon: <Lightbulb className="text-amber-500" />,
       bgClass: "bg-amber-500/10",
       sub: t("statIdeasAwaiting", "Nel Brain Dump"),
@@ -511,9 +645,10 @@ export default function DashboardShowcase() {
                 <Globe size={11} className="shrink-0 text-[#7b39fc]" />
                 <span className="truncate">app.taskly.io/dashboard</span>
               </div>
+              {/* Solo la ricerca: la campanella era un duplicato dell'Inbox
+                  mostrato nel topbar dell'app. */}
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 <Search size={13} className="text-gray-400" />
-                <Bell size={13} className="text-gray-400" />
               </div>
             </div>
 
@@ -527,11 +662,11 @@ export default function DashboardShowcase() {
                 È puramente rappresentativo: nessun puntatore, nessun focus,
                 nessuna semantica per gli screen reader. */}
             <div
-              className="flex min-h-[720px] text-left select-none pointer-events-none"
+              className="flex min-h-[560px] max-h-[620px] text-left select-none pointer-events-none"
               aria-hidden="true"
               inert
             >
-              <PreviewSidebar t={t} />
+              <PreviewSidebar t={t} language={language} />
               <div className="flex min-w-0 flex-1 flex-col bg-zinc-50">
                 <PreviewTopbar />
                 <div className="p-3 md:p-6">
@@ -549,10 +684,12 @@ export default function DashboardShowcase() {
 
                       <TodayFocusWidget
                         focus={t("dash.demoFocus", "Chiudere la proposta Alpha entro venerdì")}
-                        completionRate={63}
-                        criticalCount={3}
-                        activeGoalsCount={2}
-                        completedCount={3}
+                        completionRate={Math.round(
+                          (doneTasks / DEMO_TASKS.length) * 100,
+                        )}
+                        criticalCount={criticalTasks.length}
+                        activeGoalsCount={activeGoals.length}
+                        completedCount={doneTasks}
                         gradientId="showcaseProgressGradient"
                         labels={{
                           focus: t("dash.focusToday", "Focus di Oggi"),
@@ -572,9 +709,7 @@ export default function DashboardShowcase() {
 
                       <div className="grid lg:grid-cols-2 gap-8">
                         <CriticalTasksWidget
-                          tasks={DEMO_TASKS.filter(
-                            (task) => task.priority === "Alta" && task.status !== "done",
-                          ).slice(0, 3)}
+                          tasks={criticalTasks.slice(0, 3)}
                           title={t("priorityHigh", "Task ad Alta Priorità")}
                           seeAllLabel={t("seeAll", "Vedi tutti")}
                           emptyLabel={t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
@@ -590,7 +725,7 @@ export default function DashboardShowcase() {
 
                       <div className="grid lg:grid-cols-2 gap-8">
                         <GoalProgressWidget
-                          goals={DEMO_GOALS.filter((goal) => !goal.completed).slice(0, 2)}
+                          goals={activeGoals.slice(0, 2)}
                           title={t("goalProgress", "Progresso Obiettivi")}
                           emptyLabel={t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
                         />

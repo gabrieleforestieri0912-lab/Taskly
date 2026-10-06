@@ -341,7 +341,7 @@ export default function Sidebar({
     setPendingDelete(null);
   };
 
-  const { rootNodes, childrenMap } = React.useMemo(() => {
+  const { rootNodes, childrenMap, favoriteNodes } = React.useMemo(() => {
     const quickPage = pages.find(
       (p) => p && p.id === "new-empty-page",
     );
@@ -363,7 +363,16 @@ export default function Sidebar({
         return String(a.label || "").localeCompare(String(b.label || ""));
       });
     }
-    return { rootNodes: map.get(null) || [], childrenMap: map };
+    // Starred pages, shown in the "Preferiti" section above the full tree.
+    const favoriteNodes = (pages || [])
+      .filter((p) => p && !p?.deleted && p.isFavorite)
+      .sort((a, b) => {
+        const ta = Date.parse(a.updatedAt || a.createdAt || "") || 0;
+        const tb = Date.parse(b.updatedAt || b.createdAt || "") || 0;
+        return tb - ta;
+      });
+
+    return { rootNodes: map.get(null) || [], childrenMap: map, favoriteNodes };
   }, [pages]);
 
   const handleOpenQuickPage = (pageId: string) => {
@@ -1415,6 +1424,38 @@ export default function Sidebar({
               body="Usa + per creare una pagina vuota o partire da un template."
               whileStepPending="create_page"
             />
+
+            {/* Preferiti: starred pages, most recent first. Rendered above the
+                full tree so they stay reachable without scrolling. */}
+            {favoriteNodes.length > 0 && (
+              <SidebarSection label={t("favorites", "Preferiti")}>
+                <ul
+                  className="space-y-0.5"
+                  role="list"
+                  aria-label={t("favorites", "Preferiti")}
+                >
+                  {favoriteNodes.map((page: any) => (
+                    <PageTreeItem
+                      key={`fav-${page.id}`}
+                      page={page}
+                      depth={0}
+                      indexInParent={0}
+                      childrenMap={new Map()}
+                      activePageId={activePageId}
+                      expandedPages={{}}
+                      onToggleExpand={() => {}}
+                      onAddSubpage={handleAddSubpage}
+                      onDeletePage={(id: string) => setPendingDelete({ id })}
+                      onUpdatePage={onUpdatePage}
+                      onDuplicatePage={handleDuplicatePage}
+                      onOpenPage={onOpenPage}
+                      showUpdatedAt={false}
+                    />
+                  ))}
+                </ul>
+              </SidebarSection>
+            )}
+
             <SidebarSection
               label={t("yourPages", "Privato")}
               onAdd={() => setIsModalOpen(true)}
