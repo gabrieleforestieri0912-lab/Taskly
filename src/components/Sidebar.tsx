@@ -16,8 +16,6 @@ import {
   LogOut,
   Settings,
   CreditCard,
-  Sun,
-  Moon,
   Palette,
   Check,
   CheckSquare,
@@ -105,13 +103,15 @@ export default function Sidebar({
   onOpenQuickPage = (pageId: string) => {},
   isSidebarOpen,
   setIsSidebarOpen,
+  // theme/toggleTheme: non più usati nei menu (impostazioni rapide rimosse),
+  // mantenuti per compatibilità con i chiamanti.
   theme,
   toggleTheme,
   loading = false,
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
 
   // Apri la scheda per la pagina di destinazione PRIMA di navigare, così la
   // tab esiste già quando cambia l'URL (nessun "buco" visivo nell'header).
@@ -466,77 +466,6 @@ export default function Sidebar({
         aria-label={t("nav.more", "Altro")}
         className="w-64 p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/80 dark:border-gray-800/80 text-gray-800 dark:text-gray-100"
       >
-        {/* Quick Settings: Tema & Lingua */}
-        <div className="p-2 mb-1.5 rounded-xl bg-gray-50/80 dark:bg-white/[0.03] border border-gray-100 dark:border-white/5 space-y-1.5">
-          <div className="flex items-center justify-between px-0.5">
-            <span className="text-[9px] font-black uppercase tracking-wider text-gray-400">
-              {t("quickSettings", "Aspetto & Lingua")}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-1.5">
-            {/* Theme Toggle */}
-            <div className="flex items-center bg-white dark:bg-gray-900 rounded-lg p-0.5 border border-gray-200/60 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => {
-                  if (theme !== "light" && toggleTheme) toggleTheme();
-                }}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-md text-xs font-bold transition-all ${
-                  theme === "light"
-                    ? "bg-[#7b39fc] text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-                title="Tema Chiaro"
-              >
-                <Sun size={11} />
-                <span className="text-[10px]">Chiaro</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (theme !== "dark" && toggleTheme) toggleTheme();
-                }}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-md text-xs font-bold transition-all ${
-                  theme === "dark"
-                    ? "bg-[#7b39fc] text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-                title="Tema Scuro"
-              >
-                <Moon size={11} />
-                <span className="text-[10px]">Scuro</span>
-              </button>
-            </div>
-
-            {/* Language Toggle */}
-            <div className="flex items-center bg-white dark:bg-gray-900 rounded-lg p-0.5 border border-gray-200/60 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => setLanguage("it")}
-                className={`flex-1 flex items-center justify-center py-1 rounded-md text-xs font-bold transition-all ${
-                  language === "it"
-                    ? "bg-cyan-600 text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-              >
-                <span className="text-[10px]">IT</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`flex-1 flex items-center justify-center py-1 rounded-md text-xs font-bold transition-all ${
-                  language === "en"
-                    ? "bg-cyan-600 text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-              >
-                <span className="text-[10px]">EN</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <button
           type="button"
           role="menuitem"
@@ -655,75 +584,6 @@ export default function Sidebar({
             <p className="text-[10px] text-gray-400 truncate mt-0.5">
               {user.email || "utente@esempio.it"}
             </p>
-          </div>
-        </div>
-
-        {/* Quick in-menu settings */}
-        <div className="p-2 rounded-2xl bg-gray-50/60 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/60 mb-2 space-y-1.5">
-          <span className="text-[9px] font-black uppercase tracking-wider text-gray-400 px-1">
-            {t("quickSettings", "Impostazioni Rapide")}
-          </span>
-
-          <div className="grid grid-cols-2 gap-1.5">
-            {/* Theme Toggle */}
-            <div className="flex items-center bg-white dark:bg-gray-900 rounded-xl p-0.5 border border-gray-200/60 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => {
-                  if (theme !== "light" && toggleTheme) toggleTheme();
-                }}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
-                  theme === "light"
-                    ? "bg-[#7b39fc] text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-                title="Tema Chiaro"
-              >
-                <Sun size={12} />
-                <span className="text-[10px]">Chiaro</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (theme !== "dark" && toggleTheme) toggleTheme();
-                }}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
-                  theme === "dark"
-                    ? "bg-[#7b39fc] text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-                title="Tema Scuro"
-              >
-                <Moon size={12} />
-                <span className="text-[10px]">Scuro</span>
-              </button>
-            </div>
-
-            {/* Language Toggle */}
-            <div className="flex items-center bg-white dark:bg-gray-900 rounded-xl p-0.5 border border-gray-200/60 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => setLanguage("it")}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
-                  language === "it"
-                    ? "bg-cyan-600 text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-              >
-                <span className="text-[10px]">IT</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-xs font-bold transition-all ${
-                  language === "en"
-                    ? "bg-cyan-600 text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                }`}
-              >
-                <span className="text-[10px]">EN</span>
-              </button>
-            </div>
           </div>
         </div>
 

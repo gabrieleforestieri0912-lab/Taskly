@@ -60,6 +60,7 @@
   larghezza (niente max-w nelle viste).
 - Titolo pagina: click diretto sul testo (niente bottone matita); picker icona
   con viste separate Emoji | Icone.
+- Niente impostazioni rapide nei menu dashboard (tema/lingua solo in /settings).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
