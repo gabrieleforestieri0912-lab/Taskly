@@ -1,8 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/rules-of-hooks */
-"use client";
-
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState } from "react";
 import {
@@ -242,21 +239,6 @@ export default function GoalsView({
   onIconChange,
 }) {
   const { t, tWith } = useLanguage();
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto space-y-8 pb-20">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-2xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
   const [input, setInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
@@ -347,6 +329,24 @@ export default function GoalsView({
     };
     setData(findAndToggle(data));
   };
+
+  // Skeleton solo dopo tutti gli hook: l'ordine degli hook non deve mai
+  // cambiare tra un render e l'altro (Rules of Hooks).
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-8 pb-20">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-20">

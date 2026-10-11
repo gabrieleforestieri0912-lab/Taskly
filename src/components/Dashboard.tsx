@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   Card,
   CardContent,
   Badge,
   Button,
-  Skeleton,
-  SkeletonCard,
 } from "./UIComponents";
 import {
   Target,
@@ -63,13 +61,55 @@ export type { WidgetId };
 
 const STORAGE_KEY = "taskly_dashboard_custom_widgets_v2";
 
+const DEFAULT_VISIBILITY: Record<WidgetId, boolean> = {
+  quick_stats: true,
+  today_focus: true,
+  weekly_trend: true,
+  critical_tasks: true,
+  recent_ideas: true,
+  goal_progress: true,
+  quick_nav: true,
+  ai_insights: true,
+  tools_resources: true,
+};
+
+function readStoredConfig(): { order?: unknown; visibility?: unknown } {
+  try {
+    if (typeof window === "undefined") return {};
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return {};
+    const parsed = JSON.parse(saved);
+    return typeof parsed === "object" && parsed !== null ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function readWidgetOrder(): WidgetId[] {
+  const { order } = readStoredConfig();
+  if (Array.isArray(order) && order.length > 0) {
+    // Ensure all known widgets are present in the order list
+    return Array.from(new Set([...order, ...DEFAULT_WIDGET_ORDER])).filter(
+      (id): id is WidgetId => ALL_WIDGET_DEFS.some((def) => def.id === id),
+    );
+  }
+  return DEFAULT_WIDGET_ORDER;
+}
+
+function readWidgetVisibility(): Record<WidgetId, boolean> {
+  const { visibility } = readStoredConfig();
+  if (visibility && typeof visibility === "object") {
+    return { ...DEFAULT_VISIBILITY, ...(visibility as Record<string, boolean>) };
+  }
+  return { ...DEFAULT_VISIBILITY };
+}
+
 export default function Dashboard({
   tasks = [] as any[],
   goals = [] as any[],
   ideas = [] as any[],
   plannerMeta = {},
   pages = [] as any[],
-  loading = false,
   plan = null as any,
 }: {
   tasks?: any[];
@@ -77,7 +117,6 @@ export default function Dashboard({
   ideas?: any[];
   plannerMeta?: Record<string, any>;
   pages?: any[];
-  loading?: boolean;
   plan?: any;
 }) {
   const { t } = useLanguage();
@@ -88,49 +127,17 @@ export default function Dashboard({
   const safePlannerMeta =
     plannerMeta && typeof plannerMeta === "object" ? plannerMeta : {};
 
-  // Customization state
+  // Customization state — init lazy da localStorage (niente setState in
+  // effect: un render in meno all'avvio, analitiche subito visibili).
   const [isEditMode, setIsEditMode] = useState(false);
-  const [widgetOrder, setWidgetOrder] = useState<WidgetId[]>(DEFAULT_WIDGET_ORDER);
-  const [visibleWidgets, setVisibleWidgets] = useState<Record<WidgetId, boolean>>({
-    quick_stats: true,
-    today_focus: true,
-    weekly_trend: true,
-    critical_tasks: true,
-    recent_ideas: true,
-    goal_progress: true,
-    quick_nav: true,
-    ai_insights: true,
-    tools_resources: true,
-  });
+  const [widgetOrder, setWidgetOrder] = useState<WidgetId[]>(() =>
+    readWidgetOrder(),
+  );
+  const [visibleWidgets, setVisibleWidgets] = useState<
+    Record<WidgetId, boolean>
+  >(() => readWidgetVisibility());
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
-
-  // Load custom widgets config from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.order) && parsed.order.length > 0) {
-          // Ensure all known widgets are present in the order list
-          const uniqueOrder: WidgetId[] = Array.from(
-            new Set([...parsed.order, ...DEFAULT_WIDGET_ORDER]),
-          ).filter((id): id is WidgetId =>
-            ALL_WIDGET_DEFS.some((def) => def.id === id),
-          );
-          setWidgetOrder(uniqueOrder);
-        }
-        if (parsed.visibility && typeof parsed.visibility === "object") {
-          setVisibleWidgets((prev) => ({
-            ...prev,
-            ...parsed.visibility,
-          }));
-        }
-      }
-    } catch {
-      // ignore JSON parse error
-    }
-  }, []);
 
   // Save changes to localStorage
   const persistConfig = (
@@ -240,38 +247,8 @@ export default function Dashboard({
     persistConfig(DEFAULT_WIDGET_ORDER, defaultVis);
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto space-y-6 pb-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-4xl" />
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <Skeleton className="h-48 w-full rounded-[2.5rem]" />
-            <div className="grid md:grid-cols-2 gap-6">
-              <SkeletonCard />
-              <SkeletonCard />
-            </div>
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full rounded-4xl" />
-            <Skeleton className="h-32 w-full rounded-4xl" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Le analitiche si mostrano subito con i dati in memoria (anche vuoti):
+  // niente stato di caricamento, i numeri si aggiornano live all'arrivo dati.
 
   const todayStr = new Date().toISOString().split("T")[0];
   const todayFocus = safePlannerMeta[todayStr]?.focus || t("noFocus");

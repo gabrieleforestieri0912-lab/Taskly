@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @next/next/no-img-element */
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -1305,17 +1304,6 @@ export default function NotesView({
   minimalChrome = false,
 }) {
   const { t, tWith } = useLanguage();
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-8 pb-12">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <Skeleton className="h-72 w-full rounded-2xl" />
-      </div>
-    );
-  }
   const migrated = migrateOldData(data);
   const [blocks, setBlocks] = useState(migrated.blocks);
   const [tags, setTags] = useState(migrated.tags);
@@ -1595,6 +1583,20 @@ export default function NotesView({
     }
     return { ...b, number: num };
   });
+
+  // Skeleton solo dopo tutti gli hook: l'ordine degli hook non deve mai
+  // cambiare tra un render e l'altro (Rules of Hooks).
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8 pb-12">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <Skeleton className="h-72 w-full rounded-2xl" />
+      </div>
+    );
+  }
 
   return (
     <motion.div

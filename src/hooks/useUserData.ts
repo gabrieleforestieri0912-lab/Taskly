@@ -2,6 +2,27 @@ import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "../lib/api";
 import { normalizeIconKey } from "../lib/pageIcons";
 
+/** Cache locale delle pagine (soprattutto per gli ospiti senza account). */
+const PAGES_CACHE_KEY = "taskly_pages_v1";
+
+function loadPagesCache(): any[] {
+  if (typeof window === "undefined") return [];
+  try {
+    // Gli autenticati ricaricano dal server (fonte di verità): il seed dalla
+    // cache vale solo per gli ospiti, così uno stato remoto più recente non
+    // viene mai sovrascritto da dati locali obsoleti.
+    if (localStorage.getItem("token")) return [];
+    const raw = localStorage.getItem(PAGES_CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((p) => p && p.id !== undefined && p.id !== null);
+      }
+    }
+  } catch {}
+  return [];
+}
+
 export function useUserData() {
   const [user, setUser] = useState<{
     name?: string;
@@ -12,7 +33,7 @@ export function useUserData() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
   const [ideas, setIdeas] = useState<any[]>([]);
-  const [pages, setPages] = useState<any[]>([]);
+  const [pages, setPages] = useState<any[]>(loadPagesCache);
   const [plannerMeta, setPlannerMeta] = useState<Record<string, any>>({});
   const [plan, setPlan] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
@@ -90,6 +111,17 @@ export function useUserData() {
     setUser(JSON.parse(savedUser));
     fetchUserData(token);
   }, [fetchUserData]);
+
+  // Persiste le pagine in locale a ogni modifica: al reload le pagine aperte
+  // (e le tab che le referenziano) ci sono ancora. Il server resta fonte di
+  // verità per gli autenticati; per gli ospiti la cache È il dato.
+  useEffect(() => {
+    try {
+      localStorage.setItem(PAGES_CACHE_KEY, JSON.stringify(pages));
+    } catch {
+      // Quota esaurita o JSON non serializzabile: si continua senza cache.
+    }
+  }, [pages]);
 
   return {
     user,

@@ -1,8 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/rules-of-hooks */
-"use client";
-
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -296,6 +293,11 @@ const recurrences = [
   { id: "annuale", label: "Annuale" },
 ];
 
+/** Id univoco per nuovi task/subtask (fuori dal render: funzione pura dal punto di vista di React). */
+function newTaskId(): string {
+  return Math.random().toString(36).substring(2, 9);
+}
+
 export default function ItemList({
   title,
   items = [] as any[],
@@ -308,42 +310,6 @@ export default function ItemList({
   onIconChange,
 }) {
   const { t, tWith } = useLanguage();
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto space-y-6 pb-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-          <div className="w-full md:w-1/2 flex items-center gap-3">
-            <Skeleton className="h-10 flex-1 rounded-xl" />
-            <Skeleton className="h-10 w-10 rounded-xl" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-4xl" />
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <Skeleton className="h-48 w-full rounded-[2.5rem]" />
-            <div className="grid md:grid-cols-2 gap-6">
-              <Skeleton className="w-full h-32" />
-              <Skeleton className="w-full h-32" />
-            </div>
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full rounded-4xl" />
-            <Skeleton className="h-32 w-full rounded-4xl" />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const [view, setView] = useState(defaultView || "list");
   const [input, setInput] = useState("");
@@ -416,7 +382,7 @@ export default function ItemList({
 
   const createTask = (title, status = "todo") => {
     const newItem = {
-      id: Math.random().toString(36).substring(2, 9),
+      id: newTaskId(),
       title,
       priority: priority,
       status,
@@ -495,7 +461,7 @@ export default function ItemList({
     if (!title) return;
     const subtasks = [...(items.find((i) => i.id === taskId)?.subtasks || [])];
     subtasks.push({
-      id: Math.random().toString(36).substring(2, 9),
+      id: newTaskId(),
       title,
       done: false,
     });
@@ -526,7 +492,7 @@ export default function ItemList({
       comments: [
         ...(t?.comments || []),
         {
-          id: Math.random().toString(36).substring(2, 9),
+          id: newTaskId(),
           author: "Utente",
           text,
           createdAt: new Date().toISOString(),
@@ -558,6 +524,45 @@ export default function ItemList({
 
   const selectedPriority =
     priorities.find((p) => p.id === priority) || priorities[1];
+
+  // Skeleton solo dopo tutti gli hook: l'ordine degli hook non deve mai
+  // cambiare tra un render e l'altro (Rules of Hooks).
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6 pb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <div className="w-full md:w-1/2 flex items-center gap-3">
+            <Skeleton className="h-10 flex-1 rounded-xl" />
+            <Skeleton className="h-10 w-10 rounded-xl" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-4xl" />
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <Skeleton className="h-48 w-full rounded-[2.5rem]" />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Skeleton className="w-full h-32" />
+              <Skeleton className="w-full h-32" />
+            </div>
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-64 w-full rounded-4xl" />
+            <Skeleton className="h-32 w-full rounded-4xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-10">

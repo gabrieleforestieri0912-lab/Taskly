@@ -53,6 +53,9 @@
   con riga scrivibile finale. Mai appiattire i dati in checkbox: i dati vivono
   nel blocco (items/goals/schedule). Vale per template, progetti, onboarding e
   tipi base (tranne braindump/empty strutturati).
+- Pagine ospite in `taskly_pages_v1` (seed solo senza token); analitiche senza
+  skeleton (render immediato); MAI hook dopo early return (già causato warning
+  Hooks order: gate `loading` sempre dopo tutti gli hook).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

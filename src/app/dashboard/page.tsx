@@ -256,7 +256,18 @@ function DashboardContent() {
       const parsed = JSON.parse(
         localStorage.getItem("dashboardOpenTabs") || "[]",
       );
-      if (Array.isArray(parsed)) setOpenTabs(parsed);
+      if (Array.isArray(parsed)) {
+        if (!localStorage.getItem("token")) {
+          // Ospite: le pagine vivono nella cache locale — al reload scarta le
+          // tab che non puntano più a nessuna pagina esistente.
+          const known = new Set(
+            (Array.isArray(pages) ? pages : []).map((p) => String(p?.id)),
+          );
+          setOpenTabs(parsed.filter((t) => t && known.has(String(t?.id))));
+        } else {
+          setOpenTabs(parsed);
+        }
+      }
     } catch {
       // ignore malformed localStorage
     }
@@ -1307,7 +1318,6 @@ function DashboardContent() {
           ideas={ideas}
           plannerMeta={plannerMeta}
           pages={pages}
-          loading={loading}
           plan={plan}
         />
       </>
