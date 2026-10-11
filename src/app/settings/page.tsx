@@ -1056,7 +1056,7 @@ function SettingsContent() {
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {subscription?.plan === "Pro"
                           ? "Accesso illimitato a pagine, IA generativa e trascrizione vocale."
-                          : "Piano base con limite di 5 pagine e strumenti essenziali."}
+                          : "Piano base con pagine illimitate e strumenti essenziali."}
                       </p>
                     </div>
 

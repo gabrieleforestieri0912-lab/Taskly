@@ -13,9 +13,10 @@ interface Plan {
 }
 
 const PLANS: Record<string, Plan> = {
-  starter: { id: "starter", name: "Starter", maxPages: 3, maxMembers: 1 },
-  pro: { id: "pro", name: "Pro", maxPages: 50, maxMembers: 5 },
-  team: { id: "team", name: "Business", maxPages: 500, maxMembers: 20 },
+  // Creazione pagine illimitata su tutti i piani (nessun limite maxPages).
+  starter: { id: "starter", name: "Starter", maxPages: null, maxMembers: 1 },
+  pro: { id: "pro", name: "Pro", maxPages: null, maxMembers: 5 },
+  team: { id: "team", name: "Business", maxPages: null, maxMembers: 20 },
   enterprise: {
     id: "enterprise",
     name: "Enterprise",
