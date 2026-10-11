@@ -38,3 +38,18 @@
 - Verifica sempre con `tsc --noEmit` ed `eslint` sui file toccati prima di chiudere.
 - Preferisci `edit` su file esistenti; nuovi file solo se necessario.
 - Mai indovinare URL o ID modello; mai committare `.env`.
+
+## Bug risolti (non reintrodurre)
+- `Sidebar.tsx`: mai usare una variabile prima della sua dichiarazione `const`
+  (TDZ ReferenceError scattava solo con ≥1 pagina, cioè a ogni creazione pagina).
+  Verificato con Playwright reale su tutti i template prima di chiudere.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

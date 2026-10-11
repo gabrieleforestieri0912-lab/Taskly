@@ -111,7 +111,6 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const currentPage = pages.find((p) => String(p.id) === String(activePageId));
   const { t, language, setLanguage } = useLanguage();
 
   // Apri la scheda per la pagina di destinazione PRIMA di navigare, così la
