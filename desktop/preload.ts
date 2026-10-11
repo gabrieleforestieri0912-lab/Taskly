@@ -12,6 +12,7 @@ declare global {
     electronAPI: {
       platform: NodeJS.Platform;
       isElectron: boolean;
+      openExternal: (url: string) => Promise<void>;
       sendBadgeUpdate: (state: BadgeState) => void;
       showBadge: () => void;
       hideBadge: () => void;
@@ -26,6 +27,9 @@ declare global {
 contextBridge.exposeInMainWorld("electronAPI", {
   platform: process.platform,
   isElectron: true,
+  // Apre un URL nel browser di sistema (login Google via web)
+  openExternal: (url: string) =>
+    ipcRenderer.invoke("auth:open-external", url),
   // Badge overlay (finestra always-on-top in alto al centro)
   sendBadgeUpdate: (state: BadgeState) =>
     ipcRenderer.send("badge:update", state),

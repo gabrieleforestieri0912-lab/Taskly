@@ -67,6 +67,7 @@ import { getCatalogIcon } from "../../lib/lucideCatalog";
 import { useLanguage } from "../../lib/LanguageContext";
 import { applyTheme, readTheme } from "../../lib/theme";
 import { PageTemplate, saveCustomTemplate } from "../../lib/templates";
+import { toEditablePageTemplate } from "../../lib/templateToBlocks";
 import {
   hardDeletePageCascade,
   purgeExpiredPages,
@@ -488,9 +489,10 @@ function DashboardContent() {
       return;
     }
     // For empty pages we want an empty label so the title shows a placeholder
-    // and we can enter edit mode immediately.
+    // and we can enter edit mode immediately — MA solo se non è stato passato
+    // un titolo (es. template/progetti convertiti in pagina modificabile).
     const pageLabel =
-      pageType === "empty" ? "" : pageConfig.label || "Nuova Pagina";
+      pageConfig.label || (pageType === "empty" ? "" : "Nuova Pagina");
     const newPageId =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -2211,20 +2213,23 @@ const ensureTab = React.useCallback((page: any) => {
             saveTasksToStorage([firstTask, ...existingTasks]);
             trackOnboardingEvent("task_created");
           }
-          // Pagina da template solo se l'utente non ha gia' pagine
+          // Pagina da template solo se l'utente non ha gia' pagine.
+          // Come la Pagina Vuota: i template/progetti nascono come pagine
+          // libere modificabili (blocchi), così l'utente ha più scelta.
           if (selectedTemplate && !skippedSteps.includes("create_page")) {
             const newPageId = typeof crypto !== "undefined" && crypto.randomUUID
               ? crypto.randomUUID()
               : `page_${Date.now()}`;
+            const editable = toEditablePageTemplate(JSON.parse(JSON.stringify(selectedTemplate)));
             const newPage = {
               id: newPageId,
-              label: selectedTemplate.title,
-              type: selectedTemplate.type,
-              icon: selectedTemplate.icon,
-              iconColor: selectedTemplate.iconColor,
+              label: (editable as any).title || "Nuova pagina",
+              type: (editable as any).type,
+              icon: (editable as any).icon,
+              iconColor: (editable as any).iconColor,
               parentId: null,
               order: 0,
-              data: selectedTemplate.data,
+              data: JSON.parse(JSON.stringify((editable as any).data)),
               deleted: false,
               createdAt: new Date().toISOString(),
             };
@@ -2247,6 +2252,8 @@ const ensureTab = React.useCallback((page: any) => {
           const newPageId = typeof crypto !== "undefined" && crypto.randomUUID
             ? crypto.randomUUID()
             : `page_${Date.now()}`;
+          // Il modal converte già in pagina modificabile quando il toggle è
+          // attivo; qui si clona in profondità per non riusare gli stessi id.
           const newPage = {
             id: newPageId,
             label: template.title,
@@ -2255,7 +2262,7 @@ const ensureTab = React.useCallback((page: any) => {
             iconColor: template.iconColor,
             parentId: null,
             order: Date.now(),
-            data: template.data,
+            data: JSON.parse(JSON.stringify(template.data)),
             deleted: false,
             createdAt: new Date().toISOString(),
           };

@@ -1,5 +1,5 @@
 // main.ts
-import { app, BrowserWindow, ipcMain, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen, shell } from "electron";
 import * as path from "path";
 import * as http from "http";
 
@@ -119,8 +119,7 @@ function setupAudioDetection(): void {
 }
 
 // IPC renderer <-> badge
-function setupBadgeIPC(): void {
-  ipcMain.on("badge:update", (_event, state) => {
+function setupBadgeIPC(): void {  ipcMain.on("badge:update", (_event, state) => {
     if (!badgeWindow || badgeWindow.isDestroyed()) createBadgeWindow();
     sendToBadge("badge:update", state || {});
     // Mostra il badge per ogni stato attivo, nascondilo solo su idle esplicito
@@ -145,6 +144,17 @@ function setupBadgeIPC(): void {
     try {
       badgeWindow?.hide();
     } catch {}
+  });
+}
+
+// Apre URL nel browser di sistema (usato per il login Google via web:
+// Google blocca i webview embedded di Electron con 403 disallowed_useragent).
+function setupAuthIPC(): void {
+  ipcMain.handle("auth:open-external", async (_event, url: unknown) => {
+    if (typeof url !== "string" || !/^https:\/\//.test(url)) {
+      throw new Error("URL esterno non valido");
+    }
+    await shell.openExternal(url);
   });
 }
 
@@ -246,6 +256,7 @@ app.whenReady().then(async () => {
   console.log(`[Electron Main] App ready. Running in ${isDev ? "DEVELOPMENT" : "PRODUCTION"} mode.`);
 
   setupBadgeIPC();
+  setupAuthIPC();
   createBadgeWindow();
 
   // In production, start the servers from Electron itself

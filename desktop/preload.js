@@ -6,6 +6,8 @@ const electron_1 = require("electron");
 electron_1.contextBridge.exposeInMainWorld("electronAPI", {
     platform: process.platform,
     isElectron: true,
+    // Apre un URL nel browser di sistema (login Google via web)
+    openExternal: (url) => electron_1.ipcRenderer.invoke("auth:open-external", url),
     // Badge overlay (finestra always-on-top in alto al centro)
     sendBadgeUpdate: (state) => electron_1.ipcRenderer.send("badge:update", state),
     showBadge: () => electron_1.ipcRenderer.send("badge:show"),

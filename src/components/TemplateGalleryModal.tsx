@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageTemplate, loadAllTemplates } from "../lib/templates";
+import { toEditablePageTemplate } from "../lib/templateToBlocks";
 
 interface TemplateGalleryModalProps {
   isOpen: boolean;
@@ -43,6 +44,12 @@ export default function TemplateGalleryModal({
   const [selectedCategory, setSelectedCategory] = useState<string>("Tutti");
   const [searchQuery, setSearchQuery] = useState("");
   const [previewingTemplate, setPreviewingTemplate] = useState<PageTemplate | null>(null);
+  // Come la Pagina Vuota: i template/progetti nascono come pagine libere
+  // modificabili (blocchi). Disattivando si crea la vista strutturata originale.
+  const [editableMode, setEditableMode] = useState(true);
+
+  const toEffective = (tpl: PageTemplate): PageTemplate =>
+    editableMode ? toEditablePageTemplate(JSON.parse(JSON.stringify(tpl))) : tpl;
 
   useEffect(() => {
     if (isOpen) {
@@ -72,6 +79,8 @@ export default function TemplateGalleryModal({
   }, [templates, selectedCategory, searchQuery]);
 
   if (!isOpen) return null;
+
+  const effectivePreview = previewingTemplate ? toEffective(previewingTemplate) : null;
 
   const renderIcon = (iconName: string, className = "w-5 h-5") => {
     switch (iconName) {
@@ -147,26 +156,31 @@ export default function TemplateGalleryModal({
         </div>
 
         {/* Modal Body */}
-        {previewingTemplate ? (
+        {effectivePreview ? (
           // ── Preview View ──────────────────────────────────────────────
           <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-between">
             <div className="max-w-2xl mx-auto w-full space-y-6">
               <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center ${previewingTemplate.iconColor}`}
+                  className={`w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center ${effectivePreview.iconColor}`}
                 >
-                  {renderIcon(previewingTemplate.icon, "w-6 h-6")}
+                  {renderIcon(effectivePreview.icon, "w-6 h-6")}
                 </div>
                 <div>
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-500">
-                    {previewingTemplate.category}
+                    {effectivePreview.category}
                   </span>
                   <h3 className="text-xl font-black text-gray-900 dark:text-white mt-1">
-                    {previewingTemplate.title}
+                    {effectivePreview.title}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {previewingTemplate.description}
+                    {effectivePreview.description}
                   </p>
+                  {editableMode && (
+                    <p className="text-[10px] font-bold text-[#7b39fc] mt-1 uppercase tracking-wider">
+                      Si apre come pagina libera modificabile
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -175,10 +189,9 @@ export default function TemplateGalleryModal({
                 <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                   Contenuto del template:
                 </div>
-                {previewingTemplate.type === "notes" &&
-                previewingTemplate.data?.blocks ? (
+                {effectivePreview.data?.blocks ? (
                   <div className="space-y-2">
-                    {previewingTemplate.data.blocks.map((b: any) => (
+                    {effectivePreview.data.blocks.slice(0, 30).map((b: any) => (
                       <div key={b.id} className="text-xs text-gray-700 dark:text-gray-200">
                         {b.type === "h1" && (
                           <div className="text-base font-bold text-gray-900 dark:text-white pt-1">
@@ -223,9 +236,9 @@ export default function TemplateGalleryModal({
                       </div>
                     ))}
                   </div>
-                ) : Array.isArray(previewingTemplate.data) ? (
+                ) : Array.isArray(effectivePreview.data) ? (
                   <div className="space-y-2">
-                    {previewingTemplate.data.map((t: any) => (
+                    {effectivePreview.data.map((t: any) => (
                       <div
                         key={t.id}
                         className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-xs"
@@ -240,7 +253,7 @@ export default function TemplateGalleryModal({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-xs text-gray-400">Contenuto pronto per l'uso.</div>
+                  <div className="text-xs text-gray-400">Contenuto pronto per l&apos;uso.</div>
                 )}
               </div>
             </div>
@@ -255,12 +268,12 @@ export default function TemplateGalleryModal({
               </button>
               <button
                 onClick={() => {
-                  onSelectTemplate(previewingTemplate);
+                  onSelectTemplate(toEffective(previewingTemplate!));
                   onClose();
                 }}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:brightness-110 shadow-md shadow-[#7b39fc]/20 transition-all"
               >
-                <span>Usa questo template</span>
+                <span>{editableMode ? "Usa come pagina modificabile" : "Usa questo template"}</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -268,6 +281,29 @@ export default function TemplateGalleryModal({
         ) : (
           // ── Gallery Grid View ──────────────────────────────────────────
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Toggle pagina modificabile */}
+            <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-[#7b39fc]/5 border border-[#7b39fc]/15">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-gray-800 dark:text-gray-100 leading-tight">
+                  {editableMode ? "Pagina libera modificabile (come Pagina Vuota)" : "Vista strutturata originale"}
+                </p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-snug">
+                  {editableMode
+                    ? "Template e progetti si aprono con blocchi liberi: più scelta di personalizzazione."
+                    : "Template e progetti usano la vista classica del loro tipo."}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={editableMode}
+                onClick={() => setEditableMode((v) => !v)}
+                className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${editableMode ? "bg-[#7b39fc]" : "bg-gray-300 dark:bg-gray-700"}`}
+                title={editableMode ? "Disattiva pagina modificabile" : "Attiva pagina modificabile"}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${editableMode ? "left-[18px]" : "left-0.5"}`} />
+              </button>
+            </div>
             {/* Search & Categories Bar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               {/* Category pills */}
@@ -341,7 +377,7 @@ export default function TemplateGalleryModal({
                     </button>
                     <button
                       onClick={() => {
-                        onSelectTemplate(template);
+                        onSelectTemplate(toEffective(template));
                         onClose();
                       }}
                       className="flex-1 py-1.5 rounded-xl text-xs font-bold text-white bg-[#7b39fc] hover:brightness-110 shadow-sm transition-all"

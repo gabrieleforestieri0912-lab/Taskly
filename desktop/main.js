@@ -179,6 +179,16 @@ function setupBadgeIPC() {
         catch { }
     });
 }
+// Apre URL nel browser di sistema (usato per il login Google via web:
+// Google blocca i webview embedded di Electron con 403 disallowed_useragent).
+function setupAuthIPC() {
+    electron_1.ipcMain.handle("auth:open-external", async (_event, url) => {
+        if (typeof url !== "string" || !/^https:\/\//.test(url)) {
+            throw new Error("URL esterno non valido");
+        }
+        await electron_1.shell.openExternal(url);
+    });
+}
 // Function to start the Express backend server (port 5000)
 function startBackendServer() {
     try {
@@ -267,6 +277,7 @@ function createWindow() {
 electron_1.app.whenReady().then(async () => {
     console.log(`[Electron Main] App ready. Running in ${isDev ? "DEVELOPMENT" : "PRODUCTION"} mode.`);
     setupBadgeIPC();
+    setupAuthIPC();
     createBadgeWindow();
     // In production, start the servers from Electron itself
     if (!isDev) {

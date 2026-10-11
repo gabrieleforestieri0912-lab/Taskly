@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock, User } from "lucide-react";
 import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
+import GoogleWebLoginButton from "../components/GoogleWebLoginButton";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -41,24 +41,8 @@ export default function RegisterPage() {
     }
   };
 
-  const handleGoogleRegister = async (credentialResponse) => {
-    setError("");
-    setSuccess("");
-    setLoading(true);
-
-    try {
-      const response = await axios.post("/api/auth/google", {
-        credential: credentialResponse.credential,
-      });
-
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      router.push("/dashboard");
-    } catch (err) {
-      setError(err.response?.data?.message || "Registrazione con Google fallita. Riprova.");
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleError = (message: string) => {
+    setError(message || "Registrazione con Google fallita. Riprova.");
   };
 
   return (
@@ -164,22 +148,11 @@ export default function RegisterPage() {
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
-              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleRegister}
-                    onError={() => setError("Registrazione Google annullata o non riuscita.")}
-                    theme="outline"
-                    size="large"
-                    shape="pill"
-                    text="signup_with"
-                  />
-                </div>
-              ) : (
-                <p className="text-center text-xs text-amber-600 dark:text-amber-400">
-                  Google Sign-up non disponibile: configura `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
-                </p>
-              )}
+              {/* Registrazione Google via browser web esterno (il webview di
+                  Electron è bloccato da Google). */}
+              <div className="flex justify-center">
+                <GoogleWebLoginButton text="signup_with" onError={handleGoogleError} />
+              </div>
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700/50 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">

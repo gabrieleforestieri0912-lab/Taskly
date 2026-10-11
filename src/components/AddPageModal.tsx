@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./UIComponents";
+import { toEditableQuickTemplate } from "../lib/templateToBlocks";
 
 const PAGE_TYPES = [
   {
@@ -246,6 +247,10 @@ const TEMPLATES = [
 export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGallery }) {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("types");
+  // I template/progetti nascono come pagine libere modificabili (come la
+  // Pagina Vuota): contenuto già pronto ma ogni blocco è spostabile,
+  // eliminabile e personalizzabile. Disattivando si usa la vista strutturata.
+  const [editableMode, setEditableMode] = useState(true);
 
   // Blocca lo scroll della pagina quando il modale è aperto
   React.useEffect(() => {
@@ -260,6 +265,13 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
   }, [isOpen]);
 
   const handleAdd = (payload) => {
+    // Template e progetti: se la modalità modificabile è attiva, converte il
+    // contenuto strutturato in blocchi liberi di tipo "empty" (come la Pagina
+    // Vuota), così l'utente ha molta più scelta di personalizzazione.
+    if (payload?.isTemplate && editableMode && payload?.type !== "empty") {
+      onAdd(toEditableQuickTemplate(payload));
+      return;
+    }
     onAdd(payload);
   };
 
@@ -344,6 +356,30 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
                   exit={{ opacity: 0, x: -10 }}
                   className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-3"
                 >
+                  <div className="col-span-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-cyan-50/60 dark:bg-cyan-900/10 border border-cyan-100 dark:border-cyan-900/30">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-gray-800 dark:text-gray-100 leading-tight">
+                        {editableMode ? "Pagina libera modificabile" : "Vista strutturata originale"}
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-snug">
+                        {editableMode
+                          ? "Il template nasce come Pagina Vuota: ogni blocco si può modificare liberamente."
+                          : "Il template usa la vista classica (task, obiettivi, planner)."}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={editableMode}
+                      onClick={() => setEditableMode((v) => !v)}
+                      className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${editableMode ? "bg-cyan-500" : "bg-gray-300 dark:bg-gray-700"}`}
+                      title={editableMode ? "Disattiva pagina modificabile" : "Attiva pagina modificabile"}
+                    >
+                      <span
+                        className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${editableMode ? "left-[18px]" : "left-0.5"}`}
+                      />
+                    </button>
+                  </div>
                   {TEMPLATES.map((tpl) => (
                     <button
                       key={tpl.id}
@@ -359,7 +395,7 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
                         <p className="font-bold text-sm text-gray-900 dark:text-white">
                           {tpl.label}
                         </p>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-cyan-500 transition-colors">{t("views.addPageUse")}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-cyan-500 transition-colors">{editableMode ? "Usa come pagina modificabile" : t("views.addPageUse")}</span>
                       </div>
                       <Sparkles
                         size={14}
