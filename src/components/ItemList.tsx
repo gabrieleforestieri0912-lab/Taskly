@@ -11,9 +11,9 @@ import {
   Button,
   Input,
   Badge,
-  EditableTitle,
   Skeleton,
 } from "./UIComponents";
+import PageHeader from "./PageHeader";
 import {
   Plus,
   Trash2,
@@ -304,6 +304,8 @@ export default function ItemList({
   allPages = [] as any[],
   defaultView,
   loading = false,
+  page,
+  onIconChange,
 }) {
   const { t, tWith } = useLanguage();
   if (loading) {
@@ -559,6 +561,15 @@ export default function ItemList({
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-10">
+      {/* Titolo + icona pagina (come nelle note) */}
+      {onRename && page && (
+        <PageHeader
+          page={page}
+          title={title}
+          onRename={(next) => onRename(next)}
+          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+        />
+      )}
       {/* View Switcher moved below */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
         {/* Dynamic Column Creator Popover */}

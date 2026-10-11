@@ -46,6 +46,8 @@
 - Mobile web (verifica a 390px con Playwright): sidebar chiusa di default sotto
   768px + auto-chiusura dopo navigazione; toolbar ItemList scrollabili;
   blocchi NotesView con textarea auto-growing (niente più testo tagliato).
+- Header pagina (PageHeader: icona + titolo modificabili) presente in tutte le
+  viste: notes/empty, tasks, goals, calendar, braindump.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

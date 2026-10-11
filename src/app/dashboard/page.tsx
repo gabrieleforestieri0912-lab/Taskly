@@ -1012,6 +1012,13 @@ function DashboardContent() {
             allPages={pages}
             defaultView={defaultView}
             loading={loading}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
           />,
         );
       }
@@ -1026,6 +1033,13 @@ function DashboardContent() {
               updatePage(effectivePage.id, { label: nextTitle })
             }
             loading={loading}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
           />,
         );
       }
@@ -1062,6 +1076,13 @@ function DashboardContent() {
               updatePage(effectivePage.id, { label: nextTitle })
             }
             loading={loading}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
           />,
         );
       }
@@ -1104,6 +1125,13 @@ function DashboardContent() {
             }
             allPages={pages}
             loading={loading}
+            page={effectivePage}
+            onIconChange={(icon, iconColor) =>
+              updatePage(
+                effectivePage.id,
+                iconColor ? { icon, iconColor } : { icon },
+              )
+            }
             onConvertToTask={(idea, targetPageId) => {
               const target = pages.find(
                 (page) => String(page.id) === String(targetPageId),

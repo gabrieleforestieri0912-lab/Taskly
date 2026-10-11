@@ -7,9 +7,9 @@ import {
   CardContent,
   Button,
   Badge,
-  EditableTitle,
   Skeleton,
 } from "./UIComponents";
+import PageHeader from "./PageHeader";
 import {
   ChevronLeft,
   ChevronRight,
@@ -191,6 +191,8 @@ export default function CalendarView({
   setTasks,
   onRename,
   loading = false,
+  page,
+  onIconChange,
 }) {
   const { t, tWith } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -380,6 +382,15 @@ export default function CalendarView({
 
   return (
     <div className="space-y-8 pb-12">
+      {/* Titolo + icona pagina (come nelle note) */}
+      {onRename && page && (
+        <PageHeader
+          page={page}
+          title={title}
+          onRename={(next) => onRename(next)}
+          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+        />
+      )}
       <div className="flex justify-end mb-4">
         <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 p-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex-wrap">
           <Button variant="ghost" size="icon" onClick={() => nav(-1)}>

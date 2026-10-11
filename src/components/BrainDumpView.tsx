@@ -7,9 +7,9 @@ import {
   CardContent,
   Button,
   Badge,
-  EditableTitle,
   Skeleton,
 } from "./UIComponents";
+import PageHeader from "./PageHeader";
 import {
   Plus,
   Trash2,
@@ -65,6 +65,8 @@ export default function BrainDumpView({
   allPages = [] as any[],
   onConvertToTask,
   loading = false,
+  page,
+  onIconChange,
 }) {
   const { t } = useLanguage();
   // Hooks must be called unconditionally (before any early return) so the
@@ -113,6 +115,15 @@ export default function BrainDumpView({
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-20">
+      {/* Titolo + icona pagina (come nelle note) */}
+      {onRename && page && (
+        <PageHeader
+          page={page}
+          title={title}
+          onRename={(next) => onRename(next)}
+          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+        />
+      )}
       <div className="flex justify-end">
         <Badge variant="default" className="py-1 px-3">
           {data.length} Idee
