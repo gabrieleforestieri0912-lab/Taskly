@@ -1052,11 +1052,14 @@ function pageRowFromPayload(userId: string, page: any, order: number) {
   PAGE_META_KEYS.forEach((k) => {
     if (page[k] !== undefined) meta[k] = page[k];
   });
-  // Icona: "" = rimossa di proposito → salva NULL (nessuna icona).
-  // undefined/null = non specificata → lascia il default esistente in update,
+  // Icona: "" = rimossa di proposito → salva "" (stringa vuota).
+  // "" passa sia con la colonna nullable (migrazione applicata) sia con la
+  // colonna ancora NOT NULL (migrazione non applicata), dove NULL darebbe
+  // not_null_violation (500) e la pagina non verrebbe mai persistita.
+  // undefined/null = non specificata → default esistente in update,
   // "layout-dashboard" in insert. MAI forzare un fallback che resuscita l'icona.
   const iconValue =
-    page.icon === "" ? null : (page.icon ?? "layout-dashboard");
+    page.icon === "" ? "" : (page.icon ?? "layout-dashboard");
   return {
     id: String(page.id),
     user_id: userId,
@@ -1151,7 +1154,8 @@ async function updatePageRow(userId: string, id: string, patch: any) {
   if (patch.label !== undefined)
     updates.label = patch.label == null ? "" : String(patch.label);
   if (patch.icon !== undefined)
-    updates.icon = patch.icon === "" ? null : patch.icon;
+    // "" = icona rimossa → salva "" (sicuro sia con colonna nullable che NOT NULL).
+    updates.icon = patch.icon === "" ? "" : patch.icon;
   if (patch.iconColor !== undefined)
     updates.icon_color = patch.iconColor || "text-gray-400";
   if (patch.parentId !== undefined)
