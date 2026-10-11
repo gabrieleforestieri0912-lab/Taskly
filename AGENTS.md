@@ -48,6 +48,11 @@
   blocchi NotesView con textarea auto-growing (niente più testo tagliato).
 - Header pagina (PageHeader: icona + titolo modificabili) presente in tutte le
   viste: notes/empty, tasks, goals, calendar, braindump.
+- Architettura pagine: ogni pagina è testo libero + componenti incorporati
+  (tasks-embed ItemList, goals-embed GoalsView, planner-embed CalendarView),
+  con riga scrivibile finale. Mai appiattire i dati in checkbox: i dati vivono
+  nel blocco (items/goals/schedule). Vale per template, progetti, onboarding e
+  tipi base (tranne braindump/empty strutturati).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

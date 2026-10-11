@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./UIComponents";
-import { toEditableQuickTemplate } from "../lib/templateToBlocks";
+import { toEditableQuickTemplate, baseTypeToBlocks } from "../lib/templateToBlocks";
 
 const PAGE_TYPES = [
   {
@@ -270,6 +270,18 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
     // Vuota), così l'utente ha molta più scelta di personalizzazione.
     if (payload?.isTemplate && editableMode && payload?.type !== "empty") {
       onAdd(toEditableQuickTemplate(payload));
+      return;
+    }
+    // Tipi base: ogni pagina è un documento di testo normale con il componente
+    // specifico incorporato (lista task, obiettivi, planner) e sotto si può
+    // continuare a scrivere. Brain Dump ed Empty restano viste dedicate.
+    if (!payload?.isTemplate && ["tasks", "goals", "calendar"].includes(payload?.type)) {
+      onAdd({
+        ...payload,
+        type: "empty",
+        initialData: { blocks: baseTypeToBlocks(payload.type), tags: [] },
+        sourceType: payload.type,
+      });
       return;
     }
     onAdd(payload);

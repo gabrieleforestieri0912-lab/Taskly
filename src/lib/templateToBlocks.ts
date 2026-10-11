@@ -1,10 +1,10 @@
 /**
  * templateToBlocks.ts
  * -------------------
- * Converte template / progetti strutturati (tasks, goals, calendar, notes)
- * in blocchi liberi modificabili come la "Pagina Vuota" (EmptyPageView /
- * NotesView a blocchi). Così l'utente parte da un contenuto già pronto ma
- * può aggiungere, spostare, colorare e cancellare ogni blocco liberamente.
+ * Ogni pagina Taskly è un documento di testo libero con componenti specifici
+ * incorporati (lista task, tracker obiettivi, planner): template, progetti e
+ * tipi base nascono come blocchi modificabili e sotto si può continuare a
+ * scrivere. I componenti incapsulano gli stessi dati delle viste strutturate.
  */
 
 function genId(prefix = "b"): string {
@@ -16,130 +16,92 @@ function genId(prefix = "b"): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function statusLabel(status?: string): string {
-  if (status === "done") return "Completato";
-  if (status === "doing") return "In corso";
-  return "Da fare";
+/** Blocco di testo vuoto finale: "sotto si può continuare a scrivere". */
+function trailingText(): any {
+  return { id: genId("t"), type: "text", content: "" };
 }
 
-function taskBlocksFromItems(label: string, items: any[]): any[] {
-  const blocks: any[] = [];
-  blocks.push({ id: genId("h"), type: "h1", content: label || "Progetto" });
-  blocks.push({
-    id: genId("t"),
-    type: "text",
-    content: "Parti da questa base già pronta e modificala liberamente: aggiungi, sposta o elimina blocchi come in una pagina vuota.",
-  });
-  if (!Array.isArray(items) || items.length === 0) {
-    blocks.push({ id: genId("h"), type: "h2", content: "✅ Da fare" });
-    blocks.push({ id: genId("c"), type: "checkbox", content: "Primo task da definire", checked: false });
-    return blocks;
-  }
-  const groups: Record<string, any[]> = { todo: [], doing: [], done: [] };
-  for (const it of items) {
-    const s = it?.status === "done" ? "done" : it?.status === "doing" ? "doing" : "todo";
-    groups[s].push(it);
-  }
-  const sections: Array<[string, string]> = [
-    ["todo", "📋 Da fare"],
-    ["doing", "🚧 In corso"],
-    ["done", "✅ Completati"],
-  ];
-  for (const [key, heading] of sections) {
-    const list = groups[key];
-    if (list.length === 0) continue;
-    blocks.push({ id: genId("h"), type: "h2", content: heading });
-    for (const it of list) {
-      const title = String(it?.title ?? "Attività senza titolo");
-      const meta: string[] = [];
-      if (it?.priority) meta.push(`Priorità ${it.priority}`);
-      if (it?.deadline) {
-        try {
-          meta.push(`Scadenza ${new Date(it.deadline).toLocaleDateString("it-IT")}`);
-        } catch {
-          meta.push(`Scadenza ${it.deadline}`);
-        }
-      }
-      if (it?.assignee) meta.push(`${it.assignee}`);
-      const content = meta.length > 0 ? `${title} — ${meta.join(" · ")}` : title;
-      blocks.push({
-        id: genId("c"),
-        type: "checkbox",
-        content,
-        checked: key === "done",
-      });
-      const subs = Array.isArray(it?.subtasks) ? it.subtasks : Array.isArray(it?.subGoals) ? it.subGoals : [];
-      for (const s of subs) {
-        const st = typeof s === "string" ? s : String(s?.title ?? "");
-        if (!st.trim()) continue;
-        const done = typeof s === "object" ? Boolean(s?.done ?? s?.completed) : false;
-        blocks.push({ id: genId("c"), type: "checkbox", content: `↳ ${st}`, checked: done });
-      }
-    }
-  }
-  blocks.push({ id: genId("d"), type: "divider", content: "" });
-  blocks.push({ id: genId("t"), type: "text", content: "💡 Suggerimento: digita / per aggiungere task calendar, habit tracker, toggle, video e molto altro." });
-  return blocks;
+function ensureTrailingWritable(blocks: any[]): any[] {
+  const last = blocks[blocks.length - 1];
+  if (last && last.type === "text" && !String(last.content || "").trim()) return blocks;
+  return [...blocks, trailingText()];
+}
+
+/** Normalizza una voce generica al formato atteso da ItemList. */
+function normalizeTaskItem(it: any): any {
+  const subs = Array.isArray(it?.subtasks) ? it.subtasks : [];
+  return {
+    id: String(it?.id ?? genId("task")),
+    title: String(it?.title ?? "Attività senza titolo"),
+    priority: it?.priority ?? "Media",
+    status: it?.status === "done" || it?.status === "doing" ? it.status : "todo",
+    deadline: it?.deadline ?? "",
+    assignee: it?.assignee ?? "",
+    subtasks: subs
+      .map((s: any) =>
+        typeof s === "string"
+          ? { id: genId("st"), title: s, done: false }
+          : { id: String(s?.id ?? genId("st")), title: String(s?.title ?? ""), done: Boolean(s?.done ?? s?.completed) },
+      )
+      .filter((s: any) => s.title.trim()),
+  };
+}
+
+/** Normalizza un nodo generico al formato atteso da GoalsView (ricorsivo). */
+function normalizeGoalNode(g: any, level = 0): any {
+  const subs = Array.isArray(g?.subGoals) ? g.subGoals : Array.isArray(g?.subtasks) ? g.subtasks : [];
+  return {
+    id: String(g?.id ?? genId("goal")),
+    title: String(g?.title ?? "Obiettivo senza titolo"),
+    category: g?.category ?? "generale",
+    completed: Boolean(g?.completed ?? g?.done),
+    deadline: g?.deadline ?? "",
+    level,
+    subGoals: subs.map((s: any) => (typeof s === "string" ? normalizeGoalNode({ title: s }, level + 1) : normalizeGoalNode(s, level + 1))),
+    createdAt: g?.createdAt ?? new Date().toISOString(),
+  };
+}
+
+function tasksToBlocks(label: string, items: any[]): any[] {
+  const list = Array.isArray(items) ? items.map(normalizeTaskItem) : [];
+  return ensureTrailingWritable([
+    { id: genId("h"), type: "h1", content: label || "Progetto" },
+    {
+      id: genId("t"),
+      type: "text",
+      content: "Base già pronta e modificabile: usa la lista qui sotto e continua a scrivere nelle righe successive.",
+    },
+    { id: genId("e"), type: "tasks-embed", content: "", items: list },
+  ]);
 }
 
 function goalsToBlocks(label: string, goals: any[]): any[] {
-  const blocks: any[] = [];
-  blocks.push({ id: genId("h"), type: "h1", content: label || "Obiettivi" });
-  blocks.push({
-    id: genId("t"),
-    type: "text",
-    content: "Obiettivi già strutturati e completamente modificabili: rinomina, spuntali o aggiungi nuovi blocchi.",
-  });
-  const walk = (nodes: any[], depth: number) => {
-    for (const g of nodes || []) {
-      const title = String(g?.title ?? "Obiettivo senza titolo");
-      const done = Boolean(g?.completed ?? g?.done);
-      if (depth === 0) {
-        blocks.push({ id: genId("h"), type: "h2", content: `🎯 ${title}` });
-        if (!g?.subGoals?.length) {
-          blocks.push({ id: genId("c"), type: "checkbox", content: title, checked: done });
-        }
-      } else {
-        blocks.push({ id: genId("c"), type: "checkbox", content: `${"↳ ".repeat(Math.min(depth, 2))}${title}`, checked: done });
-      }
-      if (Array.isArray(g?.subGoals) && g.subGoals.length > 0) walk(g.subGoals, depth + 1);
-    }
-  };
-  if (!Array.isArray(goals) || goals.length === 0) {
-    blocks.push({ id: genId("h"), type: "h2", content: "🎯 Primo obiettivo" });
-    blocks.push({ id: genId("c"), type: "checkbox", content: "Definisci il risultato che vuoi raggiungere", checked: false });
-  } else {
-    walk(goals, 0);
-  }
-  blocks.push({ id: genId("d"), type: "divider", content: "" });
-  blocks.push({ id: genId("t"), type: "text", content: "💡 Suggerimento: digita / per aggiungere nuovi tipi di blocco." });
-  return blocks;
+  const list = Array.isArray(goals) ? goals.map((g: any) => (typeof g === "string" ? normalizeGoalNode({ title: g }) : normalizeGoalNode(g))) : [];
+  return ensureTrailingWritable([
+    { id: genId("h"), type: "h1", content: label || "Obiettivi" },
+    {
+      id: genId("t"),
+      type: "text",
+      content: "Obiettivi già strutturati e modificabili qui sotto; usa le righe successive per note e dettagli.",
+    },
+    { id: genId("e"), type: "goals-embed", content: "", goals: list },
+  ]);
 }
 
 function calendarToBlocks(label: string, data: any): any[] {
-  const blocks: any[] = [];
-  blocks.push({ id: genId("h"), type: "h1", content: label || "Pianificazione" });
-  blocks.push({
-    id: genId("t"),
-    type: "text",
-    content: "Pianificazione settimanale pronta e modificabile come una pagina vuota.",
-  });
-  blocks.push({ id: genId("h"), type: "h2", content: "📅 Questa settimana" });
-  // Blocco calendar interattivo supportato da NotesView/EmptyPageView
-  blocks.push({ id: genId("cal"), type: "calendar", content: "", tasks: [] });
-  const tasks = Array.isArray(data?.tasks) ? data.tasks : [];
-  for (const t of tasks.slice(0, 10)) {
-    const title = typeof t === "string" ? t : String(t?.title ?? "");
-    if (!title.trim()) continue;
-    blocks.push({ id: genId("c"), type: "checkbox", content: title, checked: Boolean((t as any)?.done) });
-  }
-  if (tasks.length === 0) {
-    for (const day of ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì"]) {
-      blocks.push({ id: genId("h"), type: "h3", content: day });
-      blocks.push({ id: genId("c"), type: "checkbox", content: "Attività da pianificare", checked: false });
-    }
-  }
-  return blocks;
+  const schedule =
+    data && typeof data === "object" && (Array.isArray((data as any).tasks) || (data as any).dailyMeta)
+      ? { tasks: Array.isArray((data as any).tasks) ? (data as any).tasks : [], dailyMeta: (data as any).dailyMeta ?? {} }
+      : { tasks: [], dailyMeta: {} };
+  return ensureTrailingWritable([
+    { id: genId("h"), type: "h1", content: label || "Pianificazione" },
+    {
+      id: genId("t"),
+      type: "text",
+      content: "Planner pronto all'uso qui sotto; continua a scrivere nelle righe successive.",
+    },
+    { id: genId("e"), type: "planner-embed", content: "", schedule },
+  ]);
 }
 
 function markdownTextToBlocks(text: string): any[] {
@@ -172,8 +134,7 @@ function markdownTextToBlocks(text: string): any[] {
       blocks.push({ id: genId("d"), type: "divider", content: "" });
       continue;
     }
-    // Etichette "Chiave: valore" (Data:, Partecipanti:) -> testo semplice
-    blocks.push({ id: genId("t"), type: line.startsWith("**") || line.length < 80 ? "text" : "text", content: line });
+    blocks.push({ id: genId("t"), type: "text", content: line });
   }
   if (blocks.length === 0) blocks.push({ id: genId("t"), type: "text", content: "" });
   return blocks;
@@ -182,38 +143,54 @@ function markdownTextToBlocks(text: string): any[] {
 /** Converte qualsiasi initialData strutturato in { blocks, tags } modificabile. */
 export function toEditableBlocks(sourceType: string, initialData: any, label: string): { blocks: any[]; tags: string[] } {
   try {
-    // Già a blocchi (template notes / pagina vuota): riusa e rigenera gli id
+    // Già a blocchi: riusa rigenerando gli id, garantendo la riga scrivibile.
     if (initialData && typeof initialData === "object" && Array.isArray((initialData as any).blocks)) {
       const cloned = JSON.parse(JSON.stringify(initialData));
       cloned.blocks = (cloned.blocks as any[]).map((b: any) => ({ ...b, id: genId("b") }));
       if (!Array.isArray(cloned.blocks) || cloned.blocks.length === 0) {
         cloned.blocks = [{ id: genId("t"), type: "text", content: "" }];
       }
-      return { blocks: cloned.blocks, tags: Array.isArray(cloned.tags) ? cloned.tags : [] };
+      return { blocks: ensureTrailingWritable(cloned.blocks), tags: Array.isArray(cloned.tags) ? cloned.tags : [] };
     }
-    // Lista task / progetto (array)
+    // Lista task / progetto (array) → componente incorporato
     if (Array.isArray(initialData)) {
-      // Distingue goals (hanno subGoals/level) da tasks
       const looksLikeGoals = initialData.some((g: any) => g && (Array.isArray(g.subGoals) || typeof g.level === "number"));
       if (looksLikeGoals || sourceType === "goals") {
         return { blocks: goalsToBlocks(label, initialData), tags: [] };
       }
-      return { blocks: taskBlocksFromItems(label, initialData), tags: [] };
+      return { blocks: tasksToBlocks(label, initialData), tags: [] };
     }
-    // Planner / calendario
+    // Planner / calendario → componente incorporato
     if (initialData && typeof initialData === "object" && (Array.isArray((initialData as any).tasks) || (initialData as any).dailyMeta)) {
       return { blocks: calendarToBlocks(label, initialData), tags: [] };
     }
     // Note testuali classiche { text, tags }
     if (initialData && typeof initialData === "object" && typeof (initialData as any).text === "string") {
       const tags = Array.isArray((initialData as any).tags) ? (initialData as any).tags : [];
-      return { blocks: markdownTextToBlocks((initialData as any).text), tags };
+      return { blocks: ensureTrailingWritable(markdownTextToBlocks((initialData as any).text)), tags };
     }
     if (typeof initialData === "string") {
-      return { blocks: markdownTextToBlocks(initialData), tags: [] };
+      return { blocks: ensureTrailingWritable(markdownTextToBlocks(initialData)), tags: [] };
     }
   } catch {}
-  return { blocks: [{ id: genId("h"), type: "h1", content: label || "Nuova pagina" }, { id: genId("t"), type: "text", content: "" }], tags: [] };
+  return { blocks: [{ id: genId("h"), type: "h1", content: label || "Nuova pagina" }, trailingText()], tags: [] };
+}
+
+/** Blocchi iniziali per i tipi base scelti nel modal ("Blocchi Base"). */
+export function baseTypeToBlocks(type: string): any[] {
+  if (type === "tasks") {
+    return [{ id: genId("e"), type: "tasks-embed", content: "", items: [] }, trailingText()];
+  }
+  if (type === "goals") {
+    return [{ id: genId("e"), type: "goals-embed", content: "", goals: [] }, trailingText()];
+  }
+  if (type === "calendar") {
+    return [
+      { id: genId("e"), type: "planner-embed", content: "", schedule: { tasks: [], dailyMeta: {} } },
+      trailingText(),
+    ];
+  }
+  return [trailingText()];
 }
 
 /** Converte un PageTemplate (galleria / onboarding) in template di tipo "empty". Idempotente. */
@@ -230,5 +207,3 @@ export function toEditableQuickTemplate<T extends { type: string; initialData: a
   const blocksData = toEditableBlocks((tpl as any).type, (tpl as any).initialData, (tpl as any).label ?? "Nuova pagina");
   return { ...(tpl as any), type: "empty", initialData: blocksData, sourceType: (tpl as any).type } as any;
 }
-
-export { statusLabel };

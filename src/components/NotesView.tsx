@@ -44,6 +44,9 @@ import {
 import * as LucideIcons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import HabitTracker from "./HabitTracker";
+import ItemList from "./ItemList";
+import GoalsView from "./GoalsView";
+import CalendarView from "./CalendarView";
 import { track } from "../lib/activity";
 
 function getYouTubeEmbedUrl(url) {
@@ -66,6 +69,9 @@ const BLOCK_TYPES = [
   { type: "numbered", label: "Lista numerata", icon: ListOrdered, cmd: "/num" },
   { type: "toggle", label: "Toggle list", icon: ChevronRight, cmd: "/toggle" },
   { type: "calendar", label: "Task Calendar", icon: Calendar, cmd: "/cal" },
+  { type: "tasks-embed", label: "Lista task", icon: ListTodo, cmd: "/tasks" },
+  { type: "goals-embed", label: "Tracker obiettivi", icon: Target, cmd: "/goals" },
+  { type: "planner-embed", label: "Planner", icon: Calendar, cmd: "/planner" },
   { type: "habit", label: "Habit Tracker", icon: Activity, cmd: "/habit" },
   { type: "code", label: "Codice", icon: FileText, cmd: "/code" },
   { type: "youtube", label: "Video YouTube", icon: Video, cmd: "/yt" },
@@ -260,6 +266,12 @@ function createBlock(type) {
       return { ...base, src: "", alt: "", size: "" };
     case "habit":
       return { ...base, month: new Date().getMonth(), year: new Date().getFullYear() };
+    case "tasks-embed":
+      return { ...base, items: [] };
+    case "goals-embed":
+      return { ...base, goals: [] };
+    case "planner-embed":
+      return { ...base, schedule: { tasks: [], dailyMeta: {} } };
     default:
       return base;
   }
@@ -1059,11 +1071,58 @@ function BlockItem({
             </div>
           </div>
         ) : block.type === "habit" ? (
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="bg-white dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 rounded-2xl p-4">
               <HabitTracker
                 initialMonth={block.month}
                 initialYear={block.year}
+              />
+            </div>
+          </div>
+        ) : block.type === "tasks-embed" ? (
+          // Componente specifico incorporato: stessa lista task delle viste
+          // strutturate, con sotto righe di testo libere. Senza onRename/page
+          // l'header proprio resta nascosto (lo mostra già la pagina).
+          <div className="flex-1 min-w-0">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+              <ItemList
+                title={`embed_${block.id}`}
+                items={Array.isArray(block.items) ? block.items : []}
+                setItems={(next) => onUpdate(block.id, { items: Array.isArray(next) ? next : [] })}
+                onRename={undefined}
+                allPages={allPages}
+                defaultView="list"
+                loading={false}
+                page={undefined}
+                onIconChange={undefined}
+              />
+            </div>
+          </div>
+        ) : block.type === "goals-embed" ? (
+          <div className="flex-1 min-w-0">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+              <GoalsView
+                title={`embed_${block.id}`}
+                data={Array.isArray(block.goals) ? block.goals : []}
+                setData={(next) => onUpdate(block.id, { goals: Array.isArray(next) ? next : [] })}
+                onRename={undefined}
+                loading={false}
+                page={undefined}
+                onIconChange={undefined}
+              />
+            </div>
+          </div>
+        ) : block.type === "planner-embed" ? (
+          <div className="flex-1 min-w-0">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+              <CalendarView
+                title={`embed_${block.id}`}
+                tasks={block.schedule || { tasks: [], dailyMeta: {} }}
+                setTasks={(next) => onUpdate(block.id, { schedule: next || { tasks: [], dailyMeta: {} } })}
+                onRename={undefined}
+                loading={false}
+                page={undefined}
+                onIconChange={undefined}
               />
             </div>
           </div>

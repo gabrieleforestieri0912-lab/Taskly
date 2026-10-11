@@ -233,6 +233,39 @@ export default function TemplateGalleryModal({
                         {b.type === "divider" && (
                           <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
                         )}
+                        {b.type === "toggle" && (
+                          <div className="text-xs text-gray-600 dark:text-gray-300 pl-1">
+                            ▸ {b.content} ({(b.children || []).length} righe)
+                          </div>
+                        )}
+                        {b.type === "calendar" && (
+                          <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-3 py-2">
+                            🗓️ Mini planner ({(b.tasks || []).length} attività)
+                          </div>
+                        )}
+                        {b.type === "habit" && (
+                          <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-3 py-2">
+                            🔁 Habit tracker
+                          </div>
+                        )}
+                        {b.type === "tasks-embed" && (
+                          <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-3 py-2">
+                            📋 Lista task incorporata ({(b.items || []).length} attività) — sotto si continua a scrivere
+                          </div>
+                        )}
+                        {b.type === "goals-embed" && (
+                          <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-3 py-2">
+                            🎯 Tracker obiettivi incorporato ({(b.goals || []).length} obiettivi) — sotto si continua a scrivere
+                          </div>
+                        )}
+                        {b.type === "planner-embed" && (
+                          <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-3 py-2">
+                            🗓️ Planner incorporato — sotto si continua a scrivere
+                          </div>
+                        )}
+                        {!["h1", "h2", "h3", "checkbox", "bullet", "numbered", "text", "divider", "toggle", "calendar", "habit", "tasks-embed", "goals-embed", "planner-embed"].includes(b.type) && (
+                          <div className="text-xs text-gray-400">▫️ Blocco {b.type}</div>
+                        )}
                       </div>
                     ))}
                   </div>
