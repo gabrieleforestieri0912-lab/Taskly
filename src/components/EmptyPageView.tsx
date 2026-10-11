@@ -30,7 +30,7 @@ export default function EmptyPageView({
         };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
+    <div className="w-full space-y-6 pb-16">
       {/* Empty placeholder removed as requested */}
 
       <NotesView

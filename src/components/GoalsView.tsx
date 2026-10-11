@@ -334,7 +334,7 @@ export default function GoalsView({
   // cambiare tra un render e l'altro (Rules of Hooks).
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto space-y-8 pb-20">
+      <div className="w-full space-y-8 pb-20">
         <div className="space-y-2">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
@@ -349,7 +349,7 @@ export default function GoalsView({
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-20">
+    <div className="w-full space-y-8 pb-20">
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader

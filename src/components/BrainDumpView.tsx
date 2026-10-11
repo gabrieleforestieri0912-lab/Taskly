@@ -76,7 +76,7 @@ export default function BrainDumpView({
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto space-y-8 pb-20">
+      <div className="w-full space-y-8 pb-20">
         <div className="flex items-center gap-2 px-1">
           <Hash size={12} className="text-gray-400" />
           <Skeleton className="h-4 w-96" />
@@ -114,7 +114,7 @@ export default function BrainDumpView({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-20">
+    <div className="w-full space-y-8 pb-20">
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader

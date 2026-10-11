@@ -56,6 +56,8 @@
 - Pagine ospite in `taskly_pages_v1` (seed solo senza token); analitiche senza
   skeleton (render immediato); MAI hook dopo early return (già causato warning
   Hooks order: gate `loading` sempre dopo tutti gli hook).
+- Card blocchi con overflow-visible (menu +/slash non tagliati); pagine a tutta
+  larghezza (niente max-w nelle viste).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

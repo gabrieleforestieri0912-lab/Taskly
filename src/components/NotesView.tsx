@@ -638,7 +638,7 @@ function BlockItem({
             initial={{ opacity: 0, scale: 0.95, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
-            className="absolute left-0 top-8 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl p-1.5 w-52"
+            className="absolute left-0 top-8 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-2xl p-1.5 w-52 max-h-[60vh] overflow-y-auto custom-scrollbar"
           >
             <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("views.notesInsertBlock")}</p>
             {BLOCK_TYPES.map((bt) => {
@@ -1083,7 +1083,7 @@ function BlockItem({
           // strutturate, con sotto righe di testo libere. Senza onRename/page
           // l'header proprio resta nascosto (lo mostra già la pagina).
           <div className="flex-1 min-w-0">
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3">
               <ItemList
                 title={`embed_${block.id}`}
                 items={Array.isArray(block.items) ? block.items : []}
@@ -1099,7 +1099,7 @@ function BlockItem({
           </div>
         ) : block.type === "goals-embed" ? (
           <div className="flex-1 min-w-0">
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3">
               <GoalsView
                 title={`embed_${block.id}`}
                 data={Array.isArray(block.goals) ? block.goals : []}
@@ -1113,7 +1113,7 @@ function BlockItem({
           </div>
         ) : block.type === "planner-embed" ? (
           <div className="flex-1 min-w-0">
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3 overflow-hidden">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 sm:p-3">
               <CalendarView
                 title={`embed_${block.id}`}
                 tasks={block.schedule || { tasks: [], dailyMeta: {} }}
@@ -1602,7 +1602,7 @@ export default function NotesView({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl mx-auto h-full flex flex-col gap-4 pb-8"
+      className="w-full h-full flex flex-col gap-4 pb-8"
     >
       {/* Header: icona + titolo inline (Notion-style). Cromature nascoste in minimal. */}
       {!minimalChrome && (
@@ -1735,7 +1735,7 @@ export default function NotesView({
       </div>
 
       {/* Blocks editor */}
-      <Card className="flex-1 min-h-96 border-none bg-white/60 dark:bg-gray-900/90 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden">
+      <Card className="flex-1 min-h-96 border-none bg-white/60 dark:bg-gray-900/90 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-visible">
         <CardContent className="h-full p-4 md:p-5">
           {isNoteLocked ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-6">

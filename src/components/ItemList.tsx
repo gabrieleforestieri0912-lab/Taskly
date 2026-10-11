@@ -529,7 +529,7 @@ export default function ItemList({
   // cambiare tra un render e l'altro (Rules of Hooks).
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6 pb-10">
+      <div className="w-full space-y-6 pb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -565,7 +565,7 @@ export default function ItemList({
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-10">
+    <div className="w-full space-y-6 pb-10">
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader
