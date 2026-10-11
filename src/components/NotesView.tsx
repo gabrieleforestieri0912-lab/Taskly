@@ -284,7 +284,7 @@ function BlockItem({
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
   const [slashQuery, setSlashQuery] = useState("");
@@ -306,6 +306,16 @@ function BlockItem({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Textarea auto-growing: il testo va a capo invece di uscire dalla card
+  // (fondamentale su mobile dove la larghezza è ~340px).
+  useEffect(() => {
+    const el = inputRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [block.content, block.type]);
 
   const filteredBlocks = BLOCK_TYPES.filter(
     (bt) =>
@@ -730,7 +740,7 @@ function BlockItem({
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex items-start gap-2">
+      <div className="flex-1 min-w-0 flex items-start gap-2">
         {renderPrefix()}
         {/* Render different editors based on block type */}
         {block.type === "code" ? (
@@ -1030,7 +1040,7 @@ function BlockItem({
                       onUpdate(block.id, { tasks: newTasks });
                     }}
                     placeholder={t("views.notesNewTask")}
-                    className={`flex-1 bg-transparent border-none outline-none text-sm font-medium ${t.done ? "line-through opacity-50" : ""}`}
+                    className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm font-medium ${t.done ? "line-through opacity-50" : ""}`}
                   />
                   <button
                     onClick={() => {
@@ -1103,9 +1113,9 @@ function BlockItem({
             </div>
           </div>
         ) : (
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
+            rows={1}
             value={block.content}
             onChange={(e) => {
               const val = e.target.value;
@@ -1153,7 +1163,7 @@ function BlockItem({
                         ? "Titolo 3..."
                         : "Scrivi qualcosa... (digita / per i comandi)"
             }
-            className={`flex-1 bg-transparent border-none outline-none leading-relaxed placeholder-gray-300 dark:placeholder-gray-700 ${getColorClass(block.color)} ${
+            className={`flex-1 min-w-0 w-full resize-none overflow-hidden bg-transparent border-none outline-none leading-relaxed placeholder-gray-300 dark:placeholder-gray-700 ${getColorClass(block.color)} ${
               block.type === "checkbox" && block.checked
                 ? "line-through opacity-60"
                 : ""
@@ -1166,7 +1176,7 @@ function BlockItem({
                     ? "text-sm font-semibold"
                     : "text-sm leading-relaxed"
             }`}
-          />
+          ></textarea>
         )}
       </div>
 
@@ -1187,7 +1197,7 @@ function BlockItem({
                     onUpdate(block.id, { children: newChildren });
                   }}
                   placeholder={t("views.notesContentPh")}
-                  className={`flex-1 bg-transparent border-none outline-none text-sm ${getColorClass(child.color || "default")}`}
+                  className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm ${getColorClass(child.color || "default")}`}
                 />
                 <button
                   onClick={() => {

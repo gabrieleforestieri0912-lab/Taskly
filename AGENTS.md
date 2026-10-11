@@ -43,6 +43,9 @@
 - `Sidebar.tsx`: mai usare una variabile prima della sua dichiarazione `const`
   (TDZ ReferenceError scattava solo con ≥1 pagina, cioè a ogni creazione pagina).
   Verificato con Playwright reale su tutti i template prima di chiudere.
+- Mobile web (verifica a 390px con Playwright): sidebar chiusa di default sotto
+  768px + auto-chiusura dopo navigazione; toolbar ItemList scrollabili;
+  blocchi NotesView con textarea auto-growing (niente più testo tagliato).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

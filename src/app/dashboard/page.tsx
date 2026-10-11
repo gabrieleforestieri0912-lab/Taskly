@@ -583,6 +583,17 @@ function DashboardContent() {
     });
   };
 
+  // Mobile: la sidebar nasce come drawer sopra il contenuto — chiudila
+  // all'avvio su schermi stretti e dopo ogni navigazione, così la pagina
+  // resta visibile e usabile. Su desktop resta sempre aperta.
+  useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      }
+    } catch {}
+  }, [activePageId, searchParams]);
+
   const duplicatePage = (id) => {
     const source = pages.find((p) => String(p.id) === String(id));
     if (!source) return;
@@ -2041,7 +2052,7 @@ const ensureTab = React.useCallback((page: any) => {
                             className="flex items-center gap-2 w-full px-2.5 py-2 rounded-xl font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
                           >
                             <Move size={14} className="text-gray-400" />
-                            <span>Sposta sotto un'altra pagina…</span>
+                            <span>Sposta sotto un&apos;altra pagina…</span>
                           </button>
 
                           {/* Salva come template */}

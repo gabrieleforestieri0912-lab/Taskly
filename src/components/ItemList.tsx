@@ -560,7 +560,7 @@ export default function ItemList({
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-10">
       {/* View Switcher moved below */}
-      <div className="flex items-center justify-between mb-4 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
         {/* Dynamic Column Creator Popover */}
         <div className="relative">
           <Button
@@ -604,7 +604,7 @@ export default function ItemList({
         </div>
 
         {/* View Switcher */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/50 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/50 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-700 max-w-full overflow-x-auto scrollbar-hide">
           {[
             { id: "list", icon: List, label: "Lista" },
             { id: "kanban", icon: KanbanIcon, label: "Kanban" },
@@ -613,7 +613,7 @@ export default function ItemList({
             <button
               key={v.id}
               onClick={() => setView(v.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 whitespace-nowrap ${
                 view === v.id
                   ? "bg-white dark:bg-gray-700 text-cyan-600 shadow-md"
                   : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -641,8 +641,8 @@ export default function ItemList({
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
-              <div className="relative" ref={priorityRef}>
+            <div className="flex items-center gap-2 w-full md:w-auto shrink-0 overflow-x-auto max-w-full scrollbar-hide">
+              <div className="relative shrink-0" ref={priorityRef}>
                 <button
                   onClick={() => setIsPriorityMenuOpen(!isPriorityMenuOpen)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all duration-300 ${selectedPriority.bg} ${selectedPriority.border} ${selectedPriority.color} min-w-[110px] justify-between group`}
@@ -695,7 +695,7 @@ export default function ItemList({
                 </AnimatePresence>
               </div>
 
-              <div className="relative" ref={recurrenceRef}>
+              <div className="relative shrink-0" ref={recurrenceRef}>
                 <button
                   type="button"
                   onClick={() =>
@@ -752,7 +752,7 @@ export default function ItemList({
                 placeholder={t("views.tasksAssigneePh")}
                 value={assignee}
                 onChange={(e) => setAssignee(e.target.value)}
-                className="w-28 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-[10px] font-bold focus:ring-cyan-500 outline-none"
+                className="w-28 shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-[10px] font-bold focus:ring-cyan-500 outline-none"
               />
               <datalist id="taskly-assignees">
                 <option value="Utente" />
@@ -761,7 +761,7 @@ export default function ItemList({
 
               <Button
                 onClick={addItem}
-                className="h-11 px-8 gap-2 text-xs font-black uppercase tracking-widest shadow-xl shadow-cyan-500/20 whitespace-nowrap"
+                className="h-11 px-8 gap-2 text-xs font-black uppercase tracking-widest shadow-xl shadow-cyan-500/20 whitespace-nowrap shrink-0"
               >
                 <Plus size={16} />{t("views.calAddShort")}</Button>
             </div>
