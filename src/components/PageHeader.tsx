@@ -47,6 +47,7 @@ export default function PageHeader({
   locked,
 }: PageHeaderProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerTab, setPickerTab] = useState<"emoji" | "icons">("icons");
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_SIZE);
   const pickerRef = useRef<HTMLDivElement | null>(null);
@@ -73,10 +74,9 @@ export default function PageHeader({
     };
   }, [pickerOpen]);
 
-  // Reset della paginazione a ogni nuova ricerca / apertura
-  useEffect(() => {
-    setVisible(PAGE_SIZE);
-  }, [query, pickerOpen]);
+  // Reset della paginazione a ogni nuova ricerca / apertura (nel gestore
+  // eventi, non in effect: niente render a cascata).
+  const resetPaging = () => setVisible(PAGE_SIZE);
 
   const isEmoji = isEmojiIcon(page?.icon);
   const Icon = !isEmoji ? resolvePageIcon(page) : null;
@@ -106,7 +106,13 @@ export default function PageHeader({
           <button
             type="button"
             disabled={locked}
-            onClick={() => !locked && setPickerOpen((s) => !s)}
+            onClick={() => {
+              if (locked) return;
+              // Apri sulla vista coerente con l'icona attuale
+              setPickerTab(isEmojiIcon(page?.icon) ? "emoji" : "icons");
+              resetPaging();
+              setPickerOpen((s) => !s);
+            }}
             title={locked ? undefined : "Cambia icona"}
             aria-label="Cambia icona pagina"
             className="grid place-items-center w-12 h-12 md:w-14 md:h-14 rounded-2xl border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-[#7b39fc]/50 hover:shadow-lg disabled:cursor-default"
@@ -114,6 +120,7 @@ export default function PageHeader({
             {isEmoji ? (
               <span className="text-2xl md:text-3xl leading-none">{page.icon}</span>
             ) : hasIcon && Icon ? (
+              // eslint-disable-next-line react-hooks/static-components -- Icon viene dal catalogo statico (resolvePageIcon), non creata nel render
               <Icon size={26} className={iconColor} aria-hidden="true" />
             ) : (
               <span className="grid place-items-center text-gray-300 dark:text-gray-600">
@@ -123,48 +130,70 @@ export default function PageHeader({
           </button>
           {pickerOpen && !locked && (
             <div className="absolute left-0 top-full mt-2 z-50 w-72 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl p-3">
-              <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Cerca icona..." className="w-full mb-2 px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">Emoji</p>
-              <div className="flex flex-wrap gap-1 mb-2">
-                {EMOJI_CHOICES.map((e) => (
-                  <button key={e} type="button" onClick={() => pick(e)} className="w-9 h-9 grid place-items-center text-xl rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">{e}</button>
-                ))}
-              </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
-                Icone ({filtered.length})
-              </p>
-              <div className="grid grid-cols-7 gap-1 max-h-56 overflow-y-auto pr-0.5">
-                {shown.map((o) => (
+              {/* Viste separate: Emoji | Icone */}
+              <div className="grid grid-cols-2 gap-1 bg-gray-100 dark:bg-gray-800 p-0.5 rounded-xl mb-3">
+                {(["emoji", "icons"] as const).map((tab) => (
                   <button
-                    key={o.key}
+                    key={tab}
                     type="button"
-                    title={o.key}
-                    onClick={() => pick(o.key)}
-                    className={
-                      "w-9 h-9 grid place-items-center rounded-xl transition-colors " +
-                      (normalizeIconKey(page?.icon) === o.key
-                        ? "bg-[#7b39fc]/15 text-[#7b39fc]"
-                        : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800")
-                    }
+                    onClick={() => { setPickerTab(tab); resetPaging(); }}
+                    className={`px-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-colors ${
+                      pickerTab === tab
+                        ? "bg-white dark:bg-gray-900 text-[#7b39fc] shadow-xs"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                    }`}
                   >
-                    <o.Icon size={18} aria-hidden="true" />
+                    {tab === "emoji" ? "Emoji" : "Icone"}
                   </button>
                 ))}
-                {shown.length === 0 && (
-                  <p className="col-span-7 text-xs text-gray-400 py-3 text-center">
-                    Nessuna icona trovata
-                  </p>
-                )}
               </div>
 
-              {filtered.length > visible && (
-                <button
-                  type="button"
-                  onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                  className="mt-2 w-full px-3 py-1.5 text-[11px] font-bold rounded-xl text-[#7b39fc] hover:bg-[#7b39fc]/10"
-                >
-                  Mostra altre {filtered.length - visible} icone
-                </button>
+              {pickerTab === "emoji" ? (
+                <div className="flex flex-wrap gap-1">
+                  {EMOJI_CHOICES.map((e) => (
+                    <button key={e} type="button" onClick={() => pick(e)} className="w-9 h-9 grid place-items-center text-xl rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">{e}</button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <input autoFocus value={query} onChange={(e) => { setQuery(e.target.value); resetPaging(); }} placeholder="Cerca icona..." className="w-full mb-2 px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+                    Icone ({filtered.length})
+                  </p>
+                  <div className="grid grid-cols-7 gap-1 max-h-56 overflow-y-auto pr-0.5">
+                    {shown.map((o) => (
+                      <button
+                        key={o.key}
+                        type="button"
+                        title={o.key}
+                        onClick={() => pick(o.key)}
+                        className={
+                          "w-9 h-9 grid place-items-center rounded-xl transition-colors " +
+                          (normalizeIconKey(page?.icon) === o.key
+                            ? "bg-[#7b39fc]/15 text-[#7b39fc]"
+                            : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800")
+                        }
+                      >
+                        <o.Icon size={18} aria-hidden="true" />
+                      </button>
+                    ))}
+                    {shown.length === 0 && (
+                      <p className="col-span-7 text-xs text-gray-400 py-3 text-center">
+                        Nessuna icona trovata
+                      </p>
+                    )}
+                  </div>
+
+                  {filtered.length > visible && (
+                    <button
+                      type="button"
+                      onClick={() => setVisible((v) => v + PAGE_SIZE)}
+                      className="mt-2 w-full px-3 py-1.5 text-[11px] font-bold rounded-xl text-[#7b39fc] hover:bg-[#7b39fc]/10"
+                    >
+                      Mostra altre {filtered.length - visible} icone
+                    </button>
+                  )}
+                </>
               )}
 
               {hasIcon && (

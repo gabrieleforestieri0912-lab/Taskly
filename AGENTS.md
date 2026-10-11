@@ -58,6 +58,8 @@
   Hooks order: gate `loading` sempre dopo tutti gli hook).
 - Card blocchi con overflow-visible (menu +/slash non tagliati); pagine a tutta
   larghezza (niente max-w nelle viste).
+- Titolo pagina: click diretto sul testo (niente bottone matita); picker icona
+  con viste separate Emoji | Icone.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

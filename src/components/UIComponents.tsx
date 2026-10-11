@@ -2,7 +2,6 @@
 
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef } from "react";
-import { Edit2, Check, X } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 export const EditableTitle = ({
@@ -76,6 +75,7 @@ export const EditableTitle = ({
         suppressContentEditableWarning
         role="textbox"
         aria-label={t("views.uiPageTitle")}
+        title={t("views.uiClickToEdit", "Clicca sul titolo per modificarlo")}
         onBlur={() => handleSave()}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -98,13 +98,6 @@ export const EditableTitle = ({
       {!title && !isEditing && (
         <div className="absolute left-0 top-0 pointer-events-none text-3xl md:text-5xl font-black text-gray-400 dark:text-gray-600 leading-tight">
           {placeholder}
-        </div>
-      )}
-
-      {/* edit icon on hover */}
-      {!isEditing && (
-        <div className="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-100 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/25 text-[#7b39fc] dark:text-[#a67cff] rounded-xl transition-all scale-90 group-hover:scale-100">
-          <Edit2 size={20} />
         </div>
       )}
     </div>
