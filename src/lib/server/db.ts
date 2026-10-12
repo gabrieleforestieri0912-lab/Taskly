@@ -5,6 +5,7 @@
 // ============================================================================
 import { getSupabase } from "./supabase";
 import { randomUUID } from "crypto";
+import { toSafeOrder } from "../pageTree";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -1072,7 +1073,7 @@ function pageRowFromPayload(userId: string, page: any, order: number) {
     is_template: Boolean(page.isTemplate),
     data: page.data == null ? null : page.data,
     meta,
-    sort_order: order,
+    sort_order: toSafeOrder(order),
     updated_at: new Date().toISOString(),
   };
 }
@@ -1172,8 +1173,8 @@ async function updatePageRow(userId: string, id: string, patch: any) {
     if (patch[k] !== undefined) meta[k] = patch[k];
   });
   if (Object.keys(meta).length > 0) updates.meta = meta;
-  if (patch.sortOrder !== undefined) updates.sort_order = patch.sortOrder;
-  else if (patch.order !== undefined) updates.sort_order = patch.order;
+  if (patch.sortOrder !== undefined) updates.sort_order = toSafeOrder(patch.sortOrder);
+  else if (patch.order !== undefined) updates.sort_order = toSafeOrder(patch.order);
   const { data, error } = await supabase
     .from("pages")
     .update(updates)

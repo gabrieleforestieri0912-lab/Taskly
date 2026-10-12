@@ -270,6 +270,20 @@ export function createEmptyPage(opts: {
 // ---------------------------------------------------------------------------
 
 /**
+ * La colonna DB `sort_order` è integer (int4, max 2147483647): un
+ * `order: Date.now()` (~1.7e12) la fa overfloware e ogni POST/PUT fallisce
+ * con 500 → banner rossi permanenti e cestino che non persiste. Questa
+ * sanitize rende ogni order sicuro per il DB (usata anche dal server).
+ */
+const MAX_DB_INT = 2147483647;
+export function toSafeOrder(v: unknown): number {
+  if (typeof v !== "number" || !Number.isFinite(v)) return 0;
+  const i = Math.trunc(v);
+  if (i < 0) return 0;
+  return i > MAX_DB_INT ? MAX_DB_INT : i;
+}
+
+/**
  * Maps the legacy page shape used by useUserData / Sidebar to the canonical
  * Page type. Safe to call on already-correct Page objects (idempotent).
  */
@@ -281,12 +295,13 @@ export function normalizePage(raw: Record<string, unknown>): Page {
     iconColor: (raw.iconColor as string | undefined) ?? "text-gray-400",
     parentId: (raw.parentId as string | null) ?? null,
     section: "private",
-    order:
+    order: toSafeOrder(
       typeof raw.order === "number"
         ? raw.order
         : typeof raw.sort_order === "number"
           ? raw.sort_order
           : 0,
+    ),
     type: String(raw.type ?? "empty"),
     isFavorite: Boolean(raw.isFavorite),
     deleted: Boolean(raw.deleted),

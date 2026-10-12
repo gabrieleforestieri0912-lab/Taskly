@@ -52,11 +52,50 @@ function emit() {
   for (const l of listeners) l();
 }
 
+// ─── Scrub vecchi fallback finti ─────────────────────────────────────────
+// La vecchia route /api/ai/chat rispondeva con messaggi preimpostati
+// (fallbackReply) quando il provider falliva: quelle risposte finte restano
+// salvate in localStorage e sembrano ancora "l'AI che risponde". Al primo
+// load vengono rimosse una volta sola; la cronologia vera resta intatta.
+const SCRUB_FLAG = "taskly_ai_scrub_v1";
+const FAKE_ASSISTANT_EXACT = new Set([
+  "Ciao! 👋 Sono Taskly AI. Posso aiutarti a pianificare la tua giornata, riassumere note o creare task e obiettivi.",
+  "Ecco cosa ho riassunto: (1) punti chiave del tuo lavoro, (2) i task prioritari da completare, (3) le idee da convertire in obiettivi. Possiamo approfondire qualsiasi punto.",
+  "Perfetto, ho preparato un nuovo task nella tua lista. Vuoi che gli assegni una priorità (Alta/Media/Bassa) e una scadenza?",
+  "Ottimo! Un obiettivo chiaro parte da un risultato misurabile. Definisci: (1) cosa vuoi ottenere, (2) entro quando, (3) i sotto-obiettivi che lo rendono raggiungibile.",
+  "Ecco un piano suggerito per oggi: mattina dedicata al focus (3 task prioritari), trasferire 1 idea in obiettivo, e 20 minuti di calendario per la revisione di fine giornata. Vuoi che generi i blocchi nel calendario?",
+  "Di nulla! 😊 Se mi serve altro: organizzazione task, riassunti, piani della giornata o obiettivi. Sono qui per questo.",
+  "Sono Taskly AI, il tuo assistente di produttività. Posso riassumere note, creare task, suggerire obiettivi e aiutarti a pianificare la giornata. Scrivi 'riassumi le mie note' o 'crea un task' per iniziare.",
+]);
+const FAKE_ASSISTANT_PREFIX = [
+  'Ecco il riassunto di "',
+  "Ho capito, parliamo di \"",
+];
+export function isFakeAssistantMessage(content: string): boolean {
+  if (FAKE_ASSISTANT_EXACT.has(content)) return true;
+  return FAKE_ASSISTANT_PREFIX.some((p) => content.startsWith(p));
+}
+function scrubFakeMessages(list: AIChatMessage[]): AIChatMessage[] {
+  return list.filter(
+    (m) => !(m && m.role === "assistant" && typeof m.content === "string" && isFakeAssistantMessage(m.content)),
+  );
+}
+
 type Snapshot = { messages: AIChatMessage[]; isStreaming: boolean; error: string | null };
 
 // Called once at module load (client only).
 if (typeof window !== "undefined") {
   messages = loadStored();
+  try {
+    if (!localStorage.getItem(SCRUB_FLAG)) {
+      const cleaned = scrubFakeMessages(messages);
+      if (cleaned.length !== messages.length) {
+        messages = cleaned;
+        persist();
+      }
+      localStorage.setItem(SCRUB_FLAG, "1");
+    }
+  } catch {}
 }
 
 // Cached snapshot: getSnapshot must return a stable reference that only

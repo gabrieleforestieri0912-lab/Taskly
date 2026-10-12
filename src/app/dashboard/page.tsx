@@ -204,6 +204,9 @@ function DashboardContent() {
   const [iconSearch, setIconSearch] = useState("");
   const [iconCategory, setIconCategory] = useState("All");
   const syncedPageIdsRef = React.useRef<Record<string, { deleted?: boolean }>>({});
+  // Ultimo payload inviato per pagina (JSON): il flush invia solo ciò che è
+  // davvero cambiato, niente raffiche di N PUT a ogni modifica.
+  const lastSentRef = React.useRef<Map<string, string>>(new Map());
   const pagesSyncedRef = React.useRef(false);
   const [isNestModalOpen, setIsNestModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -1495,42 +1498,63 @@ const ensureTab = React.useCallback((page: any) => {
         const cur = Array.isArray(pages) ? pages : [];
         const byId = new Map(cur.map((p) => [String(p.id), p]));
         const snapshot = syncedPageIdsRef.current;
+        const lastSent = lastSentRef.current;
 
         // Hard-delete pages the client no longer holds (permanently removed)
         Object.keys(snapshot).forEach((id) => {
           if (byId.has(id)) return;
           apiFetch(`/resources/pages/${id}`, { method: "DELETE" }).catch(() => {});
           delete snapshot[id];
+          lastSent.delete(id);
         });
 
-        // Upsert every known page via structured CRUD
+        // Upsert SOLO le pagine cambiate dall'ultimo flush via structured
+        // CRUD. Inviare tutte le pagine a ogni modifica causava raffiche di
+        // richieste (429) e banner rossi a ogni battitura.
         const headers = { "Content-Type": "application/json" };
+        const changed = cur.filter((p) => {
+          try {
+            return lastSent.get(String(p.id)) !== JSON.stringify(p);
+          } catch {
+            return true;
+          }
+        });
+        if (changed.length === 0) {
+          setSaveError(null);
+          return;
+        }
+        let failed = 0;
         await Promise.all(
-          cur.map(async (p) => {
+          changed.map(async (p) => {
             const id = String(p.id);
             const prev = snapshot[id];
+            const post = () =>
+              apiFetch("/resources/pages", {
+                method: "POST",
+                headers,
+                body: JSON.stringify(p),
+              });
+            const put = () =>
+              apiFetch(`/resources/pages/${id}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify(p),
+              });
             try {
-              const r = prev
-                ? await apiFetch(`/resources/pages/${id}`, {
-                    method: "PUT",
-                    headers,
-                    body: JSON.stringify(p),
-                  })
-                : await apiFetch("/resources/pages", {
-                    method: "POST",
-                    headers,
-                    body: JSON.stringify(p),
-                  });
+              let r = prev ? await put() : await post();
+              if (r.status === 404 && prev) {
+                // Pagina nota in locale ma mai creata sul server (es. creata
+                // offline o prima del login): la creo invece di fallire.
+                r = await post();
+              }
               if (r.ok) {
                 snapshot[id] = { deleted: Boolean(p.deleted) };
+                try {
+                  lastSent.set(id, JSON.stringify(p));
+                } catch {}
               } else {
+                failed += 1;
                 // Body non-JSON o status non-2xx: il create/update e' fallito.
-                // Prima veniva ignorato e la pagina spariva al reload.
-                setSaveError(
-                  `Salvataggio pagina fallito (${r.status})${
-                    prev ? "" : " durante la creazione"
-                  }: ${p.label || "senza titolo"}`,
-                );
                 console.error(
                   `Persist page ${id} failed (${prev ? "PUT" : "POST"})`,
                   r.status,
@@ -1538,13 +1562,20 @@ const ensureTab = React.useCallback((page: any) => {
                 );
               }
             } catch (e) {
-              setSaveError(
-                `Salvataggio pagina fallito: ${p.label || "senza titolo"}`,
-              );
+              failed += 1;
               console.error(`Persist page ${id} threw`, e);
             }
           }),
         );
+        // Un solo banner riepilogativo (auto-chiuso, vedi sotto), non uno per
+        // pagina; sparisce al primo flush tutto verde.
+        if (failed === 0) {
+          setSaveError(null);
+        } else {
+          setSaveError(
+            `Salvataggio non riuscito per ${failed} pagina${failed === 1 ? "" : "e"}. Riprovo automaticamente.`,
+          );
+        }
       } catch (error) {
         console.error("Error persisting pages:", error);
       }
@@ -1552,6 +1583,14 @@ const ensureTab = React.useCallback((page: any) => {
 
     return () => clearTimeout(timeout);
   }, [pages, hasLoadedUserData]);
+
+  // Il banner di errore salvataggio si auto-chiude dopo pochi secondi: resta
+  // visibile il tempo di leggerlo, senza fissarsi in rosso permanente.
+  useEffect(() => {
+    if (!saveError) return;
+    const t = setTimeout(() => setSaveError(null), 8000);
+    return () => clearTimeout(t);
+  }, [saveError]);
 
   // Closing a tab must also fix the URL when the closed tab is the active one,
   // otherwise we stay on a page whose tab no longer exists in the bar.
@@ -2354,7 +2393,9 @@ const ensureTab = React.useCallback((page: any) => {
             icon: template.icon,
             iconColor: template.iconColor,
             parentId: null,
-            order: Date.now(),
+            // MAI Date.now(): sort_order è integer su Postgres e overflowa
+            // (500 a ogni salvataggio + banner rossi). Basta l'indice in coda.
+            order: pages.filter((p) => !p.parentId).length,
             data: JSON.parse(JSON.stringify(template.data)),
             deleted: false,
             createdAt: new Date().toISOString(),
