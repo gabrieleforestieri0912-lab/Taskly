@@ -94,8 +94,8 @@ const EMOJI_SECTIONS: Array<{ label: string; codes: number[][] }> = [
       [0x260e, 0xfe0f], [0x1f4f1], [0x1f4bb], [0x1f4be], [0x1f9ee],
       [0x23f0, 0xfe0f], [0x231b, 0xfe0f], [0x23f3, 0xfe0f], [0x1f3ae],
       [0x1f3b2], [0x1f3a8], [0x1f3a4], [0x1f3a7], [0x1f3b9], [0x1f3b8],
-      [0x1f3bb], [0x1f4c4], [0x1f4dd], [0x1f3af], [0x1f4c5], [0x1f4da],
-      [0x1f4bc], [0x1f4cc],
+      [0x1f3bb], [0x1f4c4], [0x1f3af], [0x1f4c5], [0x1f4da],
+      [0x1f4bc],
     ],
   },
   {
@@ -260,10 +260,10 @@ export default function PageHeader({
                         {sec.label}
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {sec.codes.map((c) => {
+                        {sec.codes.map((c, idx) => {
                           const e = String.fromCodePoint(...c);
                           return (
-                            <button key={e} type="button" onClick={() => pick(e)} title={e} className="w-9 h-9 grid place-items-center text-xl rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <button key={`${sec.label}-${idx}-${e}`} type="button" onClick={() => pick(e)} title={e} className="w-9 h-9 grid place-items-center text-xl rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800">
                               {e}
                             </button>
                           );
