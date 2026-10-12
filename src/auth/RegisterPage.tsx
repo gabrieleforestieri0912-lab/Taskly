@@ -8,8 +8,10 @@ import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock, User } from "lucide-react";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +38,7 @@ export default function RegisterPage() {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Errore durante la registrazione. Riprova.");
+      setError(err.response?.data?.message || t("auth.registerError"));
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ export default function RegisterPage() {
       localStorage.setItem("user", JSON.stringify(response.data.user));
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registrazione con Google fallita. Riprova.");
+      setError(err.response?.data?.message || t("auth.googleRegisterError"));
     } finally {
       setLoading(false);
     }
@@ -76,7 +78,7 @@ export default function RegisterPage() {
       <div className="fixed top-8 left-8 z-100">
             <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Torna alla home</span>
+          <span className="font-medium">{t("auth.backToHome")}</span>
         </Link>
       </div>
 
@@ -84,10 +86,10 @@ export default function RegisterPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h2 className="font-inter text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-[-0.03em] dark:text-white">
-              Crea un account
+              {t("auth.createAccount")}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-2">
-              Inizia subito a gestire i tuoi obiettivi
+              {t("auth.registerSubtitle")}
             </p>
           </div>
 
@@ -100,19 +102,19 @@ export default function RegisterPage() {
               )}
               {success && (
                 <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-xl text-sm">
-                  {success} Reindirizzamento al login...
+                  {success} {t("auth.redirectingToLogin")}
                 </div>
               )}
               <form className="space-y-5" onSubmit={handleRegister}>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold ml-1 text-gray-700 dark:text-gray-300">
-                    Nome Completo
+                    {t("auth.fullName")}
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input 
                       type="text" 
-                      placeholder="Mario Rossi" 
+                      placeholder={t("auth.fullNamePlaceholder")} 
                       className="pl-12 py-3"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -129,7 +131,7 @@ export default function RegisterPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input 
                       type="email" 
-                      placeholder="nome@esempio.it" 
+                      placeholder={t("auth.emailPlaceholder")} 
                       className="pl-12 py-3"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -160,13 +162,13 @@ export default function RegisterPage() {
                   disabled={loading}
                   className="w-full py-4 text-lg mt-4 shadow-xl shadow-[#7b39fc]/30"
                 >
-                  {loading ? "Registrazione in corso..." : "Registrati"}
+                  {loading ? t("auth.registering") : t("auth.signUp")}
                 </Button>
               </form>
 
               <div className="my-6 flex items-center gap-3">
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">Oppure</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">{t("auth.orDivider")}</span>
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
@@ -174,7 +176,7 @@ export default function RegisterPage() {
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleRegister}
-                    onError={() => setError("Registrazione Google annullata o non riuscita.")}
+                    onError={() => setError(t("auth.googleRegisterCancelled"))}
                     theme="outline"
                     size="large"
                     shape="pill"
@@ -183,18 +185,18 @@ export default function RegisterPage() {
                 </div>
               ) : (
                 <p className="text-center text-xs text-amber-600 dark:text-amber-400">
-                  Google Sign-up non disponibile: configura `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
+                  {t("auth.googleSignupUnavailable")}
                 </p>
               )}
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700/50 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Hai già un account?{" "}
+                  {t("auth.alreadyHaveAccount")}{" "}
                   <Link
                     href="/login"
                     className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
                   >
-                    Accedi
+                    {t("auth.signIn")}
                   </Link>
                 </p>
               </div>

@@ -8,8 +8,10 @@ import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock } from "lucide-react";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -36,7 +38,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Errore durante l'accesso. Riprova.");
+      setError(err.response?.data?.message || t("auth.loginError"));
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Accesso Google fallito. Riprova.");
+      setError(err.response?.data?.message || t("auth.googleLoginError"));
     } finally {
       setLoading(false);
     }
@@ -75,7 +77,7 @@ export default function LoginPage() {
       <div className="fixed top-8 left-8 z-100">
             <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Torna alla home</span>
+          <span className="font-medium">{t("auth.backToHome")}</span>
         </Link>
       </div>
 
@@ -83,10 +85,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h2 className="font-inter text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-[-0.03em] dark:text-white">
-              Bentornato
+              {t("auth.welcomeBack")}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-2">
-              Accedi per gestire i tuoi obiettivi
+              {t("auth.loginSubtitle")}
             </p>
           </div>
 
@@ -106,7 +108,7 @@ export default function LoginPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input 
                       type="email" 
-                      placeholder="nome@esempio.it" 
+                      placeholder={t("auth.emailPlaceholder")} 
                       className="pl-12 py-3"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -121,7 +123,7 @@ export default function LoginPage() {
                       Password
                     </label>
                     <a href="#" className="text-xs font-medium text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff]">
-                      Dimenticata?
+                      {t("auth.forgotPassword")}
                     </a>
                   </div>
                   <div className="relative">
@@ -142,13 +144,13 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full py-4 text-lg mt-4 shadow-xl shadow-[#7b39fc]/30"
                 >
-                  {loading ? "Accesso in corso..." : "Accedi"}
+                  {loading ? t("auth.signingIn") : t("auth.signIn")}
                 </Button>
               </form>
 
               <div className="my-6 flex items-center gap-3">
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">Oppure</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400">{t("auth.orDivider")}</span>
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
@@ -156,7 +158,7 @@ export default function LoginPage() {
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleLogin}
-                    onError={() => setError("Accesso Google annullato o non riuscito.")}
+                    onError={() => setError(t("auth.googleLoginCancelled"))}
                     theme="outline"
                     size="large"
                     shape="pill"
@@ -165,18 +167,18 @@ export default function LoginPage() {
                 </div>
               ) : (
                 <p className="text-center text-xs text-amber-600 dark:text-amber-400">
-                  Google Login non disponibile: configura `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
+                  {t("auth.googleLoginUnavailable")}
                 </p>
               )}
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700/50 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Non hai ancora un account?{" "}
+                  {t("auth.noAccountYet")}{" "}
                   <Link
                     href="/register"
                     className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
                   >
-                    Registrati ora
+                    {t("auth.registerNow")}
                   </Link>
                 </p>
               </div>

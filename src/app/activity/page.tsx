@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "../../lib/api";
+import { useLanguage } from "../../lib/LanguageContext";
 
 export default function ActivityPage() {
+  const { t, language } = useLanguage();
   const [items, setItems] = useState<any[]>([]);
 
   const load = useCallback(async () => {
@@ -22,7 +24,7 @@ export default function ActivityPage() {
 
   return (
     <main className="max-w-4xl mx-auto py-16 px-4">
-      <h1 className="text-2xl font-bold mb-4">Attività recenti</h1>
+      <h1 className="text-2xl font-bold mb-4">{t("auth.activityTitle")}</h1>
       <div className="space-y-3">
         {items.map((it) => (
           <div
@@ -35,13 +37,13 @@ export default function ActivityPage() {
                 <div className="text-sm text-gray-500 dark:text-gray-400">{it.body}</div>
               </div>
               <div className="text-xs text-gray-400 dark:text-gray-500">
-                {new Date(it.createdAt).toLocaleString()}
+                {new Date(it.createdAt).toLocaleString(language === "en" ? "en-US" : "it-IT")}
               </div>
             </div>
           </div>
         ))}
         {items.length === 0 && (
-          <div className="text-sm text-gray-500 dark:text-gray-400">Nessuna attività.</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">{t("auth.activityEmpty")}</div>
         )}
       </div>
     </main>

@@ -1,7 +1,8 @@
+"use client";
 import React, { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FAQ_ITEMS } from "../lib/faq";
+import { useLanguage } from "../lib/LanguageContext";
 
 function FAQItem({ item, isOpen, onToggle }) {
   return (
@@ -39,7 +40,13 @@ function FAQItem({ item, isOpen, onToggle }) {
 }
 
 export default function FAQ() {
+  const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState(0);
+  // Sorgente dati localizzata (specchio di src/lib/faq.ts, via chiavi land.faqQ*/land.faqA*)
+  const items = [1, 2, 3, 4, 5].map((n) => ({
+    question: t(`land.faqQ${n}`),
+    answer: t(`land.faqA${n}`),
+  }));
 
   return (
     <section id="faq" className="landing-section relative px-4 py-20 bg-[#f6f7f9] dark:bg-[#1a1528] overflow-hidden sm:px-6">
@@ -50,18 +57,18 @@ export default function FAQ() {
         <div className="text-center mb-10">
           <div className="landing-eyebrow">
             <HelpCircle size={13} />
-            FAQ
+            {t("land.faqEyebrow")}
           </div>
           <h2 className="landing-heading-lg tracking-tight">
-            Domande frequenti
+            {t("land.faqTitle")}
           </h2>
           <p className="landing-body mt-3 text-sm md:text-base">
-            Le risposte rapide alle domande piu comuni su piani, pagamenti e sicurezza.
+            {t("land.faqSubtitle")}
           </p>
         </div>
 
         <div className="space-y-3">
-          {FAQ_ITEMS.map((item, index) => (
+          {items.map((item, index) => (
             <FAQItem
               key={item.question}
               item={item}

@@ -1,25 +1,9 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import { Layers, ListChecks, NotebookPen } from "lucide-react";
 import { motion } from "framer-motion";
-
-const items = [
-  {
-    icon: Layers,
-    title: "Unico workspace",
-    text: "Tutto in un solo posto: progetti, task e note connessi tra loro.",
-  },
-  {
-    icon: ListChecks,
-    title: "Flusso operativo chiaro",
-    text: "Riduci il tempo perso tra strumenti diversi e mantieni il focus sul lavoro vero.",
-  },
-  {
-    icon: NotebookPen,
-    title: "Pensato per execution",
-    text: "Dalle idee ai task in pochi click, senza setup complessi.",
-  },
-];
+import { useLanguage } from "../lib/LanguageContext";
 
 const containerVariants = {
   hidden: {},
@@ -38,19 +22,37 @@ const cardVariants = {
 };
 
 export default function ValueProposition() {
+  const { t } = useLanguage();
+  const items = [
+    {
+      icon: Layers,
+      title: t("land.vpCard1Title"),
+      text: t("land.vpCard1Text"),
+    },
+    {
+      icon: ListChecks,
+      title: t("land.vpCard2Title"),
+      text: t("land.vpCard2Text"),
+    },
+    {
+      icon: NotebookPen,
+      title: t("land.vpCard3Title"),
+      text: t("land.vpCard3Text"),
+    },
+  ];
   return (
     <section className="px-6 py-20 bg-white dark:bg-[#151020]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
-            Per chi lavora e studia ogni giorno
+            {t("land.vpEyebrow")}
           </div>
           <h2 className="landing-heading-lg mt-3">
-            Gestisci progetti, note e task in un unico spazio{" "}
-            <span className="landing-display-accent">senza cambiare app</span>
+            {t("land.vpTitlePrefix")}{" "}
+            <span className="landing-display-accent">{t("land.vpTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-3">
-            Quando tutto &egrave; nello stesso workspace, smetti di rincorrere strumenti e torni a chiudere attivit&agrave;.
+            {t("land.vpSubtitle")}
           </p>
         </div>
 
@@ -81,7 +83,7 @@ export default function ValueProposition() {
 
         <div className="mt-10 text-center">
           <Link href="/register" className="landing-btn-primary">
-            Inizia gratis adesso
+            {t("land.vpCta")}
           </Link>
         </div>
       </div>

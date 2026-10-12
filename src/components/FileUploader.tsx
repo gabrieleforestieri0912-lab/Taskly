@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { Upload, File, Download, Trash2, X } from "lucide-react";
 import { Button } from "./UIComponents";
+import { useLanguage } from "../lib/LanguageContext";
 
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
@@ -15,6 +16,7 @@ function readFileAsDataURL(file) {
 }
 
 export default function FileUploader() {
+  const { t } = useLanguage();
   const [files, setFiles] = useState<any[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -99,9 +101,9 @@ export default function FileUploader() {
           <div className="h-full flex flex-col items-center justify-center text-center opacity-40 py-10">
             <Upload size={32} className="mb-2" />
             <p className="text-xs font-bold uppercase tracking-widest">
-              Trascina i file qui
+              {t("views.filesDrag")}
             </p>
-            <p className="text-[10px] mt-1">O clicca sul pulsante sotto</p>
+            <p className="text-[10px] mt-1">{t("views.filesOrClick")}</p>
           </div>
         ) : (
           files.map((f, i) => (
@@ -156,7 +158,7 @@ export default function FileUploader() {
             className="text-gray-400 group-hover:text-cyan-500"
           />
           <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-200">
-            Seleziona File
+            {t("views.filesSelect")}
           </span>
           <input type="file" onChange={onChange} multiple className="hidden" />
         </label>

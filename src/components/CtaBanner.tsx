@@ -1,8 +1,11 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function CtaBanner() {
+  const { t } = useLanguage();
   return (
     <section className="px-6 py-24 bg-white dark:bg-[#151020]">
       <div className="max-w-5xl mx-auto">
@@ -13,16 +16,16 @@ export default function CtaBanner() {
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 text-white text-xs font-black uppercase tracking-widest mb-6 backdrop-blur-sm">
               <Sparkles size={12} />
-              Pronto a cambiare?
+              {t("land.ctaBadge")}
             </div>
 
             <h2 className="font-instrument-serif text-4xl md:text-6xl text-white leading-[1.08] tracking-[-0.02em] mb-4">
-              Inizia oggi, <br className="md:hidden" />
-              <em className="font-instrument-serif italic text-white/90">gratis per sempre.</em>
+              {t("land.ctaTitlePrefix")} <br className="md:hidden" />
+              <em className="font-instrument-serif italic text-white/90">{t("land.ctaTitleAccent")}</em>
             </h2>
 
             <p className="text-white/80 text-base max-w-xl mx-auto mb-8 font-medium">
-              Nessuna carta di credito. Nessun periodo di prova. Solo produttivit&agrave; reale.
+              {t("land.ctaSubtitle")}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -30,7 +33,7 @@ export default function CtaBanner() {
                 href="/register"
                 className="font-inter inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-white px-8 text-base font-semibold tracking-[-0.01em] text-gray-900 hover:opacity-90 transition-all shadow-lg shadow-black/10"
               >
-                Crea il tuo workspace
+                {t("land.ctaPrimary")}
                 <ArrowRight size={16} />
               </Link>
               <button
@@ -40,7 +43,7 @@ export default function CtaBanner() {
                 }}
                 className="font-inter inline-flex h-[52px] items-center justify-center rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-sm px-8 text-base font-semibold tracking-[-0.01em] text-white hover:bg-white/20 transition-all"
               >
-                Vedi piani
+                {t("land.ctaSecondary")}
               </button>
             </div>
           </div>

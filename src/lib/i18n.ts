@@ -2,7 +2,12 @@ export type LangCode = "it" | "en";
 export type TranslationDict = Record<string, string>;
 export type Translations = Record<LangCode, TranslationDict>;
 
-export const translations: Translations = {
+import { authIt, authEn } from "./i18n-areas/auth";
+import { appviewsIt, appviewsEn } from "./i18n-areas/appviews";
+import { landingIt, landingEn } from "./i18n-areas/landing";
+import { pagesIt, pagesEn } from "./i18n-areas/pages";
+
+const baseTranslations: Translations = {
   it: {
     // Navbar / General
     features: "Funzionalità",
@@ -173,6 +178,11 @@ export const translations: Translations = {
     aiAction: "Full Analysis",
     resourcesTools: "Resources & Tools",
   },
+};
+
+export const translations: Translations = {
+  it: { ...baseTranslations.it, ...authIt, ...appviewsIt, ...landingIt, ...pagesIt },
+  en: { ...baseTranslations.en, ...authEn, ...appviewsEn, ...landingEn, ...pagesEn },
 };
 
 export const translate = (lang: LangCode, key: string): string =>

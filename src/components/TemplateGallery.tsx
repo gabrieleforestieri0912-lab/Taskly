@@ -2,6 +2,7 @@
 import React from "react";
 import { Layout, Copy, Sparkles, Plus } from "lucide-react";
 import { Badge } from "./UIComponents";
+import { useLanguage } from "../lib/LanguageContext";
 
 const TEMPLATES = [
   {
@@ -35,9 +36,10 @@ const TEMPLATES = [
 ];
 
 export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void }) {
-  const handleUse = (t) => {
-    navigator.clipboard?.writeText(t.content);
-    if (onUse) onUse(t);
+  const { t } = useLanguage();
+  const handleUse = (tpl) => {
+    navigator.clipboard?.writeText(tpl.content);
+    if (onUse) onUse(tpl);
   };
 
   return (
@@ -51,7 +53,7 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
           variant="default"
           className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-none"
         >
-          {TEMPLATES.length} disponibili
+          {t("views.tplAvailable").replace("{n}", String(TEMPLATES.length))}
         </Badge>
       </div>
 
@@ -85,7 +87,7 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
             <div className="mt-4 flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400">
                 <Plus size={12} />
-                Usa Template
+                {t("views.tplUse")}
               </div>
               <div className="w-7 h-7 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 <Copy size={12} />
@@ -97,9 +99,9 @@ export default function TemplateGallery({ onUse }: { onUse?: (t: any) => void })
 
       <div className="p-4 bg-gray-50/50 dark:bg-gray-950/50 border-t border-gray-100 dark:border-gray-800">
         <p className="text-[9px] font-bold text-center text-gray-400 uppercase tracking-widest leading-relaxed">
-          Scegli un template per iniziare
+          {t("views.tplChoose")}
           <br />
-          velocemente il tuo lavoro.
+          {t("views.tplChoose2")}
         </p>
       </div>
     </div>

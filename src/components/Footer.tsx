@@ -12,39 +12,7 @@ import {
   Twitter,
   Youtube,
 } from "lucide-react";
-
-const COLUMNS = [
-  {
-    title: "Prodotto",
-    links: [
-      { label: "Funzionalità", href: "/#features" },
-      { label: "Prezzi", href: "/#pricing" },
-      { label: "Template", href: "/templates" },
-      { label: "Integrazioni", href: "/integrations" },
-      { label: "Trascrizioni", href: "/transcription" },
-    ],
-  },
-  {
-    title: "Risorse",
-    links: [
-      { label: "Documentazione", href: "/docs" },
-      { label: "Demo", href: "/#demo" },
-      { label: "Come funziona", href: "/#getting-started" },
-      { label: "FAQ", href: "/#faq" },
-      { label: "Supporto", href: "/support" },
-    ],
-  },
-  {
-    title: "Azienda",
-    links: [
-      { label: "Contattaci", href: "/#contact" },
-      { label: "Registrati", href: "/register" },
-      { label: "Accedi", href: "/login" },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Termini", href: "/terms" },
-    ],
-  },
-];
+import { useLanguage } from "../lib/LanguageContext";
 
 const SOCIALS = [
   { icon: Github, href: "https://github.com", label: "GitHub" },
@@ -55,12 +23,45 @@ const SOCIALS = [
 ];
 
 export default function Footer() {
+  const { t } = useLanguage();
+  const COLUMNS = [
+    {
+      title: t("land.footerColProduct"),
+      links: [
+        { label: t("land.footerLinkFeatures"), href: "/#features" },
+        { label: t("land.footerLinkPricing"), href: "/#pricing" },
+        { label: t("land.footerLinkTemplates"), href: "/templates" },
+        { label: t("land.footerLinkIntegrations"), href: "/integrations" },
+        { label: t("land.footerLinkTranscriptions"), href: "/transcription" },
+      ],
+    },
+    {
+      title: t("land.footerColResources"),
+      links: [
+        { label: t("land.footerLinkDocs"), href: "/docs" },
+        { label: t("land.footerLinkDemo"), href: "/#demo" },
+        { label: t("land.footerLinkHow"), href: "/#getting-started" },
+        { label: t("land.footerLinkFaq"), href: "/#faq" },
+        { label: t("land.footerLinkSupport"), href: "/support" },
+      ],
+    },
+    {
+      title: t("land.footerColCompany"),
+      links: [
+        { label: t("land.footerLinkContact"), href: "/#contact" },
+        { label: t("land.footerLinkRegister"), href: "/register" },
+        { label: t("land.footerLinkLogin"), href: "/login" },
+        { label: t("land.footerLinkPrivacy"), href: "/privacy" },
+        { label: t("land.footerLinkTerms"), href: "/terms" },
+      ],
+    },
+  ];
   return (
     <footer
       id="contact"
       className="relative bg-[#f6f7f9] dark:bg-black text-gray-900 dark:text-gray-100 mt-auto overflow-hidden transition-colors duration-300 border-t border-[#7b39fc]/10 dark:border-white/5"
       role="contentinfo"
-      aria-label="Footer"
+      aria-label={t("land.footerAria")}
     >
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
@@ -74,7 +75,7 @@ export default function Footer() {
             <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/taskly.png"
-                alt="Taskly"
+                alt={t("land.footerLogoAlt")}
                 width={32}
                 height={32}
                 className="h-8 w-8 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110"
@@ -85,9 +86,7 @@ export default function Footer() {
             </Link>
 
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-              Organizza il tuo tempo, riduci il rumore e rimani concentrato su
-              ciò che conta. Il tuo workspace intelligente per task, note,
-              obiettivi e riunioni.
+              {t("land.footerTagline")}
             </p>
 
             <div className="mt-6 space-y-2.5">
@@ -100,7 +99,7 @@ export default function Footer() {
               </a>
             </div>
 
-            <div className="mt-6 flex items-center gap-2" aria-label="Social links">
+            <div className="mt-6 flex items-center gap-2" aria-label={t("land.footerSocialAria")}>
               {SOCIALS.map((s) => {
                 const Icon = s.icon;
                 return (
@@ -110,6 +109,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={s.label}
+                    title={s.label}
                     className="grid h-9 w-9 place-items-center rounded-xl border border-[#7b39fc]/10 bg-white text-gray-500 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#7b39fc]/40 hover:text-[#7b39fc] hover:shadow-lg hover:shadow-[#7b39fc]/15 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:text-[#a67cff]"
                   >
                     <Icon size={16} />
@@ -152,7 +152,7 @@ export default function Footer() {
       <div className="relative border-t border-gray-100 bg-white/40 dark:border-white/5 dark:bg-black/40">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
           <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            © {new Date().getFullYear()} Taskly. Tutti i diritti riservati.
+            {t("land.footerRights").replace("{year}", String(new Date().getFullYear()))}
           </p>
 
           <div className="flex items-center gap-6 text-xs">
@@ -160,19 +160,19 @@ export default function Footer() {
               href="/privacy"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
             >
-              Privacy
+              {t("land.footerLinkPrivacy")}
             </Link>
             <Link
               href="/terms"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
             >
-              Termini
+              {t("land.footerLinkTerms")}
             </Link>
             <Link
               href="/docs"
               className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
             >
-              Documentazione
+              {t("land.footerBottomDocs")}
             </Link>
           </div>
 
@@ -181,7 +181,7 @@ export default function Footer() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            Tutti i sistemi operativi
+            {t("land.footerStatus")}
           </div>
         </div>
       </div>

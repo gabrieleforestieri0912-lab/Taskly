@@ -3,9 +3,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { FileText, ArrowRight, SearchX } from "lucide-react";
 import { resolvePageIcon } from "../lib/pageIcons";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function SearchResults({ results = [] as any[], query = "" }) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   if (!query || query.trim() === "") return null;
 
@@ -16,13 +18,13 @@ export default function SearchResults({ results = [] as any[], query = "" }) {
           <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-3">
              <SearchX size={20} className="text-gray-400" />
           </div>
-          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">Nessun risultato trovato</p>
-          <p className="text-xs text-gray-400 mt-1">Prova a cambiare i termini di ricerca.</p>
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">{t("views.searchNone")}</p>
+          <p className="text-xs text-gray-400 mt-1">{t("views.searchTry")}</p>
         </div>
       ) : (
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar p-2">
           <div className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-            Risultati per &quot;{query}&quot;
+            {t("views.searchResultsFor").replace("{q}", query)}
           </div>
           <div className="space-y-1">
             {results.map((r) => {

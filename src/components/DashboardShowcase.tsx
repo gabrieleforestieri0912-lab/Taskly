@@ -41,149 +41,20 @@ import {
   Globe,
   ChevronRight,
 } from "lucide-react";
+import { useLanguage } from "../lib/LanguageContext";
 
-/* ── Shared bits ─────────────────────────────────────────────────────── */
+/* ── Shared bits (icons only; labels via t()) ─────────────────────────── */
 
-const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: ListTodo, label: "Task" },
-  { icon: Target, label: "Obiettivi" },
-  { icon: Calendar, label: "Calendario" },
-  { icon: FileText, label: "Note" },
-  { icon: Lightbulb, label: "Idee" },
+const NAV_ICONS = [
+  LayoutDashboard,
+  ListTodo,
+  Target,
+  Calendar,
+  FileText,
+  Lightbulb,
 ];
 
-const SPACE_ITEMS = [
-  { icon: BookOpen, label: "Letture" },
-  { icon: Users, label: "Team Dev" },
-  { icon: Rocket, label: "Lancio v3.2" },
-];
-
-const STATS = [
-  {
-    icon: CheckCircle2,
-    label: "Task completati",
-    value: 24,
-    suffix: "",
-    delta: "+12%",
-    color: "#7b39fc",
-  },
-  {
-    icon: Flame,
-    label: "Sequenza giorni",
-    value: 12,
-    suffix: "",
-    delta: "🔥",
-    color: "#a67cff",
-  },
-  {
-    icon: Zap,
-    label: "Produttività",
-    value: 87,
-    suffix: "%",
-    delta: "+6%",
-    color: "#8b4dff",
-  },
-  {
-    icon: Clock,
-    label: "Ore focus",
-    value: 31,
-    suffix: "h",
-    delta: "sett. scorsa",
-    color: "#c4a6ff",
-  },
-];
-
-const TODOS = [
-  {
-    id: 1,
-    title: "Rivedere proposta cliente Alpha",
-    tag: "Lavoro",
-    tagColor: "#7b39fc",
-    time: "09:30",
-    done: false,
-  },
-  {
-    id: 2,
-    title: "Preparare slide demo prodotto",
-    tag: "Progetto",
-    tagColor: "#a67cff",
-    time: "11:00",
-    done: true,
-  },
-  {
-    id: 3,
-    title: "Allenamento serale",
-    tag: "Salute",
-    tagColor: "#5a1fd4",
-    time: "18:00",
-    done: false,
-  },
-  {
-    id: 4,
-    title: "Leggere 20 pagine di Deep Work",
-    tag: "Crescita",
-    tagColor: "#8b4dff",
-    time: "21:30",
-    done: false,
-  },
-];
-
-const KANBAN = [
-  {
-    column: "Da fare",
-    color: "#8b4dff",
-    cards: [
-      { title: "Definire roadmap Q4", tag: "Strategia", priority: "Alta" },
-      { title: "Rispondere ai ticket supporto", tag: "Supporto", priority: "Media" },
-    ],
-  },
-  {
-    column: "In corso",
-    color: "#7b39fc",
-    cards: [
-      { title: "Nuova board Kanban", tag: "Sviluppo", priority: "Alta" },
-      { title: "Copy landing v3.2", tag: "Marketing", priority: "Media" },
-      { title: "Integrazione calendario", tag: "Sviluppo", priority: "Bassa" },
-    ],
-  },
-  {
-    column: "Revisione",
-    color: "#a67cff",
-    cards: [
-      { title: "Review design system", tag: "Design", priority: "Alta" },
-    ],
-  },
-  {
-    column: "Fatto",
-    color: "#22c55e",
-    cards: [
-      { title: "Onboarding nuovi utenti", tag: "Prodotto", priority: "Media" },
-      { title: "Piano marketing Q3", tag: "Marketing", priority: "Bassa" },
-    ],
-  },
-];
-
-const CAL_WEEK = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-
-const WEEK_EVENTS = {
-  1: ["09:30 — Review proposta"],
-  3: ["11:00 — Standup team", "15:00 — Call cliente Alpha"],
-  5: ["09:00 — Design review"],
-  6: ["10:30 — Allenamento"],
-};
-
-const AI_SUGGESTIONS = [
-  "Riassumi le note di oggi",
-  "Pianifica la mia settimana",
-  "Crea una pagina obiettivo",
-];
-
-const AI_MESSAGES = [
-  { from: "ai", text: "Ciao Sofia! 👋 Oggi hai 3 task prioritari e 2 obiettivi vicini alla scadenza." },
-  { from: "user", text: "Organizza la mia giornata per priorità" },
-  { from: "ai", text: "Perfetto, ho pianificato la tua giornata: 1) Proposta Alpha alle 9:30, 2) Slide demo alle 11:00, 3) Allenamento alle 18:00. Vuoi che crei anche i blocchi sul calendario?" },
-];
+const SPACE_ICONS = [BookOpen, Users, Rocket];
 
 /* ── Number counter ──────────────────────────────────────────────────── */
 
@@ -227,6 +98,20 @@ function CountUp({ value, suffix = "" }) {
 /* ── Sidebar mock ────────────────────────────────────────────────────── */
 
 function MockSidebar() {
+  const { t } = useLanguage();
+  const NAV_ITEMS = [
+    { icon: NAV_ICONS[0], label: t("land.mockNavDashboard"), active: true },
+    { icon: NAV_ICONS[1], label: t("land.mockNavTask") },
+    { icon: NAV_ICONS[2], label: t("land.mockNavGoals") },
+    { icon: NAV_ICONS[3], label: t("land.mockNavCalendar") },
+    { icon: NAV_ICONS[4], label: t("land.mockNavNotes") },
+    { icon: NAV_ICONS[5], label: t("land.mockNavIdeas") },
+  ];
+  const SPACE_ITEMS = [
+    { icon: SPACE_ICONS[0], label: t("land.mockSpaceReadings") },
+    { icon: SPACE_ICONS[1], label: t("land.mockSpaceTeam") },
+    { icon: SPACE_ICONS[2], label: t("land.mockSpaceLaunch") },
+  ];
   return (
     <div className="hidden h-full w-56 shrink-0 flex-col border-r border-[#2b2344]/60 bg-[#120d20]/95 p-4 md:flex">
       <div className="mb-6 flex items-center gap-2.5 px-1">
@@ -241,7 +126,7 @@ function MockSidebar() {
       <button className="mb-4 flex items-center justify-between rounded-xl border border-[#a484d7]/20 bg-[#7b39fc]/10 px-3 py-2 text-left transition-colors hover:bg-[#7b39fc]/20">
         <span className="flex items-center gap-2 text-[13px] font-semibold text-[#a67cff]">
           <Plus size={14} />
-          Nuova pagina
+          {t("land.mockNewPage")}
         </span>
         <kbd className="rounded-md border border-[#a484d7]/25 bg-[#120d20] px-1.5 py-0.5 text-[9px] font-bold text-[#a67cff]">
           ⌘N
@@ -267,7 +152,7 @@ function MockSidebar() {
         })}
 
         <div className="px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-600">
-          Workspace
+          {t("land.mockWorkspace")}
         </div>
         {SPACE_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -291,7 +176,7 @@ function MockSidebar() {
           <div className="truncate text-[12px] font-semibold text-gray-200">
             Sofia Rossi
           </div>
-          <div className="text-[10px] text-gray-500">Plan Pro</div>
+          <div className="text-[10px] text-gray-500">{t("land.mockPlanPro")}</div>
         </div>
         <ChevronDown size={14} className="text-gray-500" />
       </div>
@@ -335,14 +220,31 @@ function StatCard({ stat, index }) {
 /* ── View: Dashboard (task list + AI panel) ──────────────────────────── */
 
 function TasksView() {
+  const { t } = useLanguage();
+  const TODOS = [
+    { id: 1, title: t("land.mockTodo1Title"), tag: t("land.mockTagWork"), tagColor: "#7b39fc", time: "09:30", done: false },
+    { id: 2, title: t("land.mockTodo2Title"), tag: t("land.mockTagProject"), tagColor: "#a67cff", time: "11:00", done: true },
+    { id: 3, title: t("land.mockTodo3Title"), tag: t("land.mockTagHealth"), tagColor: "#5a1fd4", time: "18:00", done: false },
+    { id: 4, title: t("land.mockTodo4Title"), tag: t("land.mockTagGrowth"), tagColor: "#8b4dff", time: "21:30", done: false },
+  ];
+  const AI_SUGGESTIONS = [
+    t("land.mockAiSuggestion1"),
+    t("land.mockAiSuggestion2"),
+    t("land.mockAiSuggestion3"),
+  ];
+  const AI_MESSAGES = [
+    { from: "ai", text: t("land.mockAiMsg1") },
+    { from: "user", text: t("land.mockAiMsg2") },
+    { from: "ai", text: t("land.mockAiMsg3") },
+  ];
   const [todos, setTodos] = useState(TODOS);
 
   const toggle = (id) =>
     setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+      prev.map((td) => (td.id === id ? { ...td, done: !td.done } : td)),
     );
 
-  const doneCount = todos.filter((t) => t.done).length;
+  const doneCount = todos.filter((td) => td.done).length;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
@@ -351,17 +253,17 @@ function TasksView() {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">
-              Oggi
+              {t("land.mockToday")}
             </h4>
             <p className="mt-0.5 text-[12px] text-gray-500">
-              {doneCount} di {todos.length} completati
+              {t("land.mockProgressDone").replace("{done}", String(doneCount)).replace("{total}", String(todos.length))}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+            <button aria-label={t("land.showcaseTabOverview")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
               <ListChecks size={14} />
             </button>
-            <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+            <button aria-label={t("land.showcaseTabKanban")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
               <KanbanSquare size={14} />
             </button>
           </div>
@@ -433,7 +335,7 @@ function TasksView() {
 
         <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#a484d7]/25 py-2.5 text-[12px] font-semibold text-gray-500 transition-colors hover:border-[#a67cff]/50 hover:text-[#a67cff]">
           <Plus size={14} />
-          Aggiungi task
+          {t("land.mockAddTask")}
         </button>
       </div>
 
@@ -444,10 +346,10 @@ function TasksView() {
             <Bot size={15} />
           </div>
           <div className="flex-1">
-            <div className="text-[12px] font-bold text-white">Assistente AI</div>
+            <div className="text-[12px] font-bold text-white">{t("land.mockAiTitle")}</div>
             <div className="flex items-center gap-1 text-[10px] text-emerald-400">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Online
+              {t("land.mockAiOnline")}
             </div>
           </div>
           <Sparkles size={15} className="text-[#a67cff]" />
@@ -497,7 +399,8 @@ function TasksView() {
           <div className="flex items-center gap-2 rounded-xl border border-[#a484d7]/15 bg-[#120d20] px-3 py-2">
             <input
               readOnly
-              placeholder="Chiedi a Taskly…"
+              placeholder={t("land.mockAiPlaceholder")}
+              aria-label={t("land.mockAiPlaceholder")}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-gray-300 placeholder-gray-600 outline-none"
             />
             <Send size={14} className="text-[#a67cff]" />
@@ -511,6 +414,41 @@ function TasksView() {
 /* ── View: Kanban ────────────────────────────────────────────────────── */
 
 function KanbanView() {
+  const { t } = useLanguage();
+  const KANBAN = [
+    {
+      column: t("land.mockColTodo"),
+      color: "#8b4dff",
+      cards: [
+        { title: t("land.mockCardRoadmap"), tag: t("land.mockTagStrategy"), priority: t("land.mockPrioHigh") },
+        { title: t("land.mockCardTickets"), tag: t("land.mockTagSupport"), priority: t("land.mockPrioMedium") },
+      ],
+    },
+    {
+      column: t("land.mockColDoing"),
+      color: "#7b39fc",
+      cards: [
+        { title: t("land.mockCardKanban"), tag: t("land.mockTagDev"), priority: t("land.mockPrioHigh") },
+        { title: t("land.mockCardCopy"), tag: t("land.mockTagMarketing"), priority: t("land.mockPrioMedium") },
+        { title: t("land.mockCardCalIntegration"), tag: t("land.mockTagDev"), priority: t("land.mockPrioLow") },
+      ],
+    },
+    {
+      column: t("land.mockColReview"),
+      color: "#a67cff",
+      cards: [
+        { title: t("land.mockCardDesignReview"), tag: t("land.mockTagDesign"), priority: t("land.mockPrioHigh") },
+      ],
+    },
+    {
+      column: t("land.mockColDone"),
+      color: "#22c55e",
+      cards: [
+        { title: t("land.mockCardOnboarding"), tag: t("land.mockTagProduct"), priority: t("land.mockPrioMedium") },
+        { title: t("land.mockCardMarketing"), tag: t("land.mockTagMarketing"), priority: t("land.mockPrioLow") },
+      ],
+    },
+  ];
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {KANBAN.map((col, ci) => (
@@ -561,9 +499,9 @@ function KanbanView() {
                   </span>
                   <span
                     className={`text-[10px] font-semibold ${
-                      card.priority === "Alta"
+                      card.priority === t("land.mockPrioHigh")
                         ? "text-rose-400"
-                        : card.priority === "Media"
+                        : card.priority === t("land.mockPrioMedium")
                           ? "text-amber-400"
                           : "text-gray-500"
                     }`}
@@ -582,24 +520,35 @@ function KanbanView() {
 
 /* ── View: Calendar ──────────────────────────────────────────────────── */
 
-function CalendarView() {
+function ShowcaseCalendarView() {
+  const { t } = useLanguage();
   const today = 3; // Wednesday
+  const CAL_WEEK = [
+    t("land.mockDayMon"), t("land.mockDayTue"), t("land.mockDayWed"),
+    t("land.mockDayThu"), t("land.mockDayFri"), t("land.mockDaySat"), t("land.mockDaySun"),
+  ];
+  const WEEK_EVENTS = {
+    1: [t("land.mockEventReview")],
+    3: [t("land.mockEventStandup"), t("land.mockEventCall")],
+    5: [t("land.mockEventDesign")],
+    6: [t("land.mockEventGym")],
+  };
   return (
     <div className="rounded-2xl border border-[#a484d7]/12 bg-[#1a1528]/70 p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h4 className="font-inter text-[13px] font-bold uppercase tracking-[0.14em] text-[#a67cff]">
-            Ottobre 2026
+            {t("land.mockCalMonth")}
           </h4>
           <p className="mt-0.5 text-[12px] text-gray-500">
-            La tua settimana, a colpo d&apos;occhio
+            {t("land.mockCalSubtitle")}
           </p>
         </div>
         <div className="flex items-center gap-1.5">
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+          <button aria-label={t("land.navMenu")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
             <ChevronRight size={14} className="rotate-180" />
           </button>
-          <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+          <button aria-label={t("land.navMenu")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-400 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -654,14 +603,22 @@ function CalendarView() {
 
 /* ── Main showcase ───────────────────────────────────────────────────── */
 
-const TABS = [
-  { id: "overview", label: "Panoramica", icon: BarChart3 },
-  { id: "kanban", label: "Kanban", icon: KanbanSquare },
-  { id: "calendar", label: "Calendario", icon: CalendarDays },
-];
-
 export default function DashboardShowcase() {
+  const { t } = useLanguage();
   const [tab, setTab] = useState("overview");
+
+  const TABS = [
+    { id: "overview", label: t("land.showcaseTabOverview"), icon: BarChart3 },
+    { id: "kanban", label: t("land.showcaseTabKanban"), icon: KanbanSquare },
+    { id: "calendar", label: t("land.showcaseTabCalendar"), icon: CalendarDays },
+  ];
+
+  const STATS = [
+    { icon: CheckCircle2, label: t("land.mockStatCompleted"), value: 24, suffix: "", delta: "+12%", color: "#7b39fc" },
+    { icon: Flame, label: t("land.mockStatStreak"), value: 12, suffix: "", delta: "🔥", color: "#a67cff" },
+    { icon: Zap, label: t("land.mockStatProductivity"), value: 87, suffix: "%", delta: "+6%", color: "#8b4dff" },
+    { icon: Clock, label: t("land.mockStatFocusHours"), value: 31, suffix: "h", delta: t("land.mockStatLastWeek"), color: "#c4a6ff" },
+  ];
 
   const tiltRef = useRef<HTMLDivElement | null>(null);
   const tiltX = useMotionValue(0);
@@ -714,7 +671,7 @@ export default function DashboardShowcase() {
             className="landing-eyebrow"
           >
             <Sparkles size={13} />
-            Una dashboard, tutto il tuo lavoro
+            {t("land.showcaseEyebrow")}
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -723,7 +680,7 @@ export default function DashboardShowcase() {
             transition={{ duration: 0.55, delay: 0.05 }}
             className="landing-heading-lg mt-3"
           >
-            Il tuo workspace, <span className="landing-display-accent">in tempo reale</span>
+            {t("land.showcaseTitlePrefix")} <span className="landing-display-accent">{t("land.showcaseTitleAccent")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -732,8 +689,7 @@ export default function DashboardShowcase() {
             transition={{ duration: 0.55, delay: 0.12 }}
             className="landing-body mx-auto mt-4 max-w-xl"
           >
-            Task, obiettivi, calendario e note vivono nella stessa pagina.
-            Esplora la demo: spunta i task, cambia vista e parla con l&apos;assistente AI.
+            {t("land.showcaseSubtitle")}
           </motion.p>
         </div>
 
@@ -786,15 +742,15 @@ export default function DashboardShowcase() {
                 {/* App topbar */}
                 <div className="flex items-center justify-between border-b border-[#2b2344]/60 px-4 py-2.5 sm:px-5">
                   <div className="flex items-center gap-2.5">
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] md:hidden">
+                    <button aria-label={t("land.navMenu")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] md:hidden">
                       <PanelLeft size={14} />
                     </button>
                     <div>
                       <div className="text-[13px] font-bold text-white">
-                        Buongiorno, Sofia 👋
+                        {t("land.mockGreeting")}
                       </div>
                       <div className="hidden text-[10px] text-gray-500 sm:block">
-                        Giovedì, 8 ottobre
+                        {t("land.mockDateSub")}
                       </div>
                     </div>
                   </div>
@@ -802,13 +758,13 @@ export default function DashboardShowcase() {
                     <div className="hidden items-center gap-2 rounded-lg border border-[#a484d7]/15 bg-[#120d20] px-2.5 py-1.5 sm:flex">
                       <Search size={12} className="text-gray-600" />
                       <span className="text-[11px] text-gray-500">
-                        Cerca (⌘K)
+                        {t("land.mockSearchHint")}
                       </span>
                     </div>
-                    <button className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
+                    <button aria-label={t("land.mockSearchHint")} className="grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff] sm:hidden">
                       <Search size={14} />
                     </button>
-                    <button className="relative grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
+                    <button aria-label={t("land.mockSearchHint")} className="relative grid h-8 w-8 place-items-center rounded-lg border border-[#a484d7]/20 text-gray-500 transition-colors hover:bg-[#7b39fc]/15 hover:text-[#a67cff]">
                       <Bell size={14} />
                       <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#7b39fc]" />
                     </button>
@@ -829,14 +785,14 @@ export default function DashboardShowcase() {
 
                   {/* Tab switcher */}
                   <div className="mb-4 flex items-center gap-1 rounded-xl border border-[#a484d7]/12 bg-[#120d20]/70 p-1">
-                    {TABS.map((t) => {
-                      const Icon = t.icon;
-                      const active = tab === t.id;
+                    {TABS.map((tb) => {
+                      const Icon = tb.icon;
+                      const active = tab === tb.id;
                       return (
                         <button
-                          key={t.id}
+                          key={tb.id}
                           type="button"
-                          onClick={() => setTab(t.id)}
+                          onClick={() => setTab(tb.id)}
                           className={`relative flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-semibold transition-colors ${
                             active
                               ? "text-white"
@@ -852,7 +808,7 @@ export default function DashboardShowcase() {
                           )}
                           <Icon size={13} className="relative z-10" />
                           <span className="relative z-10 hidden sm:inline">
-                            {t.label}
+                            {tb.label}
                           </span>
                         </button>
                       );
@@ -870,7 +826,7 @@ export default function DashboardShowcase() {
                     >
                       {tab === "overview" && <TasksView />}
                       {tab === "kanban" && <KanbanView />}
-                      {tab === "calendar" && <CalendarView />}
+                      {tab === "calendar" && <ShowcaseCalendarView />}
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -895,8 +851,8 @@ export default function DashboardShowcase() {
                 <TrendingUp size={17} />
               </div>
               <div>
-                <div className="text-[13px] font-bold text-white">+27% produttività</div>
-                <div className="text-[10px] text-gray-500">dopo 2 settimane</div>
+                <div className="text-[13px] font-bold text-white">{t("land.mockBadge1Title")}</div>
+                <div className="text-[10px] text-gray-500">{t("land.mockBadge1Sub")}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -917,8 +873,8 @@ export default function DashboardShowcase() {
                 <Sparkles size={17} />
               </div>
               <div>
-                <div className="text-[13px] font-bold text-white">AI che lavora con te</div>
-                <div className="text-[10px] text-gray-500">suggerimenti contestuali</div>
+                <div className="text-[13px] font-bold text-white">{t("land.mockBadge2Title")}</div>
+                <div className="text-[10px] text-gray-500">{t("land.mockBadge2Sub")}</div>
               </div>
             </motion.div>
           </motion.div>
@@ -934,11 +890,11 @@ export default function DashboardShowcase() {
           className="mt-12 flex flex-col items-center gap-4 text-center"
         >
           <p className="max-w-md text-sm text-gray-500">
-            Questa è solo un&apos;anteprima. Il tuo workspace è personale, sincronizzato e pronto in 30 secondi.
+            {t("land.showcasePreviewNote")}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/register" className="landing-btn-primary">
-              Prova Taskly gratis
+              {t("land.showcaseCtaPrimary")}
               <ArrowUpRight size={17} />
             </Link>
             <button
@@ -950,7 +906,7 @@ export default function DashboardShowcase() {
               }}
               className="landing-btn-secondary"
             >
-              Guarda il video demo
+              {t("land.showcaseCtaSecondary")}
             </button>
           </div>
         </motion.div>

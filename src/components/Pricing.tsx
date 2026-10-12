@@ -1,38 +1,42 @@
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Zap, Star, ShieldCheck, ArrowRight, Building2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "../lib/LanguageContext";
 
-const PricingCard = ({ 
-  title, 
-  price, 
-  period, 
-  description, 
-  features, 
-  buttonText,    isPopular, 
+const PricingCard = ({
+  title,
+  price,
+  period,
+  description,
+  features,
+  buttonText,    isPopular,
   isHighlighted = false,
   icon: Icon,
   onCheckout,
-  loading
+  loading,
+  mostChosenLabel,
+  redirectingLabel
 }) => {
   return (
     <motion.div
       whileHover={{ y: -10 }}
       className={`relative rounded-2xl p-5 md:p-6 flex flex-col h-full transition-all duration-500 ${
-        isPopular 
-          ? "bg-white dark:bg-gray-800 shadow-[0_20px_50px_rgba(123,57,252,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-2 border-[#7b39fc]/30 md:scale-[1.02] z-10" 
-          : "bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl border border-white/50 dark:border-white/5 shadow-xl"
+        isPopular
+          ? "bg-white dark:bg-gray-800 shadow-[0_20px_50px_rgba(123,57,252,0.18)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-2 border-[#7b39fc]/30 md:scale-[1.02] z-10"
+          : "bg-white dark:bg-gray-900/40 backdrop-blur-xl border border-gray-200 dark:border-white/5 shadow-xl"
       }`}
     >
       {isPopular && (
         <div className="absolute -top-5 left-1/2 -translate-x-1/2 px-6 py-2 bg-linear-to-r from-[#7b39fc] to-[#a67cff] rounded-full text-white text-xs font-black uppercase tracking-widest shadow-lg">
-          Più Scelto
+          {mostChosenLabel}
         </div>
       )}
 
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h3 className="text-xl font-black dark:text-white mb-1 tracking-tight">{title}</h3>
+          <h3 className="text-xl font-black text-gray-900 dark:text-white mb-1 tracking-tight">{title}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
             {description}
           </p>
@@ -43,7 +47,7 @@ const PricingCard = ({
       </div>
 
       <div className="mb-5 flex items-baseline gap-1">
-        <span className="text-4xl font-black dark:text-white tracking-tighter">€{price}</span>
+        <span className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter">€{price}</span>
         <span className="text-gray-500 dark:text-gray-400 font-bold text-sm uppercase tracking-widest">/{period}</span>
       </div>
 
@@ -64,12 +68,12 @@ const PricingCard = ({
         onClick={onCheckout}
         disabled={loading}
         className={`w-full group relative flex items-center justify-center gap-2 py-3.5 rounded-xl font-black uppercase tracking-[0.15em] text-xs transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed ${
-        isPopular 
-          ? "bg-[#7b39fc] text-white hover:bg-[#8b4dff] hover:shadow-2xl hover:shadow-[#7b39fc]/25" 
+        isPopular
+          ? "bg-[#7b39fc] text-white hover:bg-[#8b4dff] hover:shadow-2xl hover:shadow-[#7b39fc]/25"
           : "bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm"
       }`}
       >
-        {loading ? "Reindirizzamento..." : buttonText}
+        {loading ? redirectingLabel : buttonText}
         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
       </button>
     </motion.div>
@@ -77,6 +81,7 @@ const PricingCard = ({
 };
 
 function Pricing() {
+  const { t } = useLanguage();
   const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(true);
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -110,16 +115,16 @@ function Pricing() {
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Checkout non disponibile.");
+        throw new Error(data.message || t("land.prErrCheckout"));
       }
 
       if (!data.url) {
-        throw new Error("URL checkout non ricevuto dal server.");
+        throw new Error(t("land.prErrNoUrl"));
       }
       window.location.href = data.url;
       return;
     } catch (error: any) {
-      alert(error.message || "Errore durante il checkout.");
+      alert(error.message || t("land.prErrGeneric"));
     } finally {
       setLoadingPlan(null);
     }
@@ -128,79 +133,79 @@ function Pricing() {
   const plans = [
     {
       title: "Starter",
-      description: "Per iniziare gratis e scoprire Taskly, senza limiti di tempo.",
+      description: t("land.prStarterDesc"),
       price: "0",
-      period: "Sempre",
+      period: t("land.prPeriodAlways"),
       icon: Star,
       features: [
-        "Fino a 3 Pagine attive",
-        "Task illimitati per pagina",
-        "Visualizzazione Calendario base",
-        "Note minimaliste",
-        "Brain Dump illimitato",
-        "Supporto via community"
+        t("land.prStarterF1"),
+        t("land.prStarterF2"),
+        t("land.prStarterF3"),
+        t("land.prStarterF4"),
+        t("land.prStarterF5"),
+        t("land.prStarterF6")
       ],
-      buttonText: "Inizia Gratis",
+      buttonText: t("land.prStarterBtn"),
       isPopular: false,
       checkoutType: "free",
       checkoutPlanId: "starter"
     },
     {
       title: "Pro",
-      description: "Tutto ciò di cui hai bisogno per la produttività quotidiana.",
+      description: t("land.prProDesc"),
       price: isAnnual ? "7.99" : "9.99",
-      period: "Mese",
+      period: t("land.prPeriodMonth"),
       icon: Zap,
       features: [
-        "Pagine illimitate",
-        "Workspace personalizzabili",
-        "Tutti i moduli (Tasks, Goals, Note)",
-        "Notifiche push intelligenti",
-        "Export dati PDF / CSV / Markdown",
-        "Backup automatici giornalieri",
-        "Supporto prioritario 24/7"
+        t("land.prProF1"),
+        t("land.prProF2"),
+        t("land.prProF3"),
+        t("land.prProF4"),
+        t("land.prProF5"),
+        t("land.prProF6"),
+        t("land.prProF7")
       ],
-      buttonText: "Scegli Pro",
+      buttonText: t("land.prProBtn"),
       isPopular: true,
       checkoutType: "stripe",
       checkoutPlanId: isAnnual ? "pro_yearly" : "pro_monthly"
     },
     {
       title: "Business",
-      description: "Per team piccoli che collaborano in tempo reale.",
+      description: t("land.prBizDesc"),
       price: isAnnual ? "19.99" : "24.99",
-      period: "Mese",
+      period: t("land.prPeriodMonth"),
       icon: ShieldCheck,
       features: [
-        "Fino a 10 membri inclusi",
-        "Workspace condivisi",
-        "Assegnazione Task avanzata",
-        "Report di produttività del team",
-        "Integrazione Slack & Google",
-        "Permessi e ruoli personalizzati",
-        "Account Manager dedicato"
+        t("land.prBizF1"),
+        t("land.prBizF2"),
+        t("land.prBizF3"),
+        t("land.prBizF4"),
+        t("land.prBizF5"),
+        t("land.prBizF6"),
+        t("land.prBizF7")
       ],
-      buttonText: "Scegli Business",
+      buttonText: t("land.prBizBtn"),
       isPopular: false,
       checkoutType: "stripe",
       checkoutPlanId: isAnnual ? "team_yearly" : "team_monthly"
     },
     {
       title: "Enterprise",
-      description: "Scala, sicurezza e controllo per organizzazioni grandi.",
+      description: t("land.prEntDesc"),
       price: isAnnual ? "49.99" : "59.99",
-      period: "Mese",
+      period: t("land.prPeriodMonth"),
       icon: Building2,
       features: [
-        "Membri illimitati",
-        "SSO / SAML",
-        "SLA garantito al 99,9%",
-        "Audit log e conformità",
-        "API complete per integrazioni custom",
-        "Onboarding e training dedicati",
-        "Supporto dedicato 24/7"
+        t("land.prEntF1"),
+        t("land.prEntF2"),
+        t("land.prEntF3"),
+        t("land.prEntF4"),
+        t("land.prEntF5"),
+        t("land.prEntF6"),
+        t("land.prEntF7")
       ],
-      buttonText: "Parliamo del tuo team",
+      buttonText: t("land.prEntBtn"),
       isPopular: false,
       checkoutType: "contact",
       checkoutPlanId: "enterprise"
@@ -224,35 +229,36 @@ function Pricing() {
           className="landing-eyebrow"
         >
           <Star size={12} fill="currentColor" />
-          Prezzi Chiari
+          {t("land.prEyebrow")}
         </motion.div>
-        
-        <motion.h2 
+
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
            className="landing-heading-lg leading-tight mb-5"
         >
-          Scegli il piano giusto <br />
-          per il tuo <span className="landing-display-accent">focus.</span>
+          {t("land.prTitlePrefix")} <br />
+          {t("land.prTitleMiddle")} <span className="landing-display-accent">{t("land.prTitleAccent")}</span>
         </motion.h2>
 
         {/* Toggle Switch */}
         <div className="flex items-center justify-center gap-4 mt-12">
-          <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>Mensile</span>
-          <button 
+          <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("land.prMonthly")}</span>
+          <button
             onClick={() => setIsAnnual(!isAnnual)}
+            aria-label={t("land.prAnnual")}
             className="w-16 h-9 rounded-full bg-gray-200 dark:bg-gray-800 p-1 relative transition-colors border border-gray-100 dark:border-gray-700"
           >
-            <motion.div 
+            <motion.div
               animate={{ x: isAnnual ? 28 : 0 }}
               className="w-7 h-7 bg-white dark:bg-[#7b39fc] rounded-full shadow-lg"
             />
           </button>
           <div className="flex flex-col items-start leading-none">
-            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>Annuale</span>
-            <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">Risparmia 20%</span>
+            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("land.prAnnual")}</span>
+            <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">{t("land.prSave20")}</span>
           </div>
         </div>
       </div>
@@ -270,19 +276,21 @@ function Pricing() {
               {...plan}
               loading={loadingPlan === plan.checkoutPlanId}
               onCheckout={() => handleCheckout(plan)}
+              mostChosenLabel={t("land.prMostChosen")}
+              redirectingLabel={t("land.prRedirecting")}
             />
           </motion.div>
         ))}
       </div>
 
-      <motion.p 
+      <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ delay: 0.6 }}
         className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium"
       >
-        Hai bisogno di un piano personalizzato? <button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">Parla con noi</button>
+        {t("land.prCustomPrefix")} <button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">{t("land.prCustomLink")}</button>
       </motion.p>
     </section>
   );

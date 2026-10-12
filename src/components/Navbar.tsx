@@ -59,9 +59,9 @@ export default function Navbar({
   const isDashboard = pathname.startsWith("/dashboard");
 
   const landingNavLinks = [
-    { name: "Home", href: "#", key: "home" },
+    { name: t("land.navHome"), href: "#", key: "home" },
     {
-      name: "Funzionalità",
+      name: t("land.navFeaturesGroup"),
       href: "#features",
       key: "features",
       hasDropdown: true,
@@ -69,56 +69,56 @@ export default function Navbar({
         {
           name: t("howItWorks"),
           href: "#getting-started",
-          desc: "Scopri il flusso di lavoro passo dopo passo",
+          desc: t("land.navDescFlow"),
           icon: Map,
         },
         {
           name: t("demo"),
           href: "#demo",
-          desc: "Guarda Taskly in azione dal vivo",
+          desc: t("land.navDescDemoLive"),
           icon: PlayCircle,
         },
         {
-          name: "Use Cases",
+          name: t("land.navUseCases"),
           href: "#use-cases",
-          desc: "Casi d'uso per team, freelancer e studenti",
+          desc: t("land.navDescUseCases"),
           icon: Users,
         },
         {
-          name: "Confronto",
+          name: t("land.navComparison"),
           href: "#comparison",
-          desc: "Taskly a confronto con altri strumenti",
+          desc: t("land.navDescComparison"),
           icon: Scale,
         },
       ],
     },
     {
-      name: "Recensioni",
+      name: t("land.navReviews"),
       href: "#social-proof",
       key: "reviews",
       hasDropdown: true,
       children: [
         {
-          name: "Testimonianze",
+          name: t("land.navTestimonials"),
           href: "#social-proof",
-          desc: "Cosa dicono i nostri utenti",
+          desc: t("land.navDescTestimonials"),
           icon: Star,
         },
         {
           name: t("pricing"),
           href: "#pricing",
-          desc: "Piani flessibili per ogni esigenza",
+          desc: t("land.navDescPlans"),
           icon: Sparkles,
         },
         {
           name: t("faq"),
           href: "#faq",
-          desc: "Risposte alle domande più comuni",
+          desc: t("land.navDescFaq"),
           icon: CircleHelp,
         },
       ],
     },
-    { name: "Contattaci", href: "#faq", key: "contact" },
+    { name: t("land.navContact"), href: "#faq", key: "contact" },
   ];
 
   const navLinks = [
@@ -132,55 +132,55 @@ export default function Navbar({
   // Gruppi con dropdown per la navbar delle pagine interne (stesse sezioni della landing)
   const groupedNavLinks = [
     {
-      name: "Funzionalità",
+      name: t("land.navFeaturesGroup"),
       key: "features",
       children: [
         {
           name: t("howItWorks"),
           href: "#getting-started",
-          desc: "Scopri il flusso di lavoro passo dopo passo",
+          desc: t("land.navDescFlow"),
           icon: Map,
         },
         {
           name: t("demo"),
           href: "#demo",
-          desc: "Guarda Taskly in azione dal vivo",
+          desc: t("land.navDescDemoLive"),
           icon: PlayCircle,
         },
         {
-          name: "Use Cases",
+          name: t("land.navUseCases"),
           href: "#use-cases",
-          desc: "Casi d'uso per team, freelancer e studenti",
+          desc: t("land.navDescUseCases"),
           icon: Users,
         },
         {
-          name: "Confronto",
+          name: t("land.navComparison"),
           href: "#comparison",
-          desc: "Taskly a confronto con altri strumenti",
+          desc: t("land.navDescComparison"),
           icon: Scale,
         },
       ],
     },
     {
-      name: "Risorse",
+      name: t("land.navResources"),
       key: "resources",
       children: [
         {
-          name: "Testimonianze",
+          name: t("land.navTestimonials"),
           href: "#social-proof",
-          desc: "Cosa dicono i nostri utenti",
+          desc: t("land.navDescTestimonials"),
           icon: Star,
         },
         {
           name: t("pricing"),
           href: "#pricing",
-          desc: "Piani flessibili per ogni esigenza",
+          desc: t("land.navDescPlans"),
           icon: Sparkles,
         },
         {
           name: t("faq"),
           href: "#faq",
-          desc: "Risposte alle domande più comuni",
+          desc: t("land.navDescFaq"),
           icon: CircleHelp,
         },
       ],
@@ -361,7 +361,7 @@ export default function Navbar({
                 href="/docs"
                 className={menuItem}
               >
-                Documentazione
+                {t("land.navDocs")}
               </Link>
             </div>
 
@@ -382,7 +382,7 @@ export default function Navbar({
                       type="button"
                       onClick={() => setDropdownOpen((open) => !open)}
                       className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#7b39fc] text-white shadow-sm ring-2 ring-white/20 transition-colors hover:bg-[#8b4dff]"
-                      aria-label="Account"
+                      aria-label={t("land.navAccountLabel")}
                     >
                       {user.picture ? (
                         <img
@@ -451,7 +451,7 @@ export default function Navbar({
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 lg:hidden"
-              aria-label="Menu"
+              aria-label={t("land.navMenu")}
             >
               <Menu size={22} />
             </button>
@@ -483,7 +483,7 @@ export default function Navbar({
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-10 w-10 items-center justify-center text-white"
-                  aria-label="Chiudi menu"
+                  aria-label={t("land.navCloseMenu")}
                 >
                   <X size={24} />
                 </button>
@@ -555,7 +555,7 @@ export default function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="block rounded-xl px-3 py-2.5 font-inter text-2xl font-medium text-white"
                 >
-                  Documentazione
+                  {t("land.navDocs")}
                 </Link>
               </nav>
 
@@ -627,7 +627,7 @@ export default function Navbar({
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
-              aria-label="Apri menu laterale"
+              aria-label={t("land.navOpenSidebar")}
             >
               <PanelLeftOpen size={18} />
             </button>
@@ -636,7 +636,7 @@ export default function Navbar({
             <button
               onClick={() => setIsSidebarOpen(false)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#7b39fc]/20 bg-white text-gray-600 transition-all duration-200 hover:bg-[#7b39fc]/10 hover:text-[#7b39fc] hover:scale-105 dark:border-[#a484d7]/20 dark:bg-white/8 dark:text-gray-300 dark:hover:bg-[#7b39fc]/15 dark:hover:text-[#a67cff]"
-              aria-label="Chiudi menu laterale"
+              aria-label={t("land.navCloseSidebar")}
             >
               <PanelLeftClose size={18} />
             </button>
@@ -820,7 +820,7 @@ export default function Navbar({
             <button
               onClick={() => setMobileMenuOpen((open) => !open)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 md:hidden"
-              aria-label="Menu"
+              aria-label={t("land.navMenu")}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -854,14 +854,14 @@ export default function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-11 items-center justify-center rounded-lg border border-[#d4d4d4] text-sm font-semibold text-[#171717]"
                 >
-                  Accedi
+                  {t("login")}
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-11 items-center justify-center rounded-lg bg-[#7b39fc] text-sm font-semibold text-white"
                 >
-                  Inizia
+                  {t("start")}
                 </Link>
               </div>
             )}

@@ -1,25 +1,9 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import { GraduationCap, BriefcaseBusiness, Users } from "lucide-react";
 import { motion } from "framer-motion";
-
-const cases = [
-  {
-    title: "Per studenti",
-    icon: GraduationCap,
-    points: ["Piano esami e obiettivi settimanali", "Note collegate alle attivit\u00e0", "Focus giornaliero semplice"],
-  },
-  {
-    title: "Per freelance",
-    icon: BriefcaseBusiness,
-    points: ["Clienti, task e deadline nello stesso posto", "Dashboard leggera e operativa", "Meno tab aperti, pi\u00f9 consegne"],
-  },
-  {
-    title: "Per team",
-    icon: Users,
-    points: ["Workspace condiviso", "Assegnazioni chiare e reporting", "Collaborazione senza caos"],
-  },
-];
+import { useLanguage } from "../lib/LanguageContext";
 
 const containerVariants = {
   hidden: {},
@@ -38,16 +22,34 @@ const cardVariants = {
 };
 
 export default function UseCases() {
+  const { t } = useLanguage();
+  const cases = [
+    {
+      title: t("land.ucCase1Title"),
+      icon: GraduationCap,
+      points: [t("land.ucCase1P1"), t("land.ucCase1P2"), t("land.ucCase1P3")],
+    },
+    {
+      title: t("land.ucCase2Title"),
+      icon: BriefcaseBusiness,
+      points: [t("land.ucCase2P1"), t("land.ucCase2P2"), t("land.ucCase2P3")],
+    },
+    {
+      title: t("land.ucCase3Title"),
+      icon: Users,
+      points: [t("land.ucCase3P1"), t("land.ucCase3P2"), t("land.ucCase3P3")],
+    },
+  ];
   return (
     <section className="px-6 py-20 bg-[#f6f7f9] dark:bg-[#1a1528]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
-            Use cases
+            {t("land.ucEyebrow")}
           </div>
           <h2 className="landing-heading-lg mt-3">
-            Trova il modo giusto{" "}
-            <span className="landing-display-accent">per il tuo lavoro</span>
+            {t("land.ucTitlePrefix")}{" "}
+            <span className="landing-display-accent">{t("land.ucTitleAccent")}</span>
           </h2>
         </div>
 
@@ -82,7 +84,7 @@ export default function UseCases() {
 
         <div className="mt-10 text-center">
           <Link href="/register" className="landing-btn-primary">
-            Crea workspace in 2 minuti
+            {t("land.ucCta")}
           </Link>
         </div>
       </div>

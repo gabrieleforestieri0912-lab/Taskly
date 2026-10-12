@@ -2,8 +2,10 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Play } from "lucide-react";
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function ProductDemo() {
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -18,22 +20,22 @@ export default function ProductDemo() {
     <section className="landing-section px-4 py-20 bg-[#f6f7f9] dark:bg-[#1a1528] sm:px-6">
       <div className="max-w-6xl mx-auto grid min-w-0 lg:grid-cols-2 gap-10 items-center">
         <div className="min-w-0">
-          <div className="landing-eyebrow">Demo prodotto</div>
+          <div className="landing-eyebrow">{t("land.pdEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
-            Guarda il prodotto reale{" "}
-            <span className="landing-display-accent">in azione</span>
+            {t("land.pdTitlePrefix")}{" "}
+            <span className="landing-display-accent">{t("land.pdTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-4">
-            Una vista concreta di dashboard, planning e note collegate per capire subito il valore.
+            {t("land.pdSubtitle")}
           </p>
           <ul className="mt-5 space-y-2 text-sm text-gray-700 dark:text-gray-300">
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> Workflow task e obiettivi nello stesso spazio</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> Organizzazione per pagine annidate</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> Supporto AI contestuale nella dashboard</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> {t("land.pdBullet1")}</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> {t("land.pdBullet2")}</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" /> {t("land.pdBullet3")}</li>
           </ul>
           <div className="mt-7">
             <Link href="/register" className="landing-btn-primary">
-              Prova la demo nel tuo account
+              {t("land.pdCta")}
             </Link>
           </div>
         </div>
@@ -53,6 +55,7 @@ export default function ProductDemo() {
               {!isPlaying && (
                 <button
                   onClick={handlePlay}
+                  aria-label={t("land.pdPlayLabel")}
                   className="relative z-10 flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-[#7b39fc] to-[#a67cff] text-white transition-transform hover:scale-105 shadow-2xl shadow-[#7b39fc]/30"
                 >
                   <Play size={32} fill="white" />
@@ -62,7 +65,7 @@ export default function ProductDemo() {
             </div>
           </div>
           <p className="mt-3 text-[11px] text-center text-gray-500 dark:text-gray-400 font-medium">
-            Video dimostrativo - Metti il tuo file in /public/demo.mp4
+            {t("land.pdCaption")}
           </p>
         </div>
       </div>

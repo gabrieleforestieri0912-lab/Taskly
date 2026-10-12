@@ -309,7 +309,7 @@ export default function Sidebar({
           <button
             onClick={(e) => togglePageExpand(page.id, e)}
             className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-gray-200/60 dark:hover:bg-white/10 transition-colors mr-1 ${hasChildren ? "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" : "opacity-0 pointer-events-none"}`}
-            aria-label={isExpanded ? "Comprimi" : "Espandi"}
+            aria-label={isExpanded ? t("land.sideCollapse") : t("land.sideExpand")}
           >
             <ChevronRight
               size={13}
@@ -370,7 +370,7 @@ export default function Sidebar({
             <button
               onClick={(e) => confirmAndDelete(page.id, e)}
               className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all"
-              title="Elimina"
+              title={t("land.sideDeleteTitle")}
             >
               <Trash2 size={13} />
             </button>
@@ -432,7 +432,7 @@ export default function Sidebar({
           className="flex items-center gap-2 w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
         >
           <Settings size={16} />
-          <span>Impostazioni</span>
+          <span>{t("land.sideSettings")}</span>
         </Link>
 
         <Link
@@ -441,7 +441,7 @@ export default function Sidebar({
           className="flex items-center gap-2 w-full px-3 py-2 mt-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
         >
           <CreditCard size={16} />
-          <span>Piano di abbonamento</span>
+          <span>{t("land.sideSubPlan")}</span>
         </Link>
       </div>,
       document.body,
@@ -468,7 +468,7 @@ export default function Sidebar({
           className="flex items-center gap-2 w-full px-3 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
         >
           <BookOpen size={16} className="text-gray-400" />
-          <span>Documentazione</span>
+          <span>{t("land.sideDocs")}</span>
         </Link>
 
         <Link
@@ -477,7 +477,7 @@ export default function Sidebar({
           className="flex items-center gap-2 w-full px-3 py-2 mt-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
         >
           <Users size={16} className="text-gray-400" />
-          <span>Supporto</span>
+          <span>{t("land.sideSupport")}</span>
         </Link>
 
         <Link
@@ -486,7 +486,7 @@ export default function Sidebar({
           className="flex items-center gap-2 w-full px-3 py-2 mt-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-sm font-medium transition-colors"
         >
           <FileText size={16} className="text-gray-400" />
-          <span>Termini e condizioni</span>
+          <span>{t("land.sideTerms")}</span>
         </Link>
       </div>,
       document.body,
@@ -516,8 +516,8 @@ export default function Sidebar({
 
     const allDeleted = [
       ...deletedPages.map((p) => ({ ...p, _type: "page" })),
-      ...deletedTasks.map((t) => ({ ...t, _type: "task", label: t.title || t.text || "Attività" })),
-      ...deletedGoals.map((g) => ({ ...g, _type: "goal", label: g.title || g.label || "Obiettivo" })),
+      ...deletedTasks.map((t) => ({ ...t, _type: "task", label: t.title || t.text || t("land.sideTaskFallback") })),
+      ...deletedGoals.map((g) => ({ ...g, _type: "goal", label: g.title || g.label || t("land.sideGoalFallback") })),
     ];
 
     const q = (trashSearch || "").toLowerCase();
@@ -539,13 +539,13 @@ export default function Sidebar({
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Trash2 size={16} className="text-gray-500" />
-            Cestino
+            {t("land.sideTrash")}
           </h3>
           <button
             onClick={() => setIsTrashOpen(false)}
             className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
-            Chiudi
+            {t("land.sideClose")}
           </button>
         </div>
 
@@ -555,7 +555,7 @@ export default function Sidebar({
             type="text"
             value={trashSearch}
             onChange={(e) => setTrashSearch(e.target.value)}
-            placeholder="Cerca negli elementi eliminati..."
+            placeholder={t("land.sideTrashSearchPh")}
             className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
           />
         </div>
@@ -563,7 +563,7 @@ export default function Sidebar({
         <div className="flex-1 overflow-auto space-y-2 min-h-0">
           {filtered.length === 0 ? (
             <div className="text-sm text-gray-400 italic text-center py-8">
-              {trashSearch ? "Nessun risultato" : "Nessun elemento eliminato"}
+              {trashSearch ? t("land.sideNoResults") : t("land.sideNoDeleted")}
             </div>
           ) : (
             filtered.map((item, index) => (
@@ -579,10 +579,10 @@ export default function Sidebar({
                       ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
                       : "bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
                   }`}>
-                    {item._type === "page" ? "Pagina" : item._type === "task" ? "Task" : "Goal"}
+                    {item._type === "page" ? t("land.sideLabelPage") : item._type === "task" ? "Task" : t("land.sideLabelGoal")}
                   </span>
                   <span className="truncate text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {item.label || "Senza nome"}
+                    {item.label || t("land.sideUnnamed")}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -605,7 +605,7 @@ export default function Sidebar({
                     }}
                     className="px-2 py-1 text-xs font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                   >
-                    Ripristina
+                    {t("land.sideRestore")}
                   </button>
                   <button
                     onClick={() => {
@@ -623,7 +623,7 @@ export default function Sidebar({
                     }}
                     className="px-2 py-1 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   >
-                    Elimina
+                    {t("land.sideDeleteBtn")}
                   </button>
                 </div>
               </div>
@@ -645,23 +645,22 @@ export default function Sidebar({
           onClick={handleCancelDelete}
         />
         <div className="relative bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-6 w-full max-w-md">
-          <h3 className="text-lg font-bold mb-2">Conferma eliminazione</h3>
+          <h3 className="text-lg font-bold mb-2">{t("land.sideConfirmDeleteTitle")}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            Sei sicuro di voler eliminare questa pagina? L&apos;operazione può essere
-            annullata soltanto dal Cestino.
+            {t("land.sideConfirmDeleteDesc")}
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={handleCancelDelete}
               className="px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm font-semibold"
             >
-              Annulla
+              {t("land.sideCancel")}
             </button>
             <button
               onClick={handleConfirmDelete}
               className="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-bold"
             >
-              Elimina
+              {t("land.sideDeleteBtn")}
             </button>
           </div>
         </div>
@@ -842,11 +841,11 @@ export default function Sidebar({
             isAIActive ? (
               <div className="space-y-1">
                 <p className="px-3 pt-1 pb-1 text-[10px] font-black uppercase tracking-[0.15em] text-gray-400">
-                  {t("history")} AI
+                  {t("history")} {t("land.sideHistoryAi")}
                 </p>
                 {aiMessages.length === 0 ? (
                   <div className="px-3 py-4 text-center text-xs text-gray-400">
-                    Nessuna cronologia disponibile.
+                    {t("land.sideNoAiHistory")}
                   </div>
                 ) : (
                   <div className="px-2 space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
@@ -916,12 +915,12 @@ export default function Sidebar({
                 setIsTrashOpen((s) => !s);
               }}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              title="Cestino"
+              title={t("land.sideTrash")}
             >
               <Trash2 size={16} className="text-gray-500" />
               <div className="flex-1 text-left">
                 <div className="text-sm font-bold text-gray-700 dark:text-gray-200">
-                  Cestino
+                  {t("land.sideTrash")}
                 </div>
               </div>
             </button>
@@ -930,11 +929,11 @@ export default function Sidebar({
               ref={helpRef}
               onClick={() => setIsHelpOpen((s) => !s)}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              title="Aiuto / Documentazione"
+              title={t("land.sideHelpTitle")}
             >
               <BookOpen size={16} className="text-gray-500" />
               <span className="text-sm font-bold text-gray-700 dark:text-gray-200">
-                Aiuto
+                {t("land.sideHelp")}
               </span>
             </button>
           </div>
@@ -1008,7 +1007,7 @@ export default function Sidebar({
                         }}
                         className="text-[10px] font-bold text-gray-400 hover:text-red-500 transition-colors"
                       >
-                        Cancella
+                        {t("land.sideClear")}
                       </button>
                     </div>
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
@@ -1050,7 +1049,7 @@ export default function Sidebar({
                 {searchQuery && (
                   <div className="pt-2">
                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400/80 dark:text-gray-500 mb-2 px-1">
-                      Risultati Ricerca
+                      {t("land.sideSearchResults")}
                     </p>
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar text-xs text-gray-500">
                       {pages.filter(

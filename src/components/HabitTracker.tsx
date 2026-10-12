@@ -2,19 +2,21 @@
 import React, { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Check } from "lucide-react";
 import HabitCard from "./HabitCard";
+import { useLanguage } from "../lib/LanguageContext";
 
 function daysInMonth(month, year) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function monthLabel(month, year) {
-  return new Date(year, month, 1).toLocaleString(undefined, {
+function monthLabel(month, year, language) {
+  return new Date(year, month, 1).toLocaleString(language === "en" ? "en-US" : undefined, {
     month: "long",
     year: "numeric",
   });
 }
 
 export default function HabitTracker({ initialMonth, initialYear }) {
+  const { t, language } = useLanguage();
   const now = new Date();
   const [month, setMonth] = useState(
     typeof initialMonth === "number" ? initialMonth : now.getMonth(),
@@ -118,12 +120,12 @@ export default function HabitTracker({ initialMonth, initialYear }) {
               setYear(prev.getFullYear());
             }}
             className="p-2 rounded-lg hover:bg-gray-100"
-            title="Mese precedente"
+            title={t("views.habitPrevMonth")}
           >
             <ChevronLeft size={16} />
           </button>
 
-          <div className="font-bold">{monthLabel(month, year)}</div>
+          <div className="font-bold">{monthLabel(month, year, language)}</div>
 
           <button
             onClick={() => {
@@ -132,7 +134,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
               setYear(next.getFullYear());
             }}
             className="p-2 rounded-lg hover:bg-gray-100"
-            title="Mese successivo"
+            title={t("views.habitNextMonth")}
           >
             <ChevronRight size={16} />
           </button>
@@ -150,7 +152,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
           <div className="bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl w-[min(720px,95%)] p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold">
-                Giorno {editingDay.day} — {monthLabel(month, year)}
+                {t("views.habitDay").replace("{n}", String(editingDay.day)).replace("{month}", monthLabel(month, year, language))}
               </h3>
               <button
                 onClick={closeEditor}
@@ -165,14 +167,14 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                 <input
                   value={newHabitText}
                   onChange={(e) => setNewHabitText(e.target.value)}
-                  placeholder="Aggiungi nuova abitudine"
+                  placeholder={t("views.habitAddPh")}
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg bg-gray-50"
                 />
                 <button
                   onClick={addHabit}
                   className="px-4 py-2 bg-cyan-600 text-white rounded-lg"
                 >
-                  Aggiungi
+                  {t("views.habitAdd")}
                 </button>
               </div>
 
@@ -205,7 +207,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                         onClick={() => removeHabit(i)}
                         className="text-red-500 px-2 py-1 rounded hover:bg-red-50"
                       >
-                        Elimina
+                        {t("views.habitDelete")}
                       </button>
                     </div>
                   </li>
@@ -217,13 +219,13 @@ export default function HabitTracker({ initialMonth, initialYear }) {
                   onClick={closeEditor}
                   className="px-4 py-2 rounded-lg border"
                 >
-                  Annulla
+                  {t("views.habitCancel")}
                 </button>
                 <button
                   onClick={saveEditor}
                   className="px-4 py-2 bg-cyan-600 text-white rounded-lg"
                 >
-                  Salva
+                  {t("views.habitSave")}
                 </button>
               </div>
             </div>

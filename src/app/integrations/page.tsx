@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Webhook, CalendarDays, MessageSquare, ArrowLeft, Check, Link as LinkIcon, ExternalLink, Loader2 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
+import { useLanguage } from "../../lib/LanguageContext";
 
 type IntegrationState = {
   slack: boolean;
@@ -10,6 +11,7 @@ type IntegrationState = {
 };
 
 export default function IntegrationsPage() {
+  const { t } = useLanguage();
   const [connected, setConnected] = useState<IntegrationState>({ slack: false, google: false });
   const [webhookUrl, setWebhookUrl] = useState("");
   const [testMessage, setTestMessage] = useState("");
@@ -39,7 +41,7 @@ export default function IntegrationsPage() {
 
   const connectSlack = async () => {
     if (!webhookUrl.trim()) {
-      setStatus("Incolla l'URL del webhook Slack.");
+      setStatus(t("auth.intPasteWebhook"));
       return;
     }
     setSlackBusy(true);
@@ -52,13 +54,13 @@ export default function IntegrationsPage() {
       });
       if (res.ok) {
         setConnected((c) => ({ ...c, slack: true }));
-        setStatus("Slack collegato \u2713 Ora puoi inviare messaggi di test.");
+        setStatus(t("auth.intSlackConnected"));
       } else {
         const d = await res.json();
-        setStatus(d?.message || "Errore durante il collegamento.");
+        setStatus(d?.message || t("auth.intConnectError"));
       }
     } catch (e) {
-      setStatus("Errore di rete durante il collegamento.");
+      setStatus(t("auth.intNetworkError"));
     } finally {
       setSlackBusy(false);
     }
@@ -71,12 +73,12 @@ export default function IntegrationsPage() {
       const res = await apiFetch("/integrations/slack/webhook-test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: testMessage || "Collegamento Taskly verificato" }),
+        body: JSON.stringify({ message: testMessage || t("auth.intDefaultTestMessage") }),
       });
       const d = await res.json();
-      setStatus(d?.message || "Messaggio inviato a Slack");
+      setStatus(d?.message || t("auth.intSlackSent"));
     } catch {
-      setStatus("Errore di invio a Slack.");
+      setStatus(t("auth.intSlackSendError"));
     } finally {
       setSlackBusy(false);
     }
@@ -86,7 +88,7 @@ export default function IntegrationsPage() {
     await apiFetch("/integrations/slack", { method: "DELETE" }).catch(() => {});
     setConnected((c) => ({ ...c, slack: false }));
     setWebhookUrl("");
-    setStatus("Slack scollegato.");
+    setStatus(t("auth.intSlackDisconnected"));
   };
 
   const connectGoogle = async () => {
@@ -102,10 +104,10 @@ export default function IntegrationsPage() {
       if (d?.url) {
         window.location.href = d.url;
       } else {
-        setStatus(d?.message || "Google non configurato sul server. Aggiungi GOOGLE_CLIENT_ID.");
+        setStatus(d?.message || t("auth.intGoogleNotConfigured"));
       }
     } catch {
-      setStatus("Errore durante il collegamento Google.");
+      setStatus(t("auth.intGoogleConnectError"));
     } finally {
       setGoogleBusy(false);
     }
@@ -114,7 +116,7 @@ export default function IntegrationsPage() {
   const disconnectGoogle = async () => {
     await apiFetch("/integrations/google", { method: "DELETE" }).catch(() => {});
     setConnected((c) => ({ ...c, google: false }));
-    setStatus("Google Calendar scollegato.");
+    setStatus(t("auth.intGoogleDisconnected"));
   };
 
   const inp =
@@ -127,9 +129,9 @@ export default function IntegrationsPage() {
           <ArrowLeft size={16} />
           Dashboard
         </Link>
-        <h1 className="mt-8 text-3xl font-black text-gray-900 dark:text-white">Integrazioni</h1>
+        <h1 className="mt-8 text-3xl font-black text-gray-900 dark:text-white">{t("auth.intTitle")}</h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Collega Taskly ai tuoi strumenti per automatizzare i flussi di lavoro.
+          {t("auth.intSubtitle")}
         </p>
 
         {status && (
@@ -150,12 +152,12 @@ export default function IntegrationsPage() {
                   Google Calendar
                   {connected.google && (
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                      <Check size={11} /> Collegato
+                      <Check size={11} /> {t("auth.intConnectedBadge")}
                     </span>
                   )}
                 </div>
                 <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Sincronizza task e scadenze nel tuo calendario Google.
+                  {t("auth.intGoogleDesc")}
                 </div>
               </div>
             </div>
@@ -165,7 +167,7 @@ export default function IntegrationsPage() {
               className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-xs font-bold transition-all disabled:opacity-60"
             >
               {googleBusy ? <Loader2 size={14} className="animate-spin" /> : connected.google ? <ExternalLink size={14} /> : <LinkIcon size={14} />}
-              {googleBusy ? "..." : connected.google ? "Scollega" : "Connetti"}
+              {googleBusy ? "..." : connected.google ? t("auth.intDisconnect") : t("auth.intConnect")}
             </button>
           </div>
         </section>
@@ -182,12 +184,12 @@ export default function IntegrationsPage() {
                   Slack
                   {connected.slack && (
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                      <Check size={11} /> Collegato
+                      <Check size={11} /> {t("auth.intConnectedBadge")}
                     </span>
                   )}
                 </div>
                 <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Ricevi le notifiche dei task direttamente sul tuo canale Slack.
+                  {t("auth.intSlackDesc")}
                 </div>
               </div>
             </div>
@@ -207,7 +209,7 @@ export default function IntegrationsPage() {
                   onClick={disconnectSlack}
                   className="shrink-0 px-4 py-2.5 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 text-sm font-bold text-gray-700 dark:text-gray-200 transition-all"
                 >
-                  Scollega
+                  {t("auth.intDisconnect")}
                 </button>
               ) : (
                 <button
@@ -216,7 +218,7 @@ export default function IntegrationsPage() {
                   className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-sm font-bold transition-all disabled:opacity-60"
                 >
                   {slackBusy ? <Loader2 size={14} className="animate-spin" /> : <LinkIcon size={14} />}
-                  Collega webhook
+                  {t("auth.intConnectWebhook")}
                 </button>
               )}
             </div>
@@ -226,7 +228,7 @@ export default function IntegrationsPage() {
                 <input
                   value={testMessage}
                   onChange={(e) => setTestMessage(e.target.value)}
-                  placeholder="Messaggio di test (opzionale)"
+                  placeholder={t("auth.intTestPlaceholder")}
                   className={inp}
                 />
                 <button
@@ -234,7 +236,7 @@ export default function IntegrationsPage() {
                   disabled={slackBusy}
                   className="shrink-0 px-4 py-2.5 rounded-xl border border-[#7b39fc]/40 text-[#7b39fc] dark:text-[#a67cff] text-sm font-bold hover:bg-[#7b39fc]/10 transition-all disabled:opacity-60"
                 >
-                  {slackBusy ? <Loader2 size={14} className="animate-spin inline" /> : "Invia test"}
+                  {slackBusy ? <Loader2 size={14} className="animate-spin inline" /> : t("auth.intSendTest")}
                 </button>
               </div>
             )}
@@ -250,7 +252,7 @@ export default function IntegrationsPage() {
             <div>
               <div className="font-black text-gray-900 dark:text-white">Webhook API</div>
               <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Pronto per il backend: ricevi eventi in tempo reale da Taskly (task creati, completati, pagine pubblicate).
+                {t("auth.intWebhookDesc")}
               </div>
             </div>
           </div>

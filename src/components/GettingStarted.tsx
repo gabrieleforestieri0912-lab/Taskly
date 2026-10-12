@@ -1,39 +1,41 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import { TimerReset, Wrench, LayoutTemplate } from "lucide-react";
-
-const steps = [
-  {
-    icon: TimerReset,
-    title: "Start in 30 secondi",
-    text: "Registrati e crea il primo workspace in meno di un minuto.",
-  },
-  {
-    icon: Wrench,
-    title: "Nessun setup tecnico",
-    text: "Niente configurazioni complesse: apri e inizia a lavorare subito.",
-  },
-  {
-    icon: LayoutTemplate,
-    title: "Template pronti",
-    text: "Usa modelli gia pronti per task, obiettivi, note e planning settimanale.",
-  },
-];
+import { useLanguage } from "../lib/LanguageContext";
 
 export default function GettingStarted() {
+  const { t } = useLanguage();
+  const steps = [
+    {
+      icon: TimerReset,
+      title: t("land.gsStep1Title"),
+      text: t("land.gsStep1Text"),
+    },
+    {
+      icon: Wrench,
+      title: t("land.gsStep2Title"),
+      text: t("land.gsStep2Text"),
+    },
+    {
+      icon: LayoutTemplate,
+      title: t("land.gsStep3Title"),
+      text: t("land.gsStep3Text"),
+    },
+  ];
   return (
     <section className="px-6 py-20 bg-white dark:bg-[#151020]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">
-            Getting started
+            {t("land.gsEyebrow")}
           </div>
           <h2 className="landing-heading-lg mt-3">
-            Parti subito{" "}
-            <span className="landing-display-accent">senza attrito</span>
+            {t("land.gsTitlePrefix")}{" "}
+            <span className="landing-display-accent">{t("land.gsTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-3">
-            Meno tempo a capire lo strumento, più tempo a portare risultati.
+            {t("land.gsSubtitle")}
           </p>
         </div>
 
@@ -51,7 +53,7 @@ export default function GettingStarted() {
 
         <div className="mt-10 text-center">
           <Link href="/register" className="landing-btn-primary">
-            Crea account e prova i template
+            {t("land.gsCta")}
           </Link>
         </div>
       </div>

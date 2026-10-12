@@ -33,7 +33,7 @@ import { useLanguage } from "../../lib/LanguageContext";
 import { Skeleton } from "../../components/UIComponents";
 
 function MeetingsContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
 
   // Load user data using custom hook
@@ -197,6 +197,14 @@ function MeetingsContent() {
   }, 0);
 
   const categories = ["All", "Sviluppo", "Marketing", "Design", "Generale"];
+  const categoryLabel = (cat: string) =>
+    cat === "Sviluppo"
+      ? t("pg.catDevelopment")
+      : cat === "Generale"
+        ? t("pg.catGeneral")
+        : cat === "All"
+          ? t("pg.catAll")
+          : cat;
 
   const handleAIAction = (action) => {
     console.log("AI Action received in Meetings page:", action);
@@ -285,7 +293,7 @@ function MeetingsContent() {
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Totale Riunioni
+                  {t("pg.meetingsTotal")}
                 </p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {meetings.length}
@@ -299,7 +307,7 @@ function MeetingsContent() {
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Minuti Registrati
+                  {t("pg.meetingsMinutes")}
                 </p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {Math.round(totalDurationMinutes * 10) / 10} m
@@ -313,7 +321,7 @@ function MeetingsContent() {
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                  Riassunti Generati
+                  {t("pg.meetingsSummaries")}
                 </p>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-0.5">
                   {meetings.filter((m) => m.summary).length}
@@ -332,7 +340,7 @@ function MeetingsContent() {
               />
               <input
                 type="text"
-                placeholder="Cerca tra le trascrizioni..."
+                placeholder={t("pg.meetingsSearchPh")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-gray-50 dark:bg-gray-850 border border-gray-100 dark:border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500"
@@ -355,7 +363,7 @@ function MeetingsContent() {
                       : "bg-gray-50 dark:bg-gray-850 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
                 >
-                  {cat}
+                  {categoryLabel(cat)}
                 </button>
               ))}
             </div>
@@ -368,7 +376,7 @@ function MeetingsContent() {
                 const isExpanded = expandedMeetingId === meet.id;
                 const isPlaying = playingId === meet.id;
                 const formattedDate = new Date(meet.date).toLocaleDateString(
-                  "it-IT",
+                  language === "en" ? "en-US" : "it-IT",
                   {
                     day: "2-digit",
                     month: "long",
@@ -427,7 +435,7 @@ function MeetingsContent() {
                               {meet.duration}
                             </span>
                             <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-md text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                              {meet.category}
+                              {categoryLabel(meet.category)}
                             </span>
                             {meet.source && meet.source !== "manual" && (
                               <span
@@ -444,7 +452,7 @@ function MeetingsContent() {
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
                               >
-                                Apri link
+                                {t("pg.meetingsOpenLink")}
                               </a>
                             )}
                           </div>
@@ -456,7 +464,7 @@ function MeetingsContent() {
                         <button
                           onClick={(e) => handleDeleteMeeting(meet.id, e)}
                           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 md:opacity-100"
-                          title="Elimina"
+                          title={t("delete")}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -478,7 +486,7 @@ function MeetingsContent() {
                           className="text-cyan-500 shrink-0 mr-1"
                         />
                         <span className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest animate-pulse mr-2">
-                          Riproduzione in corso
+                          {t("pg.meetingsPlaying")}
                         </span>
                         {Array.from({ length: 30 }).map((_, i) => (
                           <div
@@ -509,7 +517,7 @@ function MeetingsContent() {
                             <div className="space-y-3">
                               <h4 className="font-extrabold text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <FileText size={13} className="text-gray-400" />
-                                Trascrizione
+                                {t("pg.meetingsTranscript")}
                               </h4>
                               <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-4 h-60 overflow-y-auto leading-relaxed text-gray-600 dark:text-gray-300 custom-scrollbar text-xs">
                                 {meet.text}
@@ -520,7 +528,7 @@ function MeetingsContent() {
                             <div className="space-y-3">
                               <h4 className="font-extrabold text-xs text-cyan-500 dark:text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <Sparkles size={13} />
-                                Riassunto ed Insight AI
+                                {t("pg.meetingsSummaryInsights")}
                               </h4>
                               <div className="bg-cyan-50/30 dark:bg-cyan-950/15 border border-cyan-100/50 dark:border-cyan-900/30 rounded-2xl p-4 h-60 overflow-y-auto custom-scrollbar text-xs leading-relaxed text-gray-700 dark:text-gray-300">
                                 {meet.summary ? (
@@ -545,15 +553,15 @@ function MeetingsContent() {
                                       className="mt-3 text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-60"
                                     >
                                       {recappingId === meet.id
-                                        ? "Rigenero il recap..."
-                                        : "Rigenera recap AI"}
+                                        ? t("pg.meetingsRegenerating")
+                                        : t("pg.meetingsRegenerate")}
                                     </button>
                                   </>
                                 ) : (
                                   <div className="h-full flex flex-col items-center justify-center text-center">
                                     <BrainCircuit className="text-cyan-300 dark:text-cyan-800 w-10 h-10 mb-2" />
                                     <p className="font-bold text-gray-500">
-                                      Nessun riassunto disponibile
+                                      {t("pg.meetingsNoSummary")}
                                     </p>
                                     <button
                                       onClick={(e) => {
@@ -564,8 +572,8 @@ function MeetingsContent() {
                                       className="mt-2 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-60"
                                     >
                                       {recappingId === meet.id
-                                        ? "Generazione..."
-                                        : "Genera con AI ora"}
+                                        ? t("pg.meetingsGenerating")
+                                        : t("pg.meetingsGenerateNow")}
                                     </button>
                                   </div>
                                 )}
