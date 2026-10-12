@@ -96,6 +96,11 @@ export default function Sidebar({
   onAddPage = (..._args: any[]) => {},
   onDeletePage = (..._args: any[]) => {},
   onUpdatePage = (..._args: any[]) => {},
+  // Eliminazione definitiva (hard delete a cascata) e ripristino con
+  // ricostruzione gerarchia per il popup Cestino. Default: soft-delete via
+  // onDeletePage / ripristino semplice via onUpdatePage.
+  onPermanentlyDeletePage = null as null | ((..._args: any[]) => void),
+  onRestorePage = null as null | ((..._args: any[]) => void),
   isModalOpen = false,
   setIsModalOpen = (..._args: any[]) => {},
   onOpenTemplateGallery = () => {},
@@ -950,7 +955,11 @@ export default function Sidebar({
                   <button
                     onClick={() => {
                       if (item._type === "page") {
-                        onUpdatePage && onUpdatePage(item.id, { deleted: false });
+                        if (onRestorePage) {
+                          onRestorePage(item.id);
+                        } else {
+                          onUpdatePage && onUpdatePage(item.id, { deleted: false });
+                        }
                       } else {
                         const storageKey = item._type === "task" ? "tasks" : "goals";
                         try {
@@ -969,7 +978,11 @@ export default function Sidebar({
                   <button
                     onClick={() => {
                       if (item._type === "page") {
-                        onDeletePage && onDeletePage(item.id);
+                        if (onPermanentlyDeletePage) {
+                          onPermanentlyDeletePage(item.id);
+                        } else {
+                          onDeletePage && onDeletePage(item.id);
+                        }
                       } else {
                         const storageKey = item._type === "task" ? "tasks" : "goals";
                         try {

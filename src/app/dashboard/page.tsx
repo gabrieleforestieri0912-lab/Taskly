@@ -1659,6 +1659,8 @@ const ensureTab = React.useCallback((page: any) => {
                 onAddPage={addPage}
                 onDeletePage={deletePage}
                 onUpdatePage={(id, updates) => updatePage(id, updates)}
+                onPermanentlyDeletePage={permanentlyDelete}
+                onRestorePage={restorePage}
                 onOpenPage={ensureTab}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
