@@ -881,8 +881,8 @@ export default function Sidebar({
 
     const allDeleted = [
       ...deletedPages.map((p) => ({ ...p, _type: "page" })),
-      ...deletedTasks.map((t) => ({ ...t, _type: "task", label: t.title || t.text || "Attività" })),
-      ...deletedGoals.map((g) => ({ ...g, _type: "goal", label: g.title || g.label || "Obiettivo" })),
+      ...deletedTasks.map((t) => ({ ...t, _type: "task", label: t.title || t.text || t("land.sideTaskFallback") })),
+      ...deletedGoals.map((g) => ({ ...g, _type: "goal", label: g.title || g.label || t("land.sideGoalFallback") })),
     ];
 
     const q = (trashSearch || "").toLowerCase();
@@ -923,8 +923,8 @@ export default function Sidebar({
 
         <div className="flex-1 overflow-auto space-y-2 min-h-0">
           {filtered.length === 0 ? (
-            <div className="text-sm text-gray-400 text-center py-8">
-              {trashSearch ? "Nessun risultato" : "Nessun elemento eliminato"}
+            <div className="text-sm text-gray-400 italic text-center py-8">
+              {trashSearch ? t("land.sideNoResults") : t("land.sideNoDeleted")}
             </div>
           ) : (
             filtered.map((item, index) => (
@@ -940,10 +940,10 @@ export default function Sidebar({
                       ? "bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
                       : "bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
                   }`}>
-                    {item._type === "page" ? "Pagina" : item._type === "task" ? "Task" : "Goal"}
+                    {item._type === "page" ? t("land.sideLabelPage") : item._type === "task" ? "Task" : t("land.sideLabelGoal")}
                   </span>
                   <span className="truncate text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {item.label || "Senza nome"}
+                    {item.label || t("land.sideUnnamed")}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">

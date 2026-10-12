@@ -12,8 +12,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
-import MeetingImportPanel from "../../components/meetings/MeetingImportPanel";
 import { useLanguage } from "../../lib/LanguageContext";
+import MeetingImportPanel from "../../components/meetings/MeetingImportPanel";
 
 declare global {
   interface Window {
@@ -77,7 +77,7 @@ export default function TranscriptionPage() {
     const rec = new SR();
     rec.continuous = true;
     rec.interimResults = true;
-    rec.lang = "it-IT";
+    rec.lang = language === "en" ? "en-US" : "it-IT";
     rec.onresult = handleSttResult;
     rec.onerror = (e: any) => {
       if (e.error && e.error !== "no-speech" && e.error !== "aborted") {
@@ -133,7 +133,7 @@ export default function TranscriptionPage() {
         const rec = new SR();
         rec.continuous = true;
         rec.interimResults = true;
-        rec.lang = "it-IT";
+        rec.lang = language === "en" ? "en-US" : "it-IT";
         rec.onresult = handleSttResult;
         rec.onerror = (e: any) => {
           if (e.error && e.error !== "no-speech" && e.error !== "aborted") {
@@ -168,7 +168,7 @@ export default function TranscriptionPage() {
       const res = await apiFetch("/meetings/recap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, lang: "it" }),
+        body: JSON.stringify({ transcript, lang: language === "en" ? "en" : "it" }),
       });
       if (res.ok) {
         const data = await res.json();

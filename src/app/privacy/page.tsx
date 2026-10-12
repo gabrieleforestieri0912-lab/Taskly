@@ -18,9 +18,7 @@ export default function PrivacyPage() {
           <section className="mb-10">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">{t("auth.privacyS1Title")}</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Benvenuti su Taskly. La tua privacy è fondamentale per noi. Questa Informativa sulla Privacy
-              descrive come raccogliamo, utilizziamo e proteggiamo le tue informazioni quando utilizzi l'applicazione
-              Taskly e i nostri servizi correlati.
+              {t("auth.privacyS1Body")}
             </p>
           </section>
 
@@ -30,8 +28,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-100">{t("auth.privacyS2aTitle")}</h3>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Per facilitare l'accesso e la creazione dell'account, Taskly utilizza l'autenticazione Google.
-                  Attraverso questo processo, raccogliamo le seguenti informazioni dal tuo profilo Google:
+                  {t("auth.privacyS2aBody")}
                 </p>
                 <ul className="list-disc pl-6 mt-2 text-gray-700 dark:text-gray-300 space-y-1">
                   <li>{t("auth.privacyS2aLi1")}</li>
@@ -51,8 +48,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="text-xl font-medium mb-2 text-gray-800 dark:text-gray-100">{t("auth.privacyS2cTitle")}</h3>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  Raccogliamo automaticamente informazioni tecniche limitate per garantire la sicurezza
-                  e il corretto funzionamento dell'app, come l'indirizzo IP e il tipo di browser utilizzato.
+                  {t("auth.privacyS2cBody")}
                 </p>
               </div>
             </div>
@@ -75,8 +71,7 @@ export default function PrivacyPage() {
               <strong>{t("auth.privacyS4Bold")}</strong>
             </p>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-              Condividiamo i tuoi dati esclusivamente con i nostri fornitori di servizi infrastrutturali che
-              operano come responsabili del trattamento, tra cui:
+              {t("auth.privacyS4Intro")}
             </p>
             <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
               <li><strong>{t("auth.privacyS4aLabel")}</strong>{t("auth.privacyS4aText")}</li>
@@ -99,8 +94,7 @@ export default function PrivacyPage() {
           <section className="mb-10">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">{t("auth.privacyS6Title")}</h2>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Ci riserviamo il diritto di aggiornare questa Informativa sulla Privacy. Qualsiasi modifica
-              significativa sarà comunicata tramite l'applicazione o via email all'indirizzo associato al tuo account.
+              {t("auth.privacyS6Body")}
             </p>
           </section>
 

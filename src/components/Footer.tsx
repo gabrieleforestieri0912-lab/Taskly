@@ -14,38 +14,40 @@ import {
   Youtube,
 } from "lucide-react";
 
-const COLUMNS = [
-  {
-    title: "Prodotto",
-    links: [
-      { label: "Funzionalità", href: "/#features" },
-      { label: "Prezzi", href: "/#pricing" },
-      { label: "Template", href: "/templates" },
-      { label: "Integrazioni", href: "/integrations" },
-      { label: "Trascrizioni", href: "/transcription" },
-    ],
-  },
-  {
-    title: "Risorse",
-    links: [
-      { label: "Documentazione", href: "/docs" },
-      { label: "Demo", href: "/#demo" },
-      { label: "Come funziona", href: "/#getting-started" },
-      { label: "FAQ", href: "/#faq" },
-      { label: "Supporto", href: "/support" },
-    ],
-  },
-  {
-    title: "Azienda",
-    links: [
-      { label: "Contattaci", href: "/#contact" },
-      { label: "Registrati", href: "/register" },
-      { label: "Accedi", href: "/login" },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Termini", href: "/terms" },
-    ],
-  },
-];
+export default function Footer() {
+  const { t, tWith } = useLanguage();
+  const COLUMNS = [
+    {
+      title: t("land.footerColProduct"),
+      links: [
+        { label: t("land.footerLinkFeatures"), href: "/#features" },
+        { label: t("land.footerLinkPricing"), href: "/#pricing" },
+        { label: t("land.footerLinkTemplates"), href: "/templates" },
+        { label: t("land.footerLinkIntegrations"), href: "/integrations" },
+        { label: t("land.footerLinkTranscriptions"), href: "/transcription" },
+      ],
+    },
+    {
+      title: t("land.footerColResources"),
+      links: [
+        { label: t("land.footerLinkDocs"), href: "/docs" },
+        { label: t("land.footerLinkDemo"), href: "/#demo" },
+        { label: t("land.footerLinkHow"), href: "/#getting-started" },
+        { label: t("land.footerLinkFaq"), href: "/#faq" },
+        { label: t("land.footerLinkSupport"), href: "/support" },
+      ],
+    },
+    {
+      title: t("land.footerColCompany"),
+      links: [
+        { label: t("land.footerLinkContact"), href: "/#contact" },
+        { label: t("land.footerLinkRegister"), href: "/register" },
+        { label: t("land.footerLinkLogin"), href: "/login" },
+        { label: t("land.footerLinkPrivacy"), href: "/privacy" },
+        { label: t("land.footerLinkTerms"), href: "/terms" },
+      ],
+    },
+  ];
 
 const SOCIALS = [
   { icon: Github, href: "https://github.com", label: "GitHub" },
@@ -54,9 +56,6 @@ const SOCIALS = [
   { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
   { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
 ];
-
-export default function Footer() {
-  const { t } = useLanguage();
   return (
     <footer
       id="contact"
@@ -71,7 +70,7 @@ export default function Footer() {
             <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/taskly.png"
-                alt={t("land.cmpHeaderTaskly")}
+                alt={t("land.footerLogoAlt")}
                 width={32}
                 height={32}
                 className="h-8 w-8 rounded-lg object-cover transition-transform duration-300 group-hover:scale-110"
@@ -80,9 +79,7 @@ export default function Footer() {
             </Link>
 
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-              Organizza il tuo tempo, riduci il rumore e rimani concentrato su
-              ciò che conta. Il tuo workspace intelligente per task, note,
-              obiettivi e riunioni.
+              {t("land.footerTagline")}
             </p>
 
             <div className="mt-6 space-y-2.5">
@@ -147,7 +144,7 @@ export default function Footer() {
       <div className="relative border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
           <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
-            © {new Date().getFullYear()} Taskly. Tutti i diritti riservati.
+            {tWith("land.footerRights", { year: new Date().getFullYear() })}
           </p>
 
           <div className="flex items-center gap-6 text-xs">

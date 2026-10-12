@@ -10,9 +10,10 @@ export const EditableTitle = ({
   className = "",
   autoEdit = false,
   locked = false,
-  placeholder = "Nuova pagina",
+  placeholder,
 }) => {
   const { t } = useLanguage();
+  const resolvedPlaceholder = placeholder ?? t("views.uiNewPage");
   const [isEditing, setIsEditing] = useState(() => Boolean(autoEdit));
   const ref = useRef<HTMLDivElement | null>(null);
   const initialTitleRef = useRef(title);
@@ -97,7 +98,7 @@ export const EditableTitle = ({
       {/* placeholder overlay when empty */}
       {!title && !isEditing && (
         <div className="absolute left-0 top-0 pointer-events-none text-3xl md:text-5xl font-black text-gray-400 dark:text-gray-600 leading-tight">
-          {placeholder}
+          {resolvedPlaceholder}
         </div>
       )}
     </div>

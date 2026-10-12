@@ -38,7 +38,7 @@ export default function RegisterPage() {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Errore durante la registrazione. Riprova.");
+      setError(err.response?.data?.message || t("auth.registerError"));
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function RegisterPage() {
       localStorage.setItem("user", JSON.stringify(response.data.user));
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registrazione con Google fallita. Riprova.");
+      setError(err.response?.data?.message || t("auth.googleRegisterError"));
     } finally {
       setLoading(false);
     }
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                   disabled={loading}
                   className="w-full py-3 text-sm mt-3 shadow-lg shadow-[#7b39fc]/25"
                 >
-                  {loading ? "Registrazione in corso..." : "Registrati"}
+                  {loading ? t("auth.registering") : t("auth.signUp")}
                 </Button>
               </form>
 
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleRegister}
-                    onError={() => setError("Registrazione Google annullata o non riuscita.")}
+                    onError={() => setError(t("auth.googleRegisterCancelled"))}
                     theme="outline"
                     size="medium"
                     shape="pill"
@@ -180,7 +180,7 @@ export default function RegisterPage() {
 
               <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700/50 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Hai già un account?{" "}
+                  {t("auth.alreadyHaveAccount")}{" "}
                   <Link
                     href="/login"
                     className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"

@@ -34,7 +34,7 @@ import { applyTheme, readTheme } from "../../lib/theme";
 import { Skeleton } from "../../components/UIComponents";
 
 function MeetingsContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
 
   // Load user data using custom hook
@@ -184,6 +184,14 @@ function MeetingsContent() {
   }, 0);
 
   const categories = ["All", "Sviluppo", "Marketing", "Design", "Generale"];
+  const categoryLabel = (cat: string) =>
+    cat === "Sviluppo"
+      ? t("pg.catDevelopment")
+      : cat === "Generale"
+        ? t("pg.catGeneral")
+        : cat === "All"
+          ? t("pg.catAll")
+          : cat;
 
   const handleAIAction = (action) => {
     console.log("AI Action received in Meetings page:", action);
@@ -347,7 +355,7 @@ function MeetingsContent() {
                 const isExpanded = expandedMeetingId === meet.id;
                 const isPlaying = playingId === meet.id;
                 const formattedDate = new Date(meet.date).toLocaleDateString(
-                  "it-IT",
+                  language === "en" ? "en-US" : "it-IT",
                   {
                     day: "2-digit",
                     month: "long",
@@ -406,7 +414,7 @@ function MeetingsContent() {
                               {meet.duration}
                             </span>
                             <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-md text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                              {meet.category}
+                              {categoryLabel(meet.category)}
                             </span>
                             {meet.source && meet.source !== "manual" && (
                               <span
@@ -516,8 +524,8 @@ function MeetingsContent() {
                                       className="mt-3 text-[11px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-60"
                                     >
                                       {recappingId === meet.id
-                                        ? "Rigenero il recap..."
-                                        : "Rigenera recap AI"}
+                                        ? t("pg.meetingsRegenerating")
+                                        : t("pg.meetingsRegenerate")}
                                     </button>
                                   </>
                                 ) : (
@@ -533,8 +541,8 @@ function MeetingsContent() {
                                       className="mt-2 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline disabled:opacity-60"
                                     >
                                       {recappingId === meet.id
-                                        ? "Generazione..."
-                                        : "Genera con AI ora"}
+                                        ? t("pg.meetingsGenerating")
+                                        : t("pg.meetingsGenerateNow")}
                                     </button>
                                   </div>
                                 )}

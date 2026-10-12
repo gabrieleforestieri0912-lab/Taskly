@@ -10,12 +10,11 @@ export default function TermsPage() {
       <div className="landing-eyebrow">{t("misc.termsLegal")}</div>
       <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">{t("auth.termsTitle")}</h1>
       <p className="text-gray-700 dark:text-gray-300 mb-4">
-        Questa è una pagina di esempio per i termini e le condizioni. Inserisci
-        qui i termini del servizio.
+        {t("auth.termsIntro")}
       </p>
       <section className="text-sm text-gray-600 dark:text-gray-400">
         <h2 className="font-semibold mt-4 text-gray-900 dark:text-white">{t("auth.termsUsageTitle")}</h2>
-        <p>Dettagli sui termini d&apos;uso.</p>
+        <p>{t("auth.termsUsageBody")}</p>
       </section>
     </main>
   );

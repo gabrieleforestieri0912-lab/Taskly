@@ -6,49 +6,49 @@ import Link from "next/link";
 import { GraduationCap, BriefcaseBusiness, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
-const cases = [
-  {
-    title: "Per studenti",
-    icon: GraduationCap,
-    points: ["Piano esami e obiettivi settimanali", "Note collegate alle attivit\u00e0", "Focus giornaliero semplice"],
-  },
-  {
-    title: "Per freelance",
-    icon: BriefcaseBusiness,
-    points: ["Clienti, task e deadline nello stesso posto", "Dashboard leggera e operativa", "Meno tab aperti, pi\u00f9 consegne"],
-  },
-  {
-    title: "Per team",
-    icon: Users,
-    points: ["Workspace condiviso", "Assegnazioni chiare e reporting", "Collaborazione senza caos"],
-  },
-];
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 export default function UseCases() {
   const { t } = useLanguage();
+  const cases = [
+    {
+      title: t("land.ucCase1Title"),
+      icon: GraduationCap,
+      points: [t("land.ucCase1P1"), t("land.ucCase1P2"), t("land.ucCase1P3")],
+    },
+    {
+      title: t("land.ucCase2Title"),
+      icon: BriefcaseBusiness,
+      points: [t("land.ucCase2P1"), t("land.ucCase2P2"), t("land.ucCase2P3")],
+    },
+    {
+      title: t("land.ucCase3Title"),
+      icon: Users,
+      points: [t("land.ucCase3P1"), t("land.ucCase3P2"), t("land.ucCase3P3")],
+    },
+  ];
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.12 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
   return (
     <section className="landing-section-surface px-6 py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">{t("land.ucEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
-            Trova il modo giusto{" "}
+            {t("land.ucTitlePrefix")}{" "}
             <span className="landing-display-accent">{t("land.ucTitleAccent")}</span>
           </h2>
         </div>

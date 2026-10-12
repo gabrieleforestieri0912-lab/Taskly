@@ -6,53 +6,53 @@ import Link from "next/link";
 import { Layers, ListChecks, NotebookPen } from "lucide-react";
 import { motion } from "framer-motion";
 
-const items = [
-  {
-    icon: Layers,
-    title: "Unico workspace",
-    text: "Tutto in un solo posto: progetti, task e note connessi tra loro.",
-  },
-  {
-    icon: ListChecks,
-    title: "Flusso operativo chiaro",
-    text: "Riduci il tempo perso tra strumenti diversi e mantieni il focus sul lavoro vero.",
-  },
-  {
-    icon: NotebookPen,
-    title: "Pensato per execution",
-    text: "Dalle idee ai task in pochi click, senza setup complessi.",
-  },
-];
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
 export default function ValueProposition() {
   const { t } = useLanguage();
+  const items = [
+    {
+      icon: Layers,
+      title: t("land.vpCard1Title"),
+      text: t("land.vpCard1Text"),
+    },
+    {
+      icon: ListChecks,
+      title: t("land.vpCard2Title"),
+      text: t("land.vpCard2Text"),
+    },
+    {
+      icon: NotebookPen,
+      title: t("land.vpCard3Title"),
+      text: t("land.vpCard3Text"),
+    },
+  ];
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: 0.12 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
   return (
     <section className="landing-section-surface px-6 py-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto">
           <div className="landing-eyebrow">{t("land.vpEyebrow")}</div>
           <h2 className="landing-heading-lg mt-3">
-            Gestisci progetti, note e task in un unico spazio{" "}
+            {t("land.vpTitlePrefix")}{" "}
             <span className="landing-display-accent">{t("land.vpTitleAccent")}</span>
           </h2>
           <p className="landing-body mt-3">
-            Quando tutto &egrave; nello stesso workspace, smetti di rincorrere strumenti e torni a chiudere attivit&agrave;.
+            {t("land.vpSubtitle")}
           </p>
         </div>
 

@@ -19,7 +19,7 @@ export default function BeforeAfterResults() {
             <p className="text-xs font-black uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">{t("land.baBeforeLabel")}</p>
             <h3 className="mt-2 text-xl font-black text-gray-900 dark:text-white">{t("land.baBeforeTitle")}</h3>
             <ul className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">
-              <li>- Task in una app, note in un&apos;altra, calendario altrove</li>
+              <li>{t("land.baBefore1")}</li>
               <li>{t("land.baBefore2")}</li>
               <li>{t("land.baBefore3")}</li>
             </ul>

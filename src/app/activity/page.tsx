@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "../../lib/api";
 
 export default function ActivityPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [items, setItems] = useState<any[]>([]);
 
   const load = useCallback(async () => {
@@ -37,7 +37,7 @@ export default function ActivityPage() {
                 <div className="text-sm text-gray-500 dark:text-gray-400">{it.body}</div>
               </div>
               <div className="text-xs text-gray-400 dark:text-gray-500">
-                {new Date(it.createdAt).toLocaleString()}
+                {new Date(it.createdAt).toLocaleString(language === "en" ? "en-US" : "it-IT")}
               </div>
             </div>
           </div>

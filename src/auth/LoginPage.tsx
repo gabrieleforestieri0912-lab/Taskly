@@ -38,7 +38,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Errore durante l'accesso. Riprova.");
+      setError(err.response?.data?.message || t("auth.loginError"));
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Accesso Google fallito. Riprova.");
+      setError(err.response?.data?.message || t("auth.googleLoginError"));
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full py-3 text-sm mt-3 shadow-lg shadow-[#7b39fc]/25"
                 >
-                  {loading ? "Accesso in corso..." : "Accedi"}
+                  {loading ? t("auth.signingIn") : t("auth.signIn")}
                 </Button>
               </form>
 
@@ -149,7 +149,7 @@ export default function LoginPage() {
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleLogin}
-                    onError={() => setError("Accesso Google annullato o non riuscito.")}
+                    onError={() => setError(t("auth.googleLoginCancelled"))}
                     theme="outline"
                     size="medium"
                     shape="pill"
@@ -162,7 +162,7 @@ export default function LoginPage() {
 
               <div className="mt-5 pt-4 border-t border-gray-100 dark:border-gray-700/50 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Non hai ancora un account?{" "}
+                  {t("auth.noAccountYet")}{" "}
                   <Link
                     href="/register"
                     className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"

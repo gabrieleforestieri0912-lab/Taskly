@@ -69,7 +69,7 @@ const PricingCard = ({
           : "bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
       >
-        {loading ? "Reindirizzamento..." : buttonText}
+        {loading ? t("land.prRedirecting") : buttonText}
         <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
       </button>
     </div>
@@ -111,16 +111,16 @@ function Pricing() {
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Checkout non disponibile.");
+        throw new Error(data.message || t("land.prErrCheckout"));
       }
 
       if (!data.url) {
-        throw new Error("URL checkout non ricevuto dal server.");
+        throw new Error(t("land.prErrNoUrl"));
       }
       window.location.href = data.url;
       return;
     } catch (error: any) {
-      alert(error.message || "Errore durante il checkout.");
+      alert(error.message || t("land.prErrGeneric"));
     } finally {
       setLoadingPlan(null);
     }
@@ -129,79 +129,79 @@ function Pricing() {
   const plans = [
     {
       title: "Starter",
-      description: "Per iniziare gratis e scoprire Taskly, senza limiti di tempo.",
+      description: t("land.prStarterDesc"),
       price: "0",
-      period: "Sempre",
+      period: t("land.prPeriodAlways"),
       icon: Star,
       features: [
-        "Fino a 3 Pagine attive",
-        "Task illimitati per pagina",
-        "Visualizzazione Calendario base",
-        "Note minimaliste",
-        "Brain Dump illimitato",
-        "Supporto via community"
+        t("land.prStarterF1"),
+        t("land.prStarterF2"),
+        t("land.prStarterF3"),
+        t("land.prStarterF4"),
+        t("land.prStarterF5"),
+        t("land.prStarterF6")
       ],
-      buttonText: "Inizia Gratis",
+      buttonText: t("land.prStarterBtn"),
       isPopular: false,
       checkoutType: "free",
       checkoutPlanId: "starter"
     },
     {
       title: "Pro",
-      description: "Tutto ciò di cui hai bisogno per la produttività quotidiana.",
+      description: t("land.prProDesc"),
       price: isAnnual ? "4.79" : "5.99",
-      period: "Mese",
+      period: t("land.prPeriodMonth"),
       icon: Zap,
       features: [
-        "Pagine illimitate",
-        "Workspace personalizzabili",
-        "Tutti i moduli (Tasks, Goals, Note)",
-        "Notifiche push intelligenti",
-        "Export dati PDF / CSV / Markdown",
-        "Backup automatici giornalieri",
-        "Supporto prioritario 24/7"
+        t("land.prProF1"),
+        t("land.prProF2"),
+        t("land.prProF3"),
+        t("land.prProF4"),
+        t("land.prProF5"),
+        t("land.prProF6"),
+        t("land.prProF7")
       ],
-      buttonText: "Scegli Pro",
+      buttonText: t("land.prProBtn"),
       isPopular: true,
       checkoutType: "stripe",
       checkoutPlanId: isAnnual ? "pro_yearly" : "pro_monthly"
     },
     {
       title: "Business",
-      description: "Per team piccoli che collaborano in tempo reale.",
+      description: t("land.prBizDesc"),
       price: isAnnual ? "11.99" : "14.99",
-      period: "Mese",
+      period: t("land.prPeriodMonth"),
       icon: ShieldCheck,
       features: [
-        "Fino a 10 membri inclusi",
-        "Workspace condivisi",
-        "Assegnazione Task avanzata",
-        "Report di produttività del team",
-        "Integrazione Slack & Google",
-        "Permessi e ruoli personalizzati",
-        "Account Manager dedicato"
+        t("land.prBizF1"),
+        t("land.prBizF2"),
+        t("land.prBizF3"),
+        t("land.prBizF4"),
+        t("land.prBizF5"),
+        t("land.prBizF6"),
+        t("land.prBizF7")
       ],
-      buttonText: "Scegli Business",
+      buttonText: t("land.prBizBtn"),
       isPopular: false,
       checkoutType: "stripe",
       checkoutPlanId: isAnnual ? "team_yearly" : "team_monthly"
     },
     {
       title: "Enterprise",
-      description: "Scala, sicurezza e controllo per organizzazioni grandi.",
+      description: t("land.prEntDesc"),
       price: "Contattaci",
       period: "",
       icon: Building2,
       features: [
-        "Membri illimitati",
-        "SSO / SAML",
-        "SLA garantito al 99,9%",
-        "Audit log e conformità",
-        "API complete per integrazioni custom",
-        "Onboarding e training dedicati",
-        "Supporto dedicato 24/7"
+        t("land.prEntF1"),
+        t("land.prEntF2"),
+        t("land.prEntF3"),
+        t("land.prEntF4"),
+        t("land.prEntF5"),
+        t("land.prEntF6"),
+        t("land.prEntF7")
       ],
-      buttonText: "Parliamo del tuo team",
+      buttonText: t("land.prEntBtn"),
       isPopular: false,
       checkoutType: "contact",
       checkoutPlanId: "enterprise"

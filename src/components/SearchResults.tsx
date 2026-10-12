@@ -24,7 +24,7 @@ export default function SearchResults({ results = [] as any[], query = "" }) {
       ) : (
         <div className="max-h-[400px] overflow-y-auto custom-scrollbar p-2">
           <div className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-            Risultati per &quot;{query}&quot;
+            {t("views.searchResultsFor").replace("{q}", query)}
           </div>
           <div className="space-y-1">
             {results.map((r) => {

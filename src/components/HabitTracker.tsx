@@ -8,15 +8,15 @@ function daysInMonth(month, year) {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function monthLabel(month, year) {
-  return new Date(year, month, 1).toLocaleString(undefined, {
+function monthLabel(month, year, language) {
+  return new Date(year, month, 1).toLocaleString(language === "en" ? "en-US" : undefined, {
     month: "long",
     year: "numeric",
   });
 }
 
 export default function HabitTracker({ initialMonth, initialYear }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const now = new Date();
   const [month, setMonth] = useState(
     typeof initialMonth === "number" ? initialMonth : now.getMonth(),
@@ -125,7 +125,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
             <ChevronLeft size={16} />
           </button>
 
-          <div className="font-bold">{monthLabel(month, year)}</div>
+          <div className="font-bold">{monthLabel(month, year, language)}</div>
 
           <button
             onClick={() => {
@@ -152,7 +152,7 @@ export default function HabitTracker({ initialMonth, initialYear }) {
           <div className="bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl w-[min(720px,95%)] p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold">
-                Giorno {editingDay.day} — {monthLabel(month, year)}
+                {t("views.habitDay").replace("{n}", String(editingDay.day)).replace("{month}", monthLabel(month, year, language))}
               </h3>
               <button
                 onClick={closeEditor}

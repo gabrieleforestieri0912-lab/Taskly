@@ -74,9 +74,9 @@ export default function Navbar({
   }, [isLanding]);
 
   const landingNavLinks = [
-    { name: "Home", href: "#", key: "home" },
+    { name: t("land.navHome"), href: "#", key: "home" },
     {
-      name: "Funzionalità",
+      name: t("land.navFeaturesGroup"),
       href: "#features",
       key: "features",
       hasDropdown: true,
@@ -84,56 +84,56 @@ export default function Navbar({
         {
           name: t("howItWorks"),
           href: "#getting-started",
-          desc: "Scopri il flusso di lavoro passo dopo passo",
+          desc: t("land.navDescFlow"),
           icon: Map,
         },
         {
           name: t("demo"),
           href: "#demo",
-          desc: "Guarda Taskly in azione dal vivo",
+          desc: t("land.navDescDemoLive"),
           icon: PlayCircle,
         },
         {
-          name: "Use Cases",
+          name: t("land.navUseCases"),
           href: "#use-cases",
-          desc: "Casi d'uso per team, freelancer e studenti",
+          desc: t("land.navDescUseCases"),
           icon: Users,
         },
         {
-          name: "Confronto",
+          name: t("land.navComparison"),
           href: "#comparison",
-          desc: "Taskly a confronto con altri strumenti",
+          desc: t("land.navDescComparison"),
           icon: Scale,
         },
       ],
     },
     {
-      name: "Recensioni",
+      name: t("land.navReviews"),
       href: "#social-proof",
       key: "reviews",
       hasDropdown: true,
       children: [
         {
-          name: "Testimonianze",
+          name: t("land.navTestimonials"),
           href: "#social-proof",
-          desc: "Cosa dicono i nostri utenti",
+          desc: t("land.navDescTestimonials"),
           icon: Star,
         },
         {
           name: t("pricing"),
           href: "#pricing",
-          desc: "Piani flessibili per ogni esigenza",
+          desc: t("land.navDescPlans"),
           icon: Sparkles,
         },
         {
           name: t("faq"),
           href: "#faq",
-          desc: "Risposte alle domande più comuni",
+          desc: t("land.navDescFaq"),
           icon: CircleHelp,
         },
       ],
     },
-    { name: "Contattaci", href: "#faq", key: "contact" },
+    { name: t("land.navContact"), href: "#faq", key: "contact" },
   ];
 
   const navLinks = [
@@ -147,55 +147,55 @@ export default function Navbar({
   // Gruppi con dropdown per la navbar delle pagine interne (stesse sezioni della landing)
   const groupedNavLinks = [
     {
-      name: "Funzionalità",
+      name: t("land.navFeaturesGroup"),
       key: "features",
       children: [
         {
           name: t("howItWorks"),
           href: "#getting-started",
-          desc: "Scopri il flusso di lavoro passo dopo passo",
+          desc: t("land.navDescFlow"),
           icon: Map,
         },
         {
           name: t("demo"),
           href: "#demo",
-          desc: "Guarda Taskly in azione dal vivo",
+          desc: t("land.navDescDemoLive"),
           icon: PlayCircle,
         },
         {
-          name: "Use Cases",
+          name: t("land.navUseCases"),
           href: "#use-cases",
-          desc: "Casi d'uso per team, freelancer e studenti",
+          desc: t("land.navDescUseCases"),
           icon: Users,
         },
         {
-          name: "Confronto",
+          name: t("land.navComparison"),
           href: "#comparison",
-          desc: "Taskly a confronto con altri strumenti",
+          desc: t("land.navDescComparison"),
           icon: Scale,
         },
       ],
     },
     {
-      name: "Risorse",
+      name: t("land.navResources"),
       key: "resources",
       children: [
         {
-          name: "Testimonianze",
+          name: t("land.navTestimonials"),
           href: "#social-proof",
-          desc: "Cosa dicono i nostri utenti",
+          desc: t("land.navDescTestimonials"),
           icon: Star,
         },
         {
           name: t("pricing"),
           href: "#pricing",
-          desc: "Piani flessibili per ogni esigenza",
+          desc: t("land.navDescPlans"),
           icon: Sparkles,
         },
         {
           name: t("faq"),
           href: "#faq",
-          desc: "Risposte alle domande più comuni",
+          desc: t("land.navDescFaq"),
           icon: CircleHelp,
         },
       ],
@@ -857,7 +857,7 @@ export default function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex h-11 items-center justify-center rounded-lg bg-[#7b39fc] text-sm font-semibold text-white"
                 >
-                  Inizia
+                  {t("start")}
                 </Link>
               </div>
             )}

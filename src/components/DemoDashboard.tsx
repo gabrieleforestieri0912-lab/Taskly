@@ -21,46 +21,58 @@ import {
 } from "lucide-react";
 import AIPanel from "./AIPanel";
 
-const NAV = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: ListTodo, label: "Task", active: false },
-  { icon: Target, label: "Obiettivi", active: false },
-  { icon: Calendar, label: "Calendario", active: false },
-  { icon: FileText, label: "Note", active: false },
-  { icon: Lightbulb, label: "Idee", active: false },
-  { icon: Mic, label: "Trascrizioni", active: false },
-  { icon: Settings, label: "Impostazioni", active: false },
-];
-
-const STATS = [
-  { label: "Task Attivi", value: "12", sub: "In attesa di completamento", icon: ListTodo, tint: "text-cyan-500 bg-cyan-500/10" },
-  { label: "Obiettivi", value: "5", sub: "2 raggiunti", icon: Target, tint: "text-emerald-500 bg-emerald-500/10" },
-  { label: "Idee Brainstorm", value: "18", sub: "In attesa di conversione", icon: Lightbulb, tint: "text-amber-500 bg-amber-500/10" },
-  { label: "Focus Oggi", value: "3", sub: "Focus principale", icon: Sparkles, tint: "text-rose-500 bg-rose-500/10" },
-];
-
-const GOALS = [
-  { title: "Lancia il MVP di Taskly", progress: 70, color: "bg-cyan-500" },
-  { title: "Raggiungi 100 utenti attivi", progress: 42, color: "bg-emerald-500" },
-  { title: "Leggere 12 libri quest'anno", progress: 25, color: "bg-amber-500" },
-];
-
-const CRITICAL = [
-  { title: "Fundraising deck finale", priority: "Alta", date: "Oggi" },
-  { title: "Fixing crash iOS", priority: "Alta", date: "Domani" },
-  { title: "Sprint review", priority: "Media", date: "Venerdì" },
-];
-
-const SAMPLE_TASKS = [
-  { title: "Setup Supabase schema", status: "Fatto", done: true },
-  { title: "Refactor auth middleware", status: "In corso", done: false },
-  { title: "Test Vitest core", status: "In corso", done: false },
-  { title: "Design marketing page", status: "In cors", done: false },
-  { title: "Miglioria on-boarding", status: "Da fare", done: false },
-];
-
 export default function DemoDashboard() {
   const { t } = useLanguage();
+  const NAV = [
+    { icon: LayoutDashboard, label: t("land.demoNavDashboard"), active: true },
+    { icon: ListTodo, label: t("land.demoNavTask"), active: false },
+    { icon: Target, label: t("land.demoNavGoals"), active: false },
+    { icon: Calendar, label: t("land.demoNavCalendar"), active: false },
+    { icon: FileText, label: t("land.demoNavNotes"), active: false },
+    { icon: Lightbulb, label: t("land.demoNavIdeas"), active: false },
+    { icon: Mic, label: t("land.demoNavTranscripts"), active: false },
+    { icon: Settings, label: t("land.demoNavSettings"), active: false },
+  ];
+
+  const STATS = [
+    { label: t("land.demoStatActive"), value: "12", sub: t("land.demoStatActiveSub"), icon: ListTodo, tint: "text-cyan-500 bg-cyan-500/10" },
+    { label: t("land.demoStatGoals"), value: "5", sub: t("land.demoStatGoalsSub"), icon: Target, tint: "text-emerald-500 bg-emerald-500/10" },
+    { label: t("land.demoStatIdeas"), value: "18", sub: t("land.demoStatIdeasSub"), icon: Lightbulb, tint: "text-amber-500 bg-amber-500/10" },
+    { label: t("land.demoStatFocus"), value: "3", sub: t("land.demoStatFocusSub"), icon: Sparkles, tint: "text-rose-500 bg-rose-500/10" },
+  ];
+
+  const GOALS = [
+    { title: t("land.demoGoal1"), progress: 70, color: "bg-cyan-500" },
+    { title: t("land.demoGoal2"), progress: 42, color: "bg-emerald-500" },
+    { title: t("land.demoGoal3"), progress: 25, color: "bg-amber-500" },
+  ];
+
+  const CRITICAL = [
+    { title: t("land.demoCritical1"), priority: t("land.demoPrioHigh"), date: t("land.demoDateToday") },
+    { title: t("land.demoCritical2"), priority: t("land.demoPrioHigh"), date: t("land.demoDateTomorrow") },
+    { title: t("land.demoCritical3"), priority: t("land.demoPrioMedium"), date: t("land.demoDateFriday") },
+  ];
+
+  const SAMPLE_TASKS = [
+    { title: t("land.demoTask1"), status: t("land.demoStatusDone"), done: true },
+    { title: t("land.demoTask2"), status: t("land.demoStatusDoing"), done: false },
+    { title: t("land.demoTask3"), status: t("land.demoStatusDoing"), done: false },
+    { title: t("land.demoTask4"), status: t("land.demoStatusDoing"), done: false },
+    { title: t("land.demoTask5"), status: t("land.demoStatusTodo"), done: false },
+  ];
+
+  const TOP_TABS = [
+    t("land.demoTopTabDashboard"),
+    t("land.demoTopTabTask"),
+    t("land.demoTopTabGoals"),
+    t("land.demoTopTabNotes"),
+  ];
+
+  const PAGES = [
+    t("land.demoPageBacklog"),
+    t("land.demoPageShipments"),
+    t("land.demoPageHobby"),
+  ];
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-gray-900 dark:text-gray-100">
       {/* Top bar */}
@@ -70,16 +82,16 @@ export default function DemoDashboard() {
           <span className="text-[15px] tracking-tight">{t("land.cmpHeaderTaskly")}</span>
         </div>
         <nav className="flex-1 flex items-center gap-1 overflow-hidden">
-          {["Dashboard", "Task", "Obiettivi", "Note"].map((t, i) => (
+          {TOP_TABS.map((tab, i) => (
             <span
-              key={t}
+              key={tab}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${
                 i === 0
                   ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800"
                   : "text-gray-500 dark:text-gray-400"
               }`}
             >
-              {t}
+              {tab}
             </span>
           ))}
         </nav>
@@ -118,7 +130,7 @@ export default function DemoDashboard() {
             );
           })}
           <div className="mt-4 flex items-center gap-2 px-2 text-[10px] font-black uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">{t("land.demoYourPages")}</div>
-          {["Backlog", "Spedizioni", "Hobby"].map((p) => (
+          {PAGES.map((p) => (
             <div
               key={p}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-500 dark:text-gray-400"

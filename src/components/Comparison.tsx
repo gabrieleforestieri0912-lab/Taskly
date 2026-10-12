@@ -4,31 +4,30 @@ import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 import Link from "next/link";
 
-const rows = [
-  { label: "Curva di apprendimento", taskly: "Rapida", other: "Spesso lunga" },
-  { label: "Setup iniziale", taskly: "Pronto in pochi minuti", other: "Richiede configurazione" },
-  { label: "Organizzazione quotidiana", taskly: "Lineare e focalizzata", other: "Pu\u00f2 diventare dispersiva" },
-  { label: "Esperienza visiva", taskly: "Pulita e minimal", other: "Dipende dal setup" },
-  { label: "AI integrata", taskly: "S\u00ec, nativa", other: "Solo a pagamento" },
-  { label: "App mobile", taskly: "In arrivo (PWA gi\u00e0 attiva)", other: "Spesso separata" },
-  { label: "Template pronti", taskly: "Libreria inclusa", other: "Da creare o acquistare" },
-  { label: "Export dati", taskly: "PDF / CSV nativo", other: "Limitato o assente" },
-  { label: "Collaborazione in tempo reale", taskly: "Workspace condivisi", other: "Piani superiori" },
-  { label: "Modalit\u00e0 offline", taskly: "Supporto base", other: "Raramente disponibile" },
-];
-
 export default function Comparison() {
   const { t } = useLanguage();
+  const rows = [
+    { label: t("land.cmpRow1"), taskly: t("land.cmpRow1Taskly"), other: t("land.cmpRow1Other") },
+    { label: t("land.cmpRow2"), taskly: t("land.cmpRow2Taskly"), other: t("land.cmpRow2Other") },
+    { label: t("land.cmpRow3"), taskly: t("land.cmpRow3Taskly"), other: t("land.cmpRow3Other") },
+    { label: t("land.cmpRow4"), taskly: t("land.cmpRow4Taskly"), other: t("land.cmpRow4Other") },
+    { label: t("land.cmpRow5"), taskly: t("land.cmpRow5Taskly"), other: t("land.cmpRow5Other") },
+    { label: t("land.cmpRow6"), taskly: t("land.cmpRow6Taskly"), other: t("land.cmpRow6Other") },
+    { label: t("land.cmpRow7"), taskly: t("land.cmpRow7Taskly"), other: t("land.cmpRow7Other") },
+    { label: t("land.cmpRow8"), taskly: t("land.cmpRow8Taskly"), other: t("land.cmpRow8Other") },
+    { label: t("land.cmpRow9"), taskly: t("land.cmpRow9Taskly"), other: t("land.cmpRow9Other") },
+    { label: t("land.cmpRow10"), taskly: t("land.cmpRow10Taskly"), other: t("land.cmpRow10Other") },
+  ];
   return (
     <section className="landing-section landing-section-surface px-4 py-20 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center">
           <div className="landing-eyebrow">
-            Perch\u00e9 scegliere Taskly
+            {t("land.cmpEyebrow")}
           </div>
           <h2 className="landing-heading-lg mt-3">
-            Pi&ugrave; semplice di Notion,{" "}
-            <span className="landing-display-accent">pi&ugrave; flessibile di Trello</span>{t("land.cmpTitleSuffix")}</h2>
+            {t("land.cmpTitlePrefix")}{" "}
+            <span className="landing-display-accent">{t("land.cmpTitleAccent")}</span>{t("land.cmpTitleSuffix")}</h2>
         </div>
 
         <div className="mt-9 overflow-hidden rounded-2xl border border-[#7b39fc]/10 dark:border-white/10">
@@ -45,7 +44,7 @@ export default function Comparison() {
             </div>
           ))}
           <div className="p-4 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-[#7b39fc]/10 dark:border-white/10 bg-[#f6f7f9]/50 dark:bg-white/5">
-            Confronto indicativo basato sull&apos;esperienza d&apos;uso media
+            {t("land.cmpFootnote")}
           </div>
         </div>
       </div>

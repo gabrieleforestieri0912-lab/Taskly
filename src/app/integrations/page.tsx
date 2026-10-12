@@ -42,7 +42,7 @@ export default function IntegrationsPage() {
 
   const connectSlack = async () => {
     if (!webhookUrl.trim()) {
-      setStatus("Incolla l'URL del webhook Slack.");
+      setStatus(t("auth.intPasteWebhook"));
       return;
     }
     setSlackBusy(true);
@@ -55,13 +55,13 @@ export default function IntegrationsPage() {
       });
       if (res.ok) {
         setConnected((c) => ({ ...c, slack: true }));
-        setStatus("Slack collegato \u2713 Ora puoi inviare messaggi di test.");
+        setStatus(t("auth.intSlackConnected"));
       } else {
         const d = await res.json();
-        setStatus(d?.message || "Errore durante il collegamento.");
+        setStatus(d?.message || t("auth.intConnectError"));
       }
     } catch (e) {
-      setStatus("Errore di rete durante il collegamento.");
+      setStatus(t("auth.intNetworkError"));
     } finally {
       setSlackBusy(false);
     }
@@ -74,12 +74,12 @@ export default function IntegrationsPage() {
       const res = await apiFetch("/integrations/slack/webhook-test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: testMessage || "Collegamento Taskly verificato" }),
+        body: JSON.stringify({ message: testMessage || t("auth.intDefaultTestMessage") }),
       });
       const d = await res.json();
-      setStatus(d?.message || "Messaggio inviato a Slack");
+      setStatus(d?.message || t("auth.intSlackSent"));
     } catch {
-      setStatus("Errore di invio a Slack.");
+      setStatus(t("auth.intSlackSendError"));
     } finally {
       setSlackBusy(false);
     }
@@ -89,7 +89,7 @@ export default function IntegrationsPage() {
     await apiFetch("/integrations/slack", { method: "DELETE" }).catch(() => {});
     setConnected((c) => ({ ...c, slack: false }));
     setWebhookUrl("");
-    setStatus("Slack scollegato.");
+    setStatus(t("auth.intSlackDisconnected"));
   };
 
   const connectGoogle = async () => {
@@ -105,10 +105,10 @@ export default function IntegrationsPage() {
       if (d?.url) {
         window.location.href = d.url;
       } else {
-        setStatus(d?.message || "Google non configurato sul server. Aggiungi GOOGLE_CLIENT_ID.");
+        setStatus(d?.message || t("auth.intGoogleNotConfigured"));
       }
     } catch {
-      setStatus("Errore durante il collegamento Google.");
+      setStatus(t("auth.intGoogleConnectError"));
     } finally {
       setGoogleBusy(false);
     }
@@ -117,7 +117,7 @@ export default function IntegrationsPage() {
   const disconnectGoogle = async () => {
     await apiFetch("/integrations/google", { method: "DELETE" }).catch(() => {});
     setConnected((c) => ({ ...c, google: false }));
-    setStatus("Google Calendar scollegato.");
+    setStatus(t("auth.intGoogleDisconnected"));
   };
 
   const inp =
@@ -161,7 +161,7 @@ export default function IntegrationsPage() {
               className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-xs font-bold transition-all disabled:opacity-60"
             >
               {googleBusy ? <Loader2 size={14} /> : connected.google ? <ExternalLink size={14} /> : <LinkIcon size={14} />}
-              {googleBusy ? "..." : connected.google ? "Scollega" : "Connetti"}
+              {googleBusy ? "..." : connected.google ? t("auth.intDisconnect") : t("auth.intConnect")}
             </button>
           </div>
         </section>
@@ -225,7 +225,7 @@ export default function IntegrationsPage() {
                   disabled={slackBusy}
                   className="shrink-0 px-4 py-2.5 rounded-xl border border-[#7b39fc]/40 text-[#7b39fc] dark:text-[#a67cff] text-sm font-bold hover:bg-[#7b39fc]/10 transition-all disabled:opacity-60"
                 >
-                  {slackBusy ? <Loader2 size={14} className="animate-spin inline" /> : "Invia test"}
+                  {slackBusy ? <Loader2 size={14} className="animate-spin inline" /> : t("auth.intSendTest")}
                 </button>
               </div>
             )}

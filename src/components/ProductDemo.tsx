@@ -51,6 +51,7 @@ export default function ProductDemo() {
               {!isPlaying && (
                 <button
                   onClick={handlePlay}
+                  aria-label={t("land.pdPlayLabel")}
                   className="relative z-10 flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-[#7b39fc] to-[#a67cff] text-white transition-transform hover:scale-105 shadow-2xl shadow-[#7b39fc]/30"
                 >
                   <Play size={32} fill="white" />
