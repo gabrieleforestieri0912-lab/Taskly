@@ -205,7 +205,11 @@ export function PageTreeItem({
       });
   };
 
-  // Close context menu on outside click or escape
+  // Close context menu on outside click or escape.
+  // NOTA: il menu è un portal su document.body (fuori dal bottone ⋯), quindi
+  // la chiusura deve avvenire su "click" e non su "mousedown": il mousedown
+  // scatta prima del click e smonterebbe il menu prima che l'onClick della
+  // voce (Rinomina, Duplica, Cestino...) venga eseguito.
   useEffect(() => {
     if (!isMenuOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
@@ -222,10 +226,10 @@ export function PageTreeItem({
         menuButtonRef.current?.focus();
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isMenuOpen]);
