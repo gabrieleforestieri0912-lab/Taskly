@@ -10,6 +10,8 @@ import {
   Plus,
   LayoutDashboard,
   Trash2,
+  Undo2,
+  X,
   User,
   ChevronUp,
   ChevronRight,
@@ -147,6 +149,9 @@ export default function Sidebar({
   const trashRef = useRef(null);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
   const [trashSearch, setTrashSearch] = useState("");
+  // Doppia conferma per l'eliminazione definitiva: primo click arma la riga,
+  // secondo click esegue. Si azzera alla chiusura del popup.
+  const [confirmHardDeleteId, setConfirmHardDeleteId] = useState<string | null>(null);
   const [expandedPages, setExpandedPages] = useState(() => {
     try {
       const saved = localStorage.getItem("expanded_pages");
@@ -952,7 +957,9 @@ export default function Sidebar({
                   </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  {/* Ripristina: solo icona */}
                   <button
+                    type="button"
                     onClick={() => {
                       if (item._type === "page") {
                         if (onRestorePage) {
@@ -973,28 +980,67 @@ export default function Sidebar({
                       }
                       setIsTrashOpen(false);
                     }}
-                    className="px-2 py-1 text-xs font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
-                  >{t("views.notesRestore")}</button>
-                  <button
-                    onClick={() => {
-                      if (item._type === "page") {
-                        if (onPermanentlyDeletePage) {
-                          onPermanentlyDeletePage(item.id);
-                        } else {
-                          onDeletePage && onDeletePage(item.id);
-                        }
-                      } else {
-                        const storageKey = item._type === "task" ? "tasks" : "goals";
-                        try {
-                          const raw = localStorage.getItem(storageKey);
-                          const parsed = raw ? JSON.parse(raw) : [];
-                          const updated = parsed.filter((it) => !(it && it.id === item.id));
-                          localStorage.setItem(storageKey, JSON.stringify(updated));
-                        } catch {}
-                      }
-                    }}
-                    className="px-2 py-1 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                  >{t("views.habitDelete")}</button>
+                    title={t("views.notesRestore", "Ripristina")}
+                    aria-label={`${t("views.notesRestore", "Ripristina")}: ${item.label || "Senza nome"}`}
+                    className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
+                  >
+                    <Undo2 size={14} aria-hidden="true" />
+                  </button>
+                  {/* Elimina definitiva: solo icona, con doppia conferma.
+                      Primo click arma la riga, secondo click esegue. */}
+                  {(() => {
+                    const key = `${item._type}-${item.id || item._id || index}`;
+                    const armed = confirmHardDeleteId === key;
+                    return (
+                      <>
+                        {armed && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmHardDeleteId(null)}
+                            title={t("views.habitCancel", "Annulla")}
+                            aria-label={t("views.habitCancel", "Annulla")}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                          >
+                            <X size={14} aria-hidden="true" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!armed) {
+                              setConfirmHardDeleteId(key);
+                              return;
+                            }
+                            setConfirmHardDeleteId(null);
+                            if (item._type === "page") {
+                              if (onPermanentlyDeletePage) {
+                                onPermanentlyDeletePage(item.id);
+                              } else {
+                                onDeletePage && onDeletePage(item.id);
+                              }
+                            } else {
+                              const storageKey = item._type === "task" ? "tasks" : "goals";
+                              try {
+                                const raw = localStorage.getItem(storageKey);
+                                const parsed = raw ? JSON.parse(raw) : [];
+                                const updated = parsed.filter((it) => !(it && it.id === item.id));
+                                localStorage.setItem(storageKey, JSON.stringify(updated));
+                              } catch {}
+                            }
+                          }}
+                          title={armed ? "Click di nuovo per eliminare definitivamente" : "Elimina definitivamente"}
+                          aria-label={armed ? `Conferma eliminazione definitiva di ${item.label || "Senza nome"}` : `Elimina definitivamente ${item.label || "Senza nome"}`}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            armed
+                              ? "bg-red-600 text-white hover:bg-red-500 shadow-md shadow-red-600/30"
+                              : "text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          }`}
+                        >
+                          <Trash2 size={14} aria-hidden="true" />
+                        </button>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ))
@@ -1168,8 +1214,12 @@ export default function Sidebar({
   }
 
   // close trash menu on outside click or Esc
+  // Alla chiusura si azzera anche l'eventuale conferma armata.
   useEffect(() => {
-    if (!isTrashOpen) return;
+    if (!isTrashOpen) {
+      setConfirmHardDeleteId(null);
+      return;
+    }
     const onDocClick = () => setIsTrashOpen(false);
     const onEsc = (e) => {
       if (e.key === "Escape") setIsTrashOpen(false);
