@@ -67,7 +67,7 @@
 
 @layer base {
   body {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--app-font, var(--font-inter)), ui-sans-serif, system-ui, sans-serif;
     @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased;
     width: 100%;
     max-width: 100%;
@@ -106,6 +106,28 @@
 .font-instrument-serif {
 
     font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Maniglia drag & drop (personalizzazione analitiche): scossetta
+     periodica per segnalare che il widget si può trascinare. */
+  @keyframes drag-hint-wiggle {
+    0%, 86%, 100% { transform: rotate(0deg); }
+    88% { transform: rotate(-16deg); }
+    90% { transform: rotate(13deg); }
+    92% { transform: rotate(-9deg); }
+    94% { transform: rotate(6deg); }
+    96% { transform: rotate(-2deg); }
+  }
+
+  .animate-drag-hint {
+    animation: drag-hint-wiggle 3s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-drag-hint {
+      animation: none;
+    }
   }
 
   /* Landing design system

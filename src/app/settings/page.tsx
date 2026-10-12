@@ -40,6 +40,8 @@ import {
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
 import { Theme, readTheme, applyTheme } from "../../lib/theme";
+import { applyAppFont, readAppFont, type AppFontId } from "../../lib/appFont";
+import GoogleCalendarIcon from "../../components/GoogleCalendarIcon";
 
 type SettingsTab =
   | "profile"
@@ -127,8 +129,9 @@ function SettingsContent() {
       if (rawUser) setUser((prev: any) => ({ ...prev, ...JSON.parse(rawUser) }));
       const savedAccent = localStorage.getItem("taskly_accent");
       if (savedAccent) setAccentColor(savedAccent);
-      const savedFont = localStorage.getItem("taskly_font");
-      if (savedFont) setFontFamily(savedFont);
+      const savedFont = readAppFont();
+      setFontFamily(savedFont);
+      applyAppFont(savedFont);
       const savedPrefs = localStorage.getItem("taskly_user_preferences");
       if (savedPrefs) {
         const p = JSON.parse(savedPrefs);
@@ -168,6 +171,7 @@ function SettingsContent() {
     try {
       localStorage.setItem("taskly_accent", accentColor);
       localStorage.setItem("taskly_font", fontFamily);
+      applyAppFont(fontFamily as AppFontId);
       localStorage.setItem(
         "taskly_user_preferences",
         JSON.stringify({
@@ -195,6 +199,12 @@ function SettingsContent() {
     setTheme(next);
     applyTheme(next, true);
     showToast(`Tema ${next === "dark" ? "scuro" : "chiaro"} applicato.`);
+  };
+
+  const changeFont = (next: AppFontId, label: string) => {
+    setFontFamily(next);
+    applyAppFont(next, true);
+    showToast(`Font ${label} salvato.`);
   };
 
   const openBillingPortal = async () => {
@@ -527,11 +537,7 @@ function SettingsContent() {
                         <button
                           key={f.id}
                           type="button"
-                          onClick={() => {
-                            setFontFamily(f.id);
-                            localStorage.setItem("taskly_font", f.id);
-                            showToast(`Font ${f.name} salvato.`);
-                          }}
+                          onClick={() => changeFont(f.id as AppFontId, f.name)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
                             fontFamily === f.id
                               ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc] font-bold"
@@ -856,7 +862,7 @@ function SettingsContent() {
                         name: "Google Calendar",
                         desc: "Sincronizza automaticamente le scadenze dei task con il tuo calendario personale o aziendale.",
                         connected: true,
-                        icon: "📅",
+                        icon: <GoogleCalendarIcon className="w-7 h-7" />,
                       },
                       {
                         name: "Slack",

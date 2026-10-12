@@ -221,10 +221,14 @@ async function streamChat(text: string, context: string, signal: AbortSignal): P
           : " Riprova tra qualche minuto.";
       throw new Error(`Crediti AI esauriti: hai raggiunto il limite di richieste.${wait}`);
     }
-    const body = await res.text().catch(() => "");
-    throw new Error(`AI backend ${res.status}: ${body || res.statusText}`);
+    // La route /api/ai/chat non usa più fallback: estrae l'errore reale di xKiro.
+    const data = await res.json().catch(() => null);
+    const detail =
+      (data && typeof data.error === "string" && data.error) || res.statusText;
+    throw new Error(`AI non disponibile (${res.status}): ${detail}`);
   }
   const data = await res.json().catch(() => null);
+  if (data?.error) throw new Error(`AI non disponibile: ${data.error}`);
   return data?.message || "";
 }
 

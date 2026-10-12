@@ -30,7 +30,7 @@ import AIPanel from "../../components/AIPanel";
 import { getMeetingProvider } from "../../lib/meetings/providers";
 import { useUserData } from "../../hooks/useUserData";
 import { useLanguage } from "../../lib/LanguageContext";
-import { applyTheme, readTheme, type Theme } from "../../lib/theme";
+import { applyTheme, readTheme } from "../../lib/theme";
 import { Skeleton } from "../../components/UIComponents";
 
 function MeetingsContent() {
@@ -39,9 +39,6 @@ function MeetingsContent() {
 
   // Load user data using custom hook
   const { user, pages, loading } = useUserData();
-
-  // Theme state
-  const [theme, setTheme] = useState<Theme>("light");
 
   // Layout states
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -66,9 +63,7 @@ function MeetingsContent() {
 
   // Update theme class on HTML element
   useEffect(() => {
-    const saved = readTheme();
-    setTheme(saved);
-    applyTheme(saved);
+    applyTheme(readTheme());
   }, []);
 
   // Sync server-persisted meetings (logged-in users) into the local list
@@ -112,12 +107,6 @@ function MeetingsContent() {
       active = false;
     };
   }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    applyTheme(newTheme, true);
-  };
 
   // Delete a meeting
   const handleDeleteMeeting = (id, e) => {
@@ -210,8 +199,6 @@ function MeetingsContent() {
           user={user}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
-          theme={theme}
-          toggleTheme={toggleTheme}
           pages={pages}
           loading={loading}
         />

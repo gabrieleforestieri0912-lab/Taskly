@@ -8,6 +8,7 @@ import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import AppMiniChat from "../components/AppMiniChat";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { themeBootstrapScript } from "../lib/theme";
+import { appFontBootstrapScript } from "../lib/appFont";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
 
@@ -117,12 +118,17 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
       className={cn("h-full", "antialiased", inter.variable)}
     >
-      <body className="min-h-full flex flex-col" style={{ fontFamily: 'var(--font-inter)' }}>
+      <body className="min-h-full flex flex-col" style={{ fontFamily: 'var(--app-font, var(--font-inter))' }}>
         <GoogleAuthProvider>
           <LanguageProvider>
             <script
               dangerouslySetInnerHTML={{
                 __html: themeBootstrapScript(),
+              }}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: appFontBootstrapScript(),
               }}
             />
             <script

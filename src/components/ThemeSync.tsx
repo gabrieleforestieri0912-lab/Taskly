@@ -2,16 +2,18 @@
 
 import { useEffect } from "react";
 import { applyTheme, readTheme } from "../lib/theme";
+import { applyAppFont, readAppFont } from "../lib/appFont";
 
 /**
- * Riapplica il tema scelto dall'utente dopo l'hydration: lo script inline in
- * layout.tsx lo imposta già prima del primo paint, questo lo rende coerente
- * anche per le pagine che non gestiscono il tema da sole
+ * Riapplica tema e font scelti dall'utente dopo l'hydration: gli script
+ * inline in layout.tsx li impostano già prima del primo paint, questo li
+ * rende coerenti anche per le pagine che non li gestiscono da sole
  * (login, settings, …).
  */
 export default function ThemeSync() {
   useEffect(() => {
     applyTheme(readTheme());
+    applyAppFont(readAppFont());
   }, []);
 
   return null;

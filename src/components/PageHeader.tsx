@@ -338,7 +338,7 @@ export default function PageHeader({
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Senza titolo" className="w-full" />
+          <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
         </div>
       </div>
     </div>

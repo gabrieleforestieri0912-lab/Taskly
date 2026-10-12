@@ -341,7 +341,16 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
                   {PAGE_TYPES.map((type) => (
                     <button
                       key={type.id}
-                      onClick={() => handleAdd({ ...type, isTemplate: false })}
+                      onClick={() =>
+                        handleAdd(
+                          // Pagine di testo (notes/empty): niente titolo/icona
+                          // preimpostati, li sceglie l'utente (placeholder
+                          // "Nuova Pagina"). Gli altri tipi tengono la label.
+                          type.type === "notes" || type.type === "empty"
+                            ? { type: type.type, isTemplate: false }
+                            : { ...type, isTemplate: false },
+                        )
+                      }
                       className="group flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-gray-800 hover:border-cyan-500/50 hover:bg-cyan-50/30 dark:hover:bg-cyan-900/10 transition-all text-left"
                     >
                       <div

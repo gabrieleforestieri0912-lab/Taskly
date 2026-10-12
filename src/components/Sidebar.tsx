@@ -39,7 +39,6 @@ import {
   ChevronLeft,
   Copy,
   Bell,
-  Globe,
   Shield,
   Sliders,
   Download,
@@ -53,6 +52,7 @@ import { PageTreeItem } from "./sidebar/PageTreeItem";
 import { GoogleCalendarSidebarCard } from "./sidebar/GoogleCalendarSidebarCard";
 import { OneTimeTooltip } from "./OnboardingTooltips";
 import { getAncestorIds } from "../lib/pageTree";
+import { collectDescendantIds } from "../lib/trashUtils";
 
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -103,10 +103,7 @@ export default function Sidebar({
   onOpenQuickPage = (pageId: string) => {},
   isSidebarOpen,
   setIsSidebarOpen,
-  // theme/toggleTheme: non più usati nei menu (impostazioni rapide rimosse),
-  // mantenuti per compatibilità con i chiamanti.
-  theme,
-  toggleTheme,
+  // Niente impostazioni rapide nei menu: tema e lingua si cambiano solo in /settings.
   loading = false,
 }) {
   const router = useRouter();
@@ -394,7 +391,6 @@ export default function Sidebar({
     onAddPage &&
       onAddPage({
         type: "empty",
-        label: "Senza titolo",
         parentId,
       });
   };
@@ -415,11 +411,92 @@ export default function Sidebar({
   };
 
   // allow dropping on root (make page a root child)
+  const [isRootDragOver, setIsRootDragOver] = useState(false);
   const handleRootDrop = (e: React.DragEvent) => {
+    // I drop sulle righe figlie arrivano qui per bubbling: ignorali, la riga
+    // ha già gestito lo spostamento (e fatto stopPropagation).
+    if (e.target !== e.currentTarget) return;
     e.preventDefault();
-    const draggedId = e.dataTransfer.getData("text/plain");
+    e.stopPropagation();
+    setIsRootDragOver(false);
+    const draggedId =
+      e.dataTransfer.getData("application/x-taskly-page") ||
+      e.dataTransfer.getData("text/plain");
     if (!draggedId) return;
-    onUpdatePage && onUpdatePage(draggedId, { parentId: null });
+    handleMovePage(draggedId, null, rootNodes.length);
+  };
+
+  // Espande un nodo e persiste la scelta (come handleAddSubpage).
+  const expandPageNode = (id: string) => {
+    setExpandedPages((prev: Record<string, boolean>) => {
+      if (prev[id]) return prev;
+      const next = { ...prev, [id]: true };
+      try {
+        localStorage.setItem("expanded_pages", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Spostamento stile Notion via drag & drop: centro riga = annida dentro,
+  // bordi riga = riordina tra fratelli. targetIndex è in coordinate
+  // "originali" (include la trascinata): se resta nello stesso genitore e
+  // si sposta verso il basso, la rimozione sposta tutto di 1 → compensa.
+  // Rinumera gli order dei fratelli così il drop atterra davvero al punto
+  // voluto. Rifiuta i cicli (dentro sé stessa o un discendente).
+  const handleMovePage = (
+    draggedId: string,
+    targetParentId: string | null,
+    targetIndex: number,
+  ) => {
+    const pagesArr = Array.isArray(pages) ? pages : [];
+    const dragged = pagesArr.find((p) => p && String(p.id) === String(draggedId));
+    if (!dragged || !onUpdatePage) return;
+    const normParent = (v: any) => (v === undefined || v === null ? null : String(v));
+    const destKey =
+      targetParentId === undefined || targetParentId === null
+        ? null
+        : String(targetParentId);
+    if (destKey !== null) {
+      if (destKey === String(draggedId)) return;
+      const desc = collectDescendantIds(pagesArr, draggedId).map(String);
+      if (desc.includes(destKey)) return;
+    }
+    const sameParent = normParent(dragged.parentId) === destKey;
+    // Ordine di rendering completo (inclusa la trascinata) per compensare.
+    const fullOrdered = pagesArr
+      .filter(
+        (p) => p && !p.deleted && normParent(p.parentId) === destKey,
+      )
+      .sort((a, b) => {
+        if (typeof a.order === "number" && typeof b.order === "number")
+          return a.order - b.order;
+        return String(a.label || "").localeCompare(String(b.label || ""));
+      });
+    const oldIndex = fullOrdered.findIndex(
+      (p) => String(p.id) === String(draggedId),
+    );
+    let at = Math.max(0, targetIndex);
+    if (sameParent && oldIndex !== -1 && oldIndex < at) at -= 1;
+    // Fratelli a destinazione (senza la trascinata), in ordine di rendering.
+    const siblings = fullOrdered.filter(
+      (p) => String(p.id) !== String(draggedId),
+    );
+    at = Math.max(0, Math.min(at, siblings.length));
+    // Nulla da fare se resta dov'è.
+    if (sameParent && oldIndex === at) return;
+    const next = [...siblings.slice(0, at), dragged, ...siblings.slice(at)];
+    next.forEach((p, i) => {
+      if (String(p.id) === String(draggedId)) {
+        if (normParent(p.parentId) !== destKey || p.order !== i) {
+          onUpdatePage(p.id, { parentId: targetParentId, order: i });
+        }
+      } else if (p.order !== i) {
+        onUpdatePage(p.id, { order: i });
+      }
+    });
+    // Mostra il risultato: espandi la pagina di destinazione.
+    if (destKey !== null) expandPageNode(destKey);
   };
 
   // Toggle expand/collapse for a page in the sidebar and persist to localStorage
@@ -929,8 +1006,8 @@ export default function Sidebar({
         >
           <h3 className="text-lg font-bold mb-2">{t("land.sideConfirmDeleteTitle")}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            Sei sicuro di voler eliminare questa pagina? L&apos;operazione può essere
-            annullata soltanto dal Cestino.
+            La pagina verrà spostata nel Cestino. Potrai ripristinarla o
+            eliminarla definitivamente da lì.
           </p>
           <div className="flex justify-end gap-3">
             <button
@@ -940,7 +1017,7 @@ export default function Sidebar({
             <button
               onClick={handleConfirmDelete}
               className="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-bold"
-            >{t("views.habitDelete")}</button>
+            >Sposta nel cestino</button>
           </div>
         </div>
       </div>,
@@ -1348,6 +1425,7 @@ export default function Sidebar({
                       onDuplicatePage={handleDuplicatePage}
                       onOpenPage={onOpenPage}
                       showUpdatedAt={false}
+                      draggable={false}
                     />
                   ))}
                 </ul>
@@ -1383,7 +1461,17 @@ export default function Sidebar({
                   role="tree"
                   aria-label={t("yourPages", "Pagine private")}
                   className="space-y-0.5"
-                  onDragOver={(e) => e.preventDefault()}
+                  onDragOver={(e) => {
+                    // Solo l'area vuota sotto l'albero porta al primo livello;
+                    // i drop sulle righe sono gestiti dalle righe stesse.
+                    if (e.target !== e.currentTarget) return;
+                    e.preventDefault();
+                    setIsRootDragOver(true);
+                  }}
+                  onDragLeave={(e) => {
+                    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                    setIsRootDragOver(false);
+                  }}
                   onDrop={handleRootDrop}
                 >
                   {rootNodes.map((page, idx) => (
@@ -1399,10 +1487,38 @@ export default function Sidebar({
                       onAddSubpage={handleAddSubpage}
                       onDeletePage={(id) => setPendingDelete({ id })}
                       onUpdatePage={onUpdatePage}
+                      onMovePage={handleMovePage}
                       onDuplicatePage={handleDuplicatePage}
                       onOpenPage={onOpenPage}
                     />
                   ))}
+                  {/* Zona di drop a fine albero: trascina qui per primo livello */}
+                  <li
+                    aria-hidden="true"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsRootDragOver(true);
+                    }}
+                    onDragLeave={() => setIsRootDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsRootDragOver(false);
+                      const draggedId =
+                        e.dataTransfer.getData("application/x-taskly-page") ||
+                        e.dataTransfer.getData("text/plain");
+                      if (!draggedId) return;
+                      handleMovePage(draggedId, null, rootNodes.length);
+                    }}
+                    className={`mt-1 rounded-lg border border-dashed text-center text-[11px] font-medium transition-all ${
+                      isRootDragOver
+                        ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 py-2.5 opacity-100"
+                        : "border-gray-200 dark:border-gray-800 text-gray-400 py-1.5 opacity-0 hover:opacity-100"
+                    }`}
+                  >
+                    Trascina qui per spostare al primo livello
+                  </li>
                 </ul>
               )}
             </SidebarSection>
@@ -1416,7 +1532,8 @@ export default function Sidebar({
         {/* ── Account + personalizzazione ──────────────────────────────────────
             Row compatta: avatar + nome + ChevronUp (apre profileMenuPortal)
             + bottone ⋯ (apre moreMenuPortal).
-            Sotto: mini-strip con toggle tema e lingua, sempre visibili. */}
+            Sotto: riga account + trigger menu Altro. Niente toggle rapidi qui:
+            tema e lingua si cambiano solo nella pagina /settings. */}
         <div
           className="border-t border-gray-100 dark:border-gray-800 px-2 pt-1.5 pb-1"
           ref={profileRef}

@@ -2,29 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseBody } from "@/lib/server/http";
 import { xkiroChat } from "@/lib/server/xkiro";
 
-// Fallback locale: risponde sempre anche se xKiro non è raggiungibile.
-function fallbackReply(message: string): string {
-  const t = (message || "").trim().toLowerCase();
-  if (/ciao|salve|hey|buongiorno|buonasera/.test(t))
-    return "Ciao! 👋 Sono Taskly AI. Posso aiutarti a pianificare la tua giornata, riassumere note o creare task e obiettivi.";
-  if (/riassumi|riassunto|summary/.test(t)) {
-    const target = (message.match(/riassumi(?:\s+la\s+pagina\s+)?["“]?([^”"\n]+)?/i) || [])[1];
-    if (target) return `Ecco il riassunto di "${target.trim()}": punti principali, azioni da mettere in agenda e prossimi passi. Per un riassunto dettagliato, apri la pagina dedicata e chiedi di generarlo.`;
-    return "Ecco cosa ho riassunto: (1) punti chiave del tuo lavoro, (2) i task prioritari da completare, (3) le idee da convertire in obiettivi. Possiamo approfondire qualsiasi punto.";
-  }
-  if (/crea\s+(un\s+)?task|aggiungi\s+(un\s+)?task/.test(t))
-    return "Perfetto, ho preparato un nuovo task nella tua lista. Vuoi che gli assegni una priorità (Alta/Media/Bassa) e una scadenza?";
-  if (/obiettiv|goal|target/.test(t))
-    return "Ottimo! Un obiettivo chiaro parte da un risultato misurabile. Definisci: (1) cosa vuoi ottenere, (2) entro quando, (3) i sotto-obiettivi che lo rendono raggiungibile.";
-  if (/piano|pianifica|plan|agenda|giornat/.test(t))
-    return "Ecco un piano suggerito per oggi: mattina dedicata al focus (3 task prioritari), trasferire 1 idea in obiettivo, e 20 minuti di calendario per la revisione di fine giornata. Vuoi che generi i blocchi nel calendario?";
-  if (/grazie|perfetto|ottimo|ok|d'accordo|grazie mille/.test(t))
-    return "Di nulla! 😊 Se mi serve altro: organizzazione task, riassunti, piani della giornata o obiettivi. Sono qui per questo.";
-  if (/(come|chi sei|cosa fai|help|aiuto)/.test(t))
-    return "Sono Taskly AI, il tuo assistente di produttività. Posso riassumere note, creare task, suggerire obiettivi e aiutarti a pianificare la giornata. Scrivi 'riassumi le mie note' o 'crea un task' per iniziare.";
-  return `Ho capito, parliamo di "${message}". Per ottimizzarti, dimmi più nel dettaglio: vuoi creare un task, un obiettivo, riassumere una nota o pianificare il calendario?`;
-}
-
 export async function POST(request: NextRequest) {
   const body = await parseBody(request).catch(() => ({}));
   const { message, context } = (body || {}) as {
@@ -32,19 +9,28 @@ export async function POST(request: NextRequest) {
     context?: { tasks?: unknown[]; goals?: unknown[]; ideas?: unknown[] };
   };
   const text = String(message || "");
+  if (!text.trim()) {
+    return NextResponse.json({ message: "" }, { status: 400 });
+  }
 
-  let reply: string;
   try {
-    reply = await xkiroChat([
+    const reply = await xkiroChat([
       {
         role: "system",
         content: `Sei Taskly AI, un assistente intelligente per la produttività personale. Aiuti gli utenti a gestire obiettivi, task, idee e progetti. Sei conciso, motivante e sempre utile. Rispondi in italiano. Contesto attuale: ${JSON.stringify(context || {})}`,
       },
       { role: "user", content: text },
     ]);
-  } catch {
-    reply = fallbackReply(text);
+    return NextResponse.json({ message: reply });
+  } catch (err: any) {
+    // Niente risposte preimpostate: se xKiro fallisce, il client mostra
+    // l'errore reale invece di un fallback finto.
+    console.error("AI chat xKiro error:", err?.message || err);
+    const status =
+      err?.message?.includes("Missing XKIRO_API_KEY") ? 500 : 502;
+    return NextResponse.json(
+      { message: "", error: err?.message || "AI non disponibile" },
+      { status },
+    );
   }
-
-  return NextResponse.json({ message: reply });
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type DragControls } from "framer-motion";
 import {
   ArrowDown,
   ArrowUp,
@@ -761,6 +761,8 @@ export function WidgetEditToolbar({
   onMoveDown,
   onToggle,
   hiddenLabel,
+  dragControls = null,
+  dragTitle = "Trascina per riordinare",
 }: {
   label: string;
   isVisible: boolean;
@@ -770,11 +772,26 @@ export function WidgetEditToolbar({
   onMoveDown: () => void;
   onToggle: () => void;
   hiddenLabel: string;
+  /** Se fornito, la maniglia avvia il drag & drop (Framer Motion Reorder). */
+  dragControls?: DragControls | null;
+  dragTitle?: string;
 }) {
   return (
     <div className="flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-700/60 rounded-t-3xl text-xs font-bold text-gray-500 dark:text-gray-400">
       <div className="flex items-center gap-2">
-        <GripVertical size={13} className="opacity-50" />
+        {dragControls ? (
+          <button
+            type="button"
+            onPointerDown={(e) => dragControls.start(e.nativeEvent)}
+            className="animate-drag-hint cursor-grab active:cursor-grabbing touch-none p-1 -m-1 rounded-md hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors"
+            title={dragTitle}
+            aria-label={`${dragTitle}: ${label}`}
+          >
+            <GripVertical size={13} className="opacity-80" />
+          </button>
+        ) : (
+          <GripVertical size={13} className="opacity-50" />
+        )}
         <span className="font-extrabold uppercase tracking-wider text-[10px]">{label}</span>
         {!isVisible && (
           <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[9px] font-black uppercase">

@@ -14,52 +14,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
-
-/** Google Calendar official icon */
-function GoogleCalendarIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="#FFFFFF" />
-      {/* Top red header */}
-      <path
-        d="M17.5 2.5H6.5C4.29086 2.5 2.5 4.29086 2.5 6.5V8.5H21.5V6.5C21.5 4.29086 19.7091 2.5 17.5 2.5Z"
-        fill="#EA4335"
-      />
-      {/* Right blue border */}
-      <path d="M21.5 8.5H18.5V18.5H21.5V8.5Z" fill="#4285F4" />
-      {/* Bottom green bar */}
-      <path
-        d="M18.5 18.5H5.5V21.5H17.5C19.7091 21.5 21.5 19.7091 21.5 17.5V18.5Z"
-        fill="#34A853"
-      />
-      {/* Left yellow bar */}
-      <path d="M2.5 8.5H5.5V18.5H2.5V8.5Z" fill="#FBBC05" />
-      {/* Bottom-left corner green overlap */}
-      <path
-        d="M5.5 18.5H2.5C2.5 19.5 3 21.5 5.5 21.5V18.5Z"
-        fill="#188038"
-      />
-      {/* "31" in Google Blue */}
-      <text
-        x="12"
-        y="16.2"
-        fill="#1A73E8"
-        fontSize="8.5"
-        fontWeight="800"
-        fontFamily="Google Sans, Roboto, system-ui, sans-serif"
-        textAnchor="middle"
-      >
-        31
-      </text>
-    </svg>
-  );
-}
+import GoogleCalendarIcon from "../GoogleCalendarIcon";
 
 export function GoogleCalendarSidebarCard({
   onNavigateToCalendar,

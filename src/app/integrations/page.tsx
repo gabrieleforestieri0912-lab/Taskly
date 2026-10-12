@@ -2,8 +2,9 @@
 import { useLanguage } from "../../lib/LanguageContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Webhook, CalendarDays, MessageSquare, ArrowLeft, Check, Link as LinkIcon, ExternalLink, Loader2 } from "lucide-react";
+import { Webhook, MessageSquare, ArrowLeft, Check, Link as LinkIcon, ExternalLink, Loader2 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
+import GoogleCalendarIcon from "../../components/GoogleCalendarIcon";
 
 type IntegrationState = {
   slack: boolean;
@@ -140,8 +141,8 @@ export default function IntegrationsPage() {
         <section className="mt-8 landing-card !p-6">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="landing-icon-wrap">
-                <CalendarDays size={22} />
+              <div className="landing-icon-wrap !p-1">
+                <GoogleCalendarIcon className="w-8 h-8" />
               </div>
               <div>
                 <div className="flex items-center gap-2 font-black text-gray-900 dark:text-white">

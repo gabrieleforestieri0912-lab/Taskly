@@ -1045,7 +1045,7 @@ async function listDocVersions(userId: string, docId: string) {
 // "isFavorite" lives in the `meta` jsonb column rather than in a dedicated
 // column: that keeps the schema untouched (no ALTER TABLE / backfill) and
 // rides along with the existing partial-patch logic below.
-const PAGE_META_KEYS = ["deleted", "deletedAt", "locked", "font", "isFavorite"];
+const PAGE_META_KEYS = ["deleted", "deletedAt", "locked", "font", "isFavorite", "sharing"];
 
 function pageRowFromPayload(userId: string, page: any, order: number) {
   const meta: Record<string, any> = {};

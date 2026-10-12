@@ -31,11 +31,15 @@ export interface PageTreeItemProps {
   onAddSubpage: (parentId: string, e?: React.MouseEvent) => void;
   onDeletePage: (id: string, e?: React.MouseEvent) => void;
   onUpdatePage?: (id: string, updates: any) => void;
+  /** Spostamento Notion-style (annida/riordina con rinumerazione). */
+  onMovePage?: (draggedId: string, targetParentId: string | null, targetIndex: number) => void;
   onDuplicatePage?: (page: any) => void;
   onStartRename?: (page: any) => void;
   onOpenPage?: (page: any) => void;
   /** Hide the "last modified" hint (used by the Preferiti list). */
   showUpdatedAt?: boolean;
+  /** Se false la riga non è trascinabile né zona di drop (es. Preferiti). */
+  draggable?: boolean;
 }
 
 export function PageTreeItem({
@@ -49,10 +53,12 @@ export function PageTreeItem({
   onAddSubpage,
   onDeletePage,
   onUpdatePage,
+  onMovePage,
   onDuplicatePage,
   onStartRename,
   onOpenPage,
   showUpdatedAt = true,
+  draggable = true,
 }: PageTreeItemProps) {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
@@ -106,6 +112,99 @@ export function PageTreeItem({
   const isEmoji = isEmojiIcon(page.icon);
   const Icon = !isEmoji ? resolvePageIcon(page) : null;
 
+  // ── Drag & drop stile Notion ─────────────────────────────────────────
+  // Una sola zona per riga: in base alla posizione verticale del cursore
+  //   - terzo superiore → linea sopra (riordina prima di questa pagina)
+  //   - centro         → evidenzia la riga (annida dentro questa pagina)
+  //   - terzo inferiore → linea sotto (riordina dopo questa pagina)
+  // Come su Notion: sopra = dentro, ai bordi = tra fratelli.
+  const [dropPos, setDropPos] = useState<"before" | "inside" | "after" | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const readDraggedId = (e: React.DragEvent) => {
+    try {
+      return (
+        e.dataTransfer.getData("application/x-taskly-page") ||
+        e.dataTransfer.getData("text/plain") ||
+        ""
+      );
+    } catch {
+      return "";
+    }
+  };
+
+  // Auto-espansione stile Notion: tenendo una pagina sulla zona centrale di
+  // un genitore chiuso, si apre da sola così si vede dove finisce la trascinata.
+  const expandTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (expandTimer.current) clearTimeout(expandTimer.current);
+    },
+    [],
+  );
+  const clearExpandTimer = () => {
+    if (expandTimer.current) {
+      clearTimeout(expandTimer.current);
+      expandTimer.current = null;
+    }
+  };
+  const scheduleExpand = () => {
+    if (isExpanded || !hasChildren || expandTimer.current) return;
+    expandTimer.current = setTimeout(() => {
+      expandTimer.current = null;
+      onToggleExpand(page.id);
+    }, 600);
+  };
+
+  const handleRowDragOver = (e: React.DragEvent) => {
+    if (!draggable || (!onMovePage && !onUpdatePage)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const pos: "before" | "inside" | "after" =
+      y < rect.height * 0.25 ? "before" : y > rect.height * 0.75 ? "after" : "inside";
+    setDropPos((prev) => (prev === pos ? prev : pos));
+    if (pos === "inside") scheduleExpand();
+    else clearExpandTimer();
+  };
+  const handleRowDragLeave = (e: React.DragEvent) => {
+    // Ignora i passaggi tra figli della stessa riga (evita sfarfallii).
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setDropPos(null);
+    clearExpandTimer();
+  };
+  const handleRowDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const pos = dropPos;
+    setDropPos(null);
+    clearExpandTimer();
+    if (!draggable) return;
+    const draggedId = readDraggedId(e);
+    if (!draggedId || String(draggedId) === String(page.id)) return;
+    if (onMovePage) {
+      if (pos === "before") {
+        // Linea sopra → riordina prima di questa pagina.
+        onMovePage(String(draggedId), page.parentId || null, indexInParent);
+      } else if (pos === "after") {
+        // Linea sotto → riordina dopo questa pagina.
+        onMovePage(String(draggedId), page.parentId || null, indexInParent + 1);
+      } else {
+        // Centro riga → dentro (in coda ai figli), come Notion.
+        onMovePage(String(draggedId), page.id, children.length);
+      }
+      return;
+    }
+    const targetChildren = childrenMap.get(page.id) || [];
+    onUpdatePage &&
+      onUpdatePage(draggedId, {
+        parentId: page.id,
+        order: targetChildren.length,
+      });
+  };
+
   // Close context menu on outside click or escape
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -138,15 +237,9 @@ export function PageTreeItem({
     "",
   );
 
-  // Called from both the row button and the context-menu item.
+  // Called from the context-menu item.
   const toggleFavorite = () => {
     onUpdatePage && onUpdatePage(page.id, { isFavorite: !isFavorite });
-  };
-
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFavorite();
   };
 
   const toggleMenu = (e: React.MouseEvent) => {
@@ -224,37 +317,26 @@ export function PageTreeItem({
       onKeyDown={handleKeyDown}
       className="outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 rounded-lg list-none"
     >
-      {/* Drop indicator before this page */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.add("bg-cyan-400", "h-1");
-        }}
-        onDragLeave={(e) => {
-          e.currentTarget.classList.remove("bg-cyan-400", "h-1");
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.remove("bg-cyan-400", "h-1");
-          const draggedId = e.dataTransfer.getData("text/plain");
-          if (!draggedId || String(draggedId) === String(page.id)) return;
-          onUpdatePage &&
-            onUpdatePage(draggedId, {
-              parentId: page.parentId || null,
-              order: indexInParent,
-            });
-        }}
-        className="h-0.5 transition-all duration-200"
-        style={{ marginLeft: `${8 + depth * 14}px` }}
-      />
+      {/* Linea sopra: riordina prima di questa pagina */}
+      {draggable && dropPos === "before" && (
+        <div
+          className="h-0.5 rounded-full bg-cyan-500"
+          style={{ marginLeft: `${8 + depth * 14}px` }}
+        />
+      )}
 
-      {/* Main row */}
+      {/* Main row (centro = dentro questa pagina, bordi = tra fratelli) */}
       <div
+        onDragOver={handleRowDragOver}
+        onDragLeave={handleRowDragLeave}
+        onDrop={handleRowDrop}
         className={`group flex items-center rounded-lg transition-all text-sm font-medium relative h-7 select-none ${
           isActive
             ? "bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 font-bold"
-            : "text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100"
-        }`}
+            : dropPos === "inside"
+              ? "bg-cyan-50 dark:bg-cyan-900/10 ring-1 ring-inset ring-cyan-400 text-gray-900 dark:text-gray-100"
+              : "text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-100"
+        } ${isDragging ? "opacity-50" : ""}`}
         style={{ paddingLeft: `${6 + depth * 14}px` }}
       >
         {/* Notion-style Chevron toggle */}
@@ -330,38 +412,27 @@ export function PageTreeItem({
         ) : (
           <Link
             href={`/dashboard?page=${page.id}`}
-            draggable
+            draggable={draggable}
             onClick={() => {
               try {
                 onOpenPage && onOpenPage(page);
               } catch {}
             }}
             onDragStart={(e) => {
+              if (!draggable) {
+                e.preventDefault();
+                return;
+              }
+              try {
+                e.dataTransfer.setData("application/x-taskly-page", String(page.id));
+              } catch {}
               e.dataTransfer.setData("text/plain", String(page.id));
               e.dataTransfer.effectAllowed = "move";
-              e.currentTarget.classList.add("opacity-50");
+              setIsDragging(true);
             }}
-            onDragEnd={(e) => {
-              e.currentTarget.classList.remove("opacity-50");
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.currentTarget.classList.add("bg-cyan-50", "dark:bg-cyan-900/10");
-            }}
-            onDragLeave={(e) => {
-              e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.currentTarget.classList.remove("bg-cyan-50", "dark:bg-cyan-900/10");
-              const draggedId = e.dataTransfer.getData("text/plain");
-              if (!draggedId || String(draggedId) === String(page.id)) return;
-              const targetChildren = childrenMap.get(page.id) || [];
-              onUpdatePage &&
-                onUpdatePage(draggedId, {
-                  parentId: page.id,
-                  order: targetChildren.length,
-                });
+            onDragEnd={() => {
+              setIsDragging(false);
+              setDropPos(null);
             }}
             className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden"
           >
@@ -401,41 +472,9 @@ export function PageTreeItem({
           </span>
         )}
 
-        {/* Hover action buttons (★, ⋯ and +) */}
-        <div
-          className={`flex items-center gap-0.5 transition-opacity pr-1.5 shrink-0 ${
-            showUpdatedAt && updatedLabel
-              ? "opacity-0 group-hover:opacity-100 focus-within:opacity-100"
-              : "opacity-0 group-hover:opacity-100 focus-within:opacity-100"
-          }`}
-        >
-          {/* Favourite toggle */}
-          <button
-            type="button"
-            onClick={handleToggleFavorite}
-            aria-pressed={isFavorite}
-            aria-label={
-              isFavorite
-                ? `Rimuovi ${page.label || "pagina"} dai preferiti`
-                : `Aggiungi ${page.label || "pagina"} ai preferiti`
-            }
-            title={t(
-              isFavorite ? "favRemove" : "favAdd",
-              isFavorite ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti",
-            )}
-            className={`p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 ${
-              isFavorite
-                ? "text-amber-400 hover:text-amber-500"
-                : "text-gray-400 hover:text-amber-400 hover:bg-gray-200/70 dark:hover:bg-white/10"
-            }`}
-          >
-            <Star
-              size={13}
-              aria-hidden="true"
-              fill={isFavorite ? "currentColor" : "none"}
-            />
-          </button>
-
+        {/* Azioni riga: solo ⋯ (sempre visibile, apre tutte le azioni) e
+            + rapido (hover). Il preferito ★ vive solo dentro il menu ⋯. */}
+        <div className="flex items-center gap-0.5 pr-1.5 shrink-0">
           {/* Context menu "⋯" */}
           <button
             ref={menuButtonRef}
@@ -459,12 +498,20 @@ export function PageTreeItem({
             }}
             aria-label={`Aggiungi sottopagina a ${page.label || "questa pagina"}`}
             title="Aggiungi sottopagina"
-            className="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500"
+            className="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-within:opacity-100"
           >
             <Plus size={13} aria-hidden="true" />
           </button>
         </div>
       </div>
+
+      {/* Linea sotto: riordina dopo questa pagina (e dopo il suo sottoalbero) */}
+      {draggable && dropPos === "after" && (
+        <div
+          className="h-0.5 rounded-full bg-cyan-500"
+          style={{ marginLeft: `${8 + depth * 14}px` }}
+        />
+      )}
 
       {/* ── Context Menu Portal ────────────────────────────────────────── */}
       {isMenuOpen &&
@@ -559,7 +606,7 @@ export function PageTreeItem({
               className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors text-left font-medium"
             >
               <Trash2 size={13} />
-              <span>Elimina</span>
+              <span>Sposta nel cestino</span>
             </button>
           </div>,
           document.body,
@@ -590,8 +637,11 @@ export function PageTreeItem({
                     onAddSubpage={onAddSubpage}
                     onDeletePage={onDeletePage}
                     onUpdatePage={onUpdatePage}
+                    onMovePage={onMovePage}
                     onDuplicatePage={onDuplicatePage}
                     onStartRename={onStartRename}
+                    onOpenPage={onOpenPage}
+                    draggable={draggable}
                   />
                 ))}
               </ul>

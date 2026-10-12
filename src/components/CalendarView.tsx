@@ -32,10 +32,12 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { isTaskOnDay } from "../lib/recurrence";
 
+// Id stabili (salvati nei task): mai rinominare gli `id`. Le etichette
+// visibili passano da `labelKey` così restano tradotte in entrambe le lingue.
 const priorities = [
   {
     id: "Bassa",
-    label: "Bassa",
+    labelKey: "views.calLow",
     color: "text-emerald-500",
     bg: "bg-emerald-500/10",
     border: "border-emerald-500/20",
@@ -43,7 +45,7 @@ const priorities = [
   },
   {
     id: "Media",
-    label: "Media",
+    labelKey: "views.calMedium",
     color: "text-amber-500",
     bg: "bg-amber-500/10",
     border: "border-amber-500/20",
@@ -51,7 +53,7 @@ const priorities = [
   },
   {
     id: "Alta",
-    label: "Alta",
+    labelKey: "views.calHigh",
     color: "text-red-500",
     bg: "bg-red-500/10",
     border: "border-red-500/20",
@@ -60,14 +62,26 @@ const priorities = [
 ];
 
 const recurrences = [
-  { id: "", label: "Non ricorrente" },
-  { id: "daily", label: "Ogni giorno" },
-  { id: "weekly", label: "Ogni settimana" },
-  { id: "monthly", label: "Ogni mese" },
+  { id: "", labelKey: "views.calNoRecurrence" },
+  { id: "daily", labelKey: "views.calDaily" },
+  { id: "weekly", labelKey: "views.calWeekly" },
+  { id: "monthly", labelKey: "views.calMonthly" },
 ];
 
+// Puntino di priorità nelle card (solo colore, nessuna stringa).
+const priorityDots: Record<string, string> = {
+  Bassa: "bg-emerald-500",
+  Media: "bg-amber-500",
+  Alta: "bg-red-500",
+};
+
+// Chiave i18n per un id ricorrenza salvato ("daily" → "views.calDaily").
+const recurrenceLabelKey = (id: string) =>
+  (recurrences.find((r) => r.id === id) || recurrences[0]).labelKey;
+
 const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
-  const { t, tWith } = useLanguage();
+  const { t, tWith, language } = useLanguage();
+  const locale = language === "en" ? "en-US" : "it-IT";
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("Media");
   const [recurrence, setRecurrence] = useState("");
@@ -104,7 +118,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
               <div>
                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">{t("views.calNewEvent")}</h3>
                 <p className="text-xs font-bold text-cyan-600 uppercase tracking-widest mt-1">
-                  {selectedDate?.toLocaleDateString("it-IT", {
+                  {selectedDate?.toLocaleDateString(locale, {
                     weekday: "long",
                     day: "numeric",
                     month: "long",
@@ -148,7 +162,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
                     >
                       <p.icon size={18} />
                       <span className="text-[9px] font-black uppercase tracking-widest">
-                        {p.label}
+                        {t(p.labelKey)}
                       </span>
                     </button>
                   ))}
@@ -164,7 +178,7 @@ const TaskModal = ({ isOpen, onClose, onAdd, selectedDate }) => {
                 >
                   {recurrences.map((r) => (
                     <option key={r.id} value={r.id}>
-                      {r.label}
+                      {t(r.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -194,7 +208,10 @@ export default function CalendarView({
   page,
   onIconChange,
 }) {
-  const { t, tWith } = useLanguage();
+  const { t, tWith, language } = useLanguage();
+  const locale = language === "en" ? "en-US" : "it-IT";
+  // Stringa ISO del giorno corrente per il badge "scaduto" in agenda.
+  const todayStr = new Date().toISOString().split("T")[0];
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<any>(null);
@@ -345,15 +362,15 @@ export default function CalendarView({
 
   const rangeLabel = () => {
     if (view === "month") {
-      return currentDate.toLocaleDateString("it-IT", {
+      return currentDate.toLocaleDateString(locale, {
         month: "long",
         year: "numeric",
       });
     }
     if (view === "agenda") {
-      return startOfWeek.toLocaleDateString("it-IT", { month: "long", year: "numeric" });
+      return startOfWeek.toLocaleDateString(locale, { month: "long", year: "numeric" });
     }
-    return `${startOfWeek.toLocaleDateString("it-IT", { month: "short", day: "numeric" })} - ${weekDays[6].toLocaleDateString("it-IT", { month: "short", day: "numeric", year: "numeric" })}`;
+    return `${startOfWeek.toLocaleDateString(locale, { month: "short", day: "numeric" })} - ${weekDays[6].toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}`;
   };
 
   const monthDays = (() => {
@@ -411,9 +428,9 @@ export default function CalendarView({
           <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
           <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/50 p-1 rounded-xl">
             {[
-              { id: "week", icon: CalendarDays, label: "Settimana" },
-              { id: "month", icon: CalendarRange, label: "Mese" },
-              { id: "agenda", icon: ListOrdered, label: "Agenda" },
+              { id: "week", icon: CalendarDays, labelKey: "views.calWeek" },
+              { id: "month", icon: CalendarRange, labelKey: "views.calMonth" },
+              { id: "agenda", icon: ListOrdered, labelKey: "views.calAgenda" },
             ].map((v) => (
               <button
                 key={v.id}
@@ -425,7 +442,7 @@ export default function CalendarView({
                 }`}
               >
                 <v.icon size={13} />
-                {v.label}
+                {t(v.labelKey)}
               </button>
             ))}
           </div>
@@ -457,7 +474,7 @@ export default function CalendarView({
                 <div
                   className={`text-[9px] font-black uppercase text-gray-400 ${isToday ? "text-cyan-600 dark:text-cyan-400" : ""}`}
                 >
-                  {day.getDate()} {day.toLocaleDateString("it-IT", { weekday: "short" })}
+                  {day.getDate()} {day.toLocaleDateString(locale, { weekday: "short" })}
                 </div>
                 <div className="flex flex-col gap-1 overflow-hidden">
                   {dayTasks.slice(0, 3).map((t) => (
@@ -494,10 +511,17 @@ export default function CalendarView({
 
       {view === "agenda" && (
         <div className="space-y-2">
-          {agendaItems.map(({ task, date }) => (
+          {agendaItems.map(({ task, date }) => {
+            const isOverdue =
+              !task.completed && Boolean(date) && date < todayStr;
+            return (
             <div
               key={task.id}
-              className="flex items-center gap-3 bg-white/70 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700 rounded-2xl p-3"
+              className={`flex items-center gap-3 bg-white/70 dark:bg-gray-800/60 border rounded-2xl p-3 ${
+                isOverdue
+                  ? "border-red-200 dark:border-red-900/50"
+                  : "border-gray-100 dark:border-gray-700"
+              }`}
             >
               <button onClick={() => toggleTask(task.id)} className="shrink-0">
                 {task.completed ? (
@@ -514,17 +538,22 @@ export default function CalendarView({
                 </p>
                 <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
                   {date
-                    ? new Date(date + "T00:00:00").toLocaleDateString("it-IT", {
+                    ? new Date(date + "T00:00:00").toLocaleDateString(locale, {
                         weekday: "short",
                         day: "numeric",
                         month: "short",
                       })
-                    : "Senza data"}
+                    : t("views.calNoDate")}
                 </p>
               </div>
+              {isOverdue && (
+                <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+                  {t("views.calOverdue")}
+                </span>
+              )}
               {task.recurrence && (
                 <span className="flex items-center gap-1 text-[9px] font-black text-cyan-500 uppercase shrink-0">
-                  <Repeat size={11} /> {task.recurrence}
+                  <Repeat size={11} /> {t(recurrenceLabelKey(task.recurrence))}
                 </span>
               )}
               <button
@@ -534,7 +563,8 @@ export default function CalendarView({
                 <Trash2 size={14} />
               </button>
             </div>
-          ))}
+            );
+          })}
           {agendaItems.length === 0 && (
             <div className="text-center py-16 text-gray-400 font-bold uppercase tracking-widest text-xs">{t("views.calNoAgenda")}</div>
           )}
@@ -548,6 +578,7 @@ export default function CalendarView({
           const dayTasks = getTasksForDay(day);
           const isToday = day.toDateString() === new Date().toDateString();
           const meta = dailyMeta[dateStr] || { focus: "", notes: "" };
+          const dayDone = dayTasks.filter((d) => d.completed).length;
 
           return (
             <div key={idx} className="flex flex-col gap-4">
@@ -561,9 +592,17 @@ export default function CalendarView({
                 className={`text-center p-4 rounded-[2rem] border transition-all ${isToday ? "bg-cyan-600 border-cyan-600 text-white shadow-xl shadow-cyan-500/30" : "bg-white/80 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"}`}
               >
                 <p className="text-[10px] uppercase font-black tracking-[0.2em] opacity-70 mb-1">
-                  {day.toLocaleDateString("it-IT", { weekday: "short" })}
+                  {day.toLocaleDateString(locale, { weekday: "short" })}
                 </p>
                 <p className="text-3xl font-black">{day.getDate()}</p>
+                {dayTasks.length > 0 && (
+                  <p
+                    className={`text-[9px] font-black tabular-nums mt-1 ${isToday ? "opacity-80" : "text-gray-400"}`}
+                    aria-label={`${dayDone}/${dayTasks.length}`}
+                  >
+                    {dayDone}/{dayTasks.length}
+                  </p>
+                )}
               </div>
 
               <div className="flex-1 flex flex-col gap-3 min-h-[400px] bg-gray-50/50 dark:bg-gray-900/30 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-800/50 p-3">
@@ -619,6 +658,10 @@ export default function CalendarView({
                             <p
                               className={`text-[11px] font-bold leading-tight flex-1 ${task.completed ? "line-through text-gray-400" : "text-gray-700 dark:text-gray-200"}`}
                             >
+                              <span
+                                aria-hidden="true"
+                                className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle ${priorityDots[task.priority] || "bg-gray-300 dark:bg-gray-600"}`}
+                              />
                               {task.title}
                             </p>
                             <button

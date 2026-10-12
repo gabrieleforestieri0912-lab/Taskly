@@ -34,7 +34,7 @@ import {
   WidgetManagerMenu,
   type WidgetId,
 } from "./dashboard/widgets";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 import { trackOnboardingEvent } from "../hooks/useOnboarding";
 import FileUploader from "./FileUploader";
@@ -56,6 +56,68 @@ const itemAnim = {
   hidden: { y: 20, opacity: 0 },
   show: { y: 0, opacity: 1 },
 };
+
+/**
+ * Widget trascinabile (solo in modalità personalizzazione): la maniglia
+ * ⋮⋮ nella toolbar avvia il drag (anche touch, `touch-none` sulla
+ * maniglia così lo scroll resta libero altrove). Le frecce su/giù restano
+ * come alternativa accessibile.
+ */
+function SortableWidget({
+  id,
+  isVisible,
+  label,
+  hiddenLabel,
+  dragTitle,
+  isFirst,
+  isLast,
+  onMoveUp,
+  onMoveDown,
+  onToggle,
+  children,
+}: {
+  id: WidgetId;
+  isVisible: boolean;
+  label: string;
+  hiddenLabel: string;
+  dragTitle: string;
+  isFirst: boolean;
+  isLast: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  const controls = useDragControls();
+  return (
+    <Reorder.Item
+      as="div"
+      value={id}
+      dragListener={false}
+      dragControls={controls}
+      initial={false}
+      className={`relative transition-colors rounded-3xl ${
+        isVisible
+          ? "border-2 border-dashed border-[#7b39fc]/40 bg-[#7b39fc]/[0.02]"
+          : "border-2 border-dashed border-gray-300 dark:border-gray-800 opacity-50 bg-gray-50/50 dark:bg-gray-900/20"
+      }`}
+    >
+      <WidgetEditToolbar
+        label={label}
+        isVisible={isVisible}
+        isFirst={isFirst}
+        isLast={isLast}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        onToggle={onToggle}
+        hiddenLabel={hiddenLabel}
+        dragControls={controls}
+        dragTitle={dragTitle}
+      />
+      {children}
+    </Reorder.Item>
+  );
+}
 
 export type { WidgetId };
 
@@ -170,6 +232,12 @@ export default function Dashboard({
     const nextOrder = [...widgetOrder];
     const [moved] = nextOrder.splice(index, 1);
     nextOrder.splice(targetIndex, 0, moved);
+    setWidgetOrder(nextOrder);
+    persistConfig(nextOrder, visibleWidgets);
+  };
+
+  // Drag & drop: riordino via maniglia, salvato live ad ogni spostamento.
+  const handleReorder = (nextOrder: WidgetId[]) => {
     setWidgetOrder(nextOrder);
     persistConfig(nextOrder, visibleWidgets);
   };
@@ -335,167 +403,124 @@ export default function Dashboard({
     });
   })();
 
-  // Render individual widget component by ID
-  const renderWidget = (widgetId: WidgetId, index: number) => {
-    const isVisible = visibleWidgets[widgetId] !== false;
-    if (!isVisible && !isEditMode) return null;
-
-    const widgetDef = ALL_WIDGET_DEFS.find((w) => w.id === widgetId);
-
-    const editToolbar = isEditMode ? (
-      <WidgetEditToolbar
-        label={widgetDef?.label || widgetId}
-        isVisible={isVisible}
-        isFirst={index === 0}
-        isLast={index === widgetOrder.length - 1}
-        onMoveUp={() => moveWidget(index, "up")}
-        onMoveDown={() => moveWidget(index, "down")}
-        onToggle={() => toggleWidgetVisibility(widgetId)}
-        hiddenLabel="Nascosto"
-      />
-    ) : null;
-
-    const wrapperClass = isEditMode
-      ? `relative transition-all rounded-3xl ${
-          isVisible
-            ? "border-2 border-dashed border-[#7b39fc]/40 bg-[#7b39fc]/[0.02]"
-            : "border-2 border-dashed border-gray-300 dark:border-gray-800 opacity-50 bg-gray-50/50 dark:bg-gray-900/20"
-        }`
-      : "";
-
+  // Render individual widget content by ID (i wrapper dipendono dalla modalità)
+  const renderWidgetContent = (widgetId: WidgetId) => {
     switch (widgetId) {
       case "quick_stats":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <QuickStatsWidget stats={Array.isArray(stats) ? stats : []} />
-          </motion.div>
+          <QuickStatsWidget stats={Array.isArray(stats) ? stats : []} />
         );
 
       case "today_focus":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <TodayFocusWidget
-              focus={todayFocus}
-              completionRate={completionRate}
-              criticalCount={highPriorityTasks.length}
-              activeGoalsCount={activeGoals.length}
-              completedCount={completedTasks}
-              labels={{
-                focus: t("dash.focusToday", "Focus di Oggi"),
-                critical: t("criticalTasks", "Task Critici"),
-                activeGoals: t("activeGoalsLabel", "Obiettivi Attivi"),
-                done: t("done", "Completati"),
-                completed: t("done", "Completato"),
-              }}
-            />
-          </motion.div>
+          <TodayFocusWidget
+            focus={todayFocus}
+            completionRate={completionRate}
+            criticalCount={highPriorityTasks.length}
+            activeGoalsCount={activeGoals.length}
+            completedCount={completedTasks}
+            labels={{
+              focus: t("dash.focusToday", "Focus di Oggi"),
+              critical: t("criticalTasks", "Task Critici"),
+              activeGoals: t("activeGoalsLabel", "Obiettivi Attivi"),
+              done: t("done", "Completati"),
+              completed: t("done", "Completato"),
+            }}
+          />
         );
 
       case "weekly_trend":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <WeeklyTrendWidget
-              data={trendData}
-              title={t("dash.trendTitle", "Trend & Produttività Settimanale")}
-              subtitle={t("dash.trendSub", "Attività e tasso di completamento ultimi 7 giorni")}
-              statusLabel={t("dash.trendActive", "Attivo")}
-            />
-          </motion.div>
+          <WeeklyTrendWidget
+            data={trendData}
+            title={t("dash.trendTitle", "Trend & Produttività Settimanale")}
+            subtitle={t("dash.trendSub", "Attività e tasso di completamento ultimi 7 giorni")}
+            statusLabel={t("dash.trendActive", "Attivo")}
+          />
         );
 
       case "critical_tasks":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <CriticalTasksWidget
-              tasks={highPriorityTasks || []}
-              title={t("priorityHigh", "Task ad Alta Priorità")}
-              seeAllLabel={t("seeAll", "Vedi tutti")}
-              seeAllHref="/dashboard?view=mytasks"
-              emptyLabel={t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
-            />
-          </motion.div>
+          <CriticalTasksWidget
+            tasks={highPriorityTasks || []}
+            title={t("priorityHigh", "Task ad Alta Priorità")}
+            seeAllLabel={t("seeAll", "Vedi tutti")}
+            seeAllHref="/dashboard?view=mytasks"
+            emptyLabel={t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
+          />
         );
 
       case "recent_ideas":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <RecentIdeasWidget
-              ideas={recentIdeas || []}
-              title={t("recentIdeas", "Brain Dump & Idee")}
-              linkLabel={t("dash.brainDump", "Brain Dump")}
-              linkHref="/dashboard"
-              emptyLabel={t("noIdeas", "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!")}
-              defaultCategory={t("dash.generalCategory", "Generale")}
-            />
-          </motion.div>
+          <RecentIdeasWidget
+            ideas={recentIdeas || []}
+            title={t("recentIdeas", "Brain Dump & Idee")}
+            linkLabel={t("dash.brainDump", "Brain Dump")}
+            linkHref="/dashboard"
+            emptyLabel={t("noIdeas", "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!")}
+            defaultCategory={t("dash.generalCategory", "Generale")}
+          />
         );
 
       case "goal_progress":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <GoalProgressWidget
-              goals={activeGoals || []}
-              title={t("goalProgress", "Progresso Obiettivi")}
-              emptyLabel={t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
-            />
-          </motion.div>
+          <GoalProgressWidget
+            goals={activeGoals || []}
+            title={t("goalProgress", "Progresso Obiettivi")}
+            emptyLabel={t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
+          />
         );
 
       case "quick_nav":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <QuickNavWidget
-              labels={{
-                title: t("quickNav", "Azioni Rapide"),
-                newProject: t("newProject", "Nuovo Progetto"),
-                newIdea: t("newIdea", "Nuova Idea"),
-              }}
-            />
-          </motion.div>
+          <QuickNavWidget
+            labels={{
+              title: t("quickNav", "Azioni Rapide"),
+              newProject: t("newProject", "Nuovo Progetto"),
+              newIdea: t("newIdea", "Nuova Idea"),
+            }}
+          />
         );
 
       case "ai_insights":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <AiInsightsWidget
-              text={t("aiAnalysis", "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale.")}
-              actionLabel={t("aiAction", "Genera Piano Ottimale")}
-              onAction={() => {
-                window.dispatchEvent(new Event("open-ai-panel-page"));
-              }}
-            />
-          </motion.div>
+          <AiInsightsWidget
+            text={t("aiAnalysis", "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale.")}
+            actionLabel={t("aiAction", "Genera Piano Ottimale")}
+            onAction={() => {
+              window.dispatchEvent(new Event("open-ai-panel-page"));
+            }}
+          />
         );
 
       case "tools_resources":
         return (
-          <motion.div key={widgetId} variants={itemAnim} className={wrapperClass}>
-            {editToolbar}
-            <ToolsResourcesWidget title={t("resourcesTools", "Strumenti & Risorse")}>
-              <ToolsPanel>
-                <FileUploader />
-              </ToolsPanel>
-              <ToolsPanel>
-                <TemplateGallery />
-              </ToolsPanel>
-              <ToolsPanel>
-                <ImportExport />
-              </ToolsPanel>
-            </ToolsResourcesWidget>
-          </motion.div>
+          <ToolsResourcesWidget title={t("resourcesTools", "Strumenti & Risorse")}>
+            <ToolsPanel>
+              <FileUploader />
+            </ToolsPanel>
+            <ToolsPanel>
+              <TemplateGallery />
+            </ToolsPanel>
+            <ToolsPanel>
+              <ImportExport />
+            </ToolsPanel>
+          </ToolsResourcesWidget>
         );
 
       default:
         return null;
     }
+  };
+
+  // Modalità vista: wrapper animato semplice, widget nascosti saltati
+  const renderWidget = (widgetId: WidgetId) => {
+    if (visibleWidgets[widgetId] === false) return null;
+    return (
+      <motion.div key={widgetId} variants={itemAnim}>
+        {renderWidgetContent(widgetId)}
+      </motion.div>
+    );
   };
 
   return (
@@ -532,7 +557,7 @@ export default function Dashboard({
           >
             <EditModeBanner
               title={t("dash.editModeTitle", "Modalità Personalizzazione Attiva")}
-              description={t("dash.editModeDesc", "Usa i controlli su ciascun widget per riordinare, mostrare o nascondere le sezioni.")}
+              description={t("dash.editModeDesc", "Trascina i widget dalla maniglia per riordinarli, oppure usa i controlli su ciascuno per mostrare o nascondere le sezioni.")}
               onManage={() => setIsAddMenuOpen(!isAddMenuOpen)}
               onReset={resetToDefault}
               onDone={() => setIsEditMode(false)}
@@ -580,10 +605,38 @@ export default function Dashboard({
         </motion.div>
       )}
 
-      {/* Dynamically Ordered Widgets */}
-      <div className="space-y-8">
-        {widgetOrder.map((wId, index) => renderWidget(wId, index))}
-      </div>
+      {/* Dynamically Ordered Widgets: drag & drop in personalizzazione */}
+      {isEditMode ? (
+        <Reorder.Group
+          as="div"
+          axis="y"
+          values={widgetOrder}
+          onReorder={handleReorder}
+          className="space-y-8"
+        >
+          {widgetOrder.map((wId, index) => (
+            <SortableWidget
+              key={wId}
+              id={wId}
+              isVisible={visibleWidgets[wId] !== false}
+              label={ALL_WIDGET_DEFS.find((w) => w.id === wId)?.label || wId}
+              hiddenLabel="Nascosto"
+              dragTitle={t("dash.dragWidget", "Trascina per riordinare")}
+              isFirst={index === 0}
+              isLast={index === widgetOrder.length - 1}
+              onMoveUp={() => moveWidget(index, "up")}
+              onMoveDown={() => moveWidget(index, "down")}
+              onToggle={() => toggleWidgetVisibility(wId)}
+            >
+              {renderWidgetContent(wId)}
+            </SortableWidget>
+          ))}
+        </Reorder.Group>
+      ) : (
+        <div className="space-y-8">
+          {widgetOrder.map((wId) => renderWidget(wId))}
+        </div>
+      )}
     </motion.div>
   );
 }

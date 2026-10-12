@@ -29,8 +29,6 @@ import {
   Share2,
   Star,
   Link2,
-  Sun,
-  Moon,
   LogOut,
   Settings,
   Lock,
@@ -56,6 +54,7 @@ import MyTasksView from "../../components/MyTasksView";
 import WorkspaceInbox from "../../components/WorkspaceInbox";
 import TrashView from "../../components/TrashView";
 import TemplateGalleryModal from "../../components/TemplateGalleryModal";
+import ShareDialog from "../../components/ShareDialog";
 import OnboardingModal from "../../components/OnboardingModal";
 import OnboardingChecklist from "../../components/OnboardingChecklist";
 import { motion, AnimatePresence } from "framer-motion";
@@ -145,9 +144,8 @@ function CompactEditableTitle({
 }
 
 function DashboardContent() {
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
-  const [theme, setTheme] = useState("light");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarPeekOpen, setIsSidebarPeekOpen] = useState(false); // kept for future use, not used by hover
   const [planNotice, setPlanNotice] = useState<string | null>(null);
@@ -211,6 +209,7 @@ function DashboardContent() {
   const [mounted, setMounted] = useState(false);
   const [isTemplateGalleryOpen, setIsTemplateGalleryOpen] = useState(false);
   const [isPageMenuOpen, setIsPageMenuOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [templateToast, setTemplateToast] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [pageLinkCopied, setPageLinkCopied] = useState(false);
@@ -250,8 +249,7 @@ function DashboardContent() {
   useEffect(() => {
     setMounted(true);
     const saved = readTheme();
-    setTheme(saved);
-    document.documentElement.classList.toggle("dark", saved === "dark");
+    applyTheme(saved);
     try {
       const parsed = JSON.parse(
         localStorage.getItem("dashboardOpenTabs") || "[]",
@@ -477,12 +475,6 @@ function DashboardContent() {
     return () => clearInterval(interval);
   }, [hasLoadedUserData]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    applyTheme(newTheme, true);
-  };
-
   const addPage = (pageConfig: any = {}) => {
     const pageType = pageConfig.type || "tasks";
     const curPages = Array.isArray(pages) ? pages : [];
@@ -499,11 +491,12 @@ function DashboardContent() {
       );
       return;
     }
-    // For empty pages we want an empty label so the title shows a placeholder
-    // and we can enter edit mode immediately — MA solo se non è stato passato
-    // un titolo (es. template/progetti convertiti in pagina modificabile).
+    // Pagine di testo (documenti liberi empty/notes): titolo e icona li
+    // sceglie l'utente. Senza label/icona espliciti restano vuoti così
+    // l'header mostra il placeholder "Nuova Pagina" e il selettore neutro.
+    const isTextPage = pageType === "empty" || pageType === "notes";
     const pageLabel =
-      pageConfig.label || (pageType === "empty" ? "" : "Nuova Pagina");
+      pageConfig.label || (isTextPage ? "" : "Nuova Pagina");
     const newPageId =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -513,12 +506,12 @@ function DashboardContent() {
       id: newPageId,
       type: pageType,
       label: pageLabel,
-      // Per la pagina vuota NON impostiamo un'icona di default: così il
+      // Per le pagine di testo NON impostiamo un'icona di default: così il
       // PageHeader mostra il placeholder neutro e l'utente sceglie la sua.
       icon:
         pageConfig.iconName ||
         pageConfig.icon ||
-        (pageType === "empty" ? "" : "layout-dashboard"),
+        (isTextPage ? "" : "layout-dashboard"),
       parentId: pageConfig.parentId || null,
       order: curPages.filter((p) => !p.parentId).length,
       purpose: pageConfig.purpose || null,
@@ -530,13 +523,75 @@ function DashboardContent() {
 
     setPages((prev) => {
       const cur = Array.isArray(prev) ? prev : [];
-      return [...cur, newPage];
+      const next = [...cur, newPage];
+      // Sottopagina: aggiungi un link (blocco page-ref) in coda al contenuto
+      // della pagina madre, se ha contenuto a blocchi (empty/notes). Le viste
+      // strutturate mostrano già le sottopagine come chip, lì niente link.
+      if (pageConfig.parentId) {
+        const idx = next.findIndex(
+          (p) => p && String(p.id) === String(pageConfig.parentId) && !p.deleted,
+        );
+        if (idx !== -1) {
+          const parent = next[idx];
+          if (parent.type === "empty" || parent.type === "notes") {
+            const link = {
+              id: `ref_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+              type: "page-ref",
+              pageId: String(newPageId),
+              label: pageLabel || "Nuova Pagina",
+              icon: newPage.icon || "FileText",
+              iconColor: pageConfig.iconColor || "text-cyan-500",
+            };
+            const d = parent.data;
+            const hasBlocks =
+              d && typeof d === "object" && !Array.isArray(d) && Array.isArray(d.blocks);
+            if (hasBlocks) {
+              const exists = d.blocks.some(
+                (b) => b && b.type === "page-ref" && String(b.pageId) === String(newPageId),
+              );
+              if (!exists) {
+                next[idx] = { ...parent, data: { ...d, blocks: [...d.blocks, link] } };
+              }
+            } else {
+              const rawText =
+                typeof d === "string"
+                  ? d
+                  : d && typeof d === "object" && !Array.isArray(d)
+                    ? String(d.text || "")
+                    : "";
+              const isEmptyArray = Array.isArray(d) && d.length === 0;
+              // Solo contenitori vuoti/convertibili: mai toccare array di
+              // task o altri dati strutturati non a blocchi.
+              const canTakeLink =
+                isEmptyArray ||
+                typeof d === "string" ||
+                d === null ||
+                d === undefined ||
+                (typeof d === "object" && !Array.isArray(d) && rawText.trim() === "");
+              if (canTakeLink) {
+                const base = rawText.trim()
+                  ? [{ id: `txt_${Date.now()}`, type: "text", content: rawText, color: "default" }]
+                  : [];
+                next[idx] = {
+                  ...parent,
+                  data: {
+                    ...(d && typeof d === "object" && !Array.isArray(d) ? d : {}),
+                    blocks: [...base, link],
+                    tags: (d && typeof d === "object" && !Array.isArray(d) && d.tags) || [],
+                  },
+                };
+              }
+            }
+          }
+        }
+      }
+      return next;
     });
     trackOnboardingEvent("page_created");
     if (pageConfig.parentId) trackOnboardingEvent("page_nested");
-    // If this is a freshly created empty page, add a flag so the view
-    // will autofocus the title input.
-    if (pageType === "empty") {
+    // Pagine di testo appena create: autofocus sul titolo (l'header ha
+    // autoEdit quando il titolo è vuoto, il parametro pulisce solo l'URL).
+    if (pageType === "empty" || pageType === "notes") {
       router.push(`/dashboard?page=${newPageId}&focusTitle=1`);
     } else {
       router.push(`/dashboard?page=${newPageId}`);
@@ -1561,8 +1616,6 @@ const ensureTab = React.useCallback((page: any) => {
                 user={user}
                 isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
-                theme={theme}
-                toggleTheme={toggleTheme}
                 pages={pages}
                 onAddPage={addPage}
                 onDeletePage={deletePage}
@@ -1920,21 +1973,12 @@ const ensureTab = React.useCallback((page: any) => {
                 {/* Condividi */}
                 <button
                   type="button"
-                  onClick={() => handleCopyPageLink(activePage.id)}
+                  onClick={() => setIsShareOpen(true)}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                  title="Condividi o copia link della pagina"
+                  title="Condividi la pagina"
                 >
-                  {pageLinkCopied ? (
-                    <>
-                      <Check size={14} className="text-emerald-500" />
-                      <span className="text-emerald-500 font-bold">Copiato!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share2 size={14} />
-                      <span className="hidden sm:inline">Condividi</span>
-                    </>
-                  )}
+                  <Share2 size={14} />
+                  <span className="hidden sm:inline">Condividi</span>
                 </button>
 
                 {/* Link rapido */}
@@ -2158,7 +2202,7 @@ const ensureTab = React.useCallback((page: any) => {
                             className="flex items-center gap-2 w-full px-2.5 py-2 rounded-xl font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors text-left"
                           >
                             <Trash2 size={14} className="text-red-500" />
-                            <span>Elimina pagina</span>
+                            <span>Sposta nel cestino</span>
                           </button>
                         </motion.div>
                       </>
@@ -2172,7 +2216,7 @@ const ensureTab = React.useCallback((page: any) => {
         </div>
 
         {/* Contenuto principale pagina */}
-        <div className={`p-3 md:p-6 ${activePage?.font && activePage.font !== "system-ui" ? activePage.font === "serif" ? "font-serif" : activePage.font === "monospace" ? "font-mono" : "font-serif" : ""}`}>
+        <div className={`p-3 md:p-6 ${activePage?.font === "serif" ? "font-serif" : activePage?.font === "monospace" ? "font-mono" : ""}`}>
           {/* Nest modal */}
           <AnimatePresence>
             {isNestModalOpen && (
@@ -2326,7 +2370,18 @@ const ensureTab = React.useCallback((page: any) => {
         }}
       />
 
+      {/* Dialog Condividi pagina (stile Notion: inviti + accesso + pubblica) */}
+      {isShareOpen && activePage && (
+        <ShareDialog
+          page={activePage}
+          user={user}
+          onUpdatePage={updatePage}
+          onClose={() => setIsShareOpen(false)}
+        />
+      )}
+
       {/* Toast template salvato */}
+
       {templateToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] px-4 py-2.5 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold shadow-2xl flex items-center gap-2">
           <Check size={14} className="text-emerald-400" />
