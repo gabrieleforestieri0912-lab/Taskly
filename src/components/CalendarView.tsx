@@ -388,7 +388,7 @@ export default function CalendarView({
           page={page}
           title={title}
           onRename={(next) => onRename(next)}
-          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+          onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
         />
       )}
       <div className="flex justify-end mb-4">

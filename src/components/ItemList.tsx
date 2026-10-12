@@ -572,7 +572,7 @@ export default function ItemList({
           page={page}
           title={title}
           onRename={(next) => onRename(next)}
-          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+          onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
         />
       )}
       {/* View Switcher moved below */}

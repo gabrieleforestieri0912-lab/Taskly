@@ -1652,7 +1652,7 @@ export default function NotesView({
           page={page}
           title={title}
           onRename={(next) => onRename(next)}
-          onIconChange={(icon) => onIconChange && onIconChange(icon)}
+          onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
         />
       )}
 

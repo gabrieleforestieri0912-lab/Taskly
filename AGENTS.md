@@ -61,6 +61,9 @@
 - Titolo pagina: click diretto sul testo (niente bottone matita); picker icona
   con viste separate Emoji | Icone.
 - Niente impostazioni rapide nei menu dashboard (tema/lingua solo in /settings).
+- Picker icone: tutte le 1500+ subito (niente paginazione), colore icone
+  (7 colori, applicato subito o alla scelta), ~250 emoji in 8 sezioni
+  (fromCodePoint, mai surrogate a mano).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
