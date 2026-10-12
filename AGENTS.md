@@ -64,6 +64,9 @@
 - Picker icone: tutte le 1500+ subito (niente paginazione), colore icone
   (7 colori, applicato subito o alla scelta), ~250 emoji in 8 sezioni
   (fromCodePoint, mai surrogate a mano).
+- 429 AI = limiter globale /api (non crediti reali): messaggio "Crediti AI
+  esauriti" con Retry-After; NotificationBell ogni 60s + stop a tab nascosta;
+  budget 600 req/15min per IP.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

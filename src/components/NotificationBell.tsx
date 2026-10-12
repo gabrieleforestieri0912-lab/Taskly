@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { apiFetch } from "../lib/api";
 import { useLanguage } from "../lib/LanguageContext";
 
-export default function NotificationBell({ pollInterval = 10000 }) {
+export default function NotificationBell({ pollInterval = 60000 }) {
   const { t, language } = useLanguage();
   const [items, setItems] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -24,6 +24,8 @@ export default function NotificationBell({ pollInterval = 10000 }) {
 
   async function fetchRecent() {
     try {
+      // Tab nascosta: niente polling, si aggiorna al ritorno.
+      if (typeof document !== "undefined" && document.hidden) return;
       const res = await apiFetch("/activity/recent?limit=20");
       if (!res.ok) return;
       const json = await res.json();

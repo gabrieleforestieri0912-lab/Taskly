@@ -7,7 +7,7 @@ const WINDOW_MS =
     ? Number(process.env.RATE_LIMIT_WINDOW_MS)
     : 15 * 60 * 1000;
 const MAX_REQUESTS =
-  Number(process.env.RATE_LIMIT_MAX) > 0 ? Number(process.env.RATE_LIMIT_MAX) : 200;
+  Number(process.env.RATE_LIMIT_MAX) > 0 ? Number(process.env.RATE_LIMIT_MAX) : 600;
 
 function limitedResponse(): NextResponse {
   return NextResponse.json(

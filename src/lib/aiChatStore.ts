@@ -210,6 +210,17 @@ async function streamChat(text: string, context: string, signal: AbortSignal): P
     signal,
   });
   if (!res.ok) {
+    if (res.status === 429) {
+      // Limite di richieste raggiunto (non un errore tecnico): messaggio
+      // chiaro stile "crediti esauriti" con tempo di attesa dal server.
+      const retryAfter = Number(res.headers.get("Retry-After") || 0);
+      const wait = retryAfter > 60
+        ? ` Riprova tra circa ${Math.ceil(retryAfter / 60)} minuti.`
+        : retryAfter > 0
+          ? ` Riprova tra circa ${retryAfter} secondi.`
+          : " Riprova tra qualche minuto.";
+      throw new Error(`Crediti AI esauriti: hai raggiunto il limite di richieste.${wait}`);
+    }
     const body = await res.text().catch(() => "");
     throw new Error(`AI backend ${res.status}: ${body || res.statusText}`);
   }
