@@ -62,7 +62,7 @@ export default async function DocsPage({ params }: DocsPageProps) {
     <article>
       <header className="mb-8 border-b border-gray-200 pb-6 dark:border-gray-800">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-[#7b39fc] dark:text-[#a67cff]">
+          <span className="text-xs font-bold uppercase tracking-wider text-(--accent) dark:text-(--accent-300)">
             {getSectionLabel(doc.section)}
           </span>
           {doc.status === "coming-soon" && (
@@ -85,7 +85,7 @@ export default async function DocsPage({ params }: DocsPageProps) {
           {sections.map(([section, pages]) => (
             <section
               key={section}
-              className="rounded-2xl border border-gray-200 p-5 transition-colors hover:border-[#7b39fc]/40 dark:border-gray-800"
+              className="rounded-2xl border border-gray-200 p-5 transition-colors hover:border-(--accent)/40 dark:border-gray-800"
             >
               <h2 className="text-base font-bold">{getSectionLabel(section)}</h2>
               <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
@@ -96,7 +96,7 @@ export default async function DocsPage({ params }: DocsPageProps) {
                   <li key={page.slug}>
                     <Link
                       href={docPath(page.slug)}
-                      className="text-sm font-medium text-[#7b39fc] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:text-[#a67cff]"
+                      className="text-sm font-medium text-(--accent) hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:text-(--accent-300)"
                     >
                       {page.title}
                       <span className="mt-0.5 block text-xs font-normal leading-5 text-gray-500 dark:text-gray-400">

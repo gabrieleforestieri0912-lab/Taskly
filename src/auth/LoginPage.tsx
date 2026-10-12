@@ -72,7 +72,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#fcfaff] dark:bg-black text-gray-900 dark:text-gray-100 flex flex-col relative overflow-hidden transition-colors duration-300">
 
       <div className="fixed top-5 left-5 z-100">
-            <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
+            <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300) transition-colors group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">{t("auth.backToHome")}</span>
         </Link>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       Password
                     </label>
-                    <a href="#" className="text-xs font-medium text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff]">{t("auth.forgotPassword")}</a>
+                    <a href="#" className="text-xs font-medium text-(--accent) hover:text-(--accent-hover) dark:text-(--accent-300)">{t("auth.forgotPassword")}</a>
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-3 text-sm mt-3 shadow-lg shadow-[#7b39fc]/25"
+                  className="w-full py-3 text-sm mt-3 shadow-lg shadow-(--accent)/25"
                 >
                   {loading ? t("auth.signingIn") : t("auth.signIn")}
                 </Button>
@@ -165,7 +165,7 @@ export default function LoginPage() {
                   {t("auth.noAccountYet")}{" "}
                   <Link
                     href="/register"
-                    className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
+                    className="font-bold text-(--accent) hover:text-(--accent-hover) dark:text-(--accent-300) transition-colors"
                   >{t("auth.registerNow")}</Link>
                 </p>
               </div>

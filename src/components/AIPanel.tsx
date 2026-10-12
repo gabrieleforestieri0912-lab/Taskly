@@ -66,8 +66,8 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
       <div className="relative max-w-[85%]">
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1 ml-1">
-            <div className="w-4 h-4 rounded bg-[#7b39fc]/10 flex items-center justify-center">
-              <Sparkles size={9} className="text-[#7b39fc]" />
+            <div className="w-4 h-4 rounded bg-(--accent)/10 flex items-center justify-center">
+              <Sparkles size={9} className="text-(--accent)" />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
               AI Assistant
@@ -77,13 +77,13 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
         <div
           className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
-              ? "bg-[#7b39fc] text-white rounded-2xl rounded-br-md"
+              ? "bg-(--accent) text-white rounded-2xl rounded-br-md"
               : "bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl rounded-bl-md"
           }`}
         >
           {msg.content || "…"}
           {msg.streaming && (
-            <span className="inline-block w-1.5 h-4 bg-[#7b39fc] ml-0.5 rounded-full align-middle" />
+            <span className="inline-block w-1.5 h-4 bg-(--accent) ml-0.5 rounded-full align-middle" />
           )}
         </div>
         {!isUser && !msg.streaming && (
@@ -199,7 +199,7 @@ const ChatInput = ({
           bg-white dark:bg-gray-900
           border border-gray-300 dark:border-gray-700
           transition-all duration-200 ease-out
-          focus-within:ring-2 focus-within:ring-[#7b39fc]/30 focus-within:border-[#7b39fc]/60
+          focus-within:ring-2 focus-within:ring-(--accent)/30 focus-within:border-(--accent)/60
           max-w-[720px] mx-auto
           px-2 py-2
         `}
@@ -263,7 +263,7 @@ const ChatInput = ({
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               exit={{ scale: 0.8, opacity: 0, rotate: 90 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              className="w-9 h-9 rounded-full bg-[#7b39fc] text-white flex items-center justify-center hover:bg-[#8b4dff] active:scale-95 transition-colors shadow-lg shadow-[#7b39fc]/20"
+              className="w-9 h-9 rounded-full bg-(--accent) text-white flex items-center justify-center hover:bg-(--accent-hover) active:scale-95 transition-colors shadow-lg shadow-(--accent)/20"
               aria-label={t("views.aiSendLabel", "Invia messaggio")}
             >
               <Send size={16} />
@@ -304,7 +304,7 @@ const ChatInput = ({
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
                 role="listitem"
               >
-                <Sparkles size={12} className="text-[#7b39fc]" />
+                <Sparkles size={12} className="text-(--accent)" />
                 {prompt}
               </motion.button>
             ))}
@@ -417,7 +417,7 @@ export default function AIPanel({
                 }}
                 className="flex items-center gap-2 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-xl hover:scale-105 transition-transform"
               >
-                <Maximize2 size={15} className="text-[#7b39fc]" />{t("views.aiOpenFull")}</motion.button>
+                <Maximize2 size={15} className="text-(--accent)" />{t("views.aiOpenFull")}</motion.button>
             )}
           </AnimatePresence>
 
@@ -433,11 +433,11 @@ export default function AIPanel({
                 : "0 0 24px 4px rgba(123,57,252,0.35)",
             }}
             transition={{ type: "spring", stiffness: 400, damping: 18 }}
-            className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] text-white shadow-xl shadow-[#7b39fc]/30"
+            className="group relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-(--accent) to-(--accent-300) text-white shadow-xl shadow-(--accent)/30"
             aria-label={t("views.aiOpenChat")}
           >
             {messages.length > 0 && !isOpen && (
-              <span className="absolute inset-0 rounded-full bg-[#7b39fc] opacity-60" />
+              <span className="absolute inset-0 rounded-full bg-(--accent) opacity-60" />
             )}
             {isStreaming && !isOpen && (
               <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400" />
@@ -474,8 +474,8 @@ export default function AIPanel({
             >
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800/80 shrink-0">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#7b39fc]/10 flex items-center justify-center">
-                    <Sparkles size={14} className="text-[#7b39fc]" />
+                  <div className="w-7 h-7 rounded-lg bg-(--accent)/10 flex items-center justify-center">
+                    <Sparkles size={14} className="text-(--accent)" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{t("views.aiTitle")}</h3>
                 </div>
@@ -514,8 +514,8 @@ export default function AIPanel({
                 <div className="flex-1 flex flex-col items-center justify-center overflow-y-hidden px-6 pb-10">
                   <div className="w-full max-w-[720px]">
                     <div className="flex flex-col items-center text-center mb-7">
-                      <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 flex items-center justify-center mb-4">
-                        <Sparkles size={20} className="text-[#7b39fc]" />
+                      <div className="w-12 h-12 rounded-2xl bg-(--accent)/10 flex items-center justify-center mb-4">
+                        <Sparkles size={20} className="text-(--accent)" />
                       </div>
                       <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
                         {t("views.aiHelp")}

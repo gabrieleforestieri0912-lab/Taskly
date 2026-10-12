@@ -192,7 +192,7 @@ export default function TaskBoard({ workspace }: { workspace: string }) {
         <button
           type="submit"
           disabled={!title.trim() || saving}
-          className="rounded-xl bg-[#7b39fc] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl bg-(--accent) px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? "Salvataggio…" : "Aggiungi"}
         </button>

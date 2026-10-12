@@ -27,7 +27,7 @@ function renderInline(text: string): ReactNode[] {
             href={href}
             target={href.startsWith("http") ? "_blank" : undefined}
             rel={href.startsWith("http") ? "noreferrer" : undefined}
-            className="font-medium text-[#7b39fc] underline decoration-[#7b39fc]/30 underline-offset-2 hover:decoration-[#7b39fc] dark:text-[#a67cff]"
+            className="font-medium text-(--accent) underline decoration-(--accent)/30 underline-offset-2 hover:decoration-(--accent) dark:text-(--accent-300)"
           >
             {link[1]}
           </a>

@@ -9,6 +9,7 @@ import AppMiniChat from "../components/AppMiniChat";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { themeBootstrapScript } from "../lib/theme";
 import { appFontBootstrapScript } from "../lib/appFont";
+import { accentBootstrapScript } from "../lib/accent";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
 
@@ -129,6 +130,11 @@ export default function RootLayout({ children }) {
             <script
               dangerouslySetInnerHTML={{
                 __html: appFontBootstrapScript(),
+              }}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: accentBootstrapScript(),
               }}
             />
             <script

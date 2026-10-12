@@ -41,6 +41,7 @@ import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
 import { Theme, readTheme, applyTheme } from "../../lib/theme";
 import { applyAppFont, readAppFont, type AppFontId } from "../../lib/appFont";
+import { ACCENTS, applyAccent, readAccent, DEFAULT_ACCENT } from "../../lib/accent";
 import GoogleCalendarIcon from "../../components/GoogleCalendarIcon";
 
 type SettingsTab =
@@ -74,7 +75,7 @@ function SettingsContent() {
 
   const { language, setLanguage, t } = useLanguage();
   const [theme, setTheme] = useState<Theme>("light");
-  const [accentColor, setAccentColor] = useState<string>("#7b39fc");
+  const [accentColor, setAccentColor] = useState<string>(DEFAULT_ACCENT);
   const [fontFamily, setFontFamily] = useState<string>("inter");
   const [density, setDensity] = useState<"normal" | "compact">("normal");
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
@@ -127,8 +128,9 @@ function SettingsContent() {
     try {
       const rawUser = localStorage.getItem("user");
       if (rawUser) setUser((prev: any) => ({ ...prev, ...JSON.parse(rawUser) }));
-      const savedAccent = localStorage.getItem("taskly_accent");
-      if (savedAccent) setAccentColor(savedAccent);
+      const savedAccent = readAccent();
+      setAccentColor(savedAccent);
+      applyAccent(savedAccent);
       const savedFont = readAppFont();
       setFontFamily(savedFont);
       applyAppFont(savedFont);
@@ -193,6 +195,12 @@ function SettingsContent() {
     } catch {
       showToast("Errore nel salvataggio preferenze.");
     }
+  };
+
+  const changeAccent = (color: string, label: string) => {
+    setAccentColor(color);
+    applyAccent(color, true);
+    showToast(`Colore ${label} applicato a tutta l'app.`);
   };
 
   const changeTheme = (next: Theme) => {
@@ -289,7 +297,7 @@ function SettingsContent() {
           <div>
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] mb-2 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300) mb-2 transition-colors"
             >
               <ArrowLeft size={14} />
               <span>{t("backToDashboard", "Torna alla Dashboard")}</span>
@@ -306,7 +314,7 @@ function SettingsContent() {
             <button
               type="button"
               onClick={handleSavePreferences}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-bold shadow-lg shadow-[#7b39fc]/20 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white text-xs font-bold shadow-lg shadow-(--accent)/20 transition-all cursor-pointer"
             >
               <Check size={15} />
               <span>Salva Modifiche</span>
@@ -329,15 +337,15 @@ function SettingsContent() {
                     onClick={() => selectTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left transition-all ${
                       isActive
-                        ? "bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff] font-extrabold shadow-xs"
+                        ? "bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300) font-extrabold shadow-xs"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-gray-900 text-xs font-medium"
                     }`}
                   >
-                    <Icon size={16} className={isActive ? "text-[#7b39fc] dark:text-[#a67cff]" : "text-gray-400"} />
+                    <Icon size={16} className={isActive ? "text-(--accent) dark:text-(--accent-300)" : "text-gray-400"} />
                     <div className="min-w-0 flex-1">
                       <div className="text-xs truncate">{tab.label}</div>
                     </div>
-                    {isActive && <ChevronRight size={14} className="text-[#7b39fc] dark:text-[#a67cff]" />}
+                    {isActive && <ChevronRight size={14} className="text-(--accent) dark:text-(--accent-300)" />}
                   </button>
                 );
               })}
@@ -364,7 +372,7 @@ function SettingsContent() {
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                      <User size={20} className="text-[#7b39fc]" />
+                      <User size={20} className="text-(--accent)" />
                       <span>Profilo & Account</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -374,9 +382,9 @@ function SettingsContent() {
 
                   <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
                     {user.picture ? (
-                      <img src={user.picture} alt="" className="w-16 h-16 rounded-2xl object-cover border border-[#7b39fc]/30" />
+                      <img src={user.picture} alt="" className="w-16 h-16 rounded-2xl object-cover border border-(--accent)/30" />
                     ) : (
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#7b39fc]/20">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-(--accent) to-(--accent-300) flex items-center justify-center text-white font-black text-xl shadow-lg shadow-(--accent)/20">
                         {(user.name || user.email || "U").charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -396,7 +404,7 @@ function SettingsContent() {
                         type="text"
                         value={user.name || ""}
                         onChange={(e) => setUser({ ...user, name: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#7b39fc]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -405,7 +413,7 @@ function SettingsContent() {
                         type="email"
                         value={user.email || ""}
                         onChange={(e) => setUser({ ...user, email: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#7b39fc]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
                       />
                     </div>
                   </div>
@@ -417,7 +425,7 @@ function SettingsContent() {
                       value={user.role || ""}
                       onChange={(e) => setUser({ ...user, role: e.target.value })}
                       placeholder="es. Product Manager, Ingegnere, Freelance"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#7b39fc]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
                     />
                   </div>
 
@@ -427,14 +435,14 @@ function SettingsContent() {
                       rows={3}
                       value={user.bio || ""}
                       onChange={(e) => setUser({ ...user, bio: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#7b39fc]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={handleSaveProfile}
-                    className="px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:bg-[#8b4dff] transition-all shadow-md shadow-[#7b39fc]/20"
+                    className="px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-all shadow-md shadow-(--accent)/20"
                   >
                     Salva Profilo
                   </button>
@@ -463,7 +471,7 @@ function SettingsContent() {
                         onClick={() => changeTheme("light")}
                         className={`flex items-center gap-3 p-3.5 rounded-2xl border text-xs font-bold transition-all ${
                           theme === "light"
-                            ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc] ring-2 ring-[#7b39fc]/20"
+                            ? "border-(--accent) bg-(--accent)/10 text-(--accent) ring-2 ring-(--accent)/20"
                             : "border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
                         }`}
                       >
@@ -479,7 +487,7 @@ function SettingsContent() {
                         onClick={() => changeTheme("dark")}
                         className={`flex items-center gap-3 p-3.5 rounded-2xl border text-xs font-bold transition-all ${
                           theme === "dark"
-                            ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc] ring-2 ring-[#7b39fc]/20"
+                            ? "border-(--accent) bg-(--accent)/10 text-(--accent) ring-2 ring-(--accent)/20"
                             : "border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
                         }`}
                       >
@@ -496,25 +504,15 @@ function SettingsContent() {
                   <div className="space-y-3">
                     <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Colore d&apos;Accento</label>
                     <div className="flex flex-wrap gap-3">
-                      {[
-                        { name: "Viola Taskly", color: "#7b39fc" },
-                        { name: "Ciano Vertex", color: "#06b6d4" },
-                        { name: "Smeraldo", color: "#10b981" },
-                        { name: "Rosa Shocking", color: "#ec4899" },
-                        { name: "Ambra Solare", color: "#f59e0b" },
-                        { name: "Cobalto", color: "#3b82f6" },
-                      ].map((c) => (
+                      {ACCENTS.map((c) => (
                         <button
                           key={c.color}
                           type="button"
-                          onClick={() => {
-                            setAccentColor(c.color);
-                            localStorage.setItem("taskly_accent", c.color);
-                            showToast(`Colore ${c.name} impostato.`);
-                          }}
+                          onClick={() => changeAccent(c.color, c.name)}
+                          aria-pressed={accentColor === c.color}
                           className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
                             accentColor === c.color
-                              ? "border-[#7b39fc] bg-gray-50 dark:bg-gray-900 ring-2 ring-offset-2 ring-[#7b39fc]"
+                              ? "border-(--accent) bg-(--accent)/10 ring-2 ring-(--accent)/30"
                               : "border-gray-200 dark:border-gray-800"
                           }`}
                         >
@@ -523,6 +521,9 @@ function SettingsContent() {
                         </button>
                       ))}
                     </div>
+                    <p className="text-[11px] text-gray-400">
+                      Applicato subito a bottoni, link e selezioni in tutta l&apos;app.
+                    </p>
                   </div>
 
                   {/* Typography Font */}
@@ -540,7 +541,7 @@ function SettingsContent() {
                           onClick={() => changeFont(f.id as AppFontId, f.name)}
                           className={`p-3 rounded-2xl border text-left transition-all ${
                             fontFamily === f.id
-                              ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc] font-bold"
+                              ? "border-(--accent) bg-(--accent)/10 text-(--accent) font-bold"
                               : "border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
                           }`}
                         >
@@ -560,7 +561,7 @@ function SettingsContent() {
                         onClick={() => setDensity("normal")}
                         className={`flex-1 p-3 rounded-xl border text-xs font-bold ${
                           density === "normal"
-                            ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc]"
+                            ? "border-(--accent) bg-(--accent)/10 text-(--accent)"
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
@@ -571,7 +572,7 @@ function SettingsContent() {
                         onClick={() => setDensity("compact")}
                         className={`flex-1 p-3 rounded-xl border text-xs font-bold ${
                           density === "compact"
-                            ? "border-[#7b39fc] bg-[#7b39fc]/10 text-[#7b39fc]"
+                            ? "border-(--accent) bg-(--accent)/10 text-(--accent)"
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
@@ -1040,7 +1041,7 @@ function SettingsContent() {
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
-                      <CreditCard size={20} className="text-[#7b39fc]" />
+                      <CreditCard size={20} className="text-(--accent)" />
                       <span>Abbonamento & Fatturazione</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -1048,11 +1049,11 @@ function SettingsContent() {
                     </p>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-gradient-to-br from-[#7b39fc]/10 to-[#a67cff]/5 border border-[#7b39fc]/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="p-6 rounded-2xl bg-gradient-to-br from-(--accent)/10 to-(--accent-300)/5 border border-(--accent)/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-wider text-[#7b39fc]">Piano Attivo</span>
-                        <span className="px-2 py-0.5 rounded-full bg-[#7b39fc] text-white text-[9px] font-black uppercase">
+                        <span className="text-xs font-black uppercase tracking-wider text-(--accent)">Piano Attivo</span>
+                        <span className="px-2 py-0.5 rounded-full bg-(--accent) text-white text-[9px] font-black uppercase">
                           {subscription?.plan || "Starter"}
                         </span>
                       </div>
@@ -1070,7 +1071,7 @@ function SettingsContent() {
                       type="button"
                       onClick={openBillingPortal}
                       disabled={loadingPortal}
-                      className="px-5 py-2.5 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-bold shadow-lg shadow-[#7b39fc]/20 transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white text-xs font-bold shadow-lg shadow-(--accent)/20 transition-all cursor-pointer shrink-0 disabled:opacity-50"
                     >
                       {loadingPortal ? t("loading", "Caricamento...") : "Gestisci su Stripe"}
                     </button>

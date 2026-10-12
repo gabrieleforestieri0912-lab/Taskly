@@ -146,7 +146,7 @@ export default function WorkspacesPanel() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowCreate((v) => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-[#7b39fc] to-[#a67cff] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-[#7b39fc]/25 hover:brightness-110 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-(--accent) to-(--accent-300) text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-(--accent)/25 hover:brightness-110 transition-all"
             >
               <Plus size={14} />{t("views.wsNew")}</button>
           </div>
@@ -158,13 +158,13 @@ export default function WorkspacesPanel() {
         <p className="text-gray-400 text-sm font-medium mb-8">{t("views.wsDesc")}</p>
 
         {showCreate && (
-          <div className="mb-8 p-5 rounded-3xl border border-[#7b39fc]/20 bg-white/5 dark:bg-white/5 backdrop-blur-xl flex flex-col sm:flex-row gap-3 items-center">
+          <div className="mb-8 p-5 rounded-3xl border border-(--accent)/20 bg-white/5 dark:bg-white/5 backdrop-blur-xl flex flex-col sm:flex-row gap-3 items-center">
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createWorkspace()}
               placeholder={t("views.wsNamePh")}
-              className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
+              className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-(--accent)/40 outline-none"
             />
             <div className="flex gap-2">
               <button
@@ -180,7 +180,7 @@ export default function WorkspacesPanel() {
         )}
 
         {notice && (
-          <div className="mb-6 px-4 py-3 rounded-2xl bg-[#a67cff]/10 border border-[#a67cff]/20 text-xs font-bold text-[#a67cff]">
+          <div className="mb-6 px-4 py-3 rounded-2xl bg-(--accent-300)/10 border border-(--accent-300)/20 text-xs font-bold text-(--accent-300)">
             {notice}
             <button
               onClick={() => setNotice(null)}
@@ -210,7 +210,7 @@ export default function WorkspacesPanel() {
 
         {!loading && !error && workspaces.length === 0 && (
           <div className="py-20 text-center rounded-[2rem] border-2 border-dashed border-white/10">
-            <Building2 size={40} className="mx-auto mb-4 text-[#7b39fc]" />
+            <Building2 size={40} className="mx-auto mb-4 text-(--accent)" />
             <p className="text-sm font-black uppercase tracking-widest text-gray-400">{t("views.wsEmpty")}</p>
             <p className="text-xs text-gray-500 mt-2 font-medium">{t("views.wsEmptyDesc")}</p>
           </div>
@@ -230,8 +230,8 @@ export default function WorkspacesPanel() {
                   className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#7b39fc]/15 flex items-center justify-center">
-                      <Building2 size={18} className="text-[#a67cff]" />
+                    <div className="w-10 h-10 rounded-2xl bg-(--accent)/15 flex items-center justify-center">
+                      <Building2 size={18} className="text-(--accent-300)" />
                     </div>
                     <div>
                       <p className="font-black text-gray-100">{ws.name || ws.slug}</p>
@@ -255,12 +255,12 @@ export default function WorkspacesPanel() {
                         onChange={(e) => setInviteEmail(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && inviteMember(ws._id)}
                         placeholder="email@collaboratore.com"
-                        className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
+                        className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-(--accent)/40 outline-none"
                       />
                       <select
                         value={inviteRole}
                         onChange={(e) => setInviteRole(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-300 focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
+                        className="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs font-bold text-gray-300 focus:ring-2 focus:ring-(--accent)/40 outline-none"
                       >
                         <option value="member">{t("views.wsMember")}</option>
                         <option value="admin">{t("views.wsRoleAdmin")}</option>
@@ -268,7 +268,7 @@ export default function WorkspacesPanel() {
                       </select>
                       <button
                         onClick={() => inviteMember(ws._id)}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-[#7b39fc]/25 hover:brightness-110 transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-(--accent)/25 hover:brightness-110 transition-all"
                       >
                         <UserPlus size={14} />{t("views.wsInvite")}</button>
                     </div>
@@ -289,8 +289,8 @@ export default function WorkspacesPanel() {
                             className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-8 h-8 rounded-full bg-[#a67cff]/20 flex items-center justify-center shrink-0">
-                                <span className="text-[9px] font-black uppercase text-[#a67cff]">
+                              <div className="w-8 h-8 rounded-full bg-(--accent-300)/20 flex items-center justify-center shrink-0">
+                                <span className="text-[9px] font-black uppercase text-(--accent-300)">
                                   {String(m.email || "?").charAt(0)}
                                 </span>
                               </div>
@@ -317,7 +317,7 @@ export default function WorkspacesPanel() {
                                   }));
                                   changeRole(ws._id, m.userId, e.target.value);
                                 }}
-                                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-300 focus:ring-2 focus:ring-[#7b39fc]/40 outline-none"
+                                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs font-bold text-gray-300 focus:ring-2 focus:ring-(--accent)/40 outline-none"
                               >
                                 {ROLES.filter((r) => r !== "owner").map((r) => (
                                   <option key={r} value={r}>

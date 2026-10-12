@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion, type DragControls } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowDown,
   ArrowUp,
@@ -188,7 +188,7 @@ export function QuickStatsWidget({ stats }: { stats: QuickStat[] }) {
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
           <div className={`${CARD_ROUNDED} p-4 flex items-center gap-3.5 h-full`}>
-            <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-[#7b39fc]/10"} shrink-0`}>
+            <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-(--accent)/10"} shrink-0`}>
               {s.icon}
             </div>
             <div className="min-w-0">
@@ -241,11 +241,11 @@ export function TodayFocusWidget({
   return (
     <div className={`${CARD_ROUNDED_LG} relative overflow-hidden`}>
       {/* Accent left border */}
-      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#7b39fc] to-[#a67cff] rounded-l-3xl" />
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-(--accent) to-(--accent-300) rounded-l-3xl" />
       <div className="p-5 pl-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-[#7b39fc] dark:text-[#a67cff]">
+            <div className="flex items-center gap-2 text-(--accent) dark:text-(--accent-300)">
               <Zap size={16} />
               <span className="text-[10px] font-black uppercase tracking-[0.2em]">
                 {labels.focus}
@@ -255,7 +255,7 @@ export function TodayFocusWidget({
               {focus}
             </h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300)">
                 {criticalCount} {labels.critical}
               </span>
               <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-violet-500/10 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300">
@@ -341,8 +341,8 @@ export function WeeklyTrendWidget({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/15">
-              <TrendingUp size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
+            <div className="p-2.5 rounded-xl bg-(--accent)/10 dark:bg-(--accent)/15">
+              <TrendingUp size={16} className="text-(--accent) dark:text-(--accent-300)" />
             </div>
             <div>
               <h4 className="text-sm font-black text-gray-800 dark:text-gray-100">
@@ -351,7 +351,7 @@ export function WeeklyTrendWidget({
               <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{subtitle}</p>
             </div>
           </div>
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff]">
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/15 dark:text-(--accent-300)">
             {statusLabel}
           </span>
         </div>
@@ -372,7 +372,7 @@ export function WeeklyTrendWidget({
                         initial={{ height: 0 }}
                         animate={{ height: `${pct}%` }}
                         transition={{ duration: 0.7, delay: i * 0.05, ease: "easeOut" }}
-                        className="w-full rounded-lg bg-gradient-to-t from-[#7b39fc] to-[#a67cff]"
+                        className="w-full rounded-lg bg-gradient-to-t from-(--accent) to-(--accent-300)"
                       />
                     ) : (
                       <div className="w-full h-[4%] rounded-lg bg-gray-200 dark:bg-gray-700" />
@@ -439,7 +439,7 @@ function SectionHeader({
       {actionLabel && (
         <DecorativeLink
           href={actionHref}
-          className={actionClass || "text-[10px] font-black uppercase tracking-wider hover:underline text-[#7b39fc]"}
+          className={actionClass || "text-[10px] font-black uppercase tracking-wider hover:underline text-(--accent)"}
         >
           {actionLabel}
         </DecorativeLink>
@@ -479,7 +479,7 @@ export function CriticalTasksWidget({
         title={title}
         actionLabel={seeAllLabel}
         actionHref={seeAllHref}
-        actionClass="text-[10px] font-black text-[#7b39fc] dark:text-[#a67cff] uppercase tracking-wider hover:underline"
+        actionClass="text-[10px] font-black text-(--accent) dark:text-(--accent-300) uppercase tracking-wider hover:underline"
       />
       <div className="space-y-2">
         {tasks.length > 0 ? (
@@ -657,10 +657,10 @@ export function QuickNavWidget({
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-[#7b39fc]/20 dark:border-[#7b39fc]/30 hover:bg-[#7b39fc]/8 dark:hover:bg-[#7b39fc]/15 transition-all text-center"
+            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-(--accent)/20 dark:border-(--accent)/30 hover:bg-(--accent)/8 dark:hover:bg-(--accent)/15 transition-all text-center"
           >
-            <div className="w-8 h-8 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center">
-              <Plus size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
+            <div className="w-8 h-8 rounded-xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center">
+              <Plus size={16} className="text-(--accent) dark:text-(--accent-300)" />
             </div>
             <span className="text-[9px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-300">
               {labels.newProject}
@@ -699,16 +699,16 @@ export function AiInsightsWidget({
   return (
     <div className={`${CARD_ROUNDED_LG} overflow-hidden`}>
       {/* Sottile gradient top bar */}
-      <div className="h-0.5 bg-gradient-to-r from-[#7b39fc] via-[#a67cff] to-[#7b39fc]" />
+      <div className="h-0.5 bg-gradient-to-r from-(--accent) via-(--accent-300) to-(--accent)" />
       <div className="p-6 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center mx-auto">
-          <Sparkles size={22} className="text-[#7b39fc] dark:text-[#a67cff]" />
+        <div className="w-12 h-12 rounded-2xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center mx-auto">
+          <Sparkles size={22} className="text-(--accent) dark:text-(--accent-300)" />
         </div>
         <p className="text-sm font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{text}</p>
         <button
           type="button"
           onClick={onAction}
-          className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white shadow-md shadow-[#7b39fc]/20 transition-colors cursor-pointer"
+          className="w-full text-[10px] font-black uppercase tracking-widest h-10 inline-flex items-center justify-center rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white shadow-md shadow-(--accent)/20 transition-colors cursor-pointer"
         >
           {actionLabel}
         </button>
@@ -732,7 +732,7 @@ export function ToolsResourcesWidget({
     <div className="space-y-3">
       <SectionHeader
         icon={Wrench}
-        iconClass="text-[#7b39fc] dark:text-[#a67cff]"
+        iconClass="text-(--accent) dark:text-(--accent-300)"
         title={title}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{children}</div>
@@ -761,8 +761,10 @@ export function WidgetEditToolbar({
   onMoveDown,
   onToggle,
   hiddenLabel,
-  dragControls = null,
   dragTitle = "Trascina per riordinare",
+  onDragStart,
+  onDragEnd,
+  isDragging = false,
 }: {
   label: string;
   isVisible: boolean;
@@ -772,25 +774,29 @@ export function WidgetEditToolbar({
   onMoveDown: () => void;
   onToggle: () => void;
   hiddenLabel: string;
-  /** Se fornito, la maniglia avvia il drag & drop (Framer Motion Reorder). */
-  dragControls?: DragControls | null;
+  /** Se fornito, la maniglia avvia il drag & drop nativo. */
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  isDragging?: boolean;
   dragTitle?: string;
 }) {
   return (
     <div className="flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-700/60 rounded-t-3xl text-xs font-bold text-gray-500 dark:text-gray-400">
       <div className="flex items-center gap-2">
-        {dragControls ? (
-          <button
-            type="button"
-            onPointerDown={(e) => dragControls.start(e.nativeEvent)}
-            className="animate-drag-hint cursor-grab active:cursor-grabbing touch-none p-1 -m-1 rounded-md hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors"
+        {onDragStart ? (
+          <span
+            draggable
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
             title={dragTitle}
+            role="button"
             aria-label={`${dragTitle}: ${label}`}
+            className={`touch-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${isDragging ? "opacity-50" : ""}`}
           >
-            <GripVertical size={13} className="opacity-80" />
-          </button>
+            <GripVertical size={13} className="opacity-80" aria-hidden="true" />
+          </span>
         ) : (
-          <GripVertical size={13} className="opacity-50" />
+          <GripVertical size={13} className="opacity-50" aria-hidden="true" />
         )}
         <span className="font-extrabold uppercase tracking-wider text-[10px]">{label}</span>
         {!isVisible && (
@@ -885,13 +891,13 @@ export function WidgetManagerMenu({
               className="w-full flex items-center justify-between p-2.5 rounded-xl text-left hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-semibold transition-colors text-gray-700 dark:text-gray-300"
             >
               <span className="flex items-center gap-2 truncate">
-                <IconComp size={13} className="text-[#7b39fc] dark:text-[#a67cff] shrink-0" />
+                <IconComp size={13} className="text-(--accent) dark:text-(--accent-300) shrink-0" />
                 <span className="truncate">{w.label}</span>
               </span>
               <span
                 className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${
                   isVis
-                    ? "bg-[#7b39fc] text-white"
+                    ? "bg-(--accent) text-white"
                     : "border border-gray-300 dark:border-gray-700"
                 }`}
               >
@@ -919,7 +925,7 @@ export function WidgetManagerMenu({
               key={key}
               type="button"
               onClick={() => onPreset(key)}
-              className="px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-[#7b39fc]/10 dark:hover:bg-[#7b39fc]/15 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center transition-colors"
+              className="px-2 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-(--accent)/10 dark:hover:bg-(--accent)/15 text-[10px] font-bold text-gray-600 dark:text-gray-300 text-center transition-colors"
             >
               {label}
             </button>
@@ -970,15 +976,15 @@ export function DashboardHeader({
         <motion.div
           whileHover={{ scale: 1.05, rotate: -3 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-[#7b39fc]/20"
+          className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-(--accent)/20"
           style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)` }}
         >
           <Sparkles size={20} className="text-white/90" />
         </motion.div>
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="h-px w-5 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">
+            <span className="h-px w-5 bg-gradient-to-r from-(--accent)/0 to-(--accent)" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-(--accent) dark:text-(--accent-300)">
               {eyebrow}
             </span>
           </div>
@@ -999,7 +1005,7 @@ export function DashboardHeader({
           className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md cursor-pointer ${
             isEditing
               ? "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20"
-              : "bg-gradient-to-r from-[#7b39fc] to-[#a67cff] hover:brightness-110 text-white shadow-[#7b39fc]/20"
+              : "bg-gradient-to-r from-(--accent) to-(--accent-300) hover:brightness-110 text-white shadow-(--accent)/20"
           }`}
         >
           {isEditing ? (
@@ -1035,11 +1041,11 @@ export function EditModeBanner({
   manager: React.ReactNode;
 }) {
   return (
-    <div className="p-4 md:p-5 rounded-3xl bg-[#7b39fc]/8 dark:bg-[#7b39fc]/12 border border-[#7b39fc]/20 dark:border-[#7b39fc]/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="p-4 md:p-5 rounded-3xl bg-(--accent)/8 dark:bg-(--accent)/12 border border-(--accent)/20 dark:border-(--accent)/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-black uppercase tracking-widest text-[#7b39fc] dark:text-[#a67cff]">
+          <span className="text-xs font-black uppercase tracking-widest text-(--accent) dark:text-(--accent-300)">
             {title}
           </span>
         </div>
@@ -1053,7 +1059,7 @@ export function EditModeBanner({
             onClick={onManage}
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            <Layers size={13} className="text-[#7b39fc] dark:text-[#a67cff]" />
+            <Layers size={13} className="text-(--accent) dark:text-(--accent-300)" />
             <span>{labels.manage}</span>
           </button>
           {manager}
@@ -1072,7 +1078,7 @@ export function EditModeBanner({
         <button
           type="button"
           onClick={onDone}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7b39fc] hover:bg-[#8b4dff] text-white text-xs font-black uppercase tracking-wider transition-colors shadow-md shadow-[#7b39fc]/20"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white text-xs font-black uppercase tracking-wider transition-colors shadow-md shadow-(--accent)/20"
         >
           <Check size={13} />
           <span>{labels.done}</span>
@@ -1108,14 +1114,14 @@ export function PlanQuotaBanner({
   const isFull = used >= max;
   return (
     <div className={`${CARD_ROUNDED} flex items-center gap-3 px-4 py-3`}>
-      <div className="w-9 h-9 rounded-xl bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 flex items-center justify-center shrink-0">
-        <Zap size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />
+      <div className="w-9 h-9 rounded-xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center shrink-0">
+        <Zap size={16} className="text-(--accent) dark:text-(--accent-300)" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-bold text-gray-600 dark:text-gray-300">
             {label}{" "}
-            <span className="font-black uppercase tracking-widest text-[#7b39fc] dark:text-[#a67cff]">
+            <span className="font-black uppercase tracking-widest text-(--accent) dark:text-(--accent-300)">
               {planName}
             </span>{" "}
             · {used} / {max} {word}
@@ -1124,12 +1130,12 @@ export function PlanQuotaBanner({
             upgradeHref ? (
               <Link
                 href={upgradeHref}
-                className="shrink-0 px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-(--accent) text-white text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
               >
                 {upgradeLabel}
               </Link>
             ) : (
-              <span className="shrink-0 px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[9px] font-black uppercase tracking-widest">
+              <span className="shrink-0 px-3 py-1.5 rounded-lg bg-(--accent) text-white text-[9px] font-black uppercase tracking-widest">
                 {upgradeLabel}
               </span>
             )

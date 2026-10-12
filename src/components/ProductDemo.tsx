@@ -27,9 +27,9 @@ export default function ProductDemo() {
           </h2>
           <p className="landing-body mt-4">{t("land.pdSubtitle")}</p>
           <ul className="mt-5 space-y-2 text-sm text-gray-700 dark:text-gray-300">
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />{t("land.pdBullet1")}</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />{t("land.pdBullet2")}</li>
-            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-[#7b39fc] dark:text-[#a67cff]" />{t("land.pdBullet3")}</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-(--accent) dark:text-(--accent-300)" />{t("land.pdBullet1")}</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-(--accent) dark:text-(--accent-300)" />{t("land.pdBullet2")}</li>
+            <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-(--accent) dark:text-(--accent-300)" />{t("land.pdBullet3")}</li>
           </ul>
           <div className="mt-7">
             <Link href="/register" className="landing-btn-primary">{t("land.pdCta")}</Link>
@@ -38,7 +38,7 @@ export default function ProductDemo() {
 
         <div className="min-w-0 rounded-2xl border border-gray-200/70 dark:border-gray-700/60 bg-white dark:bg-gray-900 p-3 shadow-xl sm:p-5">
           <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
-            <div className="relative aspect-video bg-gradient-to-br from-[#7b39fc]/20 to-[#a67cff]/20 flex items-center justify-center group">
+            <div className="relative aspect-video bg-gradient-to-br from-(--accent)/20 to-(--accent-300)/20 flex items-center justify-center group">
               <video
                 ref={videoRef}
                 className="absolute inset-0 w-full h-full object-cover"
@@ -52,7 +52,7 @@ export default function ProductDemo() {
                 <button
                   onClick={handlePlay}
                   aria-label={t("land.pdPlayLabel")}
-                  className="relative z-10 flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-[#7b39fc] to-[#a67cff] text-white transition-transform hover:scale-105 shadow-2xl shadow-[#7b39fc]/30"
+                  className="relative z-10 flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-(--accent) to-(--accent-300) text-white transition-transform hover:scale-105 shadow-2xl shadow-(--accent)/30"
                 >
                   <Play size={32} fill="white" />
                 </button>

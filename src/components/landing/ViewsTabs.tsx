@@ -29,7 +29,7 @@ function ListMockup() {
               {t.status === "Fatto" && <span className="h-2 w-2 rounded-full bg-emerald-500" />}
             </span>
             <span className="flex-1 text-sm font-medium truncate">{t.title}</span>
-            <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-[#f4f0fd] dark:bg-[#7b39fc]/20 text-[#7b39fc]">{t.status}</span>
+            <span className="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-[#f4f0fd] dark:bg-(--accent)/20 text-(--accent)">{t.status}</span>
             <span className="text-xs text-muted-foreground">{t.due}</span>
             <span className="h-6 w-6 rounded-full bg-gray-900 text-white grid place-items-center text-xs dark:bg-white dark:text-gray-900">{t.assignee}</span>
           </li>
@@ -60,11 +60,11 @@ function CalendarMockup() {
           {weeks.flat().map((d, i) => (
             <div
               key={i}
-              className={`h-16 rounded-lg border p-2 text-sm ${d === "11" ? "bg-[#7b39fc] text-white border-[#7b39fc]" : "bg-[#f6f7f9] dark:bg-white/[0.04] border-black/5 dark:border-white/5"}`}
+              className={`h-16 rounded-lg border p-2 text-sm ${d === "11" ? "bg-(--accent) text-white border-(--accent)" : "bg-[#f6f7f9] dark:bg-white/[0.04] border-black/5 dark:border-white/5"}`}
             >
               {d}
               {d === "11" && <span className="mt-1 block text-xs opacity-90">• Review sprint</span>}
-              {d === "5" && <span className="mt-1 block h-1.5 w-1.5 rounded-full bg-[#7b39fc]" />}
+              {d === "5" && <span className="mt-1 block h-1.5 w-1.5 rounded-full bg-(--accent)" />}
             </div>
           ))}
         </div>
@@ -83,8 +83,8 @@ function TimelineMockup() {
       </div>
       <div className="p-4 space-y-3">
         {[
-          { label: "Ricerca", w: "w-[45%]", ml: "ml-0", color: "bg-[#7b39fc]" },
-          { label: "Design", w: "w-[55%]", ml: "ml-8", color: "bg-[#a67cff]" },
+          { label: "Ricerca", w: "w-[45%]", ml: "ml-0", color: "bg-(--accent)" },
+          { label: "Design", w: "w-[55%]", ml: "ml-8", color: "bg-(--accent-300)" },
           { label: "Sviluppo", w: "w-[70%]", ml: "ml-16", color: "bg-emerald-500" },
         ].map((bar) => (
           <div key={bar.label} className="flex items-center gap-3">
@@ -177,8 +177,8 @@ export function ViewsTabs() {
                 id={`tab-${tab.id}`}
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => setActive(tab.id)}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] ${
-                  isActive ? "bg-[#7b39fc] text-white" : "text-muted-foreground hover:text-foreground"
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) ${
+                  isActive ? "bg-(--accent) text-white" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}

@@ -74,7 +74,7 @@ function Hero({ onStart, onDiscover }) {
           }}
         />
         {/* bordo inferiore netto: separa l'hero dalla sezione successiva */}
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#7b39fc]/25 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-(--accent)/25 to-transparent" />
 
         {/* elementi workspace fluttanti (tabella, task, calendario, …) */}
         <FloatingWorkspace />
@@ -91,7 +91,7 @@ function Hero({ onStart, onDiscover }) {
           {/* Headline con accento in gradiente */}
           <h1 className="font-inter text-5xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 dark:text-white sm:text-7xl lg:text-[72px]">
             {t("land.heroTitlePrefix")}{" "}
-            <span className="bg-gradient-to-r from-[#7b39fc] via-[#8b4dff] to-[#a67cff] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-(--accent) via-(--accent-hover) to-(--accent-300) bg-clip-text text-transparent">
               {t("land.heroTitleAccent")}
             </span>
           </h1>
@@ -137,9 +137,9 @@ function Hero({ onStart, onDiscover }) {
           {badges.map(({ icon: Icon, label }) => (
             <li
               key={label}
-              className="inline-flex items-center gap-2 rounded-full border border-[#7b39fc]/15 bg-white/70 px-4 py-2 text-xs font-semibold text-gray-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7b39fc]/35 hover:shadow-md hover:shadow-[#7b39fc]/10 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:border-[#a67cff]/40"
+              className="inline-flex items-center gap-2 rounded-full border border-(--accent)/15 bg-white/70 px-4 py-2 text-xs font-semibold text-gray-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-(--accent)/35 hover:shadow-md hover:shadow-(--accent)/10 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:border-(--accent-300)/40"
             >
-              <Icon className="h-3.5 w-3.5 text-[#7b39fc] dark:text-[#a67cff]" aria-hidden="true" />
+              <Icon className="h-3.5 w-3.5 text-(--accent) dark:text-(--accent-300)" aria-hidden="true" />
               {label}
             </li>
           ))}

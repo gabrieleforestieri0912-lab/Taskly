@@ -40,12 +40,12 @@ type Floater = {
 };
 
 const FLOATERS: Floater[] = [
-  { id: "table", icon: Table2, label: "Tasks", x: "3%", y: "15%", rotate: -8, duration: 11, delay: 0, width: "w-[168px]", accent: "from-[#7b39fc]/70" },
-  { id: "task", icon: CheckSquare, label: "Oggi", x: "86%", y: "11%", rotate: 7, duration: 13, delay: 0.8, width: "w-[150px]", accent: "from-[#8b4dff]/70" },
-  { id: "cal", icon: CalendarDays, label: "Settimana", x: "90%", y: "61%", rotate: 5, duration: 12, delay: 0.4, width: "w-[160px]", accent: "from-[#a67cff]/70" },
+  { id: "table", icon: Table2, label: "Tasks", x: "3%", y: "15%", rotate: -8, duration: 11, delay: 0, width: "w-[168px]", accent: "from-(--accent)/70" },
+  { id: "task", icon: CheckSquare, label: "Oggi", x: "86%", y: "11%", rotate: 7, duration: 13, delay: 0.8, width: "w-[150px]", accent: "from-(--accent-hover)/70" },
+  { id: "cal", icon: CalendarDays, label: "Settimana", x: "90%", y: "61%", rotate: 5, duration: 12, delay: 0.4, width: "w-[160px]", accent: "from-(--accent-300)/70" },
   { id: "note", icon: StickyNote, label: "Note", x: "2%", y: "59%", rotate: -6, duration: 14, delay: 1.1, width: "w-[144px]", accent: "from-[#5a1fd4]/70" },
-  { id: "goal", icon: Target, label: "Obiettivi", x: "16%", y: "83%", rotate: 4, duration: 15, delay: 0.2, width: "w-[152px]", accent: "from-[#7b39fc]/70" },
-  { id: "chat", icon: MessageSquare, label: "Assistente", x: "75%", y: "85%", rotate: -5, duration: 13, delay: 1.5, width: "w-[158px]", accent: "from-[#8b4dff]/70" },
+  { id: "goal", icon: Target, label: "Obiettivi", x: "16%", y: "83%", rotate: 4, duration: 15, delay: 0.2, width: "w-[152px]", accent: "from-(--accent)/70" },
+  { id: "chat", icon: MessageSquare, label: "Assistente", x: "75%", y: "85%", rotate: -5, duration: 13, delay: 1.5, width: "w-[158px]", accent: "from-(--accent-hover)/70" },
 ];
 
 /** Riga finta di tabella: pallino di stato + linea di lunghezza variabile. */
@@ -53,7 +53,7 @@ const TableRows = () => (
   <div className="mt-2.5 space-y-1.5">
     {[100, 72, 88].map((w) => (
       <div key={w} className="flex items-center gap-1.5">
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#7b39fc]/40" />
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-(--accent)/40" />
         <span className="h-1 rounded-full bg-gray-300/70 dark:bg-white/15" style={{ width: `${w}%` }} />
       </div>
     ))}
@@ -64,11 +64,11 @@ const TableRows = () => (
 const TaskRows = () => (
   <div className="mt-2.5 space-y-2">
     <div className="flex items-center gap-1.5">
-      <span className="h-3 w-3 shrink-0 rounded-[3px] border border-[#7b39fc]/40" />
+      <span className="h-3 w-3 shrink-0 rounded-[3px] border border-(--accent)/40" />
       <span className="h-1 w-16 rounded-full bg-gray-300/70 dark:bg-white/15" />
     </div>
     <div className="flex items-center gap-1.5">
-      <span className="h-3 w-3 shrink-0 rounded-[3px] bg-[#7b39fc]/70" />
+      <span className="h-3 w-3 shrink-0 rounded-[3px] bg-(--accent)/70" />
       <span className="h-1 w-12 rounded-full bg-gray-300/70 dark:bg-white/15" />
     </div>
   </div>
@@ -80,7 +80,7 @@ const CalRows = () => (
     {Array.from({ length: 7 }).map((_, i) => (
       <span
         key={i}
-        className={`h-4 rounded-[3px] ${i === 3 ? "bg-[#7b39fc]/70" : "bg-gray-200/80 dark:bg-white/10"}`}
+        className={`h-4 rounded-[3px] ${i === 3 ? "bg-(--accent)/70" : "bg-gray-200/80 dark:bg-white/10"}`}
       />
     ))}
   </div>

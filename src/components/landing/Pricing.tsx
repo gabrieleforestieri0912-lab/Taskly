@@ -21,14 +21,14 @@ export function Pricing() {
             <button
               onClick={() => setYearly(false)}
               aria-pressed={!yearly}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${!yearly ? "bg-[#7b39fc] text-white" : "text-muted-foreground"}`}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${!yearly ? "bg-(--accent) text-white" : "text-muted-foreground"}`}
             >
               {toggleMonthly}
             </button>
             <button
               onClick={() => setYearly(true)}
               aria-pressed={yearly}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${yearly ? "bg-[#7b39fc] text-white" : "text-muted-foreground"}`}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${yearly ? "bg-(--accent) text-white" : "text-muted-foreground"}`}
             >
               {toggleYearly}
             </button>
@@ -42,7 +42,7 @@ export function Pricing() {
               key={plan.name}
               className={`rounded-2xl border p-6 flex flex-col ${
                 plan.highlighted
-                  ? "bg-[#7b39fc] text-white border-[#7b39fc] shadow-xl shadow-[#7b39fc]/20 scale-[1.02]"
+                  ? "bg-(--accent) text-white border-(--accent) shadow-xl shadow-(--accent)/20 scale-[1.02]"
                   : "bg-white dark:bg-black border-black/10 dark:border-white/10"
               }`}
             >
@@ -63,8 +63,8 @@ export function Pricing() {
                 href="/signup"
                 className={`mt-6 inline-flex h-10 items-center justify-center rounded-xl px-6 text-sm font-semibold transition-colors ${
                   plan.highlighted
-                    ? "bg-white text-[#7b39fc] hover:bg-gray-100"
-                    : "bg-[#7b39fc] text-white hover:bg-[#6d28d9]"
+                    ? "bg-white text-(--accent) hover:bg-gray-100"
+                    : "bg-(--accent) text-white hover:bg-[#6d28d9]"
                 }`}
               >
                 {plan.cta}

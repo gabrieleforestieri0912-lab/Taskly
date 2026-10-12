@@ -34,7 +34,7 @@ export function Step({
   children: ReactNode;
 }) {
   return (
-    <section className="relative rounded-xl border border-gray-200 p-4 pl-12 dark:border-gray-800 [counter-increment:doc-step] before:absolute before:left-4 before:top-4 before:grid before:size-6 before:place-items-center before:rounded-full before:bg-[#7b39fc]/10 before:text-xs before:font-bold before:text-[#7b39fc] before:content-[counter(doc-step)]">
+    <section className="relative rounded-xl border border-gray-200 p-4 pl-12 dark:border-gray-800 [counter-increment:doc-step] before:absolute before:left-4 before:top-4 before:grid before:size-6 before:place-items-center before:rounded-full before:bg-(--accent)/10 before:text-xs before:font-bold before:text-(--accent) before:content-[counter(doc-step)]">
       <h3 className="mb-1 font-semibold">{title}</h3>
       <div className="text-sm leading-6 text-gray-600 dark:text-gray-300">{children}</div>
     </section>
@@ -78,7 +78,7 @@ export function Tabs({ children }: { children: ReactNode }) {
 
 export function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex rounded-full bg-[#7b39fc]/10 px-2 py-0.5 text-xs font-semibold text-[#7b39fc] dark:text-[#a67cff]">
+    <span className="inline-flex rounded-full bg-(--accent)/10 px-2 py-0.5 text-xs font-semibold text-(--accent) dark:text-(--accent-300)">
       {children}
     </span>
   );
@@ -128,7 +128,7 @@ export function RelatedLinks({
         <li key={link.href}>
           <Link
             href={link.href}
-            className="inline-flex rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-[#7b39fc] hover:bg-[#7b39fc]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:border-gray-800 dark:text-[#a67cff]"
+            className="inline-flex rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-(--accent) hover:bg-(--accent)/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:border-gray-800 dark:text-(--accent-300)"
           >
             {link.label}
           </Link>

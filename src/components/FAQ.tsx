@@ -9,7 +9,7 @@ import { FAQ_ITEMS } from "../lib/faq";
 function FAQItem({ item, isOpen, onToggle }) {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl border border-[#7b39fc]/10 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-sm shadow-sm">
+    <div className="rounded-2xl border border-(--accent)/10 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-sm shadow-sm">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"

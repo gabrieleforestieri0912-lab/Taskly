@@ -73,7 +73,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-[#fcfaff] dark:bg-black text-gray-900 dark:text-gray-100 flex flex-col relative overflow-hidden transition-colors duration-300">
 
       <div className="fixed top-5 left-5 z-100">
-            <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff] transition-colors group">
+            <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300) transition-colors group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">{t("auth.backToHome")}</span>
         </Link>
@@ -151,7 +151,7 @@ export default function RegisterPage() {
                 <Button 
                   type="submit" 
                   disabled={loading}
-                  className="w-full py-3 text-sm mt-3 shadow-lg shadow-[#7b39fc]/25"
+                  className="w-full py-3 text-sm mt-3 shadow-lg shadow-(--accent)/25"
                 >
                   {loading ? t("auth.registering") : t("auth.signUp")}
                 </Button>
@@ -183,7 +183,7 @@ export default function RegisterPage() {
                   {t("auth.alreadyHaveAccount")}{" "}
                   <Link
                     href="/login"
-                    className="font-bold text-[#7b39fc] hover:text-[#8b4dff] dark:text-[#a67cff] transition-colors"
+                    className="font-bold text-(--accent) hover:text-(--accent-hover) dark:text-(--accent-300) transition-colors"
                   >{t("auth.signIn")}</Link>
                 </p>
               </div>

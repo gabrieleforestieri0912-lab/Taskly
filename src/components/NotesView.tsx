@@ -152,7 +152,7 @@ const TEXT_COLORS = [
   {
     value: "purple",
     label: "Viola",
-    class: "text-[#7b39fc] dark:text-[#a67cff]",
+    class: "text-(--accent) dark:text-(--accent-300)",
     bgHex: "#7b39fc",
   },
   {

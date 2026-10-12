@@ -97,14 +97,14 @@ export default function OnboardingChecklist(props: Props) {
       exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8, scale: 0.99 }}
       transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: "easeOut" }}
       data-tour="checklist"
-      className="mb-6 rounded-3xl border border-[#7b39fc]/20 p-5 shadow-sm bg-gradient-to-r from-[#7b39fc]/5 via-white/80 to-[#a67cff]/5 dark:from-[#7b39fc]/10 dark:via-gray-900/90 dark:to-transparent"
+      className="mb-6 rounded-3xl border border-(--accent)/20 p-5 shadow-sm bg-gradient-to-r from-(--accent)/5 via-white/80 to-(--accent-300)/5 dark:from-(--accent)/10 dark:via-gray-900/90 dark:to-transparent"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <motion.div
             animate={shouldReduceMotion || done ? undefined : { rotate: [0, -8, 8, 0], scale: [1, 1.08, 1] }}
             transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 2 }}
-            className="w-8 h-8 rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] flex items-center justify-center shrink-0"
+            className="w-8 h-8 rounded-xl bg-(--accent)/10 text-(--accent) flex items-center justify-center shrink-0"
           >
             <Sparkles size={16} />
           </motion.div>
@@ -117,7 +117,7 @@ export default function OnboardingChecklist(props: Props) {
                 key={doneCount}
                 initial={shouldReduceMotion ? false : { scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#7b39fc]/10 text-[#7b39fc]"
+                className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent)"
               >
                 {doneCount} di {totalCount}
               </motion.span>
@@ -165,7 +165,7 @@ export default function OnboardingChecklist(props: Props) {
         aria-valuenow={progress}
       >
         <motion.div
-          className="h-full bg-gradient-to-r from-[#7b39fc] to-emerald-500"
+          className="h-full bg-gradient-to-r from-(--accent) to-emerald-500"
           animate={{ width: `${progress}%` }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.65, ease: "easeOut" }}
         />
@@ -214,8 +214,8 @@ export default function OnboardingChecklist(props: Props) {
                   completed
                     ? "bg-emerald-500/5 border-emerald-500/20"
                     : isNext
-                      ? "bg-[#7b39fc]/5 border-[#7b39fc]/50 ring-1 ring-[#7b39fc]/20"
-                      : "bg-white/80 dark:bg-gray-800/60 border-gray-100 dark:border-gray-800 hover:border-[#7b39fc]/30"
+                      ? "bg-(--accent)/5 border-(--accent)/50 ring-1 ring-(--accent)/20"
+                      : "bg-white/80 dark:bg-gray-800/60 border-gray-100 dark:border-gray-800 hover:border-(--accent)/30"
                 }`}
               >
                 <div className="mt-0.5 shrink-0">
@@ -226,7 +226,7 @@ export default function OnboardingChecklist(props: Props) {
                       </motion.span>
                     ) : (
                       <motion.span key="pending" initial={shouldReduceMotion ? false : { scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.7, opacity: 0 }}>
-                        <Circle size={16} className={isNext ? "text-[#7b39fc]" : "text-gray-400"} />
+                        <Circle size={16} className={isNext ? "text-(--accent)" : "text-gray-400"} />
                       </motion.span>
                     )}
                   </AnimatePresence>
@@ -240,7 +240,7 @@ export default function OnboardingChecklist(props: Props) {
                           initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.8 }}
-                          className="ml-1 inline-block text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-[#7b39fc] text-white"
+                          className="ml-1 inline-block text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md bg-(--accent) text-white"
                         >
                           Prossimo
                         </motion.span>
@@ -248,7 +248,7 @@ export default function OnboardingChecklist(props: Props) {
                     </AnimatePresence>
                   </div>
                   <div className="text-[11px] text-gray-400 mt-0.5">{meta.hint}</div>
-                  {!completed && <div className="text-[11px] font-bold text-[#7b39fc] mt-1 inline-flex items-center gap-1">Vai <ArrowRight size={11} /></div>}
+                  {!completed && <div className="text-[11px] font-bold text-(--accent) mt-1 inline-flex items-center gap-1">Vai <ArrowRight size={11} /></div>}
                 </div>
                 <Icon size={15} className="shrink-0 mt-0.5 text-gray-300" />
               </motion.button>

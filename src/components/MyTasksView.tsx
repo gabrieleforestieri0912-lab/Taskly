@@ -331,7 +331,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
           label: info.label,
           count: info.tasks.length,
           tasks: sortTasks(info.tasks),
-          badgeClass: "bg-[#7b39fc]/10 text-[#7b39fc] border border-[#7b39fc]/20",
+          badgeClass: "bg-(--accent)/10 text-(--accent) border border-(--accent)/20",
         });
       });
 
@@ -646,7 +646,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Title & Stats */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#7b39fc] to-[#a67cff] flex items-center justify-center text-white shadow-md shadow-[#7b39fc]/20 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-(--accent) to-(--accent-300) flex items-center justify-center text-white shadow-md shadow-(--accent)/20 shrink-0">
               <CheckCircle2 size={22} />
             </div>
             <div>
@@ -654,7 +654,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
                   I miei task
                 </h1>
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#7b39fc]/10 text-[#7b39fc]">
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-(--accent)/10 text-(--accent)">
                   {activeTasksCount} attivi
                 </span>
               </div>
@@ -681,7 +681,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 placeholder="Cerca task o tag..."
                 value={prefs.searchQuery}
                 onChange={(e) => updatePrefs({ searchQuery: e.target.value })}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/40 text-gray-800 dark:text-gray-200 placeholder-gray-400 transition-all"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-(--accent)/40 text-gray-800 dark:text-gray-200 placeholder-gray-400 transition-all"
               />
               {prefs.searchQuery && (
                 <button
@@ -709,7 +709,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   onClick={() => updatePrefs({ groupBy: mode.id })}
                   className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
                     prefs.groupBy === mode.id
-                      ? "bg-white dark:bg-gray-800 text-[#7b39fc] shadow-sm"
+                      ? "bg-white dark:bg-gray-800 text-(--accent) shadow-sm"
                       : "text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
                   }`}
                 >
@@ -724,7 +724,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 onClick={() => setShowFilterMenu((v) => !v)}
                 className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   showFilterMenu || prefs.filterStatus !== "active" || prefs.filterPriority !== "all" || prefs.filterProject !== "all"
-                    ? "bg-[#7b39fc]/10 border-[#7b39fc]/30 text-[#7b39fc]"
+                    ? "bg-(--accent)/10 border-(--accent)/30 text-(--accent)"
                     : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50"
                 }`}
                 title="Filtri e Ordinamento"
@@ -754,7 +754,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                           onClick={() => updatePrefs({ filterStatus: st.id })}
                           className={`py-1 rounded-lg text-center font-medium ${
                             prefs.filterStatus === st.id
-                              ? "bg-[#7b39fc] text-white"
+                              ? "bg-(--accent) text-white"
                               : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
                           }`}
                         >
@@ -846,7 +846,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
               e.preventDefault();
               handleCreateTask(quickTitle);
             }}
-            className="flex items-center gap-2 p-2 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800 shadow-sm focus-within:ring-2 focus-within:ring-[#7b39fc]/30 focus-within:border-[#7b39fc] transition-all"
+            className="flex items-center gap-2 p-2 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800 shadow-sm focus-within:ring-2 focus-within:ring-(--accent)/30 focus-within:border-(--accent) transition-all"
           >
             <div className="pl-3 text-gray-400">
               <Plus size={18} />
@@ -866,7 +866,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   if (deadline) {
                     const parsed = formatDeadlineItalian(deadline);
                     return (
-                      <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#7b39fc]/10 text-[#7b39fc] border border-[#7b39fc]/20 animate-fade-in">
+                      <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-(--accent)/10 text-(--accent) border border-(--accent)/20 animate-fade-in">
                         <Sparkles size={11} /> {parsed.formatted}
                       </span>
                     );
@@ -875,7 +875,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 })()}
                 <button
                   type="submit"
-                  className="px-4 py-1.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:brightness-110 shadow-sm transition-all"
+                  className="px-4 py-1.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:brightness-110 shadow-sm transition-all"
                 >
                   Crea
                 </button>
@@ -956,7 +956,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                               onClick={() => setSelectedTaskId(task.id)}
                               className={`group relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
                                 isSelected
-                                  ? "bg-[#7b39fc]/5 border-[#7b39fc]/40 shadow-sm"
+                                  ? "bg-(--accent)/5 border-(--accent)/40 shadow-sm"
                                   : "bg-white dark:bg-gray-900/90 border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-sm"
                               }`}
                             >
@@ -967,7 +967,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                                 className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all shrink-0 ${
                                   task.status === "done"
                                     ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/30"
-                                    : "border-gray-300 dark:border-gray-600 hover:border-[#7b39fc] bg-transparent"
+                                    : "border-gray-300 dark:border-gray-600 hover:border-(--accent) bg-transparent"
                                 }`}
                                 title={task.status === "done" ? "Segna come da fare" : "Completa task"}
                               >
@@ -1272,7 +1272,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     {(activeDetailTask.tags || []).map((t) => (
                       <span
                         key={t}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#7b39fc]/10 text-[#7b39fc] border border-[#7b39fc]/20"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-(--accent)/10 text-(--accent) border border-(--accent)/20"
                       >
                         #{t}
                         <button
@@ -1300,7 +1300,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                       {newTagInput && (
                         <button
                           onClick={addTag}
-                          className="p-1 rounded-md bg-[#7b39fc] text-white text-xs"
+                          className="p-1 rounded-md bg-(--accent) text-white text-xs"
                         >
                           <Plus size={12} />
                         </button>
@@ -1327,7 +1327,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {activeDetailTask.subtasks && activeDetailTask.subtasks.length > 0 && (
                     <div className="w-full h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden mb-3">
                       <div
-                        className="h-full bg-gradient-to-r from-[#7b39fc] to-emerald-500 transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-(--accent) to-emerald-500 transition-all duration-300"
                         style={{
                           width: `${
                             (activeDetailTask.subtasks.filter((s) => s.done).length /
@@ -1409,7 +1409,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     value={activeDetailTask.description || ""}
                     onChange={(e) => updateDetailTask({ description: e.target.value })}
                     placeholder="Aggiungi una descrizione dettagliata per questo task..."
-                    className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/30 resize-y"
+                    className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-(--accent)/30 resize-y"
                   />
                 </div>
               </div>

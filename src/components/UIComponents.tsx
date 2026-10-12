@@ -107,7 +107,7 @@ export const EditableTitle = ({
 
 export const Card = ({ children, className = "" }) => (
   <div
-    className={`bg-white/40 dark:bg-gray-900/60 backdrop-blur-xl rounded-4xl shadow-xl shadow-[#7b39fc]/10 border border-[#7b39fc]/10 dark:border-gray-800/60 ${className}`}
+    className={`bg-white/40 dark:bg-gray-900/60 backdrop-blur-xl rounded-4xl shadow-xl shadow-(--accent)/10 border border-(--accent)/10 dark:border-gray-800/60 ${className}`}
   >
     {children}
   </div>
@@ -129,9 +129,9 @@ export const Button = ({
 
   const variants = {
     default:
-      "bg-[#7b39fc] text-white hover:bg-[#8b4dff] shadow-lg shadow-[#7b39fc]/25 dark:shadow-none hover:shadow-[#7b39fc]/40 border-none",
+      "bg-(--accent) text-white hover:bg-(--accent-hover) shadow-lg shadow-(--accent)/25 dark:shadow-none hover:shadow-(--accent)/40 border-none",
     ghost:
-      "hover:bg-[#7b39fc]/10 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 hover:text-[#7b39fc] dark:hover:text-[#a67cff]",
+      "hover:bg-(--accent)/10 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 hover:text-(--accent) dark:hover:text-(--accent-300)",
   };
 
   const sizes = {
@@ -152,14 +152,14 @@ export const Button = ({
 export const Input = ({ className = "", ...props }) => (
   <input
     {...props}
-    className={`w-full border dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#7b39fc] ${className}`}
+    className={`w-full border dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-(--accent) ${className}`}
   />
 );
 
 export const Badge = ({ children, className = "", variant = "default" }) => {
   const variants = {
     default:
-      "bg-[#7b39fc]/10 text-[#6d28d9] dark:bg-[#7b39fc]/25 dark:text-[#a67cff]",
+      "bg-(--accent)/10 text-[#6d28d9] dark:bg-(--accent)/25 dark:text-(--accent-300)",
     success:
       "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
     warning:
@@ -179,7 +179,7 @@ export const Progress = ({ value, className = "" }) => (
     className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden ${className}`}
   >
     <div
-      className="bg-[#7b39fc] h-full transition-all duration-500 ease-out rounded-full"
+      className="bg-(--accent) h-full transition-all duration-500 ease-out rounded-full"
       style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
     />
   </div>
@@ -190,7 +190,7 @@ export const Checkbox = ({ checked, onChange }) => (
     type="checkbox"
     checked={checked}
     onChange={onChange}
-    className="w-5 h-5 accent-[#7b39fc] rounded-lg cursor-pointer transition-transform active:scale-90"
+    className="w-5 h-5 accent-(--accent) rounded-lg cursor-pointer transition-transform active:scale-90"
   />
 );
 

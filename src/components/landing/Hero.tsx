@@ -37,7 +37,7 @@ export function Hero() {
         >
           <h1 className="font-inter text-4xl font-extrabold leading-[1.05] tracking-[-0.035em] text-gray-900 dark:text-white sm:text-5xl lg:text-[56px]">
             {beforeAccent}
-            <span className="bg-gradient-to-r from-[#7b39fc] to-[#a67cff] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-(--accent) to-(--accent-300) bg-clip-text text-transparent">
               {headlineAccent}
             </span>
             {afterAccent}
@@ -49,13 +49,13 @@ export function Hero() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href={ctaPrimaryHref}
-              className="inline-flex h-12 min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[#7b39fc] px-6 text-sm font-semibold text-white shadow-lg shadow-[#7b39fc]/20 transition-colors hover:bg-[#6d28d9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] focus-visible:ring-offset-2"
+              className="inline-flex h-12 min-w-[180px] items-center justify-center gap-2 rounded-xl bg-(--accent) px-6 text-sm font-semibold text-white shadow-lg shadow-(--accent)/20 transition-colors hover:bg-[#6d28d9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) focus-visible:ring-offset-2"
             >
               {ctaPrimary} <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href={ctaSecondaryHref}
-              className="inline-flex h-12 min-w-[180px] items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-6 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-transparent dark:text-white dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]"
+              className="inline-flex h-12 min-w-[180px] items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-6 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-transparent dark:text-white dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)"
             >
               <Play className="h-4 w-4" /> {ctaSecondary}
             </Link>

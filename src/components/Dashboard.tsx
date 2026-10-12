@@ -34,7 +34,7 @@ import {
   WidgetManagerMenu,
   type WidgetId,
 } from "./dashboard/widgets";
-import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 import { trackOnboardingEvent } from "../hooks/useOnboarding";
 import FileUploader from "./FileUploader";
@@ -58,13 +58,14 @@ const itemAnim = {
 };
 
 /**
- * Widget trascinabile (solo in modalità personalizzazione): la maniglia
- * ⋮⋮ nella toolbar avvia il drag (anche touch, `touch-none` sulla
- * maniglia così lo scroll resta libero altrove). Le frecce su/giù restano
- * come alternativa accessibile.
+ * Widget trascinabile (solo in modalità personalizzazione): HTML5 drag & drop
+ * nativo via maniglia ⋮⋮. Sopra/sotto la card appare la linea d'inserimento;
+ * il drop riordina davvero al punto voluto. Le frecce su/giù restano come
+ * alternativa accessibile e touch.
  */
 function SortableWidget({
   id,
+  index,
   isVisible,
   label,
   hiddenLabel,
@@ -74,9 +75,11 @@ function SortableWidget({
   onMoveUp,
   onMoveDown,
   onToggle,
+  onDropWidget,
   children,
 }: {
   id: WidgetId;
+  index: number;
   isVisible: boolean;
   label: string;
   hiddenLabel: string;
@@ -86,22 +89,53 @@ function SortableWidget({
   onMoveUp: () => void;
   onMoveDown: () => void;
   onToggle: () => void;
+  onDropWidget: (draggedId: WidgetId, targetIndex: number, pos: "before" | "after") => void;
   children: React.ReactNode;
 }) {
-  const controls = useDragControls();
+  const [dropPos, setDropPos] = useState<"before" | "after" | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const posFromEvent = (e: React.DragEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return e.clientY - rect.top < rect.height / 2 ? ("before" as const) : ("after" as const);
+  };
+
   return (
-    <Reorder.Item
-      as="div"
-      value={id}
-      dragListener={false}
-      dragControls={controls}
-      initial={false}
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = "move";
+        setDropPos(posFromEvent(e));
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+        setDropPos(null);
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const pos = posFromEvent(e);
+        setDropPos(null);
+        let draggedId = "";
+        try {
+          draggedId =
+            e.dataTransfer.getData("application/x-taskly-widget") ||
+            e.dataTransfer.getData("text/plain");
+        } catch {}
+        if (draggedId && draggedId !== id) {
+          onDropWidget(draggedId as WidgetId, index, pos);
+        }
+      }}
       className={`relative transition-colors rounded-3xl ${
         isVisible
-          ? "border-2 border-dashed border-[#7b39fc]/40 bg-[#7b39fc]/[0.02]"
+          ? "border-2 border-dashed border-(--accent)/40 bg-(--accent)/[0.02]"
           : "border-2 border-dashed border-gray-300 dark:border-gray-800 opacity-50 bg-gray-50/50 dark:bg-gray-900/20"
-      }`}
+      } ${isDragging ? "opacity-50" : ""}`}
     >
+      {dropPos === "before" && (
+        <div className="h-1 rounded-full bg-(--accent) mx-4 mt-2" aria-hidden="true" />
+      )}
       <WidgetEditToolbar
         label={label}
         isVisible={isVisible}
@@ -111,11 +145,26 @@ function SortableWidget({
         onMoveDown={onMoveDown}
         onToggle={onToggle}
         hiddenLabel={hiddenLabel}
-        dragControls={controls}
         dragTitle={dragTitle}
+        isDragging={isDragging}
+        onDragStart={(e) => {
+          try {
+            e.dataTransfer.setData("application/x-taskly-widget", id);
+            e.dataTransfer.setData("text/plain", id);
+          } catch {}
+          e.dataTransfer.effectAllowed = "move";
+          setIsDragging(true);
+        }}
+        onDragEnd={() => {
+          setIsDragging(false);
+          setDropPos(null);
+        }}
       />
       {children}
-    </Reorder.Item>
+      {dropPos === "after" && (
+        <div className="h-1 rounded-full bg-(--accent) mx-4 mb-2" aria-hidden="true" />
+      )}
+    </div>
   );
 }
 
@@ -236,10 +285,24 @@ export default function Dashboard({
     persistConfig(nextOrder, visibleWidgets);
   };
 
-  // Drag & drop: riordino via maniglia, salvato live ad ogni spostamento.
-  const handleReorder = (nextOrder: WidgetId[]) => {
-    setWidgetOrder(nextOrder);
-    persistConfig(nextOrder, visibleWidgets);
+  // Drag & drop nativo: inserisce la trascinata prima/dopo la card di
+  // destinazione (coordinate già senza la trascinata), con compensazione
+  // quando resta tra gli stessi fratelli e si sposta verso il basso.
+  const moveWidgetTo = (
+    draggedId: WidgetId,
+    targetIndex: number,
+    pos: "before" | "after",
+  ) => {
+    const from = widgetOrder.indexOf(draggedId);
+    if (from === -1) return;
+    let at = pos === "before" ? targetIndex : targetIndex + 1;
+    if (from < at) at -= 1;
+    if (from === at) return;
+    const next = [...widgetOrder];
+    const [moved] = next.splice(from, 1);
+    next.splice(at, 0, moved);
+    setWidgetOrder(next);
+    persistConfig(next, visibleWidgets);
   };
 
   const applyPreset = (preset: "all" | "focus" | "analytics" | "minimal") => {
@@ -341,9 +404,9 @@ export default function Dashboard({
     {
       label: t("statActiveTasks", "Task Attivi"),
       value: safeTasks.length - completedTasks,
-      icon: <ListTodo className="text-[#7b39fc]" />,
-      bgClass: "bg-[#7b39fc]/10",
-      iconColor: "text-[#7b39fc]",
+      icon: <ListTodo className="text-(--accent)" />,
+      bgClass: "bg-(--accent)/10",
+      iconColor: "text-(--accent)",
       sub: t("statAwaiting", "In attesa"),
     },
     {
@@ -368,9 +431,9 @@ export default function Dashboard({
         todayFocus.length > 18
           ? todayFocus.substring(0, 18) + "..."
           : todayFocus,
-      icon: <Zap className="text-[#a67cff]" />,
-      bgClass: "bg-[#a67cff]/10",
-      iconColor: "text-[#a67cff]",
+      icon: <Zap className="text-(--accent-300)" />,
+      bgClass: "bg-(--accent-300)/10",
+      iconColor: "text-(--accent-300)",
       sub: t("statFocusSub", "Priorità chiave"),
     },
   ];
@@ -605,19 +668,14 @@ export default function Dashboard({
         </motion.div>
       )}
 
-      {/* Dynamically Ordered Widgets: drag & drop in personalizzazione */}
+      {/* Widget in ordine: drag & drop nativo in personalizzazione */}
       {isEditMode ? (
-        <Reorder.Group
-          as="div"
-          axis="y"
-          values={widgetOrder}
-          onReorder={handleReorder}
-          className="space-y-8"
-        >
+        <div className="space-y-8">
           {widgetOrder.map((wId, index) => (
             <SortableWidget
               key={wId}
               id={wId}
+              index={index}
               isVisible={visibleWidgets[wId] !== false}
               label={ALL_WIDGET_DEFS.find((w) => w.id === wId)?.label || wId}
               hiddenLabel="Nascosto"
@@ -627,11 +685,12 @@ export default function Dashboard({
               onMoveUp={() => moveWidget(index, "up")}
               onMoveDown={() => moveWidget(index, "down")}
               onToggle={() => toggleWidgetVisibility(wId)}
+              onDropWidget={moveWidgetTo}
             >
               {renderWidgetContent(wId)}
             </SortableWidget>
           ))}
-        </Reorder.Group>
+        </div>
       ) : (
         <div className="space-y-8">
           {widgetOrder.map((wId) => renderWidget(wId))}

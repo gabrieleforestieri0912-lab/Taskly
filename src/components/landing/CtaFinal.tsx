@@ -14,7 +14,7 @@ export function CtaFinal() {
         <div className="mt-8 flex flex-col items-center gap-4">
           <Link
             href="/signup"
-            className="inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-xl bg-white px-8 text-sm font-semibold text-[#7b39fc] hover:bg-gray-100"
+            className="inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-xl bg-white px-8 text-sm font-semibold text-(--accent) hover:bg-gray-100"
           >
             {cta} <ArrowRight className="h-4 w-4" />
           </Link>

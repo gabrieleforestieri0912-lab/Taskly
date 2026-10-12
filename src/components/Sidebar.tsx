@@ -562,7 +562,7 @@ export default function Sidebar({
           }}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 transition-colors"
         >
-          <span className="grid place-items-center w-6 h-6 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+          <span className="grid place-items-center w-6 h-6 rounded-lg bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300)">
             <Settings size={13} aria-hidden="true" />
           </span>
           {t("land.demoNavSettings")}
@@ -651,11 +651,11 @@ export default function Sidebar({
             <img
               src={user.picture}
               alt=""
-              className="w-10 h-10 rounded-full object-cover border border-[#7b39fc]/30 shrink-0"
+              className="w-10 h-10 rounded-full object-cover border border-(--accent)/30 shrink-0"
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center text-white font-black text-sm shadow-md shadow-[#7b39fc]/20 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-(--accent) to-(--accent-300) flex items-center justify-center text-white font-black text-sm shadow-md shadow-(--accent)/20 shrink-0">
               {(user.name || user.email || "U").charAt(0).toUpperCase()}
             </div>
           )}
@@ -664,7 +664,7 @@ export default function Sidebar({
               <p className="font-extrabold text-xs truncate text-gray-900 dark:text-white">
                 {user.name || "Utente"}
               </p>
-              <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+              <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300)">
                 Pro
               </span>
             </div>
@@ -686,7 +686,7 @@ export default function Sidebar({
             className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-bold transition-colors group"
           >
             <div className="flex items-center gap-2.5">
-              <div className="p-1 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/20 dark:text-[#a67cff]">
+              <div className="p-1 rounded-lg bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300)">
                 <Settings size={13} />
               </div>
               <span>Panoramica Impostazioni</span>
@@ -798,7 +798,7 @@ export default function Sidebar({
             className="flex items-center justify-between w-full px-2.5 py-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-white/5 rounded-xl text-xs font-medium transition-colors group"
           >
             <div className="flex items-center gap-2.5">
-              <div className="p-1 rounded-lg bg-[#7b39fc]/10 text-[#7b39fc]">
+              <div className="p-1 rounded-lg bg-(--accent)/10 text-(--accent)">
                 <CreditCard size={13} />
               </div>
               <span>Abbonamento & Fatturazione</span>
@@ -1623,12 +1623,12 @@ export default function Sidebar({
                 <img
                   src={user.picture}
                   alt=""
-                  className="w-5 h-5 rounded-full object-cover shrink-0 border border-[#7b39fc]/20"
+                  className="w-5 h-5 rounded-full object-cover shrink-0 border border-(--accent)/20"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-5 h-5 bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 rounded-full flex items-center justify-center shrink-0">
-                  <User size={11} aria-hidden="true" className="text-[#7b39fc] dark:text-[#a67cff]" />
+                <div className="w-5 h-5 bg-(--accent)/10 dark:bg-(--accent)/20 rounded-full flex items-center justify-center shrink-0">
+                  <User size={11} aria-hidden="true" className="text-(--accent) dark:text-(--accent-300)" />
                 </div>
               )}
               <span className="flex-1 text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">

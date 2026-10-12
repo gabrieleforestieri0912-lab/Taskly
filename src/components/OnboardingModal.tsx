@@ -548,7 +548,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         initial={shouldReduceMotion ? false : { scale: 0.7, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.05, duration: 0.35, type: "spring", stiffness: 300, damping: 20 }}
-                        className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#7b39fc] to-[#a67cff] text-white flex items-center justify-center mb-3 shadow-lg shadow-[#7b39fc]/30"
+                        className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-(--accent) to-(--accent-300) text-white flex items-center justify-center mb-3 shadow-lg shadow-(--accent)/30"
                       >
                         <Sparkles size={20} />
                       </motion.div>
@@ -585,7 +585,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Il tuo nome o nickname"
-                          className="w-full px-4 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/40 transition-all"
+                          className="w-full px-4 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-(--accent)/40 transition-all"
                         />
                       </div>
 
@@ -609,13 +609,13 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                                 className={`p-3 rounded-2xl border text-left flex flex-col gap-1 transition-all ${
                                   isSelected
-                                    ? "bg-[#7b39fc]/10 border-[#7b39fc] shadow-sm"
+                                    ? "bg-(--accent)/10 border-(--accent) shadow-sm"
                                     : "bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600"
                                 }`}
                               >
-                                <Icon size={16} className={isSelected ? "text-[#7b39fc]" : "text-gray-400 dark:text-gray-500"} />
+                                <Icon size={16} className={isSelected ? "text-(--accent)" : "text-gray-400 dark:text-gray-500"} />
                                 <div>
-                                  <div className={`font-bold text-[11px] ${isSelected ? "text-[#7b39fc]" : "text-gray-700 dark:text-gray-300"}`}>
+                                  <div className={`font-bold text-[11px] ${isSelected ? "text-(--accent)" : "text-gray-700 dark:text-gray-300"}`}>
                                     {label}
                                   </div>
                                   <div className="text-[9px] text-gray-400">{desc}</div>
@@ -633,7 +633,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         onClick={() => navigateToStep(2)}
                         whileHover={shouldReduceMotion ? undefined : { scale: 1.03, x: 2 }}
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold shadow-md shadow-[#7b39fc]/25 transition-all hover:brightness-110"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md shadow-(--accent)/25 transition-all hover:brightness-110"
                       >
                         <span>Continua</span>
                         <ArrowRight size={14} />
@@ -687,12 +687,12 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                             whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                             className={`w-full text-left p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
                               isSelected
-                                ? "bg-[#7b39fc]/5 border-[#7b39fc] shadow-sm"
+                                ? "bg-(--accent)/5 border-(--accent) shadow-sm"
                                 : "bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600"
                             }`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-[#7b39fc] shrink-0 shadow-sm">
+                              <div className="w-8 h-8 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-(--accent) shrink-0 shadow-sm">
                                 {tmpl.type === "tasks" ? <Rocket size={15} /> : <Calendar size={15} />}
                               </div>
                               <div>
@@ -704,7 +704,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                               animate={isSelected ? { scale: 1 } : { scale: 0.85 }}
                               className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
                                 isSelected
-                                  ? "bg-[#7b39fc] border-[#7b39fc]"
+                                  ? "bg-(--accent) border-(--accent)"
                                   : "border-gray-300 dark:border-gray-600"
                               }`}
                             >
@@ -728,7 +728,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         onClick={() => navigateToStep(3)}
                         whileHover={shouldReduceMotion ? undefined : { scale: 1.03, x: 2 }}
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold shadow-md shadow-[#7b39fc]/25 transition-all hover:brightness-110"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md shadow-(--accent)/25 transition-all hover:brightness-110"
                       >
                         <span>Continua</span>
                         <ArrowRight size={14} />
@@ -785,7 +785,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                           value={firstTaskTitle}
                           onChange={(e) => setFirstTaskTitle(e.target.value)}
                           placeholder="Es. Completare la revisione del progetto venerdì"
-                          className="w-full px-4 py-2 text-xs rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/40 transition-all"
+                          className="w-full px-4 py-2 text-xs rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-(--accent)/40 transition-all"
                         />
                         <p className="text-[11px] text-gray-400">
                           💡 Taskly riconosce date naturali come &quot;domani&quot; o &quot;venerdì&quot;!
@@ -835,7 +835,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         onClick={handleFinish}
                         whileHover={shouldReduceMotion ? undefined : { scale: 1.04 }}
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg shadow-[#7b39fc]/25 transition-all hover:brightness-110"
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg shadow-(--accent)/25 transition-all hover:brightness-110"
                         style={{ background: "linear-gradient(135deg, #7b39fc 0%, #10b981 100%)" }}
                       >
                         <span>Entra in Taskly</span>

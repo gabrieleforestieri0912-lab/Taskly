@@ -243,7 +243,7 @@ export default function CoachTour({
       {/* Emphasised border on the highlighted area. */}
       {found && spot && (
         <motion.div
-          className="absolute rounded-[14px] ring-2 ring-[#a67cff] shadow-[0_0_0_9999px_rgba(5,3,12,0.28)] pointer-events-none"
+          className="absolute rounded-[14px] ring-2 ring-(--accent-300) shadow-[0_0_0_9999px_rgba(5,3,12,0.28)] pointer-events-none"
           style={style}
           initial={reduce ? false : { opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -264,11 +264,11 @@ export default function CoachTour({
               ? { left: spot.rect.left, top: spot.rect.top, width: popSize.w }
               : { left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: popSize.w }
           }
-          className="absolute rounded-3xl border border-[#a67cff]/40 bg-white dark:bg-gray-900 shadow-2xl p-5"
+          className="absolute rounded-3xl border border-(--accent-300)/40 bg-white dark:bg-gray-900 shadow-2xl p-5"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[10px] font-black uppercase tracking-widest text-[#7b39fc] dark:text-[#a67cff]">
+              <div className="text-[10px] font-black uppercase tracking-widest text-(--accent) dark:text-(--accent-300)">
                 {index + 1} / {steps.length}
               </div>
               <h3 className="text-sm font-black text-gray-900 dark:text-white mt-1">
@@ -299,7 +299,7 @@ export default function CoachTour({
             </button>
             <button
               onClick={() => go(index + 1)}
-              className="px-4 py-2 rounded-xl bg-[#7b39fc] text-white text-[11px] font-black hover:brightness-110 shadow-md shadow-[#7b39fc]/25 transition-all"
+              className="px-4 py-2 rounded-xl bg-(--accent) text-white text-[11px] font-black hover:brightness-110 shadow-md shadow-(--accent)/25 transition-all"
             >
               {index === steps.length - 1 ? finishLabel : "Avanti"}
             </button>

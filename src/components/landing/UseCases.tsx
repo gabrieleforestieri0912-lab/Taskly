@@ -30,7 +30,7 @@ export function UseCases() {
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-gray-900 dark:text-white">{c.persona}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{c.desc}</p>
-                <div className="mt-4 rounded-full bg-[#f4f0fd] dark:bg-[#7b39fc]/20 px-3 py-1.5 text-xs font-medium text-[#7b39fc] dark:text-[#a67cff] text-center">
+                <div className="mt-4 rounded-full bg-[#f4f0fd] dark:bg-(--accent)/20 px-3 py-1.5 text-xs font-medium text-(--accent) dark:text-(--accent-300) text-center">
                   {c.flow}
                 </div>
               </StaggerItem>

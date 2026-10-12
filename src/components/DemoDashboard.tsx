@@ -145,13 +145,13 @@ export default function DemoDashboard() {
         <main className="flex-1 p-6 md:p-8 space-y-6 max-w-5xl">
           <div className="flex items-center justify-between">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7b39fc] to-[#a67cff] flex items-center justify-center shrink-0 shadow-lg shadow-[#7b39fc]/25">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-(--accent) to-(--accent-300) flex items-center justify-center shrink-0 shadow-lg shadow-(--accent)/25">
                 <Sparkles size={22} className="text-white/90" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="h-px w-6 bg-gradient-to-r from-[#7b39fc]/0 to-[#7b39fc]" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7b39fc] dark:text-[#a67cff]">{t("land.mockNavDashboard")}</span>
+                  <span className="h-px w-6 bg-gradient-to-r from-(--accent)/0 to-(--accent)" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-(--accent) dark:text-(--accent-300)">{t("land.mockNavDashboard")}</span>
                 </div>
                 <h1 className="text-2xl font-bold">{t("land.demoTitle")}</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t("land.demoSubtitle")}</p>

@@ -293,7 +293,7 @@ export default function WorkspaceComments({
             <button
               type="submit"
               disabled={!body.trim() || saving}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#7b39fc] px-3 py-1.5 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-(--accent) px-3 py-1.5 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Send size={13} aria-hidden="true" />
               {saving ? "Invio…" : "Commenta"}

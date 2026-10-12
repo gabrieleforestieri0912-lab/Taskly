@@ -437,7 +437,7 @@ export default function AddPageModal({ isOpen, onClose, onAdd, onOpenTemplateGal
               onClose && onClose();
               if (onOpenTemplateGallery) onOpenTemplateGallery();
             }}
-            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-[#7b39fc] hover:underline px-2 py-2"
+            className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.15em] text-(--accent) hover:underline px-2 py-2"
           >
             <Sparkles size={13} /> Galleria template
           </button>

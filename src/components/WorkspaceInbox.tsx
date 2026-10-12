@@ -178,7 +178,7 @@ export default function WorkspaceInbox() {
                       type="button"
                       onClick={() => void openNotification(item)}
                       disabled={busyId !== null}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#7b39fc] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-(--accent) px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                     >
                       <ExternalLink size={13} aria-hidden="true" />
                       Apri

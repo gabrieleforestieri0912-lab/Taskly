@@ -120,7 +120,7 @@ export default function TemplateGalleryModal({
         {/* Modal Top Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-(--accent)/10 text-(--accent) flex items-center justify-center shrink-0">
               <Sparkles size={18} />
             </div>
             <div>
@@ -177,7 +177,7 @@ export default function TemplateGalleryModal({
                     {effectivePreview.description}
                   </p>
                   {editableMode && (
-                    <p className="text-[10px] font-bold text-[#7b39fc] mt-1 uppercase tracking-wider">
+                    <p className="text-[10px] font-bold text-(--accent) mt-1 uppercase tracking-wider">
                       Si apre come pagina libera modificabile
                     </p>
                   )}
@@ -304,7 +304,7 @@ export default function TemplateGalleryModal({
                   onSelectTemplate(toEffective(previewingTemplate!));
                   onClose();
                 }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7b39fc] text-white text-xs font-bold hover:brightness-110 shadow-md shadow-[#7b39fc]/20 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:brightness-110 shadow-md shadow-(--accent)/20 transition-all"
               >
                 <span>{editableMode ? "Usa come pagina modificabile" : "Usa questo template"}</span>
                 <ArrowRight size={14} />
@@ -315,7 +315,7 @@ export default function TemplateGalleryModal({
           // ── Gallery Grid View ──────────────────────────────────────────
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Toggle pagina modificabile */}
-            <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-[#7b39fc]/5 border border-[#7b39fc]/15">
+            <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-(--accent)/5 border border-(--accent)/15">
               <div className="min-w-0">
                 <p className="text-xs font-bold text-gray-800 dark:text-gray-100 leading-tight">
                   {editableMode ? "Pagina libera modificabile (come Pagina Vuota)" : "Vista strutturata originale"}
@@ -331,7 +331,7 @@ export default function TemplateGalleryModal({
                 role="switch"
                 aria-checked={editableMode}
                 onClick={() => setEditableMode((v) => !v)}
-                className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${editableMode ? "bg-[#7b39fc]" : "bg-gray-300 dark:bg-gray-700"}`}
+                className={`relative w-10 h-6 rounded-full transition-colors shrink-0 ${editableMode ? "bg-(--accent)" : "bg-gray-300 dark:bg-gray-700"}`}
                 title={editableMode ? "Disattiva pagina modificabile" : "Attiva pagina modificabile"}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${editableMode ? "left-[18px]" : "left-0.5"}`} />
@@ -347,7 +347,7 @@ export default function TemplateGalleryModal({
                     onClick={() => setSelectedCategory(cat)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                       selectedCategory === cat
-                        ? "bg-[#7b39fc] text-white shadow-sm"
+                        ? "bg-(--accent) text-white shadow-sm"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200"
                     }`}
                   >
@@ -367,7 +367,7 @@ export default function TemplateGalleryModal({
                   placeholder="Cerca tra i template..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/40"
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-(--accent)/40"
                 />
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function TemplateGalleryModal({
               {filteredTemplates.map((template) => (
                 <div
                   key={template.id}
-                  className="group flex flex-col justify-between p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-[#7b39fc]/40 hover:shadow-lg hover:shadow-[#7b39fc]/5 transition-all"
+                  className="group flex flex-col justify-between p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-(--accent)/40 hover:shadow-lg hover:shadow-(--accent)/5 transition-all"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
@@ -392,7 +392,7 @@ export default function TemplateGalleryModal({
                     </div>
 
                     <div>
-                      <h4 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#7b39fc] transition-colors">
+                      <h4 className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-(--accent) transition-colors">
                         {template.title}
                       </h4>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed">
@@ -413,7 +413,7 @@ export default function TemplateGalleryModal({
                         onSelectTemplate(toEffective(template));
                         onClose();
                       }}
-                      className="flex-1 py-1.5 rounded-xl text-xs font-bold text-white bg-[#7b39fc] hover:brightness-110 shadow-sm transition-all"
+                      className="flex-1 py-1.5 rounded-xl text-xs font-bold text-white bg-(--accent) hover:brightness-110 shadow-sm transition-all"
                     >
                       Usa
                     </button>

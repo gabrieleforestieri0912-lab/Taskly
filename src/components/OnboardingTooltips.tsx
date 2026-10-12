@@ -71,10 +71,10 @@ export function OneTimeTooltip({
         initial={{ opacity: 0, y: position === "bottom" ? -6 : 6 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
-        className={`absolute ${position === "bottom" ? "top-full mt-2" : "bottom-full mb-2"} left-0 z-50 w-60 rounded-2xl border border-[#7b39fc]/25 bg-white dark:bg-gray-900 shadow-2xl p-3`}
+        className={`absolute ${position === "bottom" ? "top-full mt-2" : "bottom-full mb-2"} left-0 z-50 w-60 rounded-2xl border border-(--accent)/25 bg-white dark:bg-gray-900 shadow-2xl p-3`}
       >
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-[#7b39fc]">
+          <div className="flex items-center gap-1.5 text-(--accent)">
             <Sparkles size={13} />
             <span className="text-[11px] font-black uppercase tracking-widest">Suggerimento</span>
           </div>
@@ -86,7 +86,7 @@ export function OneTimeTooltip({
         <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{body}</p>
         <button
           onClick={dismiss}
-          className="mt-2 w-full py-1.5 rounded-xl text-[11px] font-bold text-white bg-[#7b39fc] hover:brightness-110"
+          className="mt-2 w-full py-1.5 rounded-xl text-[11px] font-bold text-white bg-(--accent) hover:brightness-110"
         >
           Capito
         </button>

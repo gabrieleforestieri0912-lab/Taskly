@@ -27,7 +27,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] rounded"
+              className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) rounded"
             >
               {link.label}
             </Link>
@@ -43,7 +43,7 @@ export function Navbar() {
           </Link>
           <Link
             href="/signup"
-            className="inline-flex h-8 items-center justify-center rounded-lg bg-[#7b39fc] px-4 text-sm font-medium text-white hover:bg-[#6d28d9]"
+            className="inline-flex h-8 items-center justify-center rounded-lg bg-(--accent) px-4 text-sm font-medium text-white hover:bg-[#6d28d9]"
           >
             {ctaPrimary}
           </Link>
@@ -83,7 +83,7 @@ export function Navbar() {
                 <Link
                   href="/signup"
                   onClick={() => setOpen(false)}
-                  className="inline-flex h-9 items-center justify-center rounded-lg bg-[#7b39fc] px-4 text-sm font-medium text-white hover:bg-[#6d28d9]"
+                  className="inline-flex h-9 items-center justify-center rounded-lg bg-(--accent) px-4 text-sm font-medium text-white hover:bg-[#6d28d9]"
                 >
                   {ctaPrimary}
                 </Link>

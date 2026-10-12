@@ -37,6 +37,37 @@
   --color-gray-850: #171717;
 }
 
+/* ── Accento utente ────────────────────────────────────────────────────
+   Il colore scelto nelle impostazioni guida l'interfaccia via variables
+   impostate da applyAccent()/accentBootstrapScript() (src/lib/accent.ts).
+   Regole non-layered: vincono sui valori statici di @theme.
+   --accent-* sono i toni calcolati in JS; le tinte si derivano con
+   color-mix così seguono l'accento in entrambe le modalità. */
+:root {
+  --accent: #7b39fc;
+  --accent-hover: #6c2ff0;
+  --accent-active: #5f27d8;
+  --accent-300: #a67cff;
+  --accent-900: #3d1d86;
+  --accent-ink: #ffffff;
+
+  --color-primary: var(--accent);
+
+  /* La scala cyan è l'accento funzionale dell'app (vedi @theme sopra):
+     ora segue il colore scelto dall'utente invece del viola fisso. */
+  --color-cyan-50: color-mix(in srgb, var(--accent) 7%, white);
+  --color-cyan-100: color-mix(in srgb, var(--accent) 15%, white);
+  --color-cyan-200: color-mix(in srgb, var(--accent) 30%, white);
+  --color-cyan-300: var(--accent-300);
+  --color-cyan-400: var(--accent-300);
+  --color-cyan-500: var(--accent);
+  --color-cyan-600: var(--accent);
+  --color-cyan-700: var(--accent-hover);
+  --color-cyan-800: var(--accent-active);
+  --color-cyan-900: var(--accent-900);
+  --color-cyan-950: color-mix(in srgb, var(--accent) 30%, black);
+}
+
 @variant dark (&:where(.dark, .dark *));
 
 /* App-pages dark surfaces.
@@ -144,7 +175,7 @@
 
   /* Separatore tra sezioni: mantiene il ritmo senza cambiare sfondo. */
   .landing-section-divider {
-    @apply border-t border-[#7b39fc]/10 dark:border-white/10;
+    @apply border-t border-(--accent)/10 dark:border-white/10;
   }
 
   .landing-section-light {
@@ -159,7 +190,7 @@
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-[10px] text-xs font-semibold font-inter mb-5 uppercase tracking-[0.18em];
     background: rgba(123, 57, 252, 0.08);
     border: 1px solid rgba(123, 57, 252, 0.22);
-    color: #7b39fc;
+    color: var(--accent);
   }
 
   .dark .landing-eyebrow {
@@ -181,7 +212,7 @@
   }
 
   .landing-display-accent {
-    @apply font-inter not-italic text-[#7b39fc] dark:text-[#a67cff];
+    @apply font-inter not-italic text-(--accent) dark:text-(--accent-300);
   }
 
   .landing-body {
@@ -189,15 +220,15 @@
   }
 
   .landing-card {
-    @apply rounded-2xl border border-[#7b39fc]/10 dark:border-white/10 bg-white/90 dark:bg-white/5 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-[#7b39fc]/10;
+    @apply rounded-2xl border border-(--accent)/10 dark:border-white/10 bg-white/90 dark:bg-white/5 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-(--accent)/10;
   }
 
   .landing-icon-wrap {
-    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff];
+    @apply flex h-10 w-10 items-center justify-center rounded-xl bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/15 dark:text-(--accent-300);
   }
 
   .landing-btn-primary {
-    @apply font-inter inline-flex h-[52px] min-w-[180px] items-center justify-center gap-2 rounded-[10px] bg-[#7b39fc] px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-[#8b4dff];
+    @apply font-inter inline-flex h-[52px] min-w-[180px] items-center justify-center gap-2 rounded-[10px] bg-(--accent) px-8 text-base font-semibold tracking-[-0.01em] text-white transition-colors hover:bg-(--accent-hover);
   }
 
   .landing-btn-secondary {
@@ -205,25 +236,25 @@
   }
 
   .landing-stat-card {
-    @apply rounded-xl bg-[#7b39fc]/8 dark:bg-[#7b39fc]/10 border border-[#7b39fc]/12 dark:border-white/10 p-5;
+    @apply rounded-xl bg-(--accent)/8 dark:bg-(--accent)/10 border border-(--accent)/12 dark:border-white/10 p-5;
   }
 
   .text-gradient-brand {
-    color: #7b39fc;
+    color: var(--accent);
   }
 
   .dark .text-gradient-brand {
-    color: #a67cff;
+    color: var(--accent-300);
   }
 
   .text-gradient-purple,
   .text-gradient-cyan {
-    color: #7b39fc;
+    color: var(--accent);
   }
 
   .dark .text-gradient-purple,
   .dark .text-gradient-cyan {
-    color: #a67cff;
+    color: var(--accent-300);
   }
 }
 
@@ -316,7 +347,7 @@
 
 .tl-toolbar button.is-active {
   background: #eae2fb;
-  color: #7b39fc;
+  color: var(--accent);
 }
 
 .tl-toolbar .tl-toolbar-sep {
@@ -405,7 +436,7 @@
 }
 
 .tl-editor blockquote {
-  border-left: 3px solid #7b39fc;
+  border-left: 3px solid var(--accent);
   padding: 2px 0 2px 1em;
   color: #64748b;
 }
@@ -440,7 +471,7 @@
 }
 
 .tl-editor a.internal-link {
-  color: #7b39fc;
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -507,7 +538,7 @@
 }
 
 .toggle-handle:hover {
-  color: #7b39fc;
+  color: var(--accent);
 }
 
 .toggle-block[data-open="true"] .toggle-handle {
@@ -653,7 +684,7 @@
 }
 
 .tl-bubble button.is-active {
-  background: #7b39fc;
+  background: var(--accent);
   color: #fff;
 }
 
@@ -675,7 +706,7 @@
 
 .dark .tl-toolbar button.is-active {
   background: #000000;
-  color: #a67cff;
+  color: var(--accent-300);
 }
 
 .dark .tl-toolbar .tl-toolbar-sep {
@@ -712,7 +743,7 @@
 
 .dark .tl-editor .mention {
   background: #000000;
-  color: #a67cff;
+  color: var(--accent-300);
 }
 
 .dark .tl-hint {
@@ -782,7 +813,7 @@
 }
 
 .dark .tl-bubble button.is-active {
-  background: #7b39fc;
+  background: var(--accent);
   color: #fff;
 }
 
@@ -821,7 +852,7 @@
 }
 
 .tl-link-input:focus {
-  border-color: #7b39fc;
+  border-color: var(--accent);
 }
 
 .tl-link-editor button {
@@ -855,12 +886,12 @@
 }
 
 .tl-editor ul[data-type="taskList"] li > label:hover span {
-  border-color: #7b39fc;
+  border-color: var(--accent);
 }
 
 .tl-editor ul[data-type="taskList"] li[data-checked="true"] > label span {
-  background: #7b39fc;
-  border-color: #7b39fc;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .tl-editor ul[data-type="taskList"] li[data-checked="true"] > label span::after {
@@ -907,12 +938,12 @@
 }
 
 .dark .tl-editor ul[data-type="taskList"] li > label:hover span {
-  border-color: #a67cff;
+  border-color: var(--accent-300);
 }
 
 .dark .tl-editor ul[data-type="taskList"] li[data-checked="true"] > label span {
-  background: #7b39fc;
-  border-color: #7b39fc;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ── To-do list (TaskList/TaskItem) ─────────────────────────────────── */
@@ -978,7 +1009,7 @@
   text-align: center;
   font-size: 10px;
   line-height: 1.1;
-  color: #7b39fc;
+  color: var(--accent);
   user-select: none;
   -webkit-user-select: none;
 }
@@ -1020,7 +1051,7 @@
 }
 
 .dark .tl-editor .inline-toggle-handle {
-  color: #a67cff;
+  color: var(--accent-300);
 }
 
 @theme inline {
@@ -1041,7 +1072,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #7b39fc;
+  --primary: var(--accent);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -1052,7 +1083,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: #7b39fc;
+  --ring: var(--accent);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -1060,12 +1091,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #7b39fc;
+  --sidebar-primary: var(--accent);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: #7b39fc;
+  --sidebar-ring: var(--accent);
 }
 
 .dark {
@@ -1075,7 +1106,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #7b39fc;
+  --primary: var(--accent);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.05 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -1086,5 +1117,5 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #a67cff;
+  --ring: var(--accent-300);
 }

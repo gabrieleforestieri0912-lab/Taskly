@@ -260,7 +260,7 @@ export default function Navbar({
       "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white";
 
     const navButtonClass =
-      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]/40";
+      "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)/40";
 
     return (
       <>
@@ -345,9 +345,9 @@ export default function Navbar({
                               key={child.name}
                               href={child.href}
                               onClick={scrollToHash(child.href)}
-                              className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 hover:bg-[#7b39fc]/15"
+                              className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 hover:bg-(--accent)/15"
                             >
-                              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#7b39fc]/15 text-[#a67cff]">
+                              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-(--accent)/15 text-(--accent-300)">
                                 <Icon size={17} />
                               </span>
                               <span className="min-w-0">
@@ -378,7 +378,7 @@ export default function Navbar({
                 <div className="flex items-center gap-2">
                   <Link
                     href="/dashboard"
-                    className="font-inter inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(123,57,252,0.35)] transition-all duration-300 hover:bg-[#8b4dff] hover:shadow-[0_10px_32px_rgba(123,57,252,0.5)]"
+                    className="font-inter inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-(--accent) px-5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(123,57,252,0.35)] transition-all duration-300 hover:bg-(--accent-hover) hover:shadow-[0_10px_32px_rgba(123,57,252,0.5)]"
                   >
                     <LayoutDashboard size={15} />
                     {t("dashboard")}
@@ -388,7 +388,7 @@ export default function Navbar({
                     <button
                       type="button"
                       onClick={() => setDropdownOpen((open) => !open)}
-                      className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[#7b39fc] text-white shadow-sm ring-2 ring-white/20 transition-colors hover:bg-[#8b4dff]"
+                      className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-(--accent) text-white shadow-sm ring-2 ring-white/20 transition-colors hover:bg-(--accent-hover)"
                       aria-label={t("land.navAccountLabel")}
                     >
                       {user.picture ? (
@@ -445,7 +445,7 @@ export default function Navbar({
                   </Link>
                   <Link
                     href="/register"
-                    className="font-inter inline-flex h-9 items-center justify-center rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
+                    className="font-inter inline-flex h-9 items-center justify-center rounded-full bg-(--accent) px-5 text-sm font-semibold text-white transition-colors hover:bg-(--accent-hover)"
                   >
                     {t("start")}
                   </Link>
@@ -457,7 +457,7 @@ export default function Navbar({
             <button
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition-colors hover:bg-[#7b39fc]/10 xl:hidden dark:text-white dark:hover:bg-white/10"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-900 transition-colors hover:bg-(--accent)/10 xl:hidden dark:text-white dark:hover:bg-white/10"
               aria-label={t("land.demoMenu")}
             >
               <Menu size={22} />
@@ -535,7 +535,7 @@ export default function Navbar({
                                     onClick={scrollToHash(child.href)}
                                     className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200"
                                   >
-                                    <child.icon size={16} className="text-[#a67cff]" />
+                                    <child.icon size={16} className="text-(--accent-300)" />
                                     {child.name}
                                   </Link>
                                 ))}
@@ -578,7 +578,7 @@ export default function Navbar({
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
+                    className="font-inter inline-flex h-12 items-center justify-center rounded-full bg-(--accent) px-5 text-sm font-semibold text-white transition-colors hover:bg-(--accent-hover)"
                   >
                     {t("start")}
                   </Link>
@@ -590,7 +590,7 @@ export default function Navbar({
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
+                    className="font-inter inline-flex h-12 items-center justify-center gap-2 rounded-full bg-(--accent) px-5 text-sm font-semibold text-white transition-colors hover:bg-(--accent-hover)"
                   >
                     <LayoutDashboard size={16} />
                     {t("dashboard")}
@@ -664,7 +664,7 @@ export default function Navbar({
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#7b39fc] text-white">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-(--accent) text-white">
                     <User size={14} />
                   </span>
                 )}
@@ -771,7 +771,7 @@ export default function Navbar({
                             onClick={() => setOpenMenu(null)}
                             className="flex items-start gap-3 rounded-xl px-3.5 py-3 text-left transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
                           >
-                            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#7b39fc]/10 text-[#7b39fc] dark:bg-[#7b39fc]/15 dark:text-[#a67cff]">
+                            <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/15 dark:text-(--accent-300)">
                               <ChildIcon size={17} />
                             </span>
                             <span className="min-w-0">
@@ -805,7 +805,7 @@ export default function Navbar({
               </Link>
               <Link
                 href="/register"
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-[#7b39fc] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#8b4dff]"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-(--accent) px-5 text-sm font-semibold text-white transition-colors hover:bg-(--accent-hover)"
               >
                 {t("start")}
               </Link>
@@ -855,7 +855,7 @@ export default function Navbar({
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex h-11 items-center justify-center rounded-lg bg-[#7b39fc] text-sm font-semibold text-white"
+                  className="inline-flex h-11 items-center justify-center rounded-lg bg-(--accent) text-sm font-semibold text-white"
                 >
                   {t("start")}
                 </Link>

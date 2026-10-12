@@ -121,18 +121,18 @@ export default function IntegrationsPage() {
   };
 
   const inp =
-    "w-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#7b39fc]/40";
+    "w-full bg-gray-50 dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)/40";
 
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-black px-6 py-12">
       <div className="mx-auto max-w-4xl">
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-[#7b39fc] dark:hover:text-[#a67cff]">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300)">
           <ArrowLeft size={16} />{t("land.mockNavDashboard")}</Link>
         <h1 className="mt-8 text-3xl font-black text-gray-900 dark:text-white">{t("auth.intTitle")}</h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t("auth.intSubtitle")}</p>
 
         {status && (
-          <div className="mt-6 px-4 py-3 rounded-xl border border-[#7b39fc]/25 bg-[#7b39fc]/10 text-sm font-bold text-[#7b39fc] dark:text-[#a67cff]">
+          <div className="mt-6 px-4 py-3 rounded-xl border border-(--accent)/25 bg-(--accent)/10 text-sm font-bold text-(--accent) dark:text-(--accent-300)">
             {status}
           </div>
         )}
@@ -158,7 +158,7 @@ export default function IntegrationsPage() {
             <button
               onClick={connected.google ? disconnectGoogle : connectGoogle}
               disabled={googleBusy}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-xs font-bold transition-all disabled:opacity-60"
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-(--accent) hover:brightness-110 text-white text-xs font-bold transition-all disabled:opacity-60"
             >
               {googleBusy ? <Loader2 size={14} /> : connected.google ? <ExternalLink size={14} /> : <LinkIcon size={14} />}
               {googleBusy ? "..." : connected.google ? t("auth.intDisconnect") : t("auth.intConnect")}
@@ -204,7 +204,7 @@ export default function IntegrationsPage() {
                 <button
                   onClick={connectSlack}
                   disabled={slackBusy}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#7b39fc] hover:brightness-110 text-white text-sm font-bold transition-all disabled:opacity-60"
+                  className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-(--accent) hover:brightness-110 text-white text-sm font-bold transition-all disabled:opacity-60"
                 >
                   {slackBusy ? <Loader2 size={14} /> : <LinkIcon size={14} />}
                   Collega webhook
@@ -223,7 +223,7 @@ export default function IntegrationsPage() {
                 <button
                   onClick={testSlack}
                   disabled={slackBusy}
-                  className="shrink-0 px-4 py-2.5 rounded-xl border border-[#7b39fc]/40 text-[#7b39fc] dark:text-[#a67cff] text-sm font-bold hover:bg-[#7b39fc]/10 transition-all disabled:opacity-60"
+                  className="shrink-0 px-4 py-2.5 rounded-xl border border-(--accent)/40 text-(--accent) dark:text-(--accent-300) text-sm font-bold hover:bg-(--accent)/10 transition-all disabled:opacity-60"
                 >
                   {slackBusy ? <Loader2 size={14} className="animate-spin inline" /> : t("auth.intSendTest")}
                 </button>

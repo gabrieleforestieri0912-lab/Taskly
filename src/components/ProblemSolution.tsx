@@ -25,7 +25,7 @@ export default function ProblemSolution() {
         t("land.psSolution2"),
         t("land.psSolution3"),
       ],
-      tone: "from-[#7b39fc]/5 to-purple-50 dark:from-[#7b39fc]/10 dark:to-white/5 border-[#7b39fc]/20 dark:border-white/10",
+      tone: "from-(--accent)/5 to-purple-50 dark:from-(--accent)/10 dark:to-white/5 border-(--accent)/20 dark:border-white/10",
       icon: CheckCircle,
     },
   ];
@@ -59,7 +59,7 @@ export default function ProblemSolution() {
                 className={`rounded-2xl border p-6 bg-linear-to-br ${block.tone}`}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <Icon size={20} className={bi === 0 ? "text-rose-500" : "text-[#7b39fc] dark:text-[#a67cff]"} />
+                  <Icon size={20} className={bi === 0 ? "text-rose-500" : "text-(--accent) dark:text-(--accent-300)"} />
                   <h3 className="text-xl font-black text-gray-900 dark:text-white">{block.title}</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
@@ -78,7 +78,7 @@ export default function ProblemSolution() {
         <div className="mt-8 grid md:grid-cols-3 gap-4">
           {metrics.map((m) => (
             <div key={m.value} className="landing-stat-card text-center">
-              <p className="text-2xl font-black text-[#7b39fc]">{m.value}</p>
+              <p className="text-2xl font-black text-(--accent)">{m.value}</p>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 font-medium">{m.label}</p>
             </div>
           ))}

@@ -85,9 +85,9 @@ const SOCIALS = [
             <div className="mt-6 space-y-2.5">
               <a
                 href="mailto:gabriele.forestieri0912@gmail.com"
-                className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:text-[#7b39fc] dark:hover:text-[#a67cff]"
+                className="flex items-center gap-2.5 text-sm text-gray-600 dark:text-gray-300 transition-colors hover:text-(--accent) dark:hover:text-(--accent-300)"
               >
-                <Mail size={15} className="shrink-0 text-[#7b39fc]/70" />
+                <Mail size={15} className="shrink-0 text-(--accent)/70" />
                 gabriele.forestieri0912@gmail.com
               </a>
             </div>
@@ -102,7 +102,7 @@ const SOCIALS = [
                     target="_blank"
                     rel="noreferrer"
                     aria-label={s.label}
-                    className="grid h-9 w-9 place-items-center rounded-xl border border-gray-200 bg-white text-gray-500 transition-colors hover:border-[#7b39fc] hover:text-[#7b39fc] dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:text-[#a67cff]"
+                    className="grid h-9 w-9 place-items-center rounded-xl border border-gray-200 bg-white text-gray-500 transition-colors hover:border-(--accent) hover:text-(--accent) dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:text-(--accent-300)"
                   >
                     <Icon size={16} />
                   </a>
@@ -122,7 +122,7 @@ const SOCIALS = [
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="group inline-flex items-center gap-1 text-gray-600 transition-colors hover:text-[#7b39fc] dark:text-gray-300 dark:hover:text-[#a67cff]"
+                      className="group inline-flex items-center gap-1 text-gray-600 transition-colors hover:text-(--accent) dark:text-gray-300 dark:hover:text-(--accent-300)"
                     >
                       {link.label}
                       <ArrowUpRight
@@ -150,15 +150,15 @@ const SOCIALS = [
           <div className="flex items-center gap-6 text-xs">
             <Link
               href="/privacy"
-              className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
+              className="text-gray-400 transition-colors hover:text-(--accent) dark:text-gray-500 dark:hover:text-(--accent-300)"
             >{t("land.footerLinkPrivacy")}</Link>
             <Link
               href="/terms"
-              className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
+              className="text-gray-400 transition-colors hover:text-(--accent) dark:text-gray-500 dark:hover:text-(--accent-300)"
             >{t("land.footerLinkTerms")}</Link>
             <Link
               href="/docs"
-              className="text-gray-400 transition-colors hover:text-[#7b39fc] dark:text-gray-500 dark:hover:text-[#a67cff]"
+              className="text-gray-400 transition-colors hover:text-(--accent) dark:text-gray-500 dark:hover:text-(--accent-300)"
             >{t("auth.docsTitle")}</Link>
           </div>
         </div>

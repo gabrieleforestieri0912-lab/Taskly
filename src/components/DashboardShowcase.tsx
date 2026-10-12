@@ -150,7 +150,7 @@ const DEMO_PAGES = [
   {
     id: "p1",
     label: "Roadmap Q4",
-    iconColor: "text-[#7b39fc]",
+    iconColor: "text-(--accent)",
     isFavorite: true,
     demoUpdatedAt: demoUpdatedAt(4),
   },
@@ -305,7 +305,7 @@ function PreviewSidebar({
       <div className="flex items-center px-3 pt-3 pb-1 gap-1">
         <span className="flex shrink-0 items-center gap-2 rounded-xl px-2.5 py-1.5">
           {/* Logo: replica statica di /taskly.png per non dipendere da next/image */}
-          <span className="shrink-0 w-[26px] h-[26px] rounded-lg bg-gradient-to-br from-[#7b39fc] to-[#5a1fd4]" />
+          <span className="shrink-0 w-[26px] h-[26px] rounded-lg bg-gradient-to-br from-(--accent) to-[#5a1fd4]" />
           <span className="font-inter text-[11px] font-bold text-gray-800">Taskly</span>
         </span>
         <span className="md:hidden p-1.5 rounded-xl text-gray-400">
@@ -429,8 +429,8 @@ function PreviewSidebar({
       {/* Account row */}
       <div className="border-t border-gray-100 px-2 py-2 flex items-center gap-1.5">
         <div className="flex flex-1 items-center gap-2 px-2 py-1.5 rounded-lg min-w-0">
-          <div className="w-6 h-6 bg-[#7b39fc]/10 rounded-full flex items-center justify-center shrink-0">
-            <User size={13} aria-hidden="true" className="text-[#7b39fc]" />
+          <div className="w-6 h-6 bg-(--accent)/10 rounded-full flex items-center justify-center shrink-0">
+            <User size={13} aria-hidden="true" className="text-(--accent)" />
           </div>
           <span className="flex-1 text-sm font-bold text-gray-800 truncate">Sofia Rossi</span>
           <span className="text-gray-400 shrink-0">
@@ -584,8 +584,8 @@ export default function DashboardShowcase() {
     {
       label: t("statActiveTasks", "Task Attivi"),
       value: activeTasks.length,
-      icon: <ListTodo className="text-[#7b39fc]" />,
-      bgClass: "bg-[#7b39fc]/10",
+      icon: <ListTodo className="text-(--accent)" />,
+      bgClass: "bg-(--accent)/10",
       sub: t("statAwaiting", "In attesa"),
     },
     {
@@ -605,8 +605,8 @@ export default function DashboardShowcase() {
     {
       label: t("statFocus", "Focus di Oggi"),
       value: "Chiudere la...",
-      icon: <Sparkles className="text-[#a67cff]" />,
-      bgClass: "bg-[#a67cff]/10",
+      icon: <Sparkles className="text-(--accent-300)" />,
+      bgClass: "bg-(--accent-300)/10",
       sub: t("statFocusSub", "Priorità chiave"),
     },
   ];
@@ -631,9 +631,9 @@ export default function DashboardShowcase() {
 
         {/* Browser frame */}
         <div className="relative mt-12">
-          <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-b from-[#7b39fc]/25 via-[#a67cff]/10 to-transparent blur-lg" />
+          <div className="absolute -inset-3 rounded-[28px] bg-gradient-to-b from-(--accent)/25 via-(--accent-300)/10 to-transparent blur-lg" />
 
-          <div className="relative overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-2xl shadow-[#7b39fc]/15">
+          <div className="relative overflow-hidden rounded-2xl border border-gray-200/70 bg-white shadow-2xl shadow-(--accent)/15">
             {/* Window chrome */}
             <div className="flex items-center gap-3 border-b border-gray-200/70 bg-gray-50 px-4 py-2.5">
               <div className="flex items-center gap-1.5" aria-hidden="true">
@@ -642,7 +642,7 @@ export default function DashboardShowcase() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
               </div>
               <div className="mx-auto flex min-w-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1 text-[11px] text-gray-500">
-                <Globe size={11} className="shrink-0 text-[#7b39fc]" />
+                <Globe size={11} className="shrink-0 text-(--accent)" />
                 <span className="truncate">app.taskly.io/dashboard</span>
               </div>
               {/* Solo la ricerca: la campanella era un duplicato dell'Inbox
@@ -653,7 +653,7 @@ export default function DashboardShowcase() {
             </div>
 
             {/* Badge: chiarisce che il mockup non è interattivo */}
-            <div className="pointer-events-none absolute right-4 top-16 z-10 inline-flex items-center gap-1.5 rounded-full border border-[#7b39fc]/25 bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-[#7b39fc] shadow-sm backdrop-blur-sm">
+            <div className="pointer-events-none absolute right-4 top-16 z-10 inline-flex items-center gap-1.5 rounded-full border border-(--accent)/25 bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-(--accent) shadow-sm backdrop-blur-sm">
               <Eye size={11} aria-hidden="true" />
               {t("land.showcasePreviewBadge")}
             </div>

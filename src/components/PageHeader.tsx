@@ -117,7 +117,7 @@ const EMOJI_SECTIONS: Array<{ label: string; codes: number[][] }> = [
 /** Colori applicabili alle icone lucide nel picker. */
 const ICON_COLORS = [
   { label: "Default", value: "text-gray-400", dot: "#9ca3af" },
-  { label: "Viola", value: "text-[#7b39fc]", dot: "#7b39fc" },
+  { label: "Viola", value: "text-(--accent)", dot: "#7b39fc" },
   { label: "Blu", value: "text-blue-500", dot: "#3b82f6" },
   { label: "Smeraldo", value: "text-emerald-500", dot: "#10b981" },
   { label: "Rosa", value: "text-rose-500", dot: "#ec4899" },
@@ -219,7 +219,7 @@ export default function PageHeader({
             }}
             title={locked ? undefined : "Cambia icona"}
             aria-label="Cambia icona pagina"
-            className="grid place-items-center w-12 h-12 md:w-14 md:h-14 rounded-2xl border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-[#7b39fc]/50 hover:shadow-lg disabled:cursor-default"
+            className="grid place-items-center w-12 h-12 md:w-14 md:h-14 rounded-2xl border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-(--accent)/50 hover:shadow-lg disabled:cursor-default"
           >
             {isEmoji ? (
               <span className="text-2xl md:text-3xl leading-none">{page.icon}</span>
@@ -243,7 +243,7 @@ export default function PageHeader({
                     onClick={() => setPickerTab(tab)}
                     className={`px-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-colors ${
                       pickerTab === tab
-                        ? "bg-white dark:bg-gray-900 text-[#7b39fc] shadow-xs"
+                        ? "bg-white dark:bg-gray-900 text-(--accent) shadow-xs"
                         : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                     }`}
                   >
@@ -289,7 +289,7 @@ export default function PageHeader({
                         onClick={() => applyColor(c.value)}
                         className={`w-6 h-6 rounded-full transition-all hover:scale-110 ${
                           pendingColor === c.value
-                            ? "ring-2 ring-[#7b39fc] ring-offset-2 dark:ring-offset-gray-950 scale-110"
+                            ? "ring-2 ring-(--accent) ring-offset-2 dark:ring-offset-gray-950 scale-110"
                             : "opacity-80 hover:opacity-100"
                         }`}
                         style={{ backgroundColor: c.dot }}
@@ -309,7 +309,7 @@ export default function PageHeader({
                         className={
                           "w-9 h-9 grid place-items-center rounded-xl transition-colors " +
                           (normalizeIconKey(page?.icon) === o.key
-                            ? "bg-[#7b39fc]/15 text-[#7b39fc]"
+                            ? "bg-(--accent)/15 text-(--accent)"
                             : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800")
                         }
                       >

@@ -39,8 +39,8 @@ export function BentoGrid() {
                 {/* mini-visual opzionale per alcune card */}
                 {idx === 0 && (
                   <div className="mt-4 flex gap-2">
-                    <span className="h-2 w-12 rounded-full bg-[#7b39fc]/20" />
-                    <span className="h-2 w-8 rounded-full bg-[#7b39fc]/10" />
+                    <span className="h-2 w-12 rounded-full bg-(--accent)/20" />
+                    <span className="h-2 w-8 rounded-full bg-(--accent)/10" />
                   </div>
                 )}
                 {idx === 3 && (

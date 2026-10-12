@@ -235,7 +235,7 @@ function DashboardContent() {
         category: "Personale",
         description: `Template personalizzato creato da "${page.label || "pagina"}"`,
         icon: typeof page.icon === "string" ? page.icon : "sparkles",
-        iconColor: page.iconColor || "text-[#7b39fc]",
+        iconColor: page.iconColor || "text-(--accent)",
         type: page.type === "tasks" ? "tasks" : "notes",
         data: cloned,
       });
@@ -416,7 +416,7 @@ function DashboardContent() {
 
   const COLOR_OPTIONS = [
     { label: "Default", value: "text-gray-400", bg: "bg-gray-400" },
-    { label: "Viola", value: "text-[#7b39fc]", bg: "bg-[#7b39fc]" },
+    { label: "Viola", value: "text-(--accent)", bg: "bg-(--accent)" },
     { label: "Smeraldo", value: "text-emerald-500", bg: "bg-emerald-500" },
     { label: "Rosa", value: "text-rose-500", bg: "bg-rose-500" },
     { label: "Ambra", value: "text-amber-500", bg: "bg-amber-500" },
@@ -1361,12 +1361,12 @@ function DashboardContent() {
           </div>
         )}
         {planNotice && (
-          <div className="mb-4 max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3 rounded-2xl bg-[#a67cff]/10 border border-[#a67cff]/25 text-sm font-bold text-[#a67cff]">
+          <div className="mb-4 max-w-7xl mx-auto flex items-center justify-between gap-4 px-6 py-3 rounded-2xl bg-(--accent-300)/10 border border-(--accent-300)/25 text-sm font-bold text-(--accent-300)">
             <span>{planNotice}</span>
             <span className="flex items-center gap-2 shrink-0">
               <Link
                 href="/#pricing"
-                className="px-3 py-1.5 rounded-lg bg-[#7b39fc] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
+                className="px-3 py-1.5 rounded-lg bg-(--accent) text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all"
               >{t("pg.upgradePlan")}</Link>
               <button
                 onClick={() => setPlanNotice(null)}
@@ -2271,7 +2271,7 @@ const ensureTab = React.useCallback((page: any) => {
                             }}
                             className="flex items-center gap-2 w-full px-2.5 py-2 rounded-xl font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
                           >
-                            <BookmarkPlus size={14} className="text-[#7b39fc]" />
+                            <BookmarkPlus size={14} className="text-(--accent)" />
                             <span>Salva come template</span>
                           </button>
 

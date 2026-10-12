@@ -30,20 +30,20 @@ export default function Comparison() {
             <span className="landing-display-accent">{t("land.cmpTitleAccent")}</span>{t("land.cmpTitleSuffix")}</h2>
         </div>
 
-        <div className="mt-9 overflow-hidden rounded-2xl border border-[#7b39fc]/10 dark:border-white/10">
+        <div className="mt-9 overflow-hidden rounded-2xl border border-(--accent)/10 dark:border-white/10">
           <div className="grid grid-cols-[1.1fr_0.95fr_0.95fr] bg-[#f6f7f9] dark:bg-white/5 text-[10px] font-black uppercase tracking-[0.08em] text-gray-500 dark:text-gray-300 sm:text-xs sm:tracking-[0.12em]">
             <div className="p-4">{t("land.cmpHeaderCriterion")}</div>
-            <div className="p-4 text-[#7b39fc] dark:text-[#a67cff]">{t("land.cmpHeaderTaskly")}</div>
+            <div className="p-4 text-(--accent) dark:text-(--accent-300)">{t("land.cmpHeaderTaskly")}</div>
             <div className="p-4">{t("land.cmpHeaderOthers")}</div>
           </div>
           {rows.map((row) => (
-            <div key={row.label} className="grid grid-cols-[1.1fr_0.95fr_0.95fr] border-t border-[#7b39fc]/10 dark:border-white/10 text-xs sm:text-sm">
+            <div key={row.label} className="grid grid-cols-[1.1fr_0.95fr_0.95fr] border-t border-(--accent)/10 dark:border-white/10 text-xs sm:text-sm">
               <div className="min-w-0 p-3 font-bold text-gray-900 dark:text-gray-100 sm:p-4">{row.label}</div>
               <div className="min-w-0 p-3 text-gray-700 dark:text-gray-200 sm:p-4">{row.taskly}</div>
               <div className="min-w-0 p-3 text-gray-500 dark:text-gray-400 sm:p-4">{row.other}</div>
             </div>
           ))}
-          <div className="p-4 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-[#7b39fc]/10 dark:border-white/10 bg-[#f6f7f9]/50 dark:bg-white/5">
+          <div className="p-4 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-(--accent)/10 dark:border-white/10 bg-[#f6f7f9]/50 dark:bg-white/5">
             {t("land.cmpFootnote")}
           </div>
         </div>

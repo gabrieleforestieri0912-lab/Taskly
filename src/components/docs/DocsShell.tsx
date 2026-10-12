@@ -55,9 +55,9 @@ function Toc({ headings }: { headings: DocHeading[] }) {
             <a
               href={`#${heading.id}`}
               aria-current={activeId === heading.id ? "location" : undefined}
-              className={`block border-l -ml-px py-0.5 text-xs leading-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] ${
+              className={`block border-l -ml-px py-0.5 text-xs leading-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) ${
                 activeId === heading.id
-                  ? "border-[#7b39fc] font-semibold text-[#7b39fc] dark:text-[#a67cff]"
+                  ? "border-(--accent) font-semibold text-(--accent) dark:text-(--accent-300)"
                   : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
               }`}
             >
@@ -99,9 +99,9 @@ function DocsSidebar({
         aria-current={pathname === "/docs" ? "page" : undefined}
         className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-semibold ${
           pathname === "/docs"
-            ? "bg-[#7b39fc]/10 text-[#7b39fc] dark:text-[#a67cff]"
+            ? "bg-(--accent)/10 text-(--accent) dark:text-(--accent-300)"
             : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
-        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]`}
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)`}
       >
         <BookOpen size={16} />
         Inizia dalla documentazione
@@ -123,7 +123,7 @@ function DocsSidebar({
             }}
             className="group"
           >
-            <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg px-2.5 py-2 text-xs font-bold uppercase tracking-wide text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:text-gray-400 dark:hover:bg-white/5">
+            <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg px-2.5 py-2 text-xs font-bold uppercase tracking-wide text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:text-gray-400 dark:hover:bg-white/5">
               {getSectionLabel(section)}
               <ChevronDown size={14} className="transition-transform group-open:rotate-180" />
             </summary>
@@ -139,9 +139,9 @@ function DocsSidebar({
                       aria-current={isActive ? "page" : undefined}
                       className={`block rounded-md px-2 py-1.5 text-sm ${
                         isActive
-                          ? "bg-[#7b39fc]/10 font-semibold text-[#7b39fc] dark:text-[#a67cff]"
+                          ? "bg-(--accent)/10 font-semibold text-(--accent) dark:text-(--accent-300)"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
-                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]`}
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)`}
                     >
                       {doc.title}
                     </Link>
@@ -214,7 +214,7 @@ export default function DocsShell({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] lg:hidden dark:hover:bg-white/10"
+              className="inline-flex size-9 items-center justify-center rounded-lg hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) lg:hidden dark:hover:bg-white/10"
               aria-label="Apri navigazione documentazione"
             >
               <Menu size={18} />
@@ -229,7 +229,7 @@ export default function DocsShell({
               setSearchOpen(true);
               requestAnimationFrame(() => document.getElementById("docs-search")?.focus());
             }}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:border-gray-800 dark:hover:bg-white/5"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:border-gray-800 dark:hover:bg-white/5"
           >
             <Search size={15} />
             <span className="hidden sm:inline">Cerca nella documentazione</span>
@@ -261,12 +261,12 @@ export default function DocsShell({
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Cerca pagine, argomenti e parole chiave"
-                  className="h-14 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#7b39fc]"
+                  className="h-14 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--accent)"
                 />
                 <button
                   type="button"
                   onClick={() => setSearchOpen(false)}
-                  className="rounded p-1 text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:hover:bg-white/10"
+                  className="rounded p-1 text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:hover:bg-white/10"
                   aria-label="Chiudi ricerca"
                 >
                   <X size={17} />
@@ -284,9 +284,9 @@ export default function DocsShell({
                         <Link
                           href={docHref(doc.slug)}
                           onClick={() => setSearchOpen(false)}
-                          className="block rounded-xl px-3 py-3 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:hover:bg-white/5"
+                          className="block rounded-xl px-3 py-3 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:hover:bg-white/5"
                         >
-                          <span className="block text-[10px] font-bold uppercase tracking-wide text-[#7b39fc] dark:text-[#a67cff]">
+                          <span className="block text-[10px] font-bold uppercase tracking-wide text-(--accent) dark:text-(--accent-300)">
                             {getSectionLabel(doc.section)}
                           </span>
                           <span className="mt-1 block text-sm font-semibold">{doc.title}</span>
@@ -321,7 +321,7 @@ export default function DocsShell({
                   <li key={`${crumb.label}-${index}`} className="flex items-center gap-2">
                     {index > 0 && <span aria-hidden="true">/</span>}
                     {crumb.href && index < breadcrumbs.length - 1 ? (
-                      <Link href={crumb.href} className="hover:text-[#7b39fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc]">
+                      <Link href={crumb.href} className="hover:text-(--accent) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent)">
                         {crumb.label}
                       </Link>
                     ) : (
@@ -338,13 +338,13 @@ export default function DocsShell({
             {currentIndex >= 0 && currentDoc?.slug !== "" && (
               <nav aria-label="Navigazione tra le guide" className="mt-12 grid grid-cols-1 gap-3 border-t border-gray-200 pt-5 sm:grid-cols-2 dark:border-gray-800">
                 {previous ? (
-                  <Link href={docHref(previous.slug)} className="rounded-xl border border-gray-200 p-4 hover:border-[#7b39fc]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:border-gray-800">
+                  <Link href={docHref(previous.slug)} className="rounded-xl border border-gray-200 p-4 hover:border-(--accent)/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:border-gray-800">
                     <span className="block text-xs text-gray-500">← Precedente</span>
                     <span className="mt-1 block text-sm font-semibold">{previous.title}</span>
                   </Link>
                 ) : <span />}
                 {next && (
-                  <Link href={docHref(next.slug)} className="rounded-xl border border-gray-200 p-4 text-right hover:border-[#7b39fc]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:border-gray-800">
+                  <Link href={docHref(next.slug)} className="rounded-xl border border-gray-200 p-4 text-right hover:border-(--accent)/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:border-gray-800">
                     <span className="block text-xs text-gray-500">Successivo →</span>
                     <span className="mt-1 block text-sm font-semibold">{next.title}</span>
                   </Link>
@@ -375,7 +375,7 @@ export default function DocsShell({
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Chiudi navigazione documentazione"
-                className="rounded p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b39fc] dark:hover:bg-white/10"
+                className="rounded p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) dark:hover:bg-white/10"
               >
                 <X size={18} />
               </button>

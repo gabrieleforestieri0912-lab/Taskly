@@ -21,11 +21,11 @@ const PricingCard = ({
   return (
     <div className={`relative rounded-2xl p-5 md:p-6 flex flex-col h-full transition-colors ${
       isPopular 
-        ? "bg-white dark:bg-black border-2 border-[#7b39fc] shadow-lg" 
+        ? "bg-white dark:bg-black border-2 border-(--accent) shadow-lg" 
         : "bg-white dark:bg-black border border-gray-200 dark:border-gray-800"
     }`}>
       {isPopular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#7b39fc] rounded-full text-white text-xs font-black uppercase tracking-widest">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-(--accent) rounded-full text-white text-xs font-black uppercase tracking-widest">
           {t("land.prMostChosen")}
         </div>
       )}
@@ -37,7 +37,7 @@ const PricingCard = ({
             {description}
           </p>
         </div>
-        <div className={`p-2 rounded-lg ${isPopular ? "bg-[#7b39fc]/10 dark:bg-[#7b39fc]/20 text-[#7b39fc] dark:text-[#a67cff]" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
+        <div className={`p-2 rounded-lg ${isPopular ? "bg-(--accent)/10 dark:bg-(--accent)/20 text-(--accent) dark:text-(--accent-300)" : "bg-gray-100 dark:bg-gray-800 text-gray-400"}`}>
           <Icon size={18} />
         </div>
       </div>
@@ -65,7 +65,7 @@ const PricingCard = ({
         disabled={loading}
         className={`w-full group relative flex items-center justify-center gap-2 py-3.5 rounded-xl font-black uppercase tracking-[0.15em] text-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
         isPopular 
-          ? "bg-[#7b39fc] text-white hover:bg-[#8b4dff]" 
+          ? "bg-(--accent) text-white hover:bg-(--accent-hover)" 
           : "bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
       }`}
       >
@@ -230,7 +230,7 @@ function Pricing() {
           >
             <div 
               style={{ transform: `translateX(${isAnnual ? '28px' : '0'})` }}
-              className="w-6 h-6 bg-white dark:bg-[#7b39fc] rounded-full shadow-lg transition-transform duration-200"
+              className="w-6 h-6 bg-white dark:bg-(--accent) rounded-full shadow-lg transition-transform duration-200"
             />
           </button>
           <div className="flex flex-col items-start leading-none">
@@ -252,7 +252,7 @@ function Pricing() {
         ))}
       </div>
 
-      <p className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium">{t("land.prCustomPrefix")}<button className="text-[#7b39fc] dark:text-[#a67cff] font-bold hover:underline">{t("land.prCustomLink")}</button>
+      <p className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium">{t("land.prCustomPrefix")}<button className="text-(--accent) dark:text-(--accent-300) font-bold hover:underline">{t("land.prCustomLink")}</button>
       </p>
     </section>
   );
