@@ -22,7 +22,6 @@ import {
   RotateCw,
   X,
   PanelLeftOpen,
-  PanelLeftClose,
   ChevronRight,
   MoreVertical,
   MoreHorizontal,
@@ -652,15 +651,54 @@ function DashboardContent() {
     });
   };
 
+  // Passato alla Sidebar come setIsSidebarOpen: il bottone chiudi interno
+  // chiama setIsSidebarOpen(false) e deve chiudere anche il peek fluttuante.
+  const handleSidebarOpenChange = (v: boolean | ((s: boolean) => boolean)) => {
+    if (typeof v === "function") {
+      setIsSidebarOpen(v);
+      return;
+    }
+    setIsSidebarOpen(v);
+    if (!v) setIsSidebarPeekOpen(false);
+  };
+
+  // Peek fluttuante stile Notion: bordo sinistro → la sidebar appare sopra
+  // il contenuto (solo dispositivi con hover, solo se è chiusa).
+  const openSidebarPeek = () => {
+    if (isSidebarOpen) return;
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.matchMedia &&
+        !window.matchMedia("(hover: hover)").matches
+      ) {
+        return;
+      }
+    } catch {}
+    setIsSidebarPeekOpen(true);
+  };
+
+  // Esc chiude il peek fluttuante.
+  useEffect(() => {
+    if (!isSidebarPeekOpen) return;
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSidebarPeekOpen(false);
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [isSidebarPeekOpen]);
+
   // Mobile: la sidebar nasce come drawer sopra il contenuto — chiudila
   // all'avvio su schermi stretti e dopo ogni navigazione, così la pagina
   // resta visibile e usabile. Su desktop resta sempre aperta.
+  // Il peek fluttuante si chiude a ogni navigazione.
   useEffect(() => {
     try {
       if (typeof window !== "undefined" && window.innerWidth < 768) {
         setIsSidebarOpen(false);
       }
     } catch {}
+    setIsSidebarPeekOpen(false);
   }, [activePageId, searchParams]);
 
   const duplicatePage = (id) => {
@@ -1654,7 +1692,7 @@ const ensureTab = React.useCallback((page: any) => {
               <Sidebar
                 user={user}
                 isSidebarOpen={isSidebarOpen}
-                setIsSidebarOpen={setIsSidebarOpen}
+                setIsSidebarOpen={handleSidebarOpenChange}
                 pages={pages}
                 onAddPage={addPage}
                 onDeletePage={deletePage}
@@ -1672,27 +1710,73 @@ const ensureTab = React.useCallback((page: any) => {
         )}
       </AnimatePresence>
 
+      {/* ── Hover bordo sinistro: apre il peek fluttuante (solo desktop) ── */}
+      {!shouldShowSidebar && (
+        <div
+          aria-hidden="true"
+          onMouseEnter={openSidebarPeek}
+          className="fixed left-0 top-0 bottom-0 w-2.5 z-30 hidden md:block"
+        />
+      )}
+
+      {/* ── Peek fluttuante stile Notion: sidebar sopra il contenuto ─────── */}
+      <AnimatePresence>
+        {!shouldShowSidebar && isSidebarPeekOpen && (
+          <motion.div
+            initial={{ x: -280, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -280, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 320, damping: 32 }}
+            onMouseLeave={() => setIsSidebarPeekOpen(false)}
+            onClick={(e) => {
+              if ((e.target as HTMLElement).closest("a[href]")) {
+                setIsSidebarPeekOpen(false);
+              }
+            }}
+            className="fixed left-2 top-2 bottom-2 w-64 z-[60] hidden md:block rounded-2xl shadow-2xl border border-gray-200/70 dark:border-gray-800/70 overflow-hidden bg-white dark:bg-gray-950"
+          >
+            <Sidebar
+              user={user}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={handleSidebarOpenChange}
+              pages={pages}
+              onAddPage={addPage}
+              onDeletePage={deletePage}
+              onUpdatePage={(id, updates) => updatePage(id, updates)}
+              onPermanentlyDeletePage={permanentlyDelete}
+              onRestorePage={restorePage}
+              onOpenPage={ensureTab}
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              onOpenTemplateGallery={() => setIsTemplateGalleryOpen(true)}
+              loading={loading}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <main
         className={`transition-all duration-300 ${shouldShowSidebar ? "md:pl-64 pl-0" : "pl-0"}`}
       >
         {/* Sticky Notion-style Compact Header */}
         <div className="sticky top-0 z-50 h-13 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-900/60 backdrop-blur-xl px-3 sm:px-4 flex items-center justify-between gap-2">
-          {/* Sinistra: Toggle Sidebar + Icona + Titolo / Ambiente di lavoro + Badge Privato */}
+          {/* Sinistra: Apri Sidebar (solo quando è chiusa: il chiudi vive
+              dentro la sidebar) + Icona + Titolo / Ambiente di lavoro */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <button
-              onClick={toggleSidebar}
-              className="shrink-0 p-1.5 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={t("misc.toggleSidebar")}
-              title={isSidebarOpen ? "Chiudi barra laterale" : "Apri barra laterale"}
-            >
-              {isSidebarOpen ? (
-                <PanelLeftClose size={18} />
-              ) : (
-                <PanelLeftOpen size={18} />
-              )}
-            </button>
+            {!isSidebarOpen && (
+              <>
+                <button
+                  onClick={toggleSidebar}
+                  className="shrink-0 p-1.5 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  aria-label={t("misc.toggleSidebar")}
+                  title="Apri barra laterale"
+                >
+                  <PanelLeftOpen size={18} />
+                </button>
 
-            <div className="h-4 w-px bg-gray-200 dark:bg-gray-800 shrink-0 mx-0.5" />
+                <div className="h-4 w-px bg-gray-200 dark:bg-gray-800 shrink-0 mx-0.5" />
+              </>
+            )}
 
             {/* Route Breadcrumb Path Navigator */}
             <nav

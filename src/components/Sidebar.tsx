@@ -38,7 +38,7 @@ import {
   Mic,
   Inbox,
   HelpCircle,
-  ChevronLeft,
+  PanelLeftClose,
   Copy,
   Bell,
   Shield,
@@ -1280,12 +1280,12 @@ export default function Sidebar({
           ASIDE — the Notion-style sidebar panel
           ════════════════════════════════════════════════════════════════════ */}
       <aside
-        className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
+        className="group/sidebar relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
         aria-label="Navigazione sidebar"
       >
         {/* ── Workspace header ──────────────────────────────────────────────────
-            L'account si sposta in fondo (vedi blocco "Account + altro"): qui resta
-            solo la logo di Taskly che torna alla landing e il chiudi su mobile. */}
+            Logo Taskly + Inbox + chiudi (stile Notion: il chiudi vive dentro
+            la sidebar, a destra; su desktop appare all'hover). */}
         <div className="flex items-center px-3 pt-3 pb-1 gap-1">
           <Link
             href="/"
@@ -1325,14 +1325,15 @@ export default function Sidebar({
               <Inbox size={15} aria-hidden="true" />
             </Link>
 
-            {/* Close sidebar button on mobile */}
+            {/* Chiudi sidebar (dentro la sidebar, stile Notion) */}
             <button
               type="button"
               onClick={() => setIsSidebarOpen(false)}
+              title="Chiudi barra laterale"
               aria-label="Chiudi barra laterale"
-              className="md:hidden p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+              className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 md:opacity-0 md:group-hover/sidebar:opacity-100 md:focus-visible:opacity-100"
             >
-              <ChevronLeft size={16} aria-hidden="true" />
+              <PanelLeftClose size={16} aria-hidden="true" />
             </button>
           </div>
         </div>
