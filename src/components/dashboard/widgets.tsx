@@ -48,10 +48,6 @@ const CARD_ROUNDED = `${CARD_BASE} rounded-2xl`;
 /** Card con angoli grandi (sezioni principali) */
 const CARD_ROUNDED_LG = `${CARD_BASE} rounded-3xl`;
 
-/** Accent viola coerente */
-const ACCENT = "#7b39fc";
-const ACCENT_LIGHT = "#a67cff";
-
 /* ─────────────────────────────────────────────────────────────────────────────
    Tipi condivisi
    ─────────────────────────────────────────────────────────────────────────── */
@@ -180,14 +176,14 @@ export interface QuickStat {
 
 export function QuickStatsWidget({ stats }: { stats: QuickStat[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
       {stats.map((s, idx) => (
         <motion.div
           key={idx}
           whileHover={{ y: -3 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <div className={`${CARD_ROUNDED} p-4 flex items-center gap-3.5 h-full`}>
+          <div className={`${CARD_ROUNDED} p-3.5 flex items-center gap-3 h-full`}>
             <div className={`p-2.5 rounded-xl ${s.bgClass || "bg-(--accent)/10"} shrink-0`}>
               {s.icon}
             </div>
@@ -242,8 +238,8 @@ export function TodayFocusWidget({
     <div className={`${CARD_ROUNDED_LG} relative overflow-hidden`}>
       {/* Accent left border */}
       <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-(--accent) to-(--accent-300) rounded-l-3xl" />
-      <div className="p-5 pl-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="p-4 pl-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-(--accent) dark:text-(--accent-300)">
               <Zap size={16} />
@@ -269,7 +265,7 @@ export function TodayFocusWidget({
 
           {/* Circular progress */}
           <div className="shrink-0 flex items-center justify-center">
-            <div className="relative w-28 h-28 flex items-center justify-center">
+            <div className="relative w-24 h-24 flex items-center justify-center">
               <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                 <circle
                   cx="50" cy="50" r="42"
@@ -290,8 +286,8 @@ export function TodayFocusWidget({
                 />
                 <defs>
                   <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor={ACCENT} />
-                    <stop offset="100%" stopColor={ACCENT_LIGHT} />
+                    <stop offset="0%" stopColor="var(--accent)" />
+                    <stop offset="100%" stopColor="var(--accent-300)" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -326,20 +322,29 @@ export function WeeklyTrendWidget({
   title,
   subtitle,
   statusLabel,
+  totalLabel,
+  bestLabel,
 }: {
   data: TrendPoint[];
   title: string;
   subtitle: string;
   statusLabel: string;
+  totalLabel?: string;
+  bestLabel?: string;
 }) {
   const hasData = data.some((d) => d.count > 0);
   const maxVal = Math.max(...data.map((d) => d.val), 1);
+  const totalCount = data.reduce((sum, d) => sum + (d.count || 0), 0);
+  const bestDay = data.reduce(
+    (best, d) => (d.count > (best?.count || 0) ? d : best),
+    null as TrendPoint | null,
+  );
 
   return (
     <div className={CARD_ROUNDED_LG}>
-      <div className="p-6">
+      <div className="p-5">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-(--accent)/10 dark:bg-(--accent)/15">
               <TrendingUp size={16} className="text-(--accent) dark:text-(--accent-300)" />
@@ -358,7 +363,7 @@ export function WeeklyTrendWidget({
 
         {/* Chart or empty state */}
         {hasData ? (
-          <div className="grid grid-cols-7 gap-2 items-end h-32">
+          <div className="grid grid-cols-7 gap-2 items-end h-28">
             {data.map((d, i) => {
               const pct = maxVal > 0 ? (d.val / maxVal) * 100 : 0;
               return (
@@ -366,7 +371,7 @@ export function WeeklyTrendWidget({
                   <span className="text-[9px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                     {d.count > 0 ? `${d.count}` : "—"}
                   </span>
-                  <div className="w-full max-w-[28px] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden h-20 flex flex-col justify-end p-0.5">
+                  <div className="w-full max-w-[28px] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden h-16 flex flex-col justify-end p-0.5">
                     {pct > 0 ? (
                       <motion.div
                         initial={{ height: 0 }}
@@ -388,6 +393,19 @@ export function WeeklyTrendWidget({
             icon={BarChart3}
             label="Nessuna attività registrata questa settimana. Completa i tuoi task per vedere il trend."
           />
+        )}
+        {/* Footer riepilogo: totale + giorno migliore */}
+        {hasData && (totalLabel || bestLabel) && (
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/15 dark:text-(--accent-300)">
+              {totalLabel ? `${totalLabel}: ${totalCount}` : totalCount}
+            </span>
+            {bestDay && bestDay.count > 0 && bestLabel && (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400">
+                {bestLabel}: {bestDay.day} ({bestDay.count})
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -431,7 +449,7 @@ function SectionHeader({
   actionClass?: string;
 }) {
   return (
-    <div className="flex items-center justify-between px-1 mb-3">
+    <div className="flex items-center justify-between px-1 mb-2">
       <h4 className={`text-xs font-black uppercase tracking-widest flex items-center gap-2 text-gray-500 dark:text-gray-400`}>
         <Icon size={14} className={iconClass} />
         {title}
@@ -472,7 +490,7 @@ export function CriticalTasksWidget({
   emptyLabel: string;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <SectionHeader
         icon={Flame}
         iconClass="text-orange-500"
@@ -536,7 +554,7 @@ export function RecentIdeasWidget({
   defaultCategory: string;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <SectionHeader
         icon={Lightbulb}
         iconClass="text-amber-500"
@@ -593,14 +611,14 @@ export function GoalProgressWidget({
   return (
     <div
       className="rounded-3xl text-white overflow-hidden"
-      style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)` }}
+      style={{ background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-300) 100%)" }}
     >
-      <div className="p-6">
-        <h4 className="text-xs font-black uppercase tracking-widest opacity-80 mb-5 flex items-center gap-2">
+      <div className="p-5">
+        <h4 className="text-xs font-black uppercase tracking-widest opacity-80 mb-4 flex items-center gap-2">
           <Target size={14} />
           {title}
         </h4>
-        <div className="space-y-5">
+        <div className="space-y-4">
           {goals.length > 0 ? (
             goals.map((goal) => {
               const subGoals = goal.subGoals || [];
@@ -650,14 +668,14 @@ export function QuickNavWidget({
 }) {
   return (
     <div className={CARD_ROUNDED_LG}>
-      <div className="p-5">
-        <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+      <div className="p-4">
+        <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
           {labels.title}
         </h4>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-(--accent)/20 dark:border-(--accent)/30 hover:bg-(--accent)/8 dark:hover:bg-(--accent)/15 transition-all text-center"
+            className="flex flex-col items-center gap-2 py-3 rounded-2xl border border-(--accent)/20 dark:border-(--accent)/30 hover:bg-(--accent)/8 dark:hover:bg-(--accent)/15 transition-all text-center"
           >
             <div className="w-8 h-8 rounded-xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center">
               <Plus size={16} className="text-(--accent) dark:text-(--accent-300)" />
@@ -668,7 +686,7 @@ export function QuickNavWidget({
           </button>
           <button
             type="button"
-            className="flex flex-col items-center gap-2 py-4 rounded-2xl border border-amber-500/20 dark:border-amber-500/30 hover:bg-amber-500/8 dark:hover:bg-amber-500/10 transition-all text-center"
+            className="flex flex-col items-center gap-2 py-3 rounded-2xl border border-amber-500/20 dark:border-amber-500/30 hover:bg-amber-500/8 dark:hover:bg-amber-500/10 transition-all text-center"
           >
             <div className="w-8 h-8 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center">
               <Lightbulb size={16} className="text-amber-500" />
@@ -700,9 +718,9 @@ export function AiInsightsWidget({
     <div className={`${CARD_ROUNDED_LG} overflow-hidden`}>
       {/* Sottile gradient top bar */}
       <div className="h-0.5 bg-gradient-to-r from-(--accent) via-(--accent-300) to-(--accent)" />
-      <div className="p-6 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center mx-auto">
-          <Sparkles size={22} className="text-(--accent) dark:text-(--accent-300)" />
+      <div className="p-5 text-center space-y-3">
+        <div className="w-10 h-10 rounded-2xl bg-(--accent)/10 dark:bg-(--accent)/20 flex items-center justify-center mx-auto">
+          <Sparkles size={18} className="text-(--accent) dark:text-(--accent-300)" />
         </div>
         <p className="text-sm font-medium text-gray-600 dark:text-gray-300 leading-relaxed">{text}</p>
         <button
@@ -735,7 +753,7 @@ export function ToolsResourcesWidget({
         iconClass="text-(--accent) dark:text-(--accent-300)"
         title={title}
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{children}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">{children}</div>
     </div>
   );
 }
@@ -977,7 +995,7 @@ export function DashboardHeader({
           whileHover={{ scale: 1.05, rotate: -3 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-md shadow-(--accent)/20"
-          style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)` }}
+          style={{ background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-300) 100%)" }}
         >
           <Sparkles size={20} className="text-white/90" />
         </motion.div>
@@ -1150,7 +1168,7 @@ export function PlanQuotaBanner({
             className="h-full rounded-full transition-all duration-500"
             style={{
               width: `${Math.min(100, (used / max) * 100)}%`,
-              background: `linear-gradient(90deg, ${ACCENT}, ${ACCENT_LIGHT})`,
+              background: "linear-gradient(90deg, var(--accent), var(--accent-300))",
             }}
           />
         </div>

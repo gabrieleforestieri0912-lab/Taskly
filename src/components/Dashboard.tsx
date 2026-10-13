@@ -230,7 +230,7 @@ export default function Dashboard({
   pages?: any[];
   plan?: any;
 }) {
-  const { t } = useLanguage();
+  const { t, language: activeLang } = useLanguage();
   const safeTasks = Array.isArray(tasks) ? tasks : [];
   const safeGoals = Array.isArray(goals) ? goals : [];
   const safeIdeas = Array.isArray(ideas) ? ideas : [];
@@ -396,9 +396,9 @@ export default function Dashboard({
 
   const highPriorityTasks = safeTasks
     .filter((t) => t && t.priority === "Alta" && t.status !== "done")
-    .slice(0, 3);
-  const recentIdeas = safeIdeas.slice(0, 3);
-  const activeGoals = safeGoals.filter((g) => g && !g.completed).slice(0, 2);
+    .slice(0, 5);
+  const recentIdeas = safeIdeas.slice(0, 4);
+  const activeGoals = safeGoals.filter((g) => g && !g.completed).slice(0, 3);
 
   const stats = [
     {
@@ -440,7 +440,11 @@ export default function Dashboard({
 
   // Real weekly trend — based on actual task completedAt or createdAt in the last 7 days.
   // If there is no data at all, every bar stays at 0 and WeeklyTrendWidget shows an empty state.
-  const DAY_LABELS = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+  // Etichette giorni brevi nella lingua attiva (it/en).
+  const DAY_LABELS =
+    activeLang === "en"
+      ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      : ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
   const trendData = (() => {
     const now = new Date();
     // Build an array of the last 7 days (today = index 6)
@@ -499,6 +503,8 @@ export default function Dashboard({
             title={t("dash.trendTitle", "Trend & Produttività Settimanale")}
             subtitle={t("dash.trendSub", "Attività e tasso di completamento ultimi 7 giorni")}
             statusLabel={t("dash.trendActive", "Attivo")}
+            totalLabel={t("dash.trendTotal", "Totale settimana")}
+            bestLabel={t("dash.trendBest", "Giorno migliore")}
           />
         );
 
@@ -591,7 +597,7 @@ export default function Dashboard({
       variants={container}
       initial="hidden"
       animate="show"
-      className="max-w-7xl mx-auto space-y-6 pb-12"
+      className="max-w-7xl mx-auto space-y-4 pb-8"
     >
       {/* Header with Title and Customize Button */}
       <motion.div variants={itemAnim}>
@@ -670,7 +676,7 @@ export default function Dashboard({
 
       {/* Widget in ordine: drag & drop nativo in personalizzazione */}
       {isEditMode ? (
-        <div className="space-y-8">
+        <div className="space-y-4">
           {widgetOrder.map((wId, index) => (
             <SortableWidget
               key={wId}
@@ -692,7 +698,7 @@ export default function Dashboard({
           ))}
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-4">
           {widgetOrder.map((wId) => renderWidget(wId))}
         </div>
       )}

@@ -1758,8 +1758,8 @@ const ensureTab = React.useCallback((page: any) => {
       <main
         className={`transition-all duration-300 ${shouldShowSidebar ? "md:pl-64 pl-0" : "pl-0"}`}
       >
-        {/* Sticky Notion-style Compact Header */}
-        <div className="sticky top-0 z-50 h-13 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-900/60 backdrop-blur-xl px-3 sm:px-4 flex items-center justify-between gap-2">
+        {/* Sticky Notion-style Compact Header — trasparente */}
+        <div className="sticky top-0 z-50 h-13 border-b border-transparent bg-transparent px-3 sm:px-4 flex items-center justify-between gap-2">
           {/* Sinistra: Apri Sidebar (solo quando è chiusa: il chiudi vive
               dentro la sidebar) + Icona + Titolo / Ambiente di lavoro */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
