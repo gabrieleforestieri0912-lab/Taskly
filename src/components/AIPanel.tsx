@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useAIChat, createAIChatController } from "../lib/aiChatStore";
+import { PREFS_KEY, readPref } from "../lib/prefs";
 import type { OnAction } from "../lib/aiChatStore";
 
 type ChatInputProps = {
@@ -111,6 +112,15 @@ const ChatInput = ({
 }: ChatInputProps) => {
   const [textareaHeight, setTextareaHeight] = React.useState(44);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
+  // Preferenza impostazioni: i suggerimenti proattivi si possono spegnere.
+  const [aiSuggestionsOn, setAiSuggestionsOn] = React.useState(() => readPref("aiSuggestions"));
+  React.useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === PREFS_KEY) setAiSuggestionsOn(readPref("aiSuggestions"));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const [composing, setComposing] = React.useState(false);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
@@ -286,7 +296,7 @@ const ChatInput = ({
       </div>
 
       <AnimatePresence>
-        {showSuggestions && isEmptyState && (
+        {showSuggestions && isEmptyState && aiSuggestionsOn && (
           <motion.div
             ref={suggestionsRef}
             initial={{ opacity: 0, y: -8 }}

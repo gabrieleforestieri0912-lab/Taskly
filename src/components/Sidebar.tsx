@@ -55,6 +55,7 @@ import { GoogleCalendarSidebarCard } from "./sidebar/GoogleCalendarSidebarCard";
 import { OneTimeTooltip } from "./OnboardingTooltips";
 import { getAncestorIds } from "../lib/pageTree";
 import { collectDescendantIds } from "../lib/trashUtils";
+import { readPref } from "../lib/prefs";
 
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -345,6 +346,16 @@ export default function Sidebar({
       onDeletePage && onDeletePage(pendingDelete.id);
     }
     setPendingDelete(null);
+  };
+
+  // Cestino con/senza conferma (preferenza impostazioni): se la conferma
+  // è disattivata si elimina subito senza dialogo.
+  const requestDelete = (id: string) => {
+    if (readPref("confirmDelete")) {
+      setPendingDelete({ id });
+    } else {
+      onDeletePage && onDeletePage(id);
+    }
   };
 
   const { rootNodes, childrenMap, favoriteNodes } = React.useMemo(() => {
@@ -787,7 +798,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-indigo-500/10 text-indigo-500">
                 <Shield size={13} />
               </div>
-              <span>Sicurezza, Password & 2FA</span>
+              <span>Sicurezza & Password</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -1484,7 +1495,7 @@ export default function Sidebar({
                       expandedPages={{}}
                       onToggleExpand={() => {}}
                       onAddSubpage={handleAddSubpage}
-                      onDeletePage={(id: string) => setPendingDelete({ id })}
+                      onDeletePage={(id: string) => requestDelete(id)}
                       onUpdatePage={onUpdatePage}
                       onDuplicatePage={handleDuplicatePage}
                       onOpenPage={onOpenPage}
@@ -1549,7 +1560,7 @@ export default function Sidebar({
                       expandedPages={expandedPages}
                       onToggleExpand={togglePageExpand}
                       onAddSubpage={handleAddSubpage}
-                      onDeletePage={(id) => setPendingDelete({ id })}
+                      onDeletePage={(id) => requestDelete(id)}
                       onUpdatePage={onUpdatePage}
                       onMovePage={handleMovePage}
                       onDuplicatePage={handleDuplicatePage}

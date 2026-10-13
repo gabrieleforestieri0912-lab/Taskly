@@ -272,6 +272,21 @@ async function updateProfileSubscription(userId: string, patch: any) {
   return mapProfile(data);
 }
 
+/** Aggiorna il nome visualizzato nel profilo (max 80 caratteri). */
+async function updateProfileName(userId: string, name: string) {
+  const supabase = getSupabase();
+  const clean = String(name || "").trim().slice(0, 80);
+  if (!clean) throw new Error("empty_name");
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ name: clean })
+    .eq("id", userId)
+    .select("*")
+    .maybeSingle();
+  if (error) throw error;
+  return mapProfile(data);
+}
+
 // ---------------------------------------------------------------------------
 // Tasks
 // ---------------------------------------------------------------------------
@@ -1707,6 +1722,7 @@ export {
   getProfile,
   getProfileByEmail,
   updateProfileSubscription,
+  updateProfileName,
   // tasks
   listTasks,
   listAllTasks,

@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { resolvePageIcon } from "../lib/pageIcons";
+import { readPref, playCompletionSound } from "../lib/prefs";
 import { track } from "../lib/activity";
 import { nextDeadline } from "../lib/recurrence";
 
@@ -447,6 +448,8 @@ export default function ItemList({
 
     setItems(nextItems);
     if (updates.status === "done") {
+      // Preferenza impostazioni: feedback sonoro al completamento.
+      if (readPref("notifSound")) playCompletionSound();
       track({
         type: "task_completed",
         title: "Task completato",

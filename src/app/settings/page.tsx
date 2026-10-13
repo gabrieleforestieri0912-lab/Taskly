@@ -42,6 +42,12 @@ import { useLanguage } from "../../lib/LanguageContext";
 import { Theme, readTheme, applyTheme } from "../../lib/theme";
 import { applyAppFont, readAppFont, type AppFontId } from "../../lib/appFont";
 import { ACCENTS, applyAccent, readAccent, DEFAULT_ACCENT } from "../../lib/accent";
+import {
+  PREFS_KEY,
+  applyDensity,
+  ensureNotifPermission,
+  readUserPrefs,
+} from "../../lib/prefs";
 import GoogleCalendarIcon from "../../components/GoogleCalendarIcon";
 
 type SettingsTab =
@@ -60,7 +66,7 @@ const TABS: { id: SettingsTab; label: string; icon: any; desc: string }[] = [
   { id: "appearance", label: "Aspetto & Tema", icon: Palette, desc: "Tema chiaro/scuro, colori accento e font" },
   { id: "language", label: "Lingua & Regione", icon: Globe, desc: "Lingua, formato orario e preferenze calendario" },
   { id: "notifications", label: "Notifiche & Suoni", icon: Bell, desc: "Avvisi scadenze, digest email e suoni completamento" },
-  { id: "workflow", label: "Workflow & Produttività", icon: Sliders, desc: "Vista default, Pomodoro timer e opzioni AI" },
+  { id: "workflow", label: "Workflow & Produttività", icon: Sliders, desc: "Vista default, conferme e opzioni AI" },
   { id: "integrations", label: "Integrazioni App", icon: Layers, desc: "Google Calendar, Slack, Zoom e Webhook" },
   { id: "data", label: "Dati & Backup", icon: Download, desc: "Esportazione, importazione e gestione cache" },
   { id: "security", label: "Sicurezza & Privacy", icon: Shield, desc: "Password, 2FA, sessioni attive e GDPR" },
@@ -78,32 +84,34 @@ function SettingsContent() {
   const [accentColor, setAccentColor] = useState<string>(DEFAULT_ACCENT);
   const [fontFamily, setFontFamily] = useState<string>("inter");
   const [density, setDensity] = useState<"normal" | "compact">("normal");
-  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
-  // Profile state
+  // Profile state (nome sincronizzato col server, email gestita dall'auth)
   const [user, setUser] = useState<any>({
     name: "Utente",
     email: "utente@esempio.it",
-    bio: "Product enthusiast & task manager",
-    role: "Productivity Lead",
   });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
 
   // Notification prefs
   const [notifTaskDue, setNotifTaskDue] = useState(true);
-  const [notifDailyDigest, setNotifDailyDigest] = useState(true);
   const [notifSound, setNotifSound] = useState(true);
   const [notifMeetings, setNotifMeetings] = useState(true);
 
   // Workflow prefs
   const [defaultPageView, setDefaultPageView] = useState<"list" | "kanban">("list");
-  const [pomodoroWork, setPomodoroWork] = useState(25);
-  const [pomodoroBreak, setPomodoroBreak] = useState(5);
   const [aiSuggestions, setAiSuggestions] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(true);
 
   // Format prefs
-  const [timeFormat, setTimeFormat] = useState<"24h" | "12h">("24h");
   const [firstDayMonday, setFirstDayMonday] = useState(true);
+
+  // Integrations live status
+  const [integrationStatus, setIntegrationStatus] = useState<Record<string, boolean>>({});
 
   // Billing & Sub
   const [subscription, setSubscription] = useState<any>(null);
@@ -134,17 +142,16 @@ function SettingsContent() {
       const savedFont = readAppFont();
       setFontFamily(savedFont);
       applyAppFont(savedFont);
-      const savedPrefs = localStorage.getItem("taskly_user_preferences");
-      if (savedPrefs) {
-        const p = JSON.parse(savedPrefs);
-        if (p.density) setDensity(p.density);
-        if (typeof p.notifSound === "boolean") setNotifSound(p.notifSound);
-        if (typeof p.notifTaskDue === "boolean") setNotifTaskDue(p.notifTaskDue);
-        if (typeof p.notifDailyDigest === "boolean") setNotifDailyDigest(p.notifDailyDigest);
-        if (p.defaultPageView) setDefaultPageView(p.defaultPageView);
-        if (p.pomodoroWork) setPomodoroWork(p.pomodoroWork);
-        if (typeof p.aiSuggestions === "boolean") setAiSuggestions(p.aiSuggestions);
-      }
+      const p = readUserPrefs();
+      setDensity(p.density);
+      applyDensity(p.density);
+      setNotifSound(p.notifSound);
+      setNotifTaskDue(p.notifTaskDue);
+      setNotifMeetings(p.notifMeetings);
+      setDefaultPageView(p.defaultPageView);
+      setAiSuggestions(p.aiSuggestions);
+      setConfirmDelete(p.confirmDelete);
+      setFirstDayMonday(p.firstDayMonday);
     } catch (e) {}
   }, []);
 
@@ -155,17 +162,78 @@ function SettingsContent() {
       .catch(() => setSubscription({ status: "inactive", plan: "Starter" }));
   }, []);
 
+  // Stato reale delle integrazioni (Google/Slack/Zoom) dal server.
+  useEffect(() => {
+    apiFetch("/integrations")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const map: Record<string, boolean> = {};
+        for (const it of data?.integrations || []) {
+          if (it && it.provider) map[String(it.provider)] = Boolean(it.connected);
+        }
+        setIntegrationStatus(map);
+      })
+      .catch(() => {});
+  }, []);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    const name = (user.name || "").trim();
+    if (!name) {
+      showToast("Il nome non può essere vuoto.");
+      return;
+    }
+    setSavingProfile(true);
     try {
-      localStorage.setItem("user", JSON.stringify(user));
+      const res = await apiFetch("/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || "Errore nel salvataggio.");
+      const nextUser = { ...user, name: data?.profile?.name || name };
+      setUser(nextUser);
+      try {
+        localStorage.setItem("user", JSON.stringify(nextUser));
+      } catch {}
       showToast("Profilo aggiornato con successo!");
-    } catch {
-      showToast("Errore nel salvataggio del profilo.");
+    } catch (e: any) {
+      showToast(e?.message || "Errore nel salvataggio del profilo.");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      showToast("Inserisci la password attuale e quella nuova.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      showToast("La nuova password deve avere almeno 8 caratteri.");
+      return;
+    }
+    setSavingPassword(true);
+    try {
+      const res = await apiFetch("/user/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || "Impossibile aggiornare la password.");
+      setCurrentPassword("");
+      setNewPassword("");
+      showToast("Password aggiornata con successo!");
+    } catch (e: any) {
+      showToast(e?.message || "Errore nell'aggiornamento della password.");
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -174,20 +242,17 @@ function SettingsContent() {
       localStorage.setItem("taskly_accent", accentColor);
       localStorage.setItem("taskly_font", fontFamily);
       applyAppFont(fontFamily as AppFontId);
+      applyDensity(density);
       localStorage.setItem(
-        "taskly_user_preferences",
+        PREFS_KEY,
         JSON.stringify({
           density,
           notifSound,
           notifTaskDue,
-          notifDailyDigest,
           notifMeetings,
           defaultPageView,
-          pomodoroWork,
-          pomodoroBreak,
           aiSuggestions,
           confirmDelete,
-          timeFormat,
           firstDayMonday,
         }),
       );
@@ -195,6 +260,24 @@ function SettingsContent() {
     } catch {
       showToast("Errore nel salvataggio preferenze.");
     }
+  };
+
+  // Toggle notifiche di sistema: all'attivazione chiede il permesso al browser.
+  const handleNotifToggle = async (
+    key: "notifTaskDue" | "notifMeetings" | "notifSound",
+    val: boolean,
+    set: (v: boolean) => void,
+    title: string,
+  ) => {
+    if (!val) {
+      const ok = await ensureNotifPermission();
+      if (!ok) {
+        showToast("Permesso notifiche negato dal browser.");
+        return;
+      }
+    }
+    set(!val);
+    showToast(`${title}: ${!val ? "Attivato" : "Disattivato"}`);
   };
 
   const changeAccent = (color: string, label: string) => {
@@ -230,14 +313,47 @@ function SettingsContent() {
     }
   };
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     try {
+      // Server: pagine, task, obiettivi, idee, piano e profilo.
+      let server: any = null;
+      try {
+        const res = await apiFetch("/user/data");
+        if (res.ok) server = await res.json();
+      } catch {}
+      // Locale: preferenze, accento, font, schede, cache viste, meeting.
+      const local: Record<string, unknown> = {};
+      for (const k of [
+        "tasks",
+        "taskly_tasks_v1",
+        "goals",
+        "taskly_pages_v1",
+        "meetings_data",
+        "taskly_user_preferences",
+        "taskly_accent",
+        "taskly_font",
+        "dashboardOpenTabs",
+        "expanded_pages",
+        "page_history",
+        "taskly_dashboard_custom_widgets_v2",
+        "taskly_user_usecase",
+      ]) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw === null) continue;
+          try {
+            local[k] = JSON.parse(raw);
+          } catch {
+            local[k] = raw;
+          }
+        } catch {}
+      }
       const backup = {
         exportedAt: new Date().toISOString(),
         user,
         theme,
-        openTabs: JSON.parse(localStorage.getItem("dashboardOpenTabs") || "[]"),
-        expandedPages: JSON.parse(localStorage.getItem("expanded_pages") || "{}"),
+        server,
+        local,
         version: "2.0",
       };
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -247,7 +363,7 @@ function SettingsContent() {
       a.download = `taskly-backup-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast("Backup JSON scaricato con successo!");
+      showToast(server ? "Backup completo scaricato con successo!" : "Backup locale scaricato (non sei connesso).");
     } catch (e) {
       showToast("Errore durante l'esportazione dei dati.");
     }
@@ -256,7 +372,8 @@ function SettingsContent() {
   const handleClearCache = () => {
     try {
       localStorage.removeItem("dashboardOpenTabs");
-      localStorage.removeItem("taskly_analytics_widgets_v2");
+      localStorage.removeItem("taskly_dashboard_custom_widgets_v2");
+      localStorage.removeItem("page_history");
       showToast("Cache locale svuotata con successo.");
     } catch {
       showToast("Errore nella pulizia della cache.");
@@ -412,39 +529,21 @@ function SettingsContent() {
                       <input
                         type="email"
                         value={user.email || ""}
-                        onChange={(e) => setUser({ ...user, email: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
+                        readOnly
+                        title="L'email è gestita dal tuo provider di accesso e non si può cambiare da qui."
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 text-xs font-medium text-gray-500 focus:outline-none cursor-not-allowed"
                       />
+                      <p className="text-[10px] text-gray-400">Gestita dal provider di accesso.</p>
                     </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Ruolo / Professione</label>
-                    <input
-                      type="text"
-                      value={user.role || ""}
-                      onChange={(e) => setUser({ ...user, role: e.target.value })}
-                      placeholder="es. Product Manager, Ingegnere, Freelance"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Biografia / Motto</label>
-                    <textarea
-                      rows={3}
-                      value={user.bio || ""}
-                      onChange={(e) => setUser({ ...user, bio: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-(--accent)"
-                    />
                   </div>
 
                   <button
                     type="button"
                     onClick={handleSaveProfile}
-                    className="px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-all shadow-md shadow-(--accent)/20"
+                    disabled={savingProfile}
+                    className="px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-all shadow-md shadow-(--accent)/20 disabled:opacity-50"
                   >
-                    Salva Profilo
+                    {savingProfile ? "Salvataggio..." : "Salva Profilo"}
                   </button>
                 </div>
               )}
@@ -558,7 +657,10 @@ function SettingsContent() {
                     <div className="flex gap-3">
                       <button
                         type="button"
-                        onClick={() => setDensity("normal")}
+                        onClick={() => {
+                          setDensity("normal");
+                          applyDensity("normal");
+                        }}
                         className={`flex-1 p-3 rounded-xl border text-xs font-bold ${
                           density === "normal"
                             ? "border-(--accent) bg-(--accent)/10 text-(--accent)"
@@ -569,7 +671,10 @@ function SettingsContent() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setDensity("compact")}
+                        onClick={() => {
+                          setDensity("compact");
+                          applyDensity("compact");
+                        }}
                         className={`flex-1 p-3 rounded-xl border text-xs font-bold ${
                           density === "compact"
                             ? "border-(--accent) bg-(--accent)/10 text-(--accent)"
@@ -579,6 +684,9 @@ function SettingsContent() {
                         Compatta (Alta densità)
                       </button>
                     </div>
+                    <p className="text-[11px] text-gray-400">
+                      La modalità compatta riduce le spaziature in tutta l&apos;app. Applicata subito.
+                    </p>
                   </div>
                 </div>
               )}
@@ -592,18 +700,16 @@ function SettingsContent() {
                       <span>Lingua & Regione</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Imposta la lingua e i formati locali per date, ore e numeri.
+                      Imposta la lingua dell&apos;interfaccia e il primo giorno della settimana.
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Lingua dell&apos;Applicazione</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       {[
                         { code: "it", name: "Italiano", flag: "🇮🇹" },
                         { code: "en", name: "English", flag: "🇬🇧" },
-                        { code: "es", name: "Español", flag: "🇪🇸" },
-                        { code: "de", name: "Deutsch", flag: "🇩🇪" },
                       ].map((lang) => (
                         <button
                           key={lang.code}
@@ -625,62 +731,35 @@ function SettingsContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Formato Orario</label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setTimeFormat("24h")}
-                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
-                            timeFormat === "24h"
-                              ? "bg-cyan-500 text-white border-cyan-500"
-                              : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
-                          }`}
-                        >
-                          24 Ore (14:30)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTimeFormat("12h")}
-                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
-                            timeFormat === "12h"
-                              ? "bg-cyan-500 text-white border-cyan-500"
-                              : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
-                          }`}
-                        >
-                          12 Ore (2:30 PM)
-                        </button>
-                      </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Inizio Settimana</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setFirstDayMonday(true)}
+                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
+                          firstDayMonday
+                            ? "bg-cyan-500 text-white border-cyan-500"
+                            : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
+                        }`}
+                      >
+                        Lunedì
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFirstDayMonday(false)}
+                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
+                          !firstDayMonday
+                            ? "bg-cyan-500 text-white border-cyan-500"
+                            : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
+                        }`}
+                      >
+                        Domenica
+                      </button>
                     </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Inizio Settimana</label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setFirstDayMonday(true)}
-                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
-                            firstDayMonday
-                              ? "bg-cyan-500 text-white border-cyan-500"
-                              : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
-                          }`}
-                        >
-                          Lunedì
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFirstDayMonday(false)}
-                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold ${
-                            !firstDayMonday
-                              ? "bg-cyan-500 text-white border-cyan-500"
-                              : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
-                          }`}
-                        >
-                          Domenica
-                        </button>
-                      </div>
-                    </div>
+                    <p className="text-[11px] text-gray-400">
+                      Applicato al calendario e alla pianificazione settimanale.
+                    </p>
                   </div>
                 </div>
               )}
@@ -701,28 +780,28 @@ function SettingsContent() {
                   <div className="space-y-4">
                     {[
                       {
+                        key: "notifTaskDue" as const,
                         title: "Promemoria Scadenze Task",
-                        desc: "Ricevi una notifica in-app all'avvicinarsi della scadenza di un task prioritario.",
+                        desc: "Notifica di sistema per i task ad alta priorità scaduti o in scadenza oggi.",
                         val: notifTaskDue,
                         set: setNotifTaskDue,
+                        needsPermission: true,
                       },
                       {
-                        title: "Daily Digest via Email",
-                        desc: "Un riepilogo giornaliero delle attività aperte inviato ogni mattina alle 08:30.",
-                        val: notifDailyDigest,
-                        set: setNotifDailyDigest,
-                      },
-                      {
+                        key: "notifSound" as const,
                         title: "Effetti Sonori di Completamento",
-                        desc: "Riproduci un feedback sonoro festoso al completamento di una checklist o task.",
+                        desc: "Breve segnale acustico quando completi un task o una checklist.",
                         val: notifSound,
                         set: setNotifSound,
+                        needsPermission: false,
                       },
                       {
-                        title: "Avvisi Trascrizione Riunioni",
-                        desc: "Notifica istantanea quando l'AI ha terminato di trascrivere una riunione registrata.",
+                        key: "notifMeetings" as const,
+                        title: "Promemoria Riunioni di Oggi",
+                        desc: "Notifica di sistema con le riunioni in programma nella giornata.",
                         val: notifMeetings,
                         set: setNotifMeetings,
+                        needsPermission: true,
                       },
                     ].map((item, idx) => (
                       <div
@@ -736,8 +815,12 @@ function SettingsContent() {
                         <button
                           type="button"
                           onClick={() => {
-                            item.set(!item.val);
-                            showToast(`${item.title}: ${!item.val ? "Attivato" : "Disattivato"}`);
+                            if (item.needsPermission) {
+                              void handleNotifToggle(item.key, item.val, item.set, item.title);
+                            } else {
+                              item.set(!item.val);
+                              showToast(`${item.title}: ${!item.val ? "Attivato" : "Disattivato"}`);
+                            }
                           }}
                           className={`w-12 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${
                             item.val ? "bg-amber-500" : "bg-gray-300 dark:bg-gray-700"
@@ -764,12 +847,12 @@ function SettingsContent() {
                       <span>Workflow & Produttività</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Configura il comportamento predefinito di editor, timer e viste.
+                      Configura viste predefinite, conferme e suggerimenti AI.
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Vista Pagine Predefinita</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Vista Task Predefinita</label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
@@ -794,36 +877,26 @@ function SettingsContent() {
                         Bacheca Kanban
                       </button>
                     </div>
+                    <p className="text-[11px] text-gray-400">
+                      Applicata alle nuove pagine task (le roadmap restano in Kanban).
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Durata Focus Session (Pomodoro)</label>
-                      <select
-                        value={pomodoroWork}
-                        onChange={(e) => setPomodoroWork(Number(e.target.value))}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium"
-                      >
-                        <option value={20}>20 Minuti</option>
-                        <option value={25}>25 Minuti (Standard)</option>
-                        <option value={30}>30 Minuti</option>
-                        <option value={45}>45 Minuti (Deep Work)</option>
-                        <option value={50}>50 Minuti</option>
-                      </select>
+                  <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">Conferma prima di cestinare</p>
+                      <p className="text-[11px] text-gray-500">Mostra il dialogo di conferma quando sposti una pagina nel cestino.</p>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Durata Pausa Breve</label>
-                      <select
-                        value={pomodoroBreak}
-                        onChange={(e) => setPomodoroBreak(Number(e.target.value))}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs font-medium"
-                      >
-                        <option value={5}>5 Minuti (Standard)</option>
-                        <option value={10}>10 Minuti</option>
-                        <option value={15}>15 Minuti</option>
-                      </select>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(!confirmDelete)}
+                      aria-pressed={confirmDelete}
+                      className={`w-12 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer shrink-0 ${
+                        confirmDelete ? "bg-emerald-500" : "bg-gray-300 dark:bg-gray-700"
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${confirmDelete ? "translate-x-6" : ""}`} />
+                    </button>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -860,26 +933,28 @@ function SettingsContent() {
                   <div className="space-y-4">
                     {[
                       {
+                        provider: "google",
                         name: "Google Calendar",
                         desc: "Sincronizza automaticamente le scadenze dei task con il tuo calendario personale o aziendale.",
-                        connected: true,
                         icon: <GoogleCalendarIcon className="w-7 h-7" />,
                       },
                       {
+                        provider: "slack",
                         name: "Slack",
                         desc: "Invia notifiche istantanee e riepiloghi giornalieri sui canali del tuo team.",
-                        connected: false,
                         icon: "💬",
                       },
                       {
+                        provider: "zoom",
                         name: "Zoom",
                         desc: "Importa registrazioni cloud audio e video direttamente nella suite di trascrizione AI.",
-                        connected: false,
                         icon: "🎥",
                       },
-                    ].map((item, idx) => (
+                    ].map((item) => {
+                      const connected = Boolean(integrationStatus[item.provider]);
+                      return (
                       <div
-                        key={idx}
+                        key={item.provider}
                         className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center justify-between gap-4"
                       >
                         <div className="flex items-center gap-3">
@@ -893,15 +968,16 @@ function SettingsContent() {
                           type="button"
                           onClick={() => router.push("/integrations")}
                           className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                            item.connected
+                            connected
                               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                               : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-200"
                           }`}
                         >
-                          {item.connected ? "Connesso" : "Connetti"}
+                          {connected ? "Connesso" : "Connetti"}
                         </button>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-900/10 border border-cyan-100 dark:border-cyan-800/40 flex items-center justify-between">
@@ -975,7 +1051,7 @@ function SettingsContent() {
                       <span>Crittografia End-to-End Attiva</span>
                     </div>
                     <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
-                      Le tue note private e trascrizioni sono protette con cifratura AES-GCM a 256 bit lato client.
+                      Le note protette da passcode sono cifrate con AES-GCM a 256 bit lato client.
                     </p>
                   </div>
                 </div>
@@ -990,7 +1066,7 @@ function SettingsContent() {
                       <span>Sicurezza & Password</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Proteggi il tuo account con credenziali sicure e verifica a due fattori.
+                      Cambia la password del tuo account. Ti verrà chiesto di accedere di nuovo.
                     </p>
                   </div>
 
@@ -999,7 +1075,10 @@ function SettingsContent() {
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Password Attuale</label>
                       <input
                         type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="••••••••••••"
+                        autoComplete="current-password"
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs"
                       />
                     </div>
@@ -1007,30 +1086,20 @@ function SettingsContent() {
                       <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Nuova Password</label>
                       <input
                         type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Almeno 8 caratteri"
+                        autoComplete="new-password"
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs"
                       />
                     </div>
                     <button
                       type="button"
-                      onClick={() => showToast("Password aggiornata con successo!")}
-                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all"
+                      onClick={handleChangePassword}
+                      disabled={savingPassword}
+                      className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all disabled:opacity-50"
                     >
-                      Aggiorna Password
-                    </button>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white">Autenticazione a Due Fattori (2FA)</p>
-                      <p className="text-[11px] text-gray-500">Aggiungi un livello di protezione supplementare con Google Authenticator.</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => showToast("Configurazione 2FA in corso...")}
-                      className="px-3.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 text-xs font-bold"
-                    >
-                      Attiva 2FA
+                      {savingPassword ? "Aggiornamento..." : "Aggiorna Password"}
                     </button>
                   </div>
                 </div>

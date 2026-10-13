@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { isTaskOnDay } from "../lib/recurrence";
+import { readPref, playCompletionSound } from "../lib/prefs";
 
 // Id stabili (salvati nei task): mai rinominare gli `id`. Le etichette
 // visibili passano da `labelKey` così restano tradotte in entrambe le lingue.
@@ -277,8 +278,12 @@ export default function CalendarView({
   const getStartOfWeek = (date) => {
     const d = new Date(date);
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+    // Preferenza impostazioni: settimana da lunedì (default) o domenica.
+    if (readPref("firstDayMonday")) {
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(d.setDate(diff));
+    }
+    return new Date(d.setDate(d.getDate() - day));
   };
 
   const startOfWeek = getStartOfWeek(currentDate);
@@ -321,6 +326,11 @@ export default function CalendarView({
   };
 
   const toggleTask = (id) => {
+    const target = tasksList.find((t) => t.id === id);
+    // Preferenza impostazioni: feedback sonoro al completamento.
+    if (target && !target.completed && readPref("notifSound")) {
+      playCompletionSound();
+    }
     updateCalendarData({
       tasks: tasksList.map((t) =>
         t.id === id ? { ...t, completed: !t.completed } : t,
@@ -377,7 +387,10 @@ export default function CalendarView({
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const first = new Date(year, month, 1);
-    const startOffset = (first.getDay() + 6) % 7; // lun=0
+    // Lun=0 di default, Dom=0 se la settimana inizia di domenica.
+    const startOffset = readPref("firstDayMonday")
+      ? (first.getDay() + 6) % 7
+      : first.getDay();
     const startDate = new Date(first);
     startDate.setDate(first.getDate() - startOffset);
     const cells: Date[] = [];

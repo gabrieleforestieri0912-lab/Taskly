@@ -74,6 +74,7 @@ import {
 } from "../../lib/trashUtils";
 import { parseNaturalDate, loadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal } from "../../lib/taskModel";
 import { trackOnboardingEvent } from "../../hooks/useOnboarding";
+import { notifyLocal, readPref, readUserPrefs } from "../../lib/prefs";
 
 function CompactEditableTitle({
   title,
@@ -701,6 +702,58 @@ function DashboardContent() {
     setIsSidebarPeekOpen(false);
   }, [activePageId, searchParams]);
 
+  // Promemoria reali (preferenze notifiche): una volta per sessione, solo se
+  // il permesso di sistema è garantito. Task urgenti scaduti/odierni +
+  // riunioni in programma oggi.
+  const remindersSentRef = React.useRef(false);
+  useEffect(() => {
+    if (!hasLoadedUserData || remindersSentRef.current) return;
+    remindersSentRef.current = true;
+    try {
+      if (typeof window === "undefined" || !("Notification" in window)) return;
+      if (Notification.permission !== "granted") return;
+      const prefs = readUserPrefs();
+      if (prefs.notifTaskDue) {
+        const today = new Date().toISOString().split("T")[0];
+        const due = (Array.isArray(tasks) ? tasks : []).filter((tk: any) => {
+          if (!tk || tk.deleted || tk.status === "done" || tk.completed) return false;
+          if (tk.priority !== "Alta") return false;
+          const d = String(tk.deadline || tk.dueDate || "").slice(0, 10);
+          return d !== "" && d <= today;
+        });
+        if (due.length > 0) {
+          const names = due
+            .slice(0, 3)
+            .map((tk: any) => `• ${tk.title || tk.text || "Task"}`)
+            .join("\n");
+          notifyLocal(
+            `Taskly: ${due.length} task urgenti da chiudere`,
+            due.length > 3 ? `${names}\n…e altri ${due.length - 3}` : names,
+          );
+        }
+      }
+      if (prefs.notifMeetings) {
+        try {
+          const raw = localStorage.getItem("meetings_data");
+          const list = raw ? JSON.parse(raw) : [];
+          const today = new Date().toISOString().split("T")[0];
+          const todays = (Array.isArray(list) ? list : []).filter(
+            (m: any) => m && String(m.date || "").slice(0, 10) === today,
+          );
+          if (todays.length > 0) {
+            notifyLocal(
+              `Taskly: ${todays.length} riunion${todays.length === 1 ? "e" : "i"} oggi`,
+              todays
+                .slice(0, 3)
+                .map((m: any) => `• ${m.title || "Riunione"}`)
+                .join("\n"),
+            );
+          }
+        } catch {}
+      }
+    } catch {}
+  }, [hasLoadedUserData]);
+
   const duplicatePage = (id) => {
     const source = pages.find((p) => String(p.id) === String(id));
     if (!source) return;
@@ -1104,8 +1157,14 @@ function DashboardContent() {
       const title = effectivePage.label || "Caricamento...";
 
       if (pageType === "tasks") {
+        // Roadmap sempre Kanban; le altre pagine seguono la preferenza
+        // impostazioni (Vista Task Predefinita).
         const defaultView =
-          effectivePage.purpose === "project_management" ? "kanban" : "list";
+          effectivePage.purpose === "project_management"
+            ? "kanban"
+            : readPref("defaultPageView") === "kanban"
+              ? "kanban"
+              : "list";
         return withChildren(
           <ItemList
             title={title}

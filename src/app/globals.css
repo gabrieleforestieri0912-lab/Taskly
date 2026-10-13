@@ -37,6 +37,13 @@
   --color-gray-850: #171717;
 }
 
+/* ── Densità compatta (preferenza impostazioni) ─────────────────────────
+   Riduce lo spacing di Tailwind v4 (tutte le utility p-*, m-*, gap-*
+   derivano da --spacing) del 20% su tutto il documento. */
+.density-compact {
+  --spacing: 0.2rem;
+}
+
 /* ── Accento utente ────────────────────────────────────────────────────
    Il colore scelto nelle impostazioni guida l'interfaccia via variables
    impostate da applyAccent()/accentBootstrapScript() (src/lib/accent.ts).

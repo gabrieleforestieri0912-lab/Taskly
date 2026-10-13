@@ -10,6 +10,7 @@ import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "../lib/site";
 import { themeBootstrapScript } from "../lib/theme";
 import { appFontBootstrapScript } from "../lib/appFont";
 import { accentBootstrapScript } from "../lib/accent";
+import { densityBootstrapScript } from "../lib/prefs";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
 
@@ -135,6 +136,11 @@ export default function RootLayout({ children }) {
             <script
               dangerouslySetInnerHTML={{
                 __html: accentBootstrapScript(),
+              }}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: densityBootstrapScript(),
               }}
             />
             <script
