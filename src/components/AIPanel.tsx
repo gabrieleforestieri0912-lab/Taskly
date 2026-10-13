@@ -207,22 +207,24 @@ const ChatInput = ({
         className={`
           relative flex items-end gap-1.5
           bg-white dark:bg-gray-900
-          border border-gray-300 dark:border-gray-700
+          border border-gray-200 dark:border-gray-700/80
           transition-all duration-200 ease-out
-          focus-within:ring-2 focus-within:ring-(--accent)/30 focus-within:border-(--accent)/60
+          focus-within:border-(--accent)/60 focus-within:ring-4 focus-within:ring-(--accent)/15
+          focus-within:shadow-lg focus-within:shadow-(--accent)/10
+          shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]
+          dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.35)]
           max-w-[720px] mx-auto
-          px-2 py-2
+          pl-2 pr-2 py-2
         `}
         style={{
-          borderRadius: textareaHeight > 48 ? "26px" : "9999px",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.05)",
+          borderRadius: textareaHeight > 48 ? "24px" : "9999px",
         }}
         role="group"
         aria-label={t("views.aiInputLabel", "Input chat")}
       >
         <button
           type="button"
-          className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="shrink-0 self-end mb-0.5 flex items-center justify-center w-9 h-9 rounded-full text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300) hover:bg-(--accent)/10 transition-colors"
           aria-label={t("views.aiAttachLabel", "Allega file")}
           disabled={isStreaming}
         >
@@ -239,13 +241,13 @@ const ChatInput = ({
           placeholder={t("views.aiInputPh")}
           rows={1}
           className={`
-            flex-1 min-h-[40px] max-h-[150px]
+            flex-1 min-h-[40px] max-h-[180px] w-full
             bg-transparent border-0 resize-none
-            text-[15px] text-gray-900 dark:text-gray-100
-            placeholder-gray-400
+            text-[15px] leading-[1.55] text-gray-900 dark:text-gray-100
+            placeholder:text-gray-400 dark:placeholder:text-gray-500
             focus:outline-none
-            leading-relaxed
-            py-2 px-1
+            py-2 px-1.5
+            scrollbar-thin
           `}
           style={{
             height: `${textareaHeight}px`,
@@ -255,7 +257,7 @@ const ChatInput = ({
           aria-label={t("views.aiInputPh")}
         />
 
-        <div className="shrink-0 flex items-center justify-center">
+        <div className="shrink-0 self-end mb-0.5 flex items-center justify-center">
           {isStreaming ? (
             <button
               type="button"
@@ -273,10 +275,10 @@ const ChatInput = ({
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
               exit={{ scale: 0.8, opacity: 0, rotate: 90 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              className="w-9 h-9 rounded-full bg-(--accent) text-white flex items-center justify-center hover:bg-(--accent-hover) active:scale-95 transition-colors shadow-lg shadow-(--accent)/20"
+              className="w-10 h-10 rounded-full bg-(--accent) text-white flex items-center justify-center hover:bg-(--accent-hover) active:scale-95 transition-all shadow-lg shadow-(--accent)/25 hover:shadow-xl hover:shadow-(--accent)/30"
               aria-label={t("views.aiSendLabel", "Invia messaggio")}
             >
-              <Send size={16} />
+              <Send size={17} />
             </motion.button>
           ) : (
             <motion.button
@@ -303,7 +305,7 @@ const ChatInput = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15, staggerChildren: 0.03 }}
-            className="mt-3 flex flex-wrap gap-2"
+            className="mt-3.5 flex flex-wrap items-center justify-center gap-2 max-w-[720px] mx-auto px-2 text-center"
             role="list"
             aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}
           >
@@ -311,10 +313,10 @@ const ChatInput = ({
               <motion.button
                 key={prompt}
                 onClick={() => insertSuggestion(prompt)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-[13px] font-medium rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:bg-(--accent)/5 dark:hover:bg-(--accent)/10 hover:border-(--accent)/30 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow transition-all"
                 role="listitem"
               >
-                <Sparkles size={12} className="text-(--accent)" />
+                <Sparkles size={12} className="text-(--accent) shrink-0" />
                 {prompt}
               </motion.button>
             ))}
