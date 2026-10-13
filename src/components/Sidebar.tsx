@@ -1278,7 +1278,7 @@ export default function Sidebar({
           ASIDE — the Notion-style sidebar panel
           ════════════════════════════════════════════════════════════════════ */}
       <aside
-        className="group/sidebar relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
+        className="relative w-64 h-full flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200/50 dark:border-gray-800/50"
         aria-label="Navigazione sidebar"
       >
         {/* ── Workspace header ──────────────────────────────────────────────────
@@ -1323,13 +1323,13 @@ export default function Sidebar({
               <Inbox size={15} aria-hidden="true" />
             </Link>
 
-            {/* Chiudi sidebar (dentro la sidebar, stile Notion) */}
+            {/* Chiudi sidebar (sempre visibile, dentro la sidebar) */}
             <button
               type="button"
               onClick={() => setIsSidebarOpen(false)}
               title="Chiudi barra laterale"
               aria-label="Chiudi barra laterale"
-              className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 md:opacity-0 md:group-hover/sidebar:opacity-100 md:focus-visible:opacity-100"
+              className="p-1.5 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
             >
               <PanelLeftClose size={16} aria-hidden="true" />
             </button>
