@@ -36,6 +36,7 @@ import {
   Clock,
   Sparkles,
   Mic,
+  MessageSquare,
   Inbox,
   HelpCircle,
   PanelLeftClose,
@@ -359,12 +360,6 @@ export default function Sidebar({
   };
 
   const { rootNodes, childrenMap, favoriteNodes } = React.useMemo(() => {
-    const quickPage = pages.find(
-      (p) => p && p.id === "new-empty-page",
-    );
-    const quickChatPage = pages.find(
-      (p) => p && p.id === "new-chat-page",
-    );
     const map = new Map();
     const filtered = (pages || []).filter((p) => !p?.deleted);
     for (const p of filtered) {
@@ -391,14 +386,6 @@ export default function Sidebar({
 
     return { rootNodes: map.get(null) || [], childrenMap: map, favoriteNodes };
   }, [pages]);
-
-  const handleOpenQuickPage = (pageId: string) => {
-    const page = pages.find((p) => String(p.id) === String(pageId));
-    if (!page) return;
-    onOpenPage(page);
-    router.push(`/dashboard?page=${page.id}`);
-    onOpenQuickPage(pageId);
-  };
 
   const handleAddSubpage = (parentId: string, e?: React.MouseEvent) => {
     if (e && e.stopPropagation) e.stopPropagation();
@@ -1383,19 +1370,25 @@ export default function Sidebar({
                   },
                 },
                 {
-                  id: "sidebar-empty-btn",
-                  icon: FileText,
-                  label: t("nav.empty", "Pagina vuota"),
-                  onClick: () => handleOpenQuickPage("new-empty-page"),
+                  id: "sidebar-chat-btn",
+                  icon: MessageSquare,
+                  label: t("nav.chat", "Chat"),
+                  href: "/dashboard?ai=1",
+                  isActive: isAIActive,
+                  onClick: () => {
+                    setIsTranscriptionMode(false);
+                    setIsAIActive(true);
+                  },
                 },
                 {
-                  id: "sidebar-trash-btn",
-                  icon: Trash2,
-                  label: t("land.sideTrash", "Cestino"),
-                  badge: deletedCounts.pages > 0 ? deletedCounts.pages : undefined,
+                  id: "sidebar-meeting-btn",
+                  icon: Mic,
+                  label: t("nav.meetings", "Meeting"),
+                  href: "/meetings",
+                  isActive: isTranscriptionMode,
                   onClick: () => {
-                    setTrashSearch("");
-                    setIsTrashOpen((s) => !s);
+                    setIsAIActive(false);
+                    setIsTranscriptionMode(true);
                   },
                 },
               ]}
