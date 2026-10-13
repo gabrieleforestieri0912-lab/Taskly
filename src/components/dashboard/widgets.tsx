@@ -783,6 +783,9 @@ export function WidgetEditToolbar({
   onDragStart,
   onDragEnd,
   isDragging = false,
+  onTouchPointerDown,
+  onTouchPointerMove,
+  onTouchPointerUp,
 }: {
   label: string;
   isVisible: boolean;
@@ -797,6 +800,10 @@ export function WidgetEditToolbar({
   onDragEnd?: () => void;
   isDragging?: boolean;
   dragTitle?: string;
+  /** Trascinamento touch/pen (il DnD nativo non esiste su mobile). */
+  onTouchPointerDown?: (e: React.PointerEvent) => void;
+  onTouchPointerMove?: (e: React.PointerEvent) => void;
+  onTouchPointerUp?: (e: React.PointerEvent) => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-700/60 rounded-t-3xl text-xs font-bold text-gray-500 dark:text-gray-400">
@@ -806,10 +813,15 @@ export function WidgetEditToolbar({
             draggable
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
+            onPointerDown={onTouchPointerDown}
+            onPointerMove={onTouchPointerMove}
+            onPointerUp={onTouchPointerUp}
+            onPointerCancel={onTouchPointerUp}
+            onContextMenu={(e) => e.preventDefault()}
             title={dragTitle}
             role="button"
             aria-label={`${dragTitle}: ${label}`}
-            className={`touch-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${isDragging ? "opacity-50" : ""}`}
+            className={`touch-none select-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${isDragging ? "opacity-50" : ""}`}
           >
             <GripVertical size={13} className="opacity-80" aria-hidden="true" />
           </span>

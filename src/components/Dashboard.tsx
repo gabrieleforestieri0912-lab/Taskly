@@ -76,6 +76,9 @@ function SortableWidget({
   onMoveDown,
   onToggle,
   onDropWidget,
+  touchTarget,
+  onTouchHover,
+  onTouchCommit,
   children,
 }: {
   id: WidgetId;
@@ -90,18 +93,29 @@ function SortableWidget({
   onMoveDown: () => void;
   onToggle: () => void;
   onDropWidget: (draggedId: WidgetId, targetIndex: number, pos: "before" | "after") => void;
+  /** Target d'inserimento del trascinamento touch (stato condiviso). */
+  touchTarget: { id: WidgetId; pos: "before" | "after" } | null;
+  onTouchHover: (targetId: WidgetId, pos: "before" | "after") => void;
+  onTouchCommit: (draggedId: WidgetId) => void;
   children: React.ReactNode;
 }) {
   const [dropPos, setDropPos] = useState<"before" | "after" | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  // Trascinamento touch (il DnD nativo non esiste su mobile): pointer capture
+  // sulla maniglia, target rilevato con elementFromPoint.
+  const touchDragRef = React.useRef<number | null>(null);
 
   const posFromEvent = (e: React.DragEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     return e.clientY - rect.top < rect.height / 2 ? ("before" as const) : ("after" as const);
   };
 
+  const showBefore = dropPos === "before" || (touchTarget?.id === id && touchTarget.pos === "before");
+  const showAfter = dropPos === "after" || (touchTarget?.id === id && touchTarget.pos === "after");
+
   return (
     <div
+      data-widget-id={id}
       onDragOver={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -133,7 +147,7 @@ function SortableWidget({
           : "border-2 border-dashed border-gray-300 dark:border-gray-800 opacity-50 bg-gray-50/50 dark:bg-gray-900/20"
       } ${isDragging ? "opacity-50" : ""}`}
     >
-      {dropPos === "before" && (
+      {showBefore && (
         <div className="h-1 rounded-full bg-(--accent) mx-4 mt-2" aria-hidden="true" />
       )}
       <WidgetEditToolbar
@@ -159,9 +173,41 @@ function SortableWidget({
           setIsDragging(false);
           setDropPos(null);
         }}
+        onTouchPointerDown={(e) => {
+          if (e.pointerType === "mouse") return;
+          e.preventDefault();
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {}
+          touchDragRef.current = e.pointerId;
+          setIsDragging(true);
+        }}
+        onTouchPointerMove={(e) => {
+          if (touchDragRef.current === null || e.pointerId !== touchDragRef.current) return;
+          const el = typeof document !== "undefined"
+            ? document.elementFromPoint(e.clientX, e.clientY)
+            : null;
+          const card = el && (el as HTMLElement).closest
+            ? (el as HTMLElement).closest("[data-widget-id]")
+            : null;
+          if (!card) return;
+          const targetId = card.getAttribute("data-widget-id");
+          if (!targetId) return;
+          const rect = card.getBoundingClientRect();
+          onTouchHover(
+            targetId as WidgetId,
+            e.clientY - rect.top < rect.height / 2 ? "before" : "after",
+          );
+        }}
+        onTouchPointerUp={(e) => {
+          if (touchDragRef.current === null || e.pointerId !== touchDragRef.current) return;
+          touchDragRef.current = null;
+          setIsDragging(false);
+          onTouchCommit(id);
+        }}
       />
       {children}
-      {dropPos === "after" && (
+      {showAfter && (
         <div className="h-1 rounded-full bg-(--accent) mx-4 mb-2" aria-hidden="true" />
       )}
     </div>
@@ -303,6 +349,32 @@ export default function Dashboard({
     next.splice(at, 0, moved);
     setWidgetOrder(next);
     persistConfig(next, visibleWidgets);
+  };
+
+  // Trascinamento touch: target condiviso (il pointer capture reindirizza
+  // gli eventi alla maniglia, le card non ricevono hover diretto).
+  const [touchTarget, setTouchTarget] = useState<{
+    id: WidgetId;
+    pos: "before" | "after";
+  } | null>(null);
+  const touchTargetRef = React.useRef<typeof touchTarget>(null);
+  const setTouchTargetBoth = (v: typeof touchTarget) => {
+    touchTargetRef.current = v;
+    setTouchTarget(v);
+  };
+  const moveWidgetToById = (
+    draggedId: WidgetId,
+    targetId: WidgetId,
+    pos: "before" | "after",
+  ) => {
+    const targetIndex = widgetOrder.indexOf(targetId);
+    if (targetIndex === -1) return;
+    moveWidgetTo(draggedId, targetIndex, pos);
+  };
+  const commitTouchDrop = (draggedId: WidgetId) => {
+    const t = touchTargetRef.current;
+    setTouchTargetBoth(null);
+    if (t) moveWidgetToById(draggedId, t.id, t.pos);
   };
 
   const applyPreset = (preset: "all" | "focus" | "analytics" | "minimal") => {
@@ -692,6 +764,9 @@ export default function Dashboard({
               onMoveDown={() => moveWidget(index, "down")}
               onToggle={() => toggleWidgetVisibility(wId)}
               onDropWidget={moveWidgetTo}
+              touchTarget={touchTarget}
+              onTouchHover={(targetId, pos) => setTouchTargetBoth({ id: targetId, pos })}
+              onTouchCommit={commitTouchDrop}
             >
               {renderWidgetContent(wId)}
             </SortableWidget>
