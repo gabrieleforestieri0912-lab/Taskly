@@ -39,6 +39,7 @@ import {
   Activity,
   Palette,
   Check,
+  Columns2,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -76,6 +77,7 @@ const BLOCK_TYPES = [
   { type: "youtube", label: "Video YouTube", icon: Video, cmd: "/yt" },
   { type: "document", label: "Documento / File", icon: FileText, cmd: "/doc" },
   { type: "divider", label: "Divisore", icon: Minus, cmd: "/div" },
+  { type: "columns", label: "Colonne", icon: Columns2, cmd: "/col" },
   {
     type: "empty",
     label: "Nuova Pagina",
@@ -255,6 +257,16 @@ function createBlock(type) {
       return { ...base, expanded: false, children: [] };
     case "divider":
       return { id: generateId(), type: "divider" };
+    case "columns":
+      return {
+        id: generateId(),
+        type: "columns",
+        color: "default",
+        columns: [
+          { id: generateId(), content: "" },
+          { id: generateId(), content: "" },
+        ],
+      };
     case "code":
       return { ...base, lang: "javascript", content: "" };
     case "image":
@@ -274,6 +286,41 @@ function createBlock(type) {
     default:
       return base;
   }
+}
+
+/* ─── Cella di colonna (textarea auto-growing + rimozione) ─────────── */
+
+function ColumnCell({ col, colorClass, onChange, onRemove, canRemove }) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [col.content]);
+  return (
+    <div className="group/col relative min-w-0 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/30 p-2 focus-within:border-cyan-300 dark:focus-within:border-cyan-800 transition-colors">
+      <textarea
+        ref={ref}
+        rows={1}
+        value={col.content || ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Scrivi…"
+        className={`w-full resize-none overflow-hidden bg-transparent border-none outline-none text-sm leading-relaxed placeholder-gray-300 dark:placeholder-gray-700 ${colorClass}`}
+      />
+      {canRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          title="Rimuovi colonna"
+          className="absolute top-1 right-1 p-1 rounded-md opacity-0 group-hover/col:opacity-100 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-all"
+        >
+          <X size={12} />
+        </button>
+      )}
+    </div>
+  );
 }
 
 /* ─── Block component ─────────────────────────────────────────── */
@@ -469,7 +516,7 @@ function BlockItem({
         exit={{ opacity: 0, y: -8 }}
         className="group flex items-center gap-2 py-2"
       >
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
@@ -497,7 +544,7 @@ function BlockItem({
       className="group flex items-start gap-1 py-1 relative"
       ref={menuRef}
     >
-      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity pt-0.5">
         <button
           type="button"
           onClick={() => {
@@ -1058,7 +1105,7 @@ function BlockItem({
                       const newTasks = block.tasks.filter((_, i) => i !== ti);
                       onUpdate(block.id, { tasks: newTasks });
                     }}
-                    className="opacity-0 group-hover/task:opacity-100 p-1 text-gray-300 hover:text-red-500 transition-opacity"
+                    className="opacity-0 group-hover/task:opacity-100 [@media(hover:none)]:opacity-100 p-1 text-gray-300 hover:text-red-500 transition-opacity"
                   >
                     <Trash2 size={12} />
                   </button>
@@ -1125,6 +1172,53 @@ function BlockItem({
               />
             </div>
           </div>
+        ) : block.type === "columns" ? (
+          <div className="flex-1 min-w-0">
+            <div
+              className={`grid gap-2 ${
+                (block.columns || []).length >= 4
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                  : (block.columns || []).length === 3
+                    ? "grid-cols-1 sm:grid-cols-3"
+                    : "grid-cols-1 sm:grid-cols-2"
+              }`}
+            >
+              {(block.columns || []).map((col, ci) => (
+                <ColumnCell
+                  key={col.id || ci}
+                  col={col}
+                  colorClass={getColorClass(block.color)}
+                  onChange={(content) => {
+                    const cols = [...(block.columns || [])];
+                    cols[ci] = { ...cols[ci], content };
+                    onUpdate(block.id, { columns: cols });
+                  }}
+                  onRemove={() => {
+                    onUpdate(block.id, {
+                      columns: (block.columns || []).filter((_, i) => i !== ci),
+                    });
+                  }}
+                  canRemove={(block.columns || []).length > 1}
+                />
+              ))}
+            </div>
+            {(block.columns || []).length < 4 && (
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdate(block.id, {
+                    columns: [
+                      ...(block.columns || []),
+                      { id: generateId(), content: "" },
+                    ],
+                  });
+                }}
+                className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <Plus size={12} /> Aggiungi colonna
+              </button>
+            )}
+          </div>
         ) : block.type === "page-ref" ? (
           <div className="flex-1">
             <a
@@ -1137,7 +1231,7 @@ function BlockItem({
               })()}
               <span>{block.label || "Pagina"}</span>
             </a>
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity mt-1">
               <button
                 onClick={() => {
                   if (block.content === undefined) {
@@ -1264,7 +1358,7 @@ function BlockItem({
                     );
                     onUpdate(block.id, { children: newChildren });
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500"
+                  className="opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 p-0.5 text-gray-400 hover:text-red-500"
                 >
                   <X size={12} />
                 </button>
@@ -1429,13 +1523,14 @@ export default function NotesView({
     );
   }, []);
 
-  const deleteBlock = useCallback(
-    (id) => {
-      if (blocks.length <= 1) return;
-      setBlocks((prev) => prev.filter((b) => b.id !== id));
-    },
-    [blocks.length],
-  );
+  const deleteBlock = useCallback((id) => {
+    // L'ultimo blocco non si rimuove: si svuota (come Notion), così il
+    // comando non sembra mai "rotto" e resta sempre una riga scrivibile.
+    setBlocks((prev) => {
+      if (prev.length <= 1) return [{ ...createBlock("text") }];
+      return prev.filter((b) => b.id !== id);
+    });
+  }, []);
 
   const addBlockBelow = useCallback((afterId, type = "text") => {
     const newBlock = createBlock(type);
