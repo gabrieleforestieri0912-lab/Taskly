@@ -2,8 +2,11 @@
  * Preferenze utente (impostazioni) — lettura/scrittura + applicazione reale.
  * Ogni chiave salvata qui DEVE avere almeno un consumer che la applica,
  * altrimenti è un placeholder: non aggiungere chiavi senza consumer.
+ *
+ * Niente "use client": come theme.ts/appFont.ts, deve restare importabile
+ * dai Server Component (layout bootstrap) — tutti gli accessi a
+ * window/document/localStorage sono già protetti.
  */
-"use client";
 
 export const PREFS_KEY = "taskly_user_preferences";
 
