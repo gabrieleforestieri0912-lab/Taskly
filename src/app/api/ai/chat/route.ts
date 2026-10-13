@@ -26,10 +26,15 @@ export async function POST(request: NextRequest) {
     // Niente risposte preimpostate: se xKiro fallisce, il client mostra
     // l'errore reale invece di un fallback finto.
     console.error("AI chat xKiro error:", err?.message || err);
-    const status =
-      err?.message?.includes("Missing XKIRO_API_KEY") ? 500 : 502;
+    const missingKey = err?.message?.includes("Missing XKIRO_API_KEY");
+    const status = missingKey ? 500 : 502;
     return NextResponse.json(
-      { message: "", error: err?.message || "AI non disponibile" },
+      {
+        message: "",
+        error: missingKey
+          ? "Chiave AI non configurata sul server (XKIRO_API_KEY mancante)."
+          : err?.message || "AI non disponibile",
+      },
       { status },
     );
   }

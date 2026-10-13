@@ -216,8 +216,8 @@ function MeetingsContent() {
       <div
         className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${isSidebarOpen ? "pl-64" : "pl-0"}`}
       >
-        {/* Sticky Header Navbar */}
-        <header className="sticky top-0 z-30 h-14 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-950/60 backdrop-blur-xl px-6 flex items-center justify-between">
+        {/* Sticky Header Navbar — trasparente */}
+        <header className="sticky top-0 z-30 h-14 border-b border-transparent bg-transparent px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
