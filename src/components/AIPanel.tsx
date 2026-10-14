@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAIChat, createAIChatController } from "../lib/aiChatStore";
 import { PREFS_KEY, readPref } from "../lib/prefs";
 import type { OnAction } from "../lib/aiChatStore";
@@ -461,7 +462,7 @@ export default function AIPanel({
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  const { messages, isStreaming, error } = useAIChat();
+  const { messages, isStreaming, error, upgradeRequired, remaining } = useAIChat();
 
   const controller = createAIChatController({ pages, onAction });
 
@@ -604,6 +605,11 @@ export default function AIPanel({
                     <Sparkles size={14} className="text-(--accent)" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{t("views.aiTitle")}</h3>
+                  {typeof remaining === "number" && (
+                    <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500">
+                      {remaining > 0 ? `${remaining} messaggi rimasti oggi` : "Limite giornaliero raggiunto"}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-1">
                   {!isPageVariant && (
@@ -671,8 +677,17 @@ export default function AIPanel({
                     ))}
 
                     {error && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-xs text-red-600 dark:text-red-400">
-                        {error}
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-xs text-red-600 dark:text-red-400 space-y-2">
+                        <p>{error}</p>
+                        {upgradeRequired && (
+                          <Link
+                            href="/#pricing"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-colors"
+                          >
+                            <Sparkles size={12} />
+                            Fai l&apos;upgrade del piano
+                          </Link>
+                        )}
                       </div>
                     )}
 

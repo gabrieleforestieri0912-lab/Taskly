@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseBody } from "@/lib/server/http";
 import { xkiroChat } from "@/lib/server/xkiro";
+import { checkAiQuota, quotaExceededMessage } from "@/lib/server/aiQuota";
 
 const SYSTEM = `Sei Taskly AI, assistente di produttività. Rispondi in italiano, conciso e utile.
 Usa la sintassi markdown: **grassetto**, *corsivo*, \`codice\`, elenchi con - o 1.
@@ -67,6 +68,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "" }, { status: 400 });
   }
 
+  // Quota giornaliera (5/giorno Starter, illimitati piani a pagamento).
+  // Minichat e chat condividono questa route: un solo contatore per tutto.
+  const quota = await checkAiQuota(request);
+  if (!quota.allowed) {
+    return NextResponse.json(
+      {
+        message: "",
+        error: quotaExceededMessage(
+          Number(process.env.AI_DAILY_LIMIT_FREE) > 0
+            ? Number(process.env.AI_DAILY_LIMIT_FREE)
+            : 5,
+        ),
+        code: "AI_QUOTA_EXHAUSTED",
+        remaining: 0,
+      },
+      { status: 429 },
+    );
+  }
+
   try {
     const past = Array.isArray(history)
       ? history
@@ -83,7 +103,7 @@ export async function POST(request: NextRequest) {
       { role: "user", content: text.slice(0, 4000) },
     ]);
     const { clean, actions } = extractActions(reply);
-    return NextResponse.json({ message: clean, actions });
+    return NextResponse.json({ message: clean, actions, remaining: quota.remaining });
   } catch (err: any) {
     // Niente risposte preimpostate: se xKiro fallisce, il client mostra
     // l'errore reale invece di un fallback finto.

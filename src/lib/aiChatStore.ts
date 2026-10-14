@@ -31,6 +31,10 @@ const STORAGE_KEY = "taskly_ai_chat_messages";
 let messages: AIChatMessage[] = [];
 let isStreaming = false;
 let error: string | null = null;
+// Quota giornaliera AI: upgrade richiesto quando esaurita, messaggi rimasti
+// (null = illimitati o sconosciuti). Condivisi come il resto dello store.
+let upgradeRequired = false;
+let remaining: number | null = null;
 
 function loadStored(): AIChatMessage[] {
   if (typeof window === "undefined") return [];
@@ -84,7 +88,7 @@ function scrubFakeMessages(list: AIChatMessage[]): AIChatMessage[] {
   );
 }
 
-type Snapshot = { messages: AIChatMessage[]; isStreaming: boolean; error: string | null };
+type Snapshot = { messages: AIChatMessage[]; isStreaming: boolean; error: string | null; upgradeRequired: boolean; remaining: number | null };
 
 // Called once at module load (client only).
 if (typeof window !== "undefined") {
@@ -103,10 +107,10 @@ if (typeof window !== "undefined") {
 
 // Cached snapshot: getSnapshot must return a stable reference that only
 // changes when state actually changes, otherwise React loops forever.
-let snapshot: Snapshot = { messages, isStreaming, error };
+let snapshot: Snapshot = { messages, isStreaming, error, upgradeRequired, remaining };
 
 function makeSnapshot() {
-  snapshot = { messages, isStreaming, error };
+  snapshot = { messages, isStreaming, error, upgradeRequired, remaining };
 }
 
 function setState(next: Partial<Snapshot>) {
@@ -121,6 +125,14 @@ function setState(next: Partial<Snapshot>) {
   }
   if (next.error !== undefined && next.error !== error) {
     error = next.error;
+    changed = true;
+  }
+  if (next.upgradeRequired !== undefined && next.upgradeRequired !== upgradeRequired) {
+    upgradeRequired = next.upgradeRequired;
+    changed = true;
+  }
+  if (next.remaining !== undefined && next.remaining !== remaining) {
+    remaining = next.remaining;
     changed = true;
   }
   if (changed) {
@@ -243,7 +255,7 @@ function detectAction(text: string, pages: any[]): AIAction | null {
 
 // ─── Backend stream (returns a single accumulated reply) ─────────────────
 
-type ChatResult = { message: string; actions?: AIAction[] };
+type ChatResult = { message: string; actions?: AIAction[]; remaining?: number | null };
 
 async function streamChat(
   text: string,
@@ -260,6 +272,16 @@ async function streamChat(
   });
   if (!res.ok) {
     if (res.status === 429) {
+      // Quota giornaliera esaurita: il server chiede l'upgrade del piano.
+      const data429 = await res.json().catch(() => null);
+      if (data429?.code === "AI_QUOTA_EXHAUSTED") {
+        const err: any = new Error(
+          (typeof data429?.error === "string" && data429.error) ||
+          "Hai esaurito i messaggi AI giornalieri. Fai l'upgrade per continuare.",
+        );
+        err.upgradeRequired = true;
+        throw err;
+      }
       // Limite di richieste raggiunto (non un errore tecnico): messaggio
       // chiaro stile "crediti esauriti" con tempo di attesa dal server.
       const retryAfter = Number(res.headers.get("Retry-After") || 0);
@@ -278,7 +300,11 @@ async function streamChat(
   }
   const data = await res.json().catch(() => null);
   if (data?.error) throw new Error(`AI non disponibile: ${data.error}`);
-  return { message: data?.message || "", actions: Array.isArray(data?.actions) ? data.actions : [] };
+  return {
+    message: data?.message || "",
+    actions: Array.isArray(data?.actions) ? data.actions : [],
+    remaining: typeof data?.remaining === "number" ? data.remaining : null,
+  };
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────
@@ -404,6 +430,9 @@ export function createAIChatController(opts: {
     try {
       const history = messages.filter((m) => !m.streaming).slice(-10);
       const result = await streamChat(text, buildContext(), controller.signal, history);
+      if (typeof result.remaining === "number") {
+        setState({ remaining: result.remaining });
+      }
       // Esegui le modifiche proposte dall'AI sulle pagine (se ce ne sono)
       let suffix = "";
       if (result.actions?.length && onAction) {
@@ -434,6 +463,9 @@ export function createAIChatController(opts: {
             ? { error: "Impossibile comunicare con il servizio AI. Riprova più tardi." }
             : { error: err.message },
         );
+        if ((err as any)?.upgradeRequired) {
+          setState({ upgradeRequired: true, remaining: 0 });
+        }
         setState({ messages: messages.slice(0, -1) });
       }
     } finally {
@@ -466,7 +498,7 @@ export function createAIChatController(opts: {
   }
 
   function clear() {
-    setState({ messages: [], error: null });
+    setState({ messages: [], error: null, upgradeRequired: false });
   }
 
   return {
