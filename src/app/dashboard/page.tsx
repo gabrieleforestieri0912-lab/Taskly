@@ -58,6 +58,7 @@ import OnboardingModal from "../../components/OnboardingModal";
 import OnboardingChecklist from "../../components/OnboardingChecklist";
 import { motion, AnimatePresence } from "framer-motion";
 import AIPanel from "../../components/AIPanel";
+import PageCard, { getPagePreviewText } from "../../components/PageCard";
 import { useUserData } from "../../hooks/useUserData";
 import { apiFetch } from "../../lib/api";
 import { normalizeIconKey, resolvePageIcon } from "../../lib/pageIcons";
@@ -1262,31 +1263,17 @@ function DashboardContent() {
       const withChildren = (view) => (
         <>
           {childPages && childPages.length > 0 && (
-            <div className="mb-4">
-              <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{t("pg.subpages")}</div>
-              <div className="flex flex-wrap gap-2">
-                {childPages.map((c) => (
-                  <Link
-                    key={c.id}
-                    href={`/dashboard?page=${c.id}`}
-                    className="px-3 py-1.5 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-cyan-900/10 transition-colors"
-                  >
-                    <span className="flex items-center gap-2">
-                      {(() => {
-                        const IconComp =
-                          resolvePageIcon(c) || LayoutDashboard;
-                        return (
-                          <IconComp
-                            size={14}
-                            className={`${c.iconColor || "text-gray-400"} shrink-0`}
-                          />
-                        );
-                      })()}
-                      <span>{c.label || "(senza titolo)"}</span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
+            <div className="mb-4 space-y-2">
+              {childPages.map((c) => (
+                <PageCard
+                  key={c.id}
+                  pageId={String(c.id)}
+                  label={c.label}
+                  iconName={c.icon}
+                  iconColor={c.iconColor}
+                  preview={getPagePreviewText(c)}
+                />
+              ))}
             </div>
           )}
           {view}

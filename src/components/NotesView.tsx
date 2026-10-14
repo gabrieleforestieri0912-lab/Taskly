@@ -11,6 +11,7 @@ import {
   Skeleton,
 } from "./UIComponents";
 import PageHeader from "./PageHeader";
+import PageCard, { getPagePreviewText } from "./PageCard";
 import { encryptText, decryptText } from "../lib/crypto";
 import {
   Trash2,
@@ -1247,17 +1248,21 @@ function BlockItem({
             )}
           </div>
         ) : block.type === "page-ref" ? (
-          <div className="flex-1">
-            <a
-              href={`/dashboard?page=${block.pageId}`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition-all text-sm font-semibold shadow-sm"
-            >
-              {(() => {
-                const IconComp = LucideIcons[block.icon] || FileText;
-                return <IconComp size={16} className={block.iconColor || "text-cyan-500"} />;
-              })()}
-              <span>{block.label || "Pagina"}</span>
-            </a>
+          <div className="flex-1 min-w-0">
+            {(() => {
+              const target = (allPages || []).find(
+                (p) => p && String(p.id) === String(block.pageId),
+              );
+              return (
+                <PageCard
+                  pageId={String(block.pageId)}
+                  label={(target && target.label) || block.label}
+                  iconName={(target && target.icon) || block.icon}
+                  iconColor={(target && target.iconColor) || block.iconColor}
+                  preview={getPagePreviewText(target)}
+                />
+              );
+            })()}
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity mt-1">
               <button
                 onClick={() => {
