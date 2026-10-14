@@ -472,11 +472,17 @@ export default function AIPanel({
   const router = useRouter();
 
   useEffect(() => {
+    if (variant === "page") return;
     if (searchParams?.get("ai")) {
       setForcedFull(true);
       setIsOpen(true);
+    } else {
+      // Navigando a una pagina (?page=...) il parametro ?ai sparisce:
+      // la chat full-screen deve chiudersi, altrimenti copre il contenuto
+      // e sembra che i click sulle pagine non funzionino.
+      setForcedFull(false);
     }
-  }, [searchParams]);
+  }, [searchParams, variant]);
 
   useEffect(() => {
     if (!isPageVariant && !searchParams?.get("ai")) {
