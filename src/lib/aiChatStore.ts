@@ -11,10 +11,13 @@ export type AIChatMessage = {
 
 export type AIAction =
   | { type: "add_block"; payload?: any }
-  | { type: "update_page_content"; payload: { id: number; content: string } }
-  | { type: "insert_page_text"; payload: { id: number; text: string } }
-  | { type: "create_page"; payload: { label: string; parentId?: number | null } }
-  | { type: "update_page"; payload: { id: number; updates: Record<string, any> } }
+  | { type: "update_page_content"; payload: { id: number | string; content: string } }
+  | { type: "insert_page_text"; payload: { id: number | string; text: string } }
+  | { type: "append_text"; payload: { pageId?: number | string; pageLabel?: string; text: string } }
+  | { type: "add_task"; payload: { pageId?: number | string; pageLabel?: string; title: string; priority?: string; deadline?: string } }
+  | { type: "add_goal"; payload: { pageId?: number | string; pageLabel?: string; title: string; deadline?: string } }
+  | { type: "create_page"; payload: { label: string; parentId?: number | string | null; type?: string; contentText?: string } }
+  | { type: "update_page"; payload: { id: number | string; updates: Record<string, any> } }
   | { type: "error"; payload: { message: string } };
 
 export type OnAction = (action: AIAction) => any;
@@ -240,8 +243,15 @@ function detectAction(text: string, pages: any[]): AIAction | null {
 
 // ─── Backend stream (returns a single accumulated reply) ─────────────────
 
-async function streamChat(text: string, context: string, signal: AbortSignal): Promise<string> {
-  const payload = { message: text + context, context: {} };
+type ChatResult = { message: string; actions?: AIAction[] };
+
+async function streamChat(
+  text: string,
+  context: string,
+  signal: AbortSignal,
+  history: AIChatMessage[],
+): Promise<ChatResult> {
+  const payload = { message: text, contextDump: context, history: history.slice(-10) };
   const res = await apiFetch(`/ai/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -268,7 +278,7 @@ async function streamChat(text: string, context: string, signal: AbortSignal): P
   }
   const data = await res.json().catch(() => null);
   if (data?.error) throw new Error(`AI non disponibile: ${data.error}`);
-  return data?.message || "";
+  return { message: data?.message || "", actions: Array.isArray(data?.actions) ? data.actions : [] };
 }
 
 // ─── Public API ──────────────────────────────────────────────────────────
@@ -283,14 +293,91 @@ export function createAIChatController(opts: {
 }) {
   const { pages = [], onAction } = opts;
 
+  // ── Serializzazione contenuto reale delle pagine per l'AI ──
+  function getActivePageId(): string | null {
+    try {
+      if (typeof window === "undefined") return null;
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get("page");
+    } catch { return null; }
+  }
+
+  function truncate(s: string, n: number): string {
+    const t = String(s || "");
+    return t.length > n ? t.slice(0, n) + "…" : t;
+  }
+
+  function blocksToText(data: any, budget: number): string {
+    try {
+      if (!data) return "";
+      if (Array.isArray(data)) {
+        // task / goal / idee strutturate
+        return data.slice(0, 25).map((it: any, i: number) => {
+          const title = it?.title ?? it?.text ?? it?.name ?? JSON.stringify(it).slice(0, 120);
+          const extra = it?.status ? ` [${it.status}]` : it?.completed ? " [done]" : "";
+          const sub = Array.isArray(it?.subtasks) && it.subtasks.length
+            ? ` (sotto: ${it.subtasks.slice(0, 5).map((s: any) => s?.title ?? s).join("; ")})`
+            : "";
+          return `${i + 1}. ${title}${extra}${sub}`;
+        }).join("\n").slice(0, budget);
+      }
+      if (typeof data === "object" && Array.isArray((data as any).blocks)) {
+        const lines: string[] = [];
+        for (const b of (data as any).blocks) {
+          if (!b) continue;
+          if (typeof b.content === "string" && b.content.trim()) {
+            const prefix = b.type === "h1" ? "# " : b.type === "h2" ? "## " : b.type === "h3" ? "### "
+              : b.type === "bullet" ? "- " : b.type === "checkbox" ? (b.checked ? "- [x] " : "- [ ] ")
+              : b.type === "numbered" ? "1. " : b.type === "divider" ? "---" : "";
+            lines.push(`${prefix}${truncate(b.content, 300)}`);
+          }
+          if (b.type === "tasks-embed" && Array.isArray(b.items)) {
+            b.items.slice(0, 20).forEach((it: any, i: number) =>
+              lines.push(`  task ${i + 1}: ${truncate(it?.title ?? it?.text ?? "", 150)}${it?.status ? ` [${it.status}]` : ""}`));
+          }
+          if (b.type === "goals-embed" && Array.isArray(b.goals)) {
+            b.goals.slice(0, 15).forEach((g: any, i: number) =>
+              lines.push(`  obiettivo ${i + 1}: ${truncate(g?.title ?? "", 150)}${g?.completed ? " [done]" : ""}`));
+          }
+          if (b.type === "planner-embed" && b.schedule) {
+            const sch = b.schedule;
+            const n = Array.isArray(sch.tasks) ? sch.tasks.length : 0;
+            lines.push(`  [planner: ${n} attività pianificate]`);
+            if (Array.isArray(sch.tasks)) sch.tasks.slice(0, 10).forEach((t: any) =>
+              lines.push(`  - ${truncate(t?.title ?? t?.text ?? "", 120)}`));
+          }
+          if (b.type === "page-ref") lines.push(`  [sottopagina: ${b.label ?? b.pageId}]`);
+          const joined = lines.join("\n");
+          if (joined.length >= budget) return joined.slice(0, budget);
+        }
+        return lines.join("\n").slice(0, budget);
+      }
+      if (typeof data === "object" && typeof (data as any).text === "string") {
+        return truncate((data as any).text, budget);
+      }
+      if (typeof data === "string") return truncate(data, budget);
+    } catch {}
+    return "";
+  }
+
   function buildContext() {
-    const list = Array.isArray(pages) ? pages : [];
+    const list = (Array.isArray(pages) ? pages : []).filter((p) => p && !p.deleted);
     if (!list.length) return "";
-    const summaries = list.map((p) => {
-      const count = Array.isArray(p.data) ? p.data.length : 0;
-      return `- ${p.label} (${p.type || "pagina"}, ${count} elementi)`;
-    });
-    return `\n\nContesto pagine utente:\n${summaries.join("\n")}`;
+    const activeId = getActivePageId();
+    const lines: string[] = [];
+    let budget = 12000;
+    // Pagina attiva prima, con contenuto esteso
+    const ordered = [...list].sort((a, b) =>
+      String(a?.id) === String(activeId) ? -1 : String(b?.id) === String(activeId) ? 1 : 0);
+    for (const p of ordered.slice(0, 30)) {
+      const isActive = activeId && String(p.id) === String(activeId);
+      const perPage = isActive ? 4000 : 800;
+      const content = blocksToText(p.data ?? (p as any).initialData, perPage);
+      lines.push(`### "${p.label || "(senza titolo)"}" [id:${p.id}] tipo:${p.type || "?"}${isActive ? " ← PAGINA APERTA" : ""}\n${content || "(vuota)"}`);
+      budget -= perPage;
+      if (budget <= 0) break;
+    }
+    return `Pagine utente (l'AI le VEDE e può modificarle con azioni):\n${lines.join("\n\n")}`;
   }
 
   let abortController: AbortController | null = null;
@@ -315,7 +402,23 @@ export function createAIChatController(opts: {
     abortController = controller;
 
     try {
-      const reply = await streamChat(text, buildContext(), controller.signal);
+      const history = messages.filter((m) => !m.streaming).slice(-10);
+      const result = await streamChat(text, buildContext(), controller.signal, history);
+      // Esegui le modifiche proposte dall'AI sulle pagine (se ce ne sono)
+      let suffix = "";
+      if (result.actions?.length && onAction) {
+        const outcomes: string[] = [];
+        for (const a of result.actions.slice(0, 5)) {
+          try {
+            const r = await Promise.resolve(onAction(a));
+            if (r?.message) outcomes.push(r.message);
+          } catch (e: any) {
+            outcomes.push(`Errore: ${e?.message || "azione fallita"}`);
+          }
+        }
+        if (outcomes.length) suffix = `\n\n✅ ${outcomes.join("\n✅ ")}`;
+      }
+      const reply = `${result.message || "Fatto."}${suffix}`;
       setState({ isStreaming: false });
       setState({
         messages: [

@@ -37,8 +37,6 @@ import {
   Target,
   Video,
   Activity,
-  Palette,
-  Check,
   Columns2,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
@@ -348,7 +346,6 @@ function BlockItem({
 }) {
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
-  const [showColorMenu, setShowColorMenu] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -364,7 +361,6 @@ function BlockItem({
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
-        setShowColorMenu(false);
         setSlashMenuOpen(false);
         setBracketMenuOpen(false);
       }
@@ -627,23 +623,11 @@ function BlockItem({
           type="button"
           onClick={() => {
             setShowMenu(!showMenu);
-            setShowColorMenu(false);
           }}
           title={t("views.notesInsertBlock")}
           className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
         >
           <Plus size={14} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setShowColorMenu(!showColorMenu);
-            setShowMenu(false);
-          }}
-          title="Colore del testo"
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-        >
-          <Palette size={14} />
         </button>
       </div>
 
@@ -834,44 +818,6 @@ function BlockItem({
               className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-500 transition-colors"
             >
               <Trash2 size={16} />{t("views.notesDeleteBlock")}</button>
-          </motion.div>
-        )}
-
-        {/* Dedicated color palette dropdown */}
-        {showColorMenu && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -4 }}
-            className="absolute left-8 top-7 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl p-2 w-48"
-          >
-            <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Colore testo</p>
-            <div className="space-y-0.5 mt-1 max-h-56 overflow-y-auto custom-scrollbar">
-              {TEXT_COLORS.map((tc) => (
-                <button
-                  key={tc.value}
-                  type="button"
-                  onClick={() => {
-                    onUpdate(block.id, { color: tc.value });
-                    setShowColorMenu(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
-                    (block.color || "default") === tc.value
-                      ? "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
-                      style={{ backgroundColor: tc.bgHex }}
-                    />
-                    <span>{tc.label}</span>
-                  </div>
-                  {(block.color || "default") === tc.value && <Check size={12} className="text-cyan-500" />}
-                </button>
-              ))}
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

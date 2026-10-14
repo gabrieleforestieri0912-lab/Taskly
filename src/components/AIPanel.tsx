@@ -46,6 +46,114 @@ const QUICK_ACTIONS = [
   { id: "plan", icon: Target, label: "Crea piano" },
 ];
 
+/** Mini-renderer markdown (zero dipendenze) per i messaggi AI.
+ * Supporta: **grassetto**, *corsivo*, `codice`, ```blocchi```,
+ * # titoli, - elenchi, 1. numerati, - [ ] checkbox, [link](url). */
+function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  // link, bold, italic, code — un solo passaggio con regex alternata
+  const re = /(\[([^\]]+)\]\((https?:[^)\s]+)\))|(\*\*([^*]+)\*\*)|(\*([^*\n]+)\*)|(_([^_\n]+)_)|(`([^`\n]+)`)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    if (m[1]) {
+      out.push(
+        <a key={`${keyPrefix}-${k++}`} href={m[3]} target="_blank" rel="noreferrer" className="underline underline-offset-2 text-(--accent)">
+          {m[2]}
+        </a>,
+      );
+    } else if (m[4]) {
+      out.push(<strong key={`${keyPrefix}-${k++}`} className="font-bold text-gray-900 dark:text-white">{m[5]}</strong>);
+    } else if (m[6] || m[8]) {
+      out.push(<em key={`${keyPrefix}-${k++}`}>{m[7] ?? m[9]}</em>);
+    } else if (m[10]) {
+      out.push(
+        <code key={`${keyPrefix}-${k++}`} className="px-1 py-0.5 rounded bg-gray-200/70 dark:bg-gray-800 text-[12.5px] font-mono">
+          {m[11]}
+        </code>,
+      );
+    }
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+function MarkdownText({ text }: { text: string }) {
+  const blocks = React.useMemo(() => {
+    const parts = String(text || "").split(/```/);
+    const nodes: React.ReactNode[] = [];
+    parts.forEach((part, pi) => {
+      if (pi % 2 === 1) {
+        // fence di codice (tollera streaming senza chiusura)
+        nodes.push(
+          <pre key={`code-${pi}`} className="my-2 overflow-x-auto rounded-lg bg-gray-900 p-3 text-[12.5px] leading-relaxed text-gray-100 font-mono whitespace-pre-wrap">
+            {part.replace(/^\w+\n/, "")}
+          </pre>,
+        );
+        return;
+      }
+      const lines = part.split("\n");
+      let i = 0;
+      let k = 0;
+      while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        if (!trimmed) { i++; continue; }
+        const h = /^(#{1,3})\s+(.*)$/.exec(trimmed);
+        if (h) {
+          const lvl = h[1].length;
+          nodes.push(
+            lvl === 1
+              ? <p key={`b-${pi}-${k++}`} className="mt-1 text-[15px] font-extrabold text-gray-900 dark:text-white">{renderInline(h[2], `h-${pi}-${k}`)}</p>
+              : <p key={`b-${pi}-${k++}`} className="mt-1 text-sm font-bold text-gray-900 dark:text-white">{renderInline(h[2], `h-${pi}-${k}`)}</p>,
+          );
+          i++; continue;
+        }
+        // gruppo elenco consecutivo
+        const listLines: string[] = [];
+        let j = i;
+        while (j < lines.length) {
+          const t = lines[j].trim();
+          if (/^(?:-|\*|•)\s+\[([ xX])\]\s+/.test(t) || /^(?:-|\*|•)\s+/.test(t) || /^\d+[.)]\s+/.test(t)) { listLines.push(lines[j]); j++; }
+          else break;
+        }
+        if (listLines.length > 0) {
+          const ordered = /^\d+[.)]\s+/.test(listLines[0].trim());
+          const items = listLines.map((ln, li) => {
+            const t = ln.trim();
+            const cb = /^(?:-|\*|•)\s+\[([ xX])\]\s+(.*)$/.exec(t);
+            if (cb) {
+              return (
+                <li key={li} className="flex items-start gap-2">
+                  <span className={`mt-1 inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border text-[10px] ${cb[1].toLowerCase() === "x" ? "bg-emerald-500 border-emerald-500 text-white" : "border-gray-300 dark:border-gray-600"}`}>
+                    {cb[1].toLowerCase() === "x" ? "✓" : ""}
+                  </span>
+                  <span>{renderInline(cb[2], `li-${pi}-${k}-${li}`)}</span>
+                </li>
+              );
+            }
+            const content = t.replace(/^(?:-|\*|•)\s+/, "").replace(/^\d+[.)]\s+/, "");
+            return <li key={li}>{renderInline(content, `li-${pi}-${k}-${li}`)}</li>;
+          });
+          nodes.push(
+            ordered
+              ? <ol key={`b-${pi}-${k++}`} className="my-1 list-decimal space-y-1 pl-5">{items}</ol>
+              : <ul key={`b-${pi}-${k++}`} className="my-1 list-disc space-y-1 pl-5">{items}</ul>,
+          );
+          i = j; continue;
+        }
+        nodes.push(<p key={`b-${pi}-${k++}`} className="my-0.5">{renderInline(line, `p-${pi}-${k}`)}</p>);
+        i++;
+      }
+    });
+    return nodes;
+  }, [text]);
+  return <div className="break-words">{blocks}</div>;
+}
+
 function MessageBubble({ msg }: { msg: { role: string; content: string; streaming?: boolean } }) {
   const { t } = useLanguage();
   const [copied, setCopied] = React.useState(false);
@@ -76,13 +184,13 @@ function MessageBubble({ msg }: { msg: { role: string; content: string; streamin
           </div>
         )}
         <div
-          className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+          className={`px-4 py-3 text-sm leading-relaxed ${
             isUser
-              ? "bg-(--accent) text-white rounded-2xl rounded-br-md"
+              ? "bg-(--accent) text-white rounded-2xl rounded-br-md whitespace-pre-wrap"
               : "bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-200 rounded-2xl rounded-bl-md"
           }`}
         >
-          {msg.content || "…"}
+          {msg.content ? (isUser ? msg.content : <MarkdownText text={msg.content} />) : "…"}
           {msg.streaming && (
             <span className="inline-block w-1.5 h-4 bg-(--accent) ml-0.5 rounded-full align-middle" />
           )}

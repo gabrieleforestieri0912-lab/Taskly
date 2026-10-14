@@ -907,15 +907,176 @@ function DashboardContent() {
       return { ok: false, message: "Azione AI non valida." };
     }
 
+    const findTargetPage = (pageId, pageLabel) => {
+      const list = Array.isArray(pages) ? pages : [];
+      if (pageId) {
+        const byId = list.find((p) => p && !p.deleted && String(p.id) === String(pageId));
+        if (byId) return byId;
+      }
+      if (pageLabel) {
+        const needle = String(pageLabel).trim().toLowerCase();
+        return list.find((p) => p && !p.deleted && String(p.label || "").toLowerCase().includes(needle)) || null;
+      }
+      return null;
+    };
+
+    const textToBlocks = (text) =>
+      String(text || "")
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .slice(0, 20)
+        .map((line) => {
+          const h = /^(#{1,3})\s+(.*)$/.exec(line);
+          if (h) return { id: `b_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, type: h[1].length === 1 ? "h1" : h[1].length === 2 ? "h2" : "h3", content: h[2] };
+          const cb = /^(?:-|\*)\s*\[([ xX])\]\s+(.*)$/.exec(line);
+          if (cb) return { id: `b_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, type: "checkbox", content: cb[2], checked: cb[1].toLowerCase() === "x" };
+          const bul = /^(?:-|\*|•)\s+(.*)$/.exec(line);
+          if (bul) return { id: `b_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, type: "bullet", content: bul[1] };
+          return { id: `b_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, type: "text", content: line };
+        });
+
+    const appendTextToPage = (page, text) => {
+      const blocks = textToBlocks(text);
+      if (!blocks.length) return false;
+      const d = page.data;
+      if (d && typeof d === "object" && !Array.isArray(d) && Array.isArray(d.blocks)) {
+        updatePageData(page.id, { ...d, blocks: [...d.blocks, ...blocks] });
+        return true;
+      }
+      if (d && typeof d === "object" && !Array.isArray(d) && typeof d.text === "string") {
+        updatePageData(page.id, { ...d, text: `${d.text}\n${text}` });
+        return true;
+      }
+      if (Array.isArray(d)) {
+        // pagina strutturata: il testo diventa task da completare
+        const items = blocks.map((b) => ({
+          id: Math.random().toString(36).substring(2, 9),
+          title: b.content,
+          status: "todo",
+          priority: "Media",
+          deadline: "",
+          createdAt: new Date().toISOString(),
+        }));
+        updatePageData(page.id, [...d, ...items]);
+        return true;
+      }
+      updatePageData(page.id, { blocks, tags: [] });
+      return true;
+    };
+
+    const addTaskToPage = (page, { title, priority, deadline }) => {
+      const task = {
+        id: Math.random().toString(36).substring(2, 9),
+        title: String(title || "Nuovo task"),
+        priority: priority || "Media",
+        status: "todo",
+        deadline: deadline || "",
+        assignee: "",
+        links: [],
+        createdAt: new Date().toISOString(),
+      };
+      const d = page.data;
+      if (Array.isArray(d)) {
+        updatePageData(page.id, [task, ...d]);
+        return true;
+      }
+      if (d && typeof d === "object" && !Array.isArray(d) && Array.isArray(d.blocks)) {
+        const idx = d.blocks.findIndex((b) => b && b.type === "tasks-embed");
+        if (idx !== -1) {
+          const next = [...d.blocks];
+          const embed = next[idx];
+          next[idx] = { ...embed, items: [task, ...(Array.isArray(embed.items) ? embed.items : [])] };
+          updatePageData(page.id, { ...d, blocks: next });
+        } else {
+          updatePageData(page.id, {
+            ...d,
+            blocks: [...d.blocks, { id: `b_${Date.now()}`, type: "checkbox", content: task.title, checked: false }],
+          });
+        }
+        return true;
+      }
+      return false;
+    };
+
+    const addGoalToPage = (page, { title, deadline }) => {
+      const goal = {
+        id: Math.random().toString(36).substring(2, 9),
+        title: String(title || "Nuovo obiettivo"),
+        category: "generale",
+        completed: false,
+        deadline: deadline || "",
+        level: 0,
+        subGoals: [],
+        createdAt: new Date().toISOString(),
+      };
+      const d = page.data;
+      if (Array.isArray(d)) {
+        updatePageData(page.id, [goal, ...d]);
+        return true;
+      }
+      if (d && typeof d === "object" && !Array.isArray(d) && Array.isArray(d.blocks)) {
+        const idx = d.blocks.findIndex((b) => b && b.type === "goals-embed");
+        if (idx !== -1) {
+          const next = [...d.blocks];
+          const embed = next[idx];
+          next[idx] = { ...embed, goals: [goal, ...(Array.isArray(embed.goals) ? embed.goals : [])] };
+          updatePageData(page.id, { ...d, blocks: next });
+        } else {
+          updatePageData(page.id, {
+            ...d,
+            blocks: [...d.blocks, { id: `b_${Date.now()}`, type: "checkbox", content: goal.title, checked: false }],
+          });
+        }
+        return true;
+      }
+      return false;
+    };
+
     if (action.type === "create_page") {
       const label = action.payload?.label || "Nuova Pagina";
+      const contentText = typeof action.payload?.contentText === "string" ? action.payload.contentText : "";
+      const ptype = action.payload?.type || (contentText ? "empty" : "tasks");
+      const initialData = contentText
+        ? { blocks: [{ id: `b_${Date.now()}`, type: "h1", content: label }, ...textToBlocks(contentText), { id: `t_${Date.now()}`, type: "text", content: "" }], tags: [] }
+        : undefined;
       addPage({
         label,
-        type: "tasks",
+        type: ptype,
         icon: "layout-dashboard",
         parentId: action.payload?.parentId || null,
+        ...(initialData ? { initialData } : {}),
       });
       return { ok: true, message: `Pagina "${label}" creata nella dashboard.` };
+    }
+
+    if (action.type === "append_text") {
+      const target = findTargetPage(action.payload?.pageId ?? action.payload?.id, action.payload?.pageLabel);
+      if (!target) return { ok: false, message: `Pagina "${action.payload?.pageLabel || action.payload?.pageId || "?"}" non trovata.` };
+      const ok = appendTextToPage(target, action.payload?.text || "");
+      return ok
+        ? { ok: true, message: `Testo aggiunto a "${target.label}".` }
+        : { ok: false, message: `Non sono riuscito a modificare "${target.label}".` };
+    }
+
+    if (action.type === "add_task") {
+      const target = findTargetPage(action.payload?.pageId, action.payload?.pageLabel)
+        || (Array.isArray(pages) ? pages.find((p) => p && !p.deleted && (p.type === "tasks" || (p.data && p.data.blocks?.some?.((b) => b?.type === "tasks-embed")))) : null);
+      if (!target) return { ok: false, message: "Non trovo una pagina dove aggiungere il task." };
+      const ok = addTaskToPage(target, action.payload || {});
+      return ok
+        ? { ok: true, message: `Task "${action.payload?.title}" aggiunto a "${target.label}".` }
+        : { ok: false, message: `Non sono riuscito ad aggiungere il task a "${target.label}".` };
+    }
+
+    if (action.type === "add_goal") {
+      const target = findTargetPage(action.payload?.pageId, action.payload?.pageLabel)
+        || (Array.isArray(pages) ? pages.find((p) => p && !p.deleted && (p.type === "goals" || (p.data && p.data.blocks?.some?.((b) => b?.type === "goals-embed")))) : null);
+      if (!target) return { ok: false, message: "Non trovo una pagina dove aggiungere l'obiettivo." };
+      const ok = addGoalToPage(target, action.payload || {});
+      return ok
+        ? { ok: true, message: `Obiettivo "${action.payload?.title}" aggiunto a "${target.label}".` }
+        : { ok: false, message: `Non sono riuscito ad aggiungere l'obiettivo a "${target.label}".` };
     }
 
     if (action.type === "update_page") {
@@ -955,10 +1116,8 @@ function DashboardContent() {
 
     if (action.type === "add_block") {
       const { blockType, content, targetPageId, targetPageLabel } =
-        action.payload;
-      const targetPage = targetPageId
-        ? pages.find((p) => String(p.id) === String(targetPageId))
-        : null;
+        action.payload || {};
+      const targetPage = findTargetPage(targetPageId ?? (action.payload || {}).pageId, targetPageLabel ?? (action.payload || {}).pageLabel);
 
       if (!targetPage) {
         return {
@@ -967,10 +1126,18 @@ function DashboardContent() {
         };
       }
 
-      if (targetPage.type !== "notes") {
+      if (targetPage.type !== "notes" && targetPage.type !== "empty") {
+        // fallback: pagine strutturate ricevono il contenuto come testo/task
+        const okFallback = appendTextToPage(targetPage, content || "");
+        if (okFallback) {
+          return {
+            ok: true,
+            message: `Contenuto aggiunto alla pagina "${targetPage.label}".`,
+          };
+        }
         return {
           ok: false,
-          message: `La funzione "aggiungi blocco" funziona solo per le pagine di tipo "Note".`,
+          message: `La pagina "${targetPage.label}" non supporta i blocchi di testo.`,
         };
       }
 
@@ -1003,56 +1170,27 @@ function DashboardContent() {
     }
 
     if (action.type === "update_page_content") {
-      const { id, content } = action.payload;
-      const targetPage = pages.find((p) => String(p.id) === String(id));
+      const { id, content } = action.payload || {};
+      const targetPage = findTargetPage(id, (action.payload || {}).pageLabel);
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
-      if (targetPage.type !== "notes") {
-        return {
-          ok: false,
-          message:
-            "L'aggiornamento del contenuto funziona solo per le pagine Note.",
-        };
-      }
-      const updateContent = (notesData) => {
-        const blocks = notesData.blocks || [];
-        const newBlock = {
-          id: Math.random().toString(36).substring(2, 9),
-          type: "text",
-          content: content,
-          color: "default",
-        };
-        return { ...notesData, blocks: [...blocks, newBlock] };
-      };
-      updatePageData(id, updateContent(targetPage.data || { blocks: [] }));
-      return { ok: true, message: `Contenuto aggiunto alla pagina.` };
+      const ok = appendTextToPage(targetPage, content || "");
+      return ok
+        ? { ok: true, message: `Contenuto aggiunto alla pagina "${targetPage.label}".` }
+        : { ok: false, message: "Pagina non modificabile." };
     }
 
     if (action.type === "insert_page_text") {
-      const { id, text } = action.payload;
-      const targetPage = pages.find((p) => String(p.id) === String(id));
+      const { id, text } = action.payload || {};
+      const targetPage = findTargetPage(id, (action.payload || {}).pageLabel);
       if (!targetPage) {
         return { ok: false, message: "Pagina non trovata." };
       }
-      if (targetPage.type !== "notes") {
-        return {
-          ok: false,
-          message: "L'inserimento di testo funziona solo per le pagine Note.",
-        };
-      }
-      const insertText = (notesData) => {
-        const blocks = notesData.blocks || [];
-        const newBlock = {
-          id: Math.random().toString(36).substring(2, 9),
-          type: "text",
-          content: text,
-          color: "default",
-        };
-        return { ...notesData, blocks: [...blocks, newBlock] };
-      };
-      updatePageData(id, insertText(targetPage.data || { blocks: [] }));
-      return { ok: true, message: `Testo aggiunto alla pagina.` };
+      const ok = appendTextToPage(targetPage, text || "");
+      return ok
+        ? { ok: true, message: `Testo aggiunto alla pagina "${targetPage.label}".` }
+        : { ok: false, message: "Pagina non modificabile." };
     }
 
     return { ok: false, message: `Azione "${action.type}" non supportata.` };
