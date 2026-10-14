@@ -468,11 +468,11 @@ export default function PageHeader({
                         className={
                           "w-9 h-9 grid place-items-center rounded-xl transition-colors " +
                           (normalizeIconKey(page?.icon) === o.key
-                            ? "bg-(--accent)/15 text-(--accent)"
-                            : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800")
+                            ? "bg-(--accent)/15 ring-2 ring-(--accent)/40"
+                            : "hover:bg-gray-100 dark:hover:bg-gray-800")
                         }
                       >
-                        <o.Icon size={18} aria-hidden="true" />
+                        <o.Icon size={18} aria-hidden="true" className={pendingColor} />
                       </button>
                     ))}
                     {filtered.length === 0 && (
