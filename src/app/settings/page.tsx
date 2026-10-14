@@ -42,6 +42,7 @@ import { useLanguage } from "../../lib/LanguageContext";
 import { Theme, readTheme, applyTheme } from "../../lib/theme";
 import { applyAppFont, readAppFont, type AppFontId } from "../../lib/appFont";
 import { ACCENTS, applyAccent, readAccent, DEFAULT_ACCENT } from "../../lib/accent";
+import { collectEntities, downloadCSV } from "../../lib/exportData";
 import {
   PREFS_KEY,
   applyDensity,
@@ -377,6 +378,20 @@ function SettingsContent() {
       showToast("Cache locale svuotata con successo.");
     } catch {
       showToast("Errore nella pulizia della cache.");
+    }
+  };
+
+  // ── Export tabellare: vedi lib/exportData.ts ──────────────────────────
+  const handleExportCSV = async (entity: "tasks" | "goals" | "ideas" | "pages", label: string) => {
+    try {
+      const all = await collectEntities();
+      const n = downloadCSV(
+        `taskly-${label}-${new Date().toISOString().split("T")[0]}.csv`,
+        all[entity] || [],
+      );
+      showToast(n > 0 ? `Esportati ${n} elementi in ${label}.csv` : `Niente da esportare in ${label}.`);
+    } catch {
+      showToast("Errore durante l'esportazione CSV.");
     }
   };
 
@@ -1025,6 +1040,35 @@ function SettingsContent() {
                       >
                         Scarica Backup JSON
                       </button>
+                    </div>
+
+                    <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-3">
+                      <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 w-fit">
+                        <FileText size={18} />
+                      </div>
+                      <h4 className="text-xs font-bold">Esporta CSV</h4>
+                      <p className="text-[11px] text-gray-500">
+                        Tabelle compatibili con Excel e Fogli Google.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(
+                          [
+                            ["tasks", "Task"],
+                            ["goals", "Obiettivi"],
+                            ["ideas", "Idee"],
+                            ["pages", "Pagine"],
+                          ] as const
+                        ).map(([entity, label]) => (
+                          <button
+                            key={entity}
+                            type="button"
+                            onClick={() => handleExportCSV(entity, label.toLowerCase())}
+                            className="py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold transition-all"
+                          >
+                            {label} CSV
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="p-5 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-3">
