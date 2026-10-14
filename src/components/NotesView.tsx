@@ -2029,13 +2029,13 @@ export default function NotesView({
                 </AnimatePresence>
               </div>
 
-              {/* Zona di scrittura finale: la pagina arriva in fondo con righe
-                  quaderno — click per una nuova riga in coda. */}
+              {/* Zona di scrittura finale: area vuota cliccabile per
+                  aggiungere una nuova riga in coda. */}
               <div
                 onClick={appendTrailingBlock}
                 title="Continua a scrivere"
                 aria-label="Continua a scrivere"
-                className="min-h-[32vh] cursor-text rounded-xl bg-[repeating-linear-gradient(transparent,transparent_31px,rgba(100,116,139,0.16)_31px,rgba(100,116,139,0.16)_32px)] dark:bg-[repeating-linear-gradient(transparent,transparent_31px,rgba(148,163,184,0.22)_31px,rgba(148,163,184,0.22)_32px)]"
+                className="min-h-[32vh] cursor-text"
               />
 
               {/* Block picker removed: blocks can be added via "/" in the editor */}
