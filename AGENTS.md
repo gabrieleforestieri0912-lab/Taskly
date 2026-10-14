@@ -38,6 +38,9 @@
 - Verifica sempre con `tsc --noEmit` ed `eslint` sui file toccati prima di chiudere.
 - Preferisci `edit` su file esistenti; nuovi file solo se necessario.
 - Mai indovinare URL o ID modello; mai committare `.env`.
+- File di test temporanei (`scripts/tmp-*`, `e2e-tmp/`, probe Playwright,
+  script una-tantum in TEMP): solo se servono, eseguirli e ELIMINARLI subito
+  dopo il pass. Mai committarli né lasciarli nel repo.
 
 ## Bug risolti (non reintrodurre)
 - `Sidebar.tsx`: mai usare una variabile prima della sua dichiarazione `const`
