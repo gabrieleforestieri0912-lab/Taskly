@@ -67,6 +67,7 @@ export default function BrainDumpView({
   loading = false,
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
 }) {
   const { t } = useLanguage();
   // Hooks must be called unconditionally (before any early return) so the
@@ -122,6 +123,7 @@ export default function BrainDumpView({
           title={title}
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
+          onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
       <div className="flex justify-end">

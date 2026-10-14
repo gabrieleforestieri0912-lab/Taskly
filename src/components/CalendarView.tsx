@@ -208,6 +208,9 @@ export default function CalendarView({
   loading = false,
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
+  /** Vista incorporata nei blocchi: ritmo compatto, niente scheda analisi. */
+  compact = false,
 }) {
   const { t, tWith, language } = useLanguage();
   const locale = language === "en" ? "en-US" : "it-IT";
@@ -411,7 +414,7 @@ export default function CalendarView({
     .sort((a, b) => (a.task.date || "").localeCompare(b.task.date || ""));
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className={compact ? "space-y-4 pb-4" : "space-y-8 pb-12"}>
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader
@@ -419,6 +422,7 @@ export default function CalendarView({
           title={title}
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
+          onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
       <div className="flex justify-end mb-4">
@@ -727,6 +731,7 @@ export default function CalendarView({
         selectedDate={selectedDay}
       />
 
+      {!compact && (
       <Card className="border-none bg-white dark:bg-gray-800/40 overflow-hidden shadow-2xl shadow-cyan-500/5">
         <CardContent className="p-8">
           <div className="flex flex-col md:flex-row items-center gap-12">
@@ -807,6 +812,7 @@ export default function CalendarView({
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

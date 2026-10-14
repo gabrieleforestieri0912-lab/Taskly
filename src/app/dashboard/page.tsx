@@ -1185,6 +1185,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
           />,
         );
       }
@@ -1206,6 +1207,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
           />,
         );
       }
@@ -1249,6 +1251,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
           />,
         );
       }
@@ -1276,6 +1279,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
           />,
         );
       }
@@ -1298,6 +1302,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
             onConvertToTask={(idea, targetPageId) => {
               const target = pages.find(
                 (page) => String(page.id) === String(targetPageId),
@@ -1342,6 +1347,7 @@ function DashboardContent() {
                 iconColor ? { icon, iconColor } : { icon },
               )
             }
+            onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
           />,
         );
       }

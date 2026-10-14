@@ -13,6 +13,7 @@ export default function EmptyPageView({
   loading = false,
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
 }) {
   // If the page already uses the block format, pass through. Otherwise normalize.
   const normalized =
@@ -57,6 +58,7 @@ export default function EmptyPageView({
         loading={loading}
         page={page}
         onIconChange={onIconChange}
+        onCoverChange={onCoverChange}
         minimalChrome
       />
     </div>

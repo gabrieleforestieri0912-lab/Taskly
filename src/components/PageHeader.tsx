@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Smile } from "lucide-react";
+import { Smile, ImagePlus, Check, X, Link2 } from "lucide-react";
 import { EditableTitle } from "./UIComponents";
 import {
   ICON_OPTIONS,
@@ -125,11 +125,41 @@ const ICON_COLORS = [
   { label: "Rosso", value: "text-red-500", dot: "#ef4444" },
 ];
 
+/** Copertine sfumate pronte (stile Notion). `gradient:<indice>`. */
+const COVER_GRADIENTS = [
+  { label: "Viola", css: "linear-gradient(135deg, #7b39fc 0%, #a67cff 100%)" },
+  { label: "Oceano", css: "linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)" },
+  { label: "Tramonto", css: "linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)" },
+  { label: "Foresta", css: "linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)" },
+  { label: "Notte", css: "linear-gradient(135deg, #1e1b4b 0%, #7b39fc 100%)" },
+  { label: "Rosa", css: "linear-gradient(135deg, #f472b6 0%, #a78bfa 100%)" },
+  { label: "Sabbia", css: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)" },
+  { label: "Abisso", css: "linear-gradient(135deg, #0369a1 0%, #10b981 100%)" },
+];
+
+/** `gradient:<i>` o `img:<url>` → stile per il banner. */
+function coverStyle(cover: string | null | undefined): React.CSSProperties | undefined {
+  if (!cover || typeof cover !== "string") return undefined;
+  if (cover.startsWith("gradient:")) {
+    const g = COVER_GRADIENTS[Number(cover.slice("gradient:".length))];
+    if (g) return { background: g.css };
+    return undefined;
+  }
+  if (cover.startsWith("img:")) {
+    const url = cover.slice("img:".length).trim();
+    if (!url) return undefined;
+    return { backgroundImage: `url("${url}")`, backgroundSize: "cover", backgroundPosition: "center" };
+  }
+  return undefined;
+}
+
 export interface PageHeaderProps {
   page: any;
   title: string;
   onRename: (nextTitle: string) => void;
-  onIconChange: (icon: string, iconColor?: string) => void;
+  onIconChange?: (icon: string, iconColor?: string) => void;
+  /** Copertina stile Notion (`gradient:<i>` | `img:<url>` | null). */
+  onCoverChange?: (cover: string | null) => void;
   locked?: boolean;
   /** Riservato: in "minimal" il chiamante nasconde le altre cromature. */
   minimal?: boolean;
@@ -140,6 +170,7 @@ export default function PageHeader({
   title,
   onRename,
   onIconChange,
+  onCoverChange,
   locked,
 }: PageHeaderProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -147,19 +178,26 @@ export default function PageHeader({
   const [query, setQuery] = useState("");
   const [pendingColor, setPendingColor] = useState("text-gray-400");
   const pickerRef = useRef<HTMLDivElement | null>(null);
+  const [coverOpen, setCoverOpen] = useState(false);
+  const [coverUrl, setCoverUrl] = useState("");
+  const coverRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!pickerOpen) return;
+    if (!pickerOpen && !coverOpen) return;
     const onDown = (e: MouseEvent) => {
       if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
         setPickerOpen(false);
         setQuery("");
+      }
+      if (coverRef.current && !coverRef.current.contains(e.target as Node)) {
+        setCoverOpen(false);
       }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setPickerOpen(false);
         setQuery("");
+        setCoverOpen(false);
       }
     };
     document.addEventListener("mousedown", onDown);
@@ -168,7 +206,7 @@ export default function PageHeader({
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [pickerOpen]);
+  }, [pickerOpen, coverOpen]);
 
   const isEmoji = isEmojiIcon(page?.icon);
   const Icon = !isEmoji ? resolvePageIcon(page) : null;
@@ -185,7 +223,7 @@ export default function PageHeader({
 
   const pick = (iconKey: string, color?: string) => {
     const normalized = iconKey ? (normalizeIconKey(iconKey) ?? iconKey) : "";
-    onIconChange(normalized, color);
+    if (onIconChange) onIconChange(normalized, color);
     setPickerOpen(false);
     setQuery("");
   };
@@ -196,12 +234,132 @@ export default function PageHeader({
     setPendingColor(color);
     const current = typeof page?.icon === "string" ? page.icon : "";
     if (current && !isEmojiIcon(current)) {
-      onIconChange(normalizeIconKey(current) ?? current, color);
+      if (onIconChange) onIconChange(normalizeIconKey(current) ?? current, color);
     }
   };
+
+  const cover = typeof page?.cover === "string" && page.cover ? page.cover : null;
+  const canEditCover = Boolean(page && page.id !== undefined && page.id !== null && onCoverChange);
+  const openCoverEditor = () => {
+    const cur = typeof page?.cover === "string" ? page.cover : "";
+    setCoverUrl(cur.startsWith("img:") ? cur.slice("img:".length) : "");
+    setCoverOpen((s) => !s);
+  };
+
   return (
     <div className="relative">
-      <div className="flex items-center gap-3 md:gap-4">
+      {/* ── Copertina stile Notion ─────────────────────────────────── */}
+      {(cover || canEditCover) && (
+        <div className="group/cover relative mb-2">
+          {cover ? (
+            <div
+              className="h-36 md:h-44 rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-800"
+              style={coverStyle(cover)}
+              role="img"
+              aria-label="Copertina pagina"
+            />
+          ) : (
+            <div className="h-10" aria-hidden="true" />
+          )}
+          {canEditCover && !locked && (
+            <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover/cover:opacity-100 [@media(hover:none)]:opacity-100 focus-within:opacity-100 transition-opacity">
+              <button
+                type="button"
+                onClick={openCoverEditor}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/90 dark:bg-gray-950/90 backdrop-blur text-[11px] font-bold text-gray-700 dark:text-gray-200 shadow-md hover:bg-white dark:hover:bg-gray-900 transition-colors"
+              >
+                <ImagePlus size={13} aria-hidden="true" />
+                {cover ? "Cambia copertina" : "Aggiungi copertina"}
+              </button>
+              {cover && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onCoverChange && onCoverChange(null);
+                    setCoverOpen(false);
+                  }}
+                  title="Rimuovi copertina"
+                  aria-label="Rimuovi copertina"
+                  className="p-1.5 rounded-xl bg-white/90 dark:bg-gray-950/90 backdrop-blur text-gray-500 hover:text-red-500 shadow-md transition-colors"
+                >
+                  <X size={13} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          )}
+          {coverOpen && canEditCover && !locked && (
+            <div
+              ref={coverRef}
+              className="absolute left-0 right-0 sm:right-auto top-full mt-2 z-50 w-full sm:w-80 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl p-3 space-y-3"
+            >
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+                  Sfumature
+                </p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {COVER_GRADIENTS.map((g, i) => {
+                    const selected = cover === `gradient:${i}`;
+                    return (
+                      <button
+                        key={g.label}
+                        type="button"
+                        title={g.label}
+                        aria-label={`Copertina ${g.label}`}
+                        aria-pressed={selected}
+                        onClick={() => {
+                          onCoverChange && onCoverChange(`gradient:${i}`);
+                          setCoverOpen(false);
+                        }}
+                        className={`h-10 rounded-lg transition-all hover:scale-105 ${
+                          selected ? "ring-2 ring-(--accent) ring-offset-2 dark:ring-offset-gray-950" : ""
+                        }`}
+                        style={{ background: g.css }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+                  Immagine (URL)
+                </p>
+                <div className="flex gap-1.5">
+                  <input
+                    type="url"
+                    value={coverUrl}
+                    onChange={(e) => setCoverUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && coverUrl.trim()) {
+                        onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
+                        setCoverOpen(false);
+                      }
+                    }}
+                    placeholder="https://…"
+                    className="flex-1 min-w-0 px-2.5 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-(--accent)/40"
+                  />
+                  <button
+                    type="button"
+                    disabled={!coverUrl.trim()}
+                    onClick={() => {
+                      if (!coverUrl.trim()) return;
+                      onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
+                      setCoverOpen(false);
+                    }}
+                    title="Applica immagine"
+                    aria-label="Applica immagine di copertina"
+                    className="p-2 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) disabled:opacity-40 transition-colors shrink-0"
+                  >
+                    <Check size={14} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Icona sopra il titolo: solo icona, grande, senza sfondo ─── */}
+      <div className={`relative self-start ${cover ? "-mt-9 md:-mt-11 ml-3 md:ml-5 z-10" : "mt-1"}`}>
         <div className="relative shrink-0" ref={pickerRef}>
           <button
             type="button"
@@ -217,18 +375,19 @@ export default function PageHeader({
               );
               setPickerOpen((s) => !s);
             }}
-            title={locked ? undefined : "Cambia icona"}
+            title={locked ? undefined : hasIcon ? "Cambia icona" : "Aggiungi icona"}
             aria-label="Cambia icona pagina"
-            className="grid place-items-center w-12 h-12 md:w-14 md:h-14 rounded-2xl border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:border-(--accent)/50 hover:shadow-lg disabled:cursor-default"
+            className="grid place-items-center min-w-[76px] min-h-[76px] rounded-2xl transition-colors hover:bg-gray-100 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--accent) disabled:cursor-default"
           >
             {isEmoji ? (
-              <span className="text-2xl md:text-3xl leading-none">{page.icon}</span>
+              <span className="text-6xl md:text-7xl leading-none select-none">{page.icon}</span>
             ) : hasIcon && Icon ? (
               // eslint-disable-next-line react-hooks/static-components -- Icon viene dal catalogo statico (resolvePageIcon), non creata nel render
-              <Icon size={26} className={iconColor} aria-hidden="true" />
+              <Icon size={56} className={iconColor} aria-hidden="true" />
             ) : (
-              <span className="grid place-items-center text-gray-300 dark:text-gray-600">
-                <Smile size={22} aria-hidden="true" />
+              <span className="grid place-items-center gap-1 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 px-5 py-4 text-gray-300 dark:text-gray-600">
+                <Smile size={34} aria-hidden="true" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Icona</span>
               </span>
             )}
           </button>
@@ -337,10 +496,10 @@ export default function PageHeader({
             </div>
           )}
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 mt-2">
           <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
         </div>
-      </div>
+    </div>
     </div>
   );
 }

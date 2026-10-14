@@ -237,6 +237,9 @@ export default function GoalsView({
   loading = false,
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
+  /** Vista incorporata nei blocchi: ritmo compatto. */
+  compact = false,
 }) {
   const { t, tWith } = useLanguage();
   const [input, setInput] = useState("");
@@ -349,7 +352,7 @@ export default function GoalsView({
   }
 
   return (
-    <div className="w-full space-y-8 pb-20">
+    <div className={compact ? "w-full space-y-4 pb-4" : "w-full space-y-8 pb-20"}>
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader
@@ -357,6 +360,7 @@ export default function GoalsView({
           title={title}
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
+          onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
       <div className="flex justify-end">

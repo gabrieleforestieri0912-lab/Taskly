@@ -309,6 +309,9 @@ export default function ItemList({
   loading = false,
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
+  /** Vista incorporata nei blocchi: ritmo compatto. */
+  compact = false,
 }) {
   const { t, tWith } = useLanguage();
 
@@ -568,7 +571,7 @@ export default function ItemList({
   }
 
   return (
-    <div className="w-full space-y-6 pb-10">
+    <div className={compact ? "w-full space-y-3 pb-4" : "w-full space-y-6 pb-10"}>
       {/* Titolo + icona pagina (come nelle note) */}
       {onRename && page && (
         <PageHeader
@@ -576,6 +579,7 @@ export default function ItemList({
           title={title}
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
+          onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
       {/* View Switcher moved below */}

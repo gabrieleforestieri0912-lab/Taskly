@@ -1141,6 +1141,7 @@ function BlockItem({
                 loading={false}
                 page={undefined}
                 onIconChange={undefined}
+                compact
               />
             </div>
           </div>
@@ -1155,6 +1156,7 @@ function BlockItem({
                 loading={false}
                 page={undefined}
                 onIconChange={undefined}
+                compact
               />
             </div>
           </div>
@@ -1169,6 +1171,7 @@ function BlockItem({
                 loading={false}
                 page={undefined}
                 onIconChange={undefined}
+                compact
               />
             </div>
           </div>
@@ -1268,6 +1271,7 @@ function BlockItem({
           <textarea
             ref={inputRef}
             rows={1}
+            data-block-id={block.id}
             value={block.content}
             onChange={(e) => {
               const val = e.target.value;
@@ -1395,6 +1399,7 @@ export default function NotesView({
   allPages = [] as any[],
   page,
   onIconChange,
+  onCoverChange = undefined as ((cover: string | null) => void) | undefined,
   minimalChrome = false,
 }) {
   const { t, tWith } = useLanguage();
@@ -1535,11 +1540,45 @@ export default function NotesView({
   const addBlockBelow = useCallback((afterId, type = "text") => {
     const newBlock = createBlock(type);
     setBlocks((prev) => {
-      const idx = prev.findIndex((b) => b.id === afterId);
+      const idx = afterId ? prev.findIndex((b) => b.id === afterId) : -1;
       const arr = [...prev];
-      arr.splice(idx + 1, 0, newBlock);
+      arr.splice(idx === -1 ? arr.length : idx + 1, 0, newBlock);
       return arr;
     });
+    return newBlock.id;
+  }, []);
+
+  // Zona di scrittura finale: click → nuova riga di testo in coda + focus.
+  const appendTrailingBlock = useCallback(() => {
+    setBlocks((prev) => {
+      const lastId = prev.length > 0 ? prev[prev.length - 1].id : null;
+      const nb = createBlock("text");
+      const arr = [...prev];
+      const idx = lastId ? prev.findIndex((b) => b.id === lastId) : -1;
+      arr.splice(idx === -1 ? arr.length : idx + 1, 0, nb);
+      return arr;
+    });
+    // Focus sulla nuova riga: riprova finché il DOM non ce l'ha (commit React).
+    let attempts = 0;
+    const focusNew = () => {
+      attempts += 1;
+      try {
+        const all = Array.from(
+          document.querySelectorAll("textarea[data-block-id]"),
+        ) as HTMLTextAreaElement[];
+        const el = all[all.length - 1];
+        if (el) {
+          el.focus();
+          try {
+            el.setSelectionRange(el.value.length, el.value.length);
+          } catch {}
+          el.scrollIntoView({ block: "nearest" });
+          return;
+        }
+      } catch {}
+      if (attempts < 20) setTimeout(focusNew, 50);
+    };
+    setTimeout(focusNew, 30);
   }, []);
 
   const addBlock = (type) => {
@@ -1740,14 +1779,16 @@ export default function NotesView({
         </div>
       )}
 
-      {/* Titolo inline con icona. In modalità `minimalChrome` (pagina vuota) il
-          dashboard NON rende il proprio header, quindi questo è l'unico header. */}
-      {minimalChrome && onRename && page && (
+      {/* Header pagina stile Notion (copertina + icona + titolo): sempre
+          visibile nelle viste documento; il breadcrumb dashboard resta come
+          navigazione compatta. */}
+      {onRename && page && (
         <PageHeader
           page={page}
           title={title}
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
+          onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
 
@@ -1907,6 +1948,15 @@ export default function NotesView({
                   ))}
                 </AnimatePresence>
               </div>
+
+              {/* Zona di scrittura finale: la pagina arriva in fondo con righe
+                  quaderno — click per una nuova riga in coda. */}
+              <div
+                onClick={appendTrailingBlock}
+                title="Continua a scrivere"
+                aria-label="Continua a scrivere"
+                className="min-h-[32vh] cursor-text rounded-xl bg-[repeating-linear-gradient(transparent,transparent_31px,rgba(100,116,139,0.16)_31px,rgba(100,116,139,0.16)_32px)] dark:bg-[repeating-linear-gradient(transparent,transparent_31px,rgba(148,163,184,0.22)_31px,rgba(148,163,184,0.22)_32px)]"
+              />
 
               {/* Block picker removed: blocks can be added via "/" in the editor */}
             </>
