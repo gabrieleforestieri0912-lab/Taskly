@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Smile, ImagePlus, Check, X, Link2 } from "lucide-react";
+import { Smile, ImagePlus, Check, X, Link2, MessageSquare, Send } from "lucide-react";
 import { EditableTitle } from "./UIComponents";
 import {
   ICON_OPTIONS,
@@ -153,6 +153,13 @@ function coverStyle(cover: string | null | undefined): React.CSSProperties | und
   return undefined;
 }
 
+export interface PageComment {
+  id: string;
+  text: string;
+  author?: string;
+  createdAt?: string;
+}
+
 export interface PageHeaderProps {
   page: any;
   title: string;
@@ -160,6 +167,10 @@ export interface PageHeaderProps {
   onIconChange?: (icon: string, iconColor?: string) => void;
   /** Copertina stile Notion (`gradient:<i>` | `img:<url>` | null). */
   onCoverChange?: (cover: string | null) => void;
+  /** Commenti pagina (persistiti in `data.comments` dal chiamante). */
+  comments?: PageComment[];
+  onCommentsChange?: (comments: PageComment[]) => void;
+  userName?: string;
   locked?: boolean;
   /** Riservato: in "minimal" il chiamante nasconde le altre cromature. */
   minimal?: boolean;
@@ -171,6 +182,9 @@ export default function PageHeader({
   onRename,
   onIconChange,
   onCoverChange,
+  comments,
+  onCommentsChange,
+  userName,
   locked,
 }: PageHeaderProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -181,6 +195,36 @@ export default function PageHeader({
   const [coverOpen, setCoverOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState("");
   const coverRef = useRef<HTMLDivElement | null>(null);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentDraft, setCommentDraft] = useState("");
+  const commentList = Array.isArray(comments) ? comments : [];
+  const canComment = typeof onCommentsChange === "function";
+
+  const sendComment = () => {
+    const text = commentDraft.trim();
+    if (!text || !onCommentsChange) return;
+    onCommentsChange([
+      ...commentList,
+      {
+        id: `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+        text,
+        author: userName || "Tu",
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+    setCommentDraft("");
+  };
+
+  const formatCommentDate = (iso?: string) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    try {
+      return d.toLocaleDateString(undefined, { day: "2-digit", month: "short" });
+    } catch {
+      return "";
+    }
+  };
 
   useEffect(() => {
     if (!pickerOpen && !coverOpen) return;
@@ -496,10 +540,102 @@ export default function PageHeader({
             </div>
           )}
         </div>
-        <div className="flex-1 min-w-0 mt-2">
-          <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
+        <div className="group/title mt-2 flex items-start gap-1">
+          <div className="flex-1 min-w-0">
+            <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
+          </div>
+          {/* Azioni titolo all'hover: commenti pagina + copertina */}
+          <div className="flex items-center gap-1 pt-2 shrink-0 opacity-0 group-hover/title:opacity-100 [@media(hover:none)]:opacity-100 focus-within:opacity-100 transition-opacity">
+            {canComment && (
+              <button
+                type="button"
+                onClick={() => setCommentsOpen((s) => !s)}
+                title={commentList.length > 0 ? `Commenti (${commentList.length})` : "Aggiungi commento"}
+                aria-label={commentList.length > 0 ? `Commenti della pagina (${commentList.length})` : "Aggiungi commento alla pagina"}
+                aria-expanded={commentsOpen}
+                className="relative p-1.5 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              >
+                <MessageSquare size={16} aria-hidden="true" />
+                {commentList.length > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 grid place-items-center rounded-full bg-(--accent) text-white text-[9px] font-black tabular-nums">
+                    {commentList.length > 99 ? "99+" : commentList.length}
+                  </span>
+                )}
+              </button>
+            )}
+            {canEditCover && !locked && (
+              <button
+                type="button"
+                onClick={openCoverEditor}
+                title={cover ? "Cambia copertina" : "Aggiungi copertina"}
+                aria-label={cover ? "Cambia copertina" : "Aggiungi copertina alla pagina"}
+                className="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              >
+                <ImagePlus size={16} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
-    </div>
+        {commentsOpen && canComment && (
+          <div className="mt-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-white/[0.03] p-3 space-y-2.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              Commenti{commentList.length > 0 ? ` (${commentList.length})` : ""}
+            </p>
+            {commentList.length > 0 && (
+              <ul className="space-y-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
+                {commentList.map((c) => (
+                  <li key={c.id} className="group/comment flex items-start gap-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 px-2.5 py-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold text-gray-400">
+                        {c.author || "Tu"}
+                        {formatCommentDate(c.createdAt) ? ` · ${formatCommentDate(c.createdAt)}` : ""}
+                      </p>
+                      <p className="text-xs text-gray-800 dark:text-gray-100 leading-relaxed break-words mt-0.5">
+                        {c.text}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onCommentsChange && onCommentsChange(commentList.filter((x) => x.id !== c.id))}
+                      title="Elimina commento"
+                      aria-label="Elimina commento"
+                      className="p-1 rounded-lg text-gray-300 hover:text-red-500 opacity-0 group-hover/comment:opacity-100 [@media(hover:none)]:opacity-100 transition-all shrink-0"
+                    >
+                      <X size={12} aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={commentDraft}
+                onChange={(e) => setCommentDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && commentDraft.trim()) {
+                    e.preventDefault();
+                    sendComment();
+                  }
+                }}
+                placeholder="Scrivi un commento…"
+                aria-label="Scrivi un commento"
+                className="flex-1 min-w-0 px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-(--accent)/40 placeholder:text-gray-400"
+              />
+              <button
+                type="button"
+                onClick={sendComment}
+                disabled={!commentDraft.trim()}
+                title="Invia commento"
+                aria-label="Invia commento"
+                className="p-2 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) disabled:opacity-40 transition-colors shrink-0"
+              >
+                <Send size={13} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        )}
+        </div>
     </div>
   );
 }

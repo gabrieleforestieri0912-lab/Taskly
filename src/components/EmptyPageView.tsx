@@ -14,6 +14,7 @@ export default function EmptyPageView({
   page,
   onIconChange,
   onCoverChange = undefined as ((cover: string | null) => void) | undefined,
+  userName,
 }) {
   // If the page already uses the block format, pass through. Otherwise normalize.
   const normalized =
@@ -28,6 +29,7 @@ export default function EmptyPageView({
             },
           ],
           tags: data?.tags || [],
+          ...(Array.isArray(data?.comments) ? { comments: data.comments } : {}),
         };
 
   return (
@@ -43,6 +45,7 @@ export default function EmptyPageView({
               setData({
                 text: next.blocks[0].content,
                 tags: next.tags || [],
+                ...(Array.isArray(next.comments) ? { comments: next.comments } : {}),
               });
             } else {
               setData(next);
@@ -59,6 +62,7 @@ export default function EmptyPageView({
         page={page}
         onIconChange={onIconChange}
         onCoverChange={onCoverChange}
+        userName={userName}
         minimalChrome
       />
     </div>

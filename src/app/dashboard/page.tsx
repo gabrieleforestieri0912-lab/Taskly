@@ -1280,6 +1280,7 @@ function DashboardContent() {
               )
             }
             onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
+            userName={user?.name}
           />,
         );
       }
@@ -1348,6 +1349,7 @@ function DashboardContent() {
               )
             }
             onCoverChange={(cover) => updatePage(effectivePage.id, { cover })}
+            userName={user?.name}
           />,
         );
       }

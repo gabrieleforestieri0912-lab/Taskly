@@ -241,7 +241,11 @@ function migrateOldData(data) {
     };
   }
   if (data.blocks) {
-    return { blocks: data.blocks, tags: data.tags || [] };
+    return {
+      blocks: data.blocks,
+      tags: data.tags || [],
+      ...(Array.isArray(data.comments) ? { comments: data.comments } : {}),
+    };
   }
   return { blocks: [createBlock("text")], tags: [] };
 }
@@ -333,6 +337,9 @@ function BlockItem({
   onAddBelow,
   onMoveUp,
   onMoveDown,
+  onDropBlock,
+  dropTarget,
+  onHoverBlock,
   totalCount,
   onAddPage,
   activePageId,
@@ -342,6 +349,7 @@ function BlockItem({
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [slashMenuOpen, setSlashMenuOpen] = useState(false);
@@ -374,6 +382,66 @@ function BlockItem({
       el.style.height = `${el.scrollHeight}px`;
     }
   }, [block.content, block.type]);
+
+  // ── Drag & drop righe stile Notion (HTML5 nativo, funziona con blocchi
+  // di qualsiasi altezza: la metà sopra/sotto decide prima/dopo) ──
+  const showBefore = dropTarget?.id === block.id && dropTarget.pos === "before";
+  const showAfter = dropTarget?.id === block.id && dropTarget.pos === "after";
+  const posFromEvent = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    return e.clientY - rect.top < rect.height / 2 ? "before" : "after";
+  };
+  const rowDragHandlers = {
+    onDragOver: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = "move";
+      if (onHoverBlock) onHoverBlock({ id: block.id, pos: posFromEvent(e) });
+    },
+    onDragLeave: (e) => {
+      if (e.currentTarget.contains(e.relatedTarget)) return;
+      if (dropTarget?.id === block.id && onHoverBlock) onHoverBlock(null);
+    },
+    onDrop: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const pos = posFromEvent(e);
+      if (onHoverBlock) onHoverBlock(null);
+      let draggedId = "";
+      try {
+        draggedId =
+          e.dataTransfer.getData("application/x-taskly-block") ||
+          e.dataTransfer.getData("text/plain");
+      } catch {}
+      if (draggedId && draggedId !== block.id && onDropBlock) {
+        onDropBlock(draggedId, index, pos);
+      }
+    },
+  };
+  const dragHandle = (
+    <span
+      draggable
+      onDragStart={(e) => {
+        try {
+          e.dataTransfer.setData("application/x-taskly-block", String(block.id));
+          e.dataTransfer.setData("text/plain", String(block.id));
+        } catch {}
+        e.dataTransfer.effectAllowed = "move";
+        setIsDragging(true);
+      }}
+      onDragEnd={() => setIsDragging(false)}
+      onContextMenu={(e) => e.preventDefault()}
+      title="Trascina per spostare la riga"
+      role="button"
+      aria-label="Trascina per spostare la riga"
+      className="touch-none select-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500"
+    >
+      <GripVertical size={14} className="text-gray-300 dark:text-gray-600" aria-hidden="true" />
+    </span>
+  );
+  const dropLine = (
+    <div className="h-0.5 rounded-full bg-(--accent) mx-8" aria-hidden="true" />
+  );
 
   const filteredBlocks = BLOCK_TYPES.filter(
     (bt) =>
@@ -509,14 +577,18 @@ function BlockItem({
 
   if (block.type === "divider") {
     return (
-      <motion.div
-        layout
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        className="group flex items-center gap-2 py-2"
-      >
+      <>
+        {showBefore && dropLine}
+        <motion.div
+          layout
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          {...rowDragHandlers}
+          className={`group flex items-center gap-2 py-2 ${isDragging ? "opacity-50" : ""}`}
+        >
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
+          {dragHandle}
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
@@ -531,20 +603,26 @@ function BlockItem({
           </button>
         </div>
         <hr className="flex-1 border-gray-200 dark:border-gray-800" />
-      </motion.div>
+        </motion.div>
+        {showAfter && dropLine}
+      </>
     );
   }
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      className="group flex items-start gap-1 py-1 relative"
-      ref={menuRef}
-    >
+    <>
+      {showBefore && dropLine}
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        {...rowDragHandlers}
+        className={`group flex items-start gap-1 py-1 relative ${isDragging ? "opacity-50" : ""}`}
+        ref={menuRef}
+      >
       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity pt-0.5">
+        {dragHandle}
         <button
           type="button"
           onClick={() => {
@@ -1383,6 +1461,8 @@ function BlockItem({
         </div>
       )}
     </motion.div>
+      {showAfter && dropLine}
+    </>
   );
 }
 
@@ -1400,6 +1480,7 @@ export default function NotesView({
   page,
   onIconChange,
   onCoverChange = undefined as ((cover: string | null) => void) | undefined,
+  userName,
   minimalChrome = false,
 }) {
   const { t, tWith } = useLanguage();
@@ -1502,7 +1583,16 @@ export default function NotesView({
         );
       }
 
-      setData({ blocks: finalBlocks, tags, versions, published });
+      setData({
+        blocks: finalBlocks,
+        tags,
+        versions,
+        published,
+        // I commenti vivono in data.comments: non perderli al salvataggio.
+        ...((data as any) && Array.isArray((data as any).comments)
+          ? { comments: (data as any).comments }
+          : {}),
+      });
       setIsSaving(true);
       setTimeout(() => setIsSaving(false), 1000);
     }, 800);
@@ -1548,37 +1638,44 @@ export default function NotesView({
     return newBlock.id;
   }, []);
 
-  // Zona di scrittura finale: click → nuova riga di testo in coda + focus.
+  // Zona di scrittura finale: usa l'ultima riga vuota se c'è, altrimenti ne
+  // crea una in coda — poi mette il focus (con retry finché il DOM ce l'ha).
   const appendTrailingBlock = useCallback(() => {
+    let targetId: string | null = null;
     setBlocks((prev) => {
-      const lastId = prev.length > 0 ? prev[prev.length - 1].id : null;
+      const last = prev[prev.length - 1];
+      if (last && last.type === "text" && !String(last.content || "").trim()) {
+        targetId = last.id;
+        return prev;
+      }
       const nb = createBlock("text");
-      const arr = [...prev];
-      const idx = lastId ? prev.findIndex((b) => b.id === lastId) : -1;
-      arr.splice(idx === -1 ? arr.length : idx + 1, 0, nb);
-      return arr;
+      targetId = nb.id;
+      return [...prev, nb];
     });
-    // Focus sulla nuova riga: riprova finché il DOM non ce l'ha (commit React).
     let attempts = 0;
     const focusNew = () => {
       attempts += 1;
       try {
-        const all = Array.from(
-          document.querySelectorAll("textarea[data-block-id]"),
-        ) as HTMLTextAreaElement[];
-        const el = all[all.length - 1];
+        const el = document.querySelector(
+          `textarea[data-block-id="${targetId}"]`,
+        ) as HTMLTextAreaElement | null;
         if (el) {
-          el.focus();
+          el.focus({ preventScroll: true });
           try {
             el.setSelectionRange(el.value.length, el.value.length);
           } catch {}
           el.scrollIntoView({ block: "nearest" });
-          return;
+          // Verifica: se il focus è scivolato via, riprova.
+          if (document.activeElement === el) return;
         }
       } catch {}
       if (attempts < 20) setTimeout(focusNew, 50);
     };
-    setTimeout(focusNew, 30);
+    if (typeof requestAnimationFrame !== "undefined") {
+      requestAnimationFrame(() => focusNew());
+    } else {
+      setTimeout(focusNew, 0);
+    }
   }, []);
 
   const addBlock = (type) => {
@@ -1662,6 +1759,28 @@ export default function NotesView({
       arr.splice(idx + 1, 0, item);
       return arr;
     });
+  }, []);
+
+  // Drag & drop righe stile Notion: la trascinata atterra prima/dopo la riga
+  // di destinazione (coordinate già senza la trascinata). Funziona con righe
+  // di qualsiasi altezza (testo o componenti incorporati).
+  const [blockDropTarget, setBlockDropTarget] = useState<{
+    id: string;
+    pos: "before" | "after";
+  } | null>(null);
+  const moveBlockTo = useCallback((draggedId, targetIndex, pos) => {
+    setBlocks((prev) => {
+      const from = prev.findIndex((b) => b.id === draggedId);
+      if (from === -1) return prev;
+      let at = pos === "before" ? targetIndex : targetIndex + 1;
+      if (from < at) at -= 1;
+      if (from === at) return prev;
+      const arr = [...prev];
+      const [item] = arr.splice(from, 1);
+      arr.splice(at, 0, item);
+      return arr;
+    });
+    setBlockDropTarget(null);
   }, []);
 
   const insertPageRef = useCallback((id, bracketPos, pageId, pageLabel, pageIcon, pageIconColor) => {
@@ -1789,6 +1908,13 @@ export default function NotesView({
           onRename={(next) => onRename(next)}
           onIconChange={(icon, iconColor) => onIconChange && onIconChange(icon, iconColor)}
           onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
+          comments={Array.isArray((data as any)?.comments) ? (data as any).comments : []}
+          onCommentsChange={(comments) => {
+            const base =
+              data && typeof data === "object" && !Array.isArray(data) ? data : {};
+            setData({ ...base, comments });
+          }}
+          userName={userName}
         />
       )}
 
@@ -1939,6 +2065,9 @@ export default function NotesView({
                       onAddBelow={addBlockBelow}
                       onMoveUp={moveBlockUp}
                       onMoveDown={moveBlockDown}
+                      onDropBlock={moveBlockTo}
+                      dropTarget={blockDropTarget}
+                      onHoverBlock={setBlockDropTarget}
                       totalCount={blocks.length}
                       onAddPage={onAddPage}
                       activePageId={activePageId}
