@@ -347,6 +347,7 @@ function BlockItem({
 }) {
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -450,6 +451,31 @@ function BlockItem({
     .filter((p) => !p.deleted)
     .filter((p) => (p.label || "").toLowerCase().includes(bracketQuery.toLowerCase()));
 
+  // Sposta il focus sulla riga appena creata (con retry: il DOM si aggiorna
+  // dopo il setState). onAddBelow restituisce l'id del nuovo blocco.
+  const focusBlock = (id: string | null | undefined) => {
+    if (!id) return;
+    let attempts = 0;
+    const tryFocus = () => {
+      attempts += 1;
+      try {
+        const el = document.querySelector(
+          `textarea[data-block-id="${id}"]`,
+        ) as HTMLTextAreaElement | null;
+        if (el) {
+          el.focus({ preventScroll: true });
+          if (document.activeElement === el) return;
+        }
+      } catch {}
+      if (attempts < 10) setTimeout(tryFocus, 50);
+    };
+    if (typeof requestAnimationFrame !== "undefined") {
+      requestAnimationFrame(() => tryFocus());
+    } else {
+      setTimeout(tryFocus, 0);
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       if (bracketMenuOpen && bracketPageItems.length > 0) {
@@ -481,7 +507,7 @@ function BlockItem({
         return;
       }
       e.preventDefault();
-      onAddBelow(block.id);
+      focusBlock(onAddBelow(block.id));
     }
     if (bracketMenuOpen) {
       if (e.key === "ArrowDown") {
@@ -757,7 +783,7 @@ function BlockItem({
                 <button
                   key={bt.type}
                   onClick={() => {
-                    onAddBelow(block.id, bt.type);
+                    focusBlock(onAddBelow(block.id, bt.type));
                     setShowMenu(false);
                   }}
                   className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 transition-colors"
@@ -1335,9 +1361,13 @@ function BlockItem({
               }
             }}
             onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             placeholder={
-              block.type === "checkbox"
-                ? "Checkbox..."
+              !isFocused
+                ? ""
+                : block.type === "checkbox"
+                  ? "Checkbox..."
                 : block.type === "toggle"
                   ? "Toggle..."
                   : block.type === "h1"
