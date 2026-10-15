@@ -76,6 +76,13 @@ const priorityDots: Record<string, string> = {
   Alta: "bg-red-500",
 };
 
+// Barre evento nella griglia mese (stile Notion): tinta per priorità.
+const priorityBars: Record<string, string> = {
+  Bassa: "bg-emerald-100/80 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200",
+  Media: "bg-amber-100/80 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200",
+  Alta: "bg-red-100/80 dark:bg-red-900/30 text-red-800 dark:text-red-200",
+};
+
 // Chiave i18n per un id ricorrenza salvato ("daily" → "views.calDaily").
 const recurrenceLabelKey = (id: string) =>
   (recurrences.find((r) => r.id === id) || recurrences[0]).labelKey;
@@ -219,7 +226,7 @@ export default function CalendarView({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<any>(null);
-  const [view, setView] = useState("week");
+  const [view, setView] = useState("month");
   const [draggedTaskId, setDraggedTaskId] = useState(null);
 
   // Blocca lo scroll della pagina quando il modale è aperto
@@ -425,104 +432,159 @@ export default function CalendarView({
           onCoverChange={(cover) => onCoverChange && onCoverChange(cover)}
         />
       )}
-      <div className="flex justify-end mb-4">
-        <div className="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 p-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex-wrap">
-          <Button variant="ghost" size="icon" onClick={() => nav(-1)}>
-            <ChevronLeft size={20} />
-          </Button>
-          <span className="font-bold px-4 min-w-[150px] text-center text-xs uppercase tracking-widest">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-0.5">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white capitalize min-w-[140px]">
             {rangeLabel()}
-          </span>
-          <Button variant="ghost" size="icon" onClick={() => nav(1)}>
-            <ChevronRight size={20} />
+          </h2>
+          <Button variant="ghost" size="icon" onClick={() => nav(-1)} aria-label="Precedente">
+            <ChevronLeft size={18} />
           </Button>
-          <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+          <Button variant="ghost" size="icon" onClick={() => nav(1)} aria-label="Successivo">
+            <ChevronRight size={18} />
+          </Button>
           <Button
             variant="ghost"
             onClick={goToToday}
-            className="text-[10px] font-black uppercase tracking-widest"
+            className="text-[11px] font-semibold text-gray-500 dark:text-gray-400"
           >{t("views.calToday")}</Button>
-          <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800/50 p-1 rounded-xl">
-            {[
-              { id: "week", icon: CalendarDays, labelKey: "views.calWeek" },
-              { id: "month", icon: CalendarRange, labelKey: "views.calMonth" },
-              { id: "agenda", icon: ListOrdered, labelKey: "views.calAgenda" },
-            ].map((v) => (
-              <button
-                key={v.id}
-                onClick={() => setView(v.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
-                  view === v.id
-                    ? "bg-white dark:bg-gray-700 text-cyan-600 shadow-md"
-                    : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                }`}
-              >
-                <v.icon size={13} />
-                {t(v.labelKey)}
-              </button>
-            ))}
-          </div>
+        </div>
+        <div className="flex items-center gap-0.5 bg-gray-100 dark:bg-gray-800/70 p-0.5 rounded-lg">
+          {[
+            { id: "month", icon: CalendarRange, labelKey: "views.calMonth" },
+            { id: "week", icon: CalendarDays, labelKey: "views.calWeek" },
+            { id: "agenda", icon: ListOrdered, labelKey: "views.calAgenda" },
+          ].map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setView(v.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${
+                view === v.id
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+              }`}
+            >
+              <v.icon size={13} />
+              {t(v.labelKey)}
+            </button>
+          ))}
         </div>
       </div>
 
       {view === "month" && (
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
-          {monthDays.map((day) => {
-            const dateStr = day.toISOString().split("T")[0];
-            const dayTasks = getTasksForDay(day);
-            const isToday = day.toDateString() === new Date().toDateString();
-            const inMonth = day.getMonth() === currentDate.getMonth();
-            return (
+        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          {/* Intestazione giorni settimana */}
+          <div className="hidden md:grid grid-cols-7">
+            {monthDays.slice(0, 7).map((d, i) => (
               <div
-                key={dateStr}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  if (draggedTaskId) moveTaskToDate(draggedTaskId, dateStr);
-                  setDraggedTaskId(null);
-                }}
-                className={`min-h-[110px] rounded-2xl border p-2 flex flex-col gap-1 transition-all ${
-                  inMonth
-                    ? "bg-white/70 dark:bg-gray-800/60 border-gray-100 dark:border-gray-700"
-                    : "bg-gray-50/60 dark:bg-gray-900/30 border-dashed border-gray-200 dark:border-gray-800 opacity-60"
-                } ${isToday ? "ring-2 ring-cyan-500/40" : ""}`}
+                key={i}
+                className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-gray-800"
               >
-                <div
-                  className={`text-[9px] font-black uppercase text-gray-400 ${isToday ? "text-cyan-600 dark:text-cyan-400" : ""}`}
-                >
-                  {day.getDate()} {day.toLocaleDateString(locale, { weekday: "short" })}
-                </div>
-                <div className="flex flex-col gap-1 overflow-hidden">
-                  {dayTasks.slice(0, 3).map((t) => (
-                    <div
-                      key={t.id}
-                      className={`px-1.5 py-0.5 rounded text-[8px] font-bold truncate cursor-pointer ${
-                        t.completed
-                          ? "line-through text-gray-400 bg-gray-100/50 dark:bg-gray-800"
-                          : "bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300"
-                      }`}
-                      onClick={() => {
-                        setSelectedDay(day);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      {t.title}
-                    </div>
-                  ))}
-                  {dayTasks.length > 3 && (
-                    <span className="text-[8px] font-black text-gray-400 px-1">
-                      +{dayTasks.length - 3}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleOpenModal(day)}
-                  className="mt-auto text-[8px] font-black text-gray-300 hover:text-cyan-500 text-left"
-                >{t("views.calAdd")}</button>
+                {d.toLocaleDateString(locale, { weekday: "short" })}
               </div>
-            );
-          })}
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-px bg-gray-200 dark:bg-gray-800">
+            {monthDays.map((day) => {
+              const dateStr = day.toISOString().split("T")[0];
+              const dayTasks = getTasksForDay(day);
+              const isToday = day.toDateString() === new Date().toDateString();
+              const inMonth = day.getMonth() === currentDate.getMonth();
+              return (
+                <div
+                  key={dateStr}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const taskId = e.dataTransfer.getData("text/task-id") || draggedTaskId;
+                    if (taskId) moveTaskToDate(taskId, dateStr);
+                    setDraggedTaskId(null);
+                  }}
+                  className={`group/cell min-h-[64px] md:min-h-[104px] bg-white dark:bg-gray-900 p-1 flex flex-col gap-0.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 ${inMonth ? "" : "opacity-55"}`}
+                >
+                  <div className="flex items-center gap-1.5 px-1 pt-0.5">
+                    <span
+                      className={`md:hidden text-[11px] font-semibold uppercase text-gray-400 dark:text-gray-500`}
+                    >
+                      {day.toLocaleDateString(locale, { weekday: "short" })}
+                    </span>
+                    <span
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                        isToday
+                          ? "bg-(--accent) text-white font-bold"
+                          : inMonth
+                            ? "text-gray-700 dark:text-gray-200"
+                            : "text-gray-400"
+                      }`}
+                    >
+                      {day.getDate()}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    {dayTasks.slice(0, 3).map((t) => (
+                      <div
+                        key={t.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("text/task-id", t.id);
+                          setDraggedTaskId(t.id);
+                        }}
+                        className={`group flex items-center gap-1 rounded px-1 py-0.5 text-[11px] leading-tight font-medium cursor-grab active:cursor-grabbing ${
+                          t.completed
+                            ? "line-through text-gray-400 bg-gray-100 dark:bg-gray-800"
+                            : priorityBars[t.priority] || "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); toggleTask(t.id); }}
+                          className="shrink-0 opacity-60 hover:opacity-100"
+                          aria-label={t.completed ? "Riapri" : "Completa"}
+                        >
+                          {t.completed ? <CheckCircle2 size={12} /> : <Circle size={12} />}
+                        </button>
+                        <span
+                          className="flex-1 min-w-0 truncate"
+                          onClick={() => {
+                            setSelectedDay(day);
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          {t.title}
+                        </span>
+                        {t.recurrence && !t.completed && (
+                          <Repeat size={10} className="shrink-0 opacity-60" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); deleteTask(t.id); }}
+                          className="shrink-0 hidden group-hover:block opacity-60 hover:opacity-100 hover:text-red-500"
+                          aria-label="Elimina"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    ))}
+                    {dayTasks.length > 3 && (
+                      <button
+                        onClick={() => handleOpenModal(day)}
+                        className="px-1 text-left text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      >
+                        +{dayTasks.length - 3}
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleOpenModal(day)}
+                    className="mt-auto hidden group-hover/cell:flex [@media(hover:none)]:flex items-center gap-1 px-1 py-0.5 text-[11px] text-gray-300 hover:text-(--accent) dark:text-gray-600 dark:hover:text-(--accent-300) text-left"
+                  >
+                    <Plus size={11} />
+                    {t("views.calAdd")}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
