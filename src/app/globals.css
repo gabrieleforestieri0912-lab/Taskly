@@ -1126,3 +1126,39 @@
   --input: oklch(1 0 0 / 15%);
   --ring: var(--accent-300);
 }
+
+/* ── Selezione ad area / marquee (stile Notion) ─────────────────────────
+   Token fucsia centralizzati: il rettangolo e l'evidenziazione usano solo
+   queste variabili, mai valori hardcoded nei componenti. */
+:root {
+  --marquee-fill: rgba(255, 0, 128, 0.12);
+  --marquee-border: rgba(255, 0, 128, 0.5);
+  --marquee-selected-bg: rgba(255, 0, 128, 0.15);
+  --marquee-selected-outline: rgba(255, 0, 128, 0.55);
+}
+
+/* Rettangolo di selezione: coordinate viewport (position: fixed),
+   pointer-events disabilitati così non intercetta mai il mouse. */
+.marquee-rect {
+  position: fixed;
+  pointer-events: none;
+  z-index: 150;
+  background: var(--marquee-fill);
+  border: 1px solid var(--marquee-border);
+  border-radius: 4px;
+}
+
+/* Evidenziazione elementi selezionati: tinta fucsia sopra lo sfondo
+   esistente (box-shadow inset, non copre il contenuto) + outline leggero. */
+[data-marquee-selected="true"] {
+  box-shadow: inset 0 0 0 999px var(--marquee-selected-bg);
+  outline: 1.5px solid var(--marquee-selected-outline);
+  outline-offset: -1.5px;
+}
+
+/* Durante il drag disabilita la selezione nativa del testo. */
+.marquee-selecting,
+.marquee-selecting * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}

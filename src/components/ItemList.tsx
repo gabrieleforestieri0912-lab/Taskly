@@ -39,14 +39,16 @@ import { resolvePageIcon } from "../lib/pageIcons";
 import { readPref, playCompletionSound } from "../lib/prefs";
 import { track } from "../lib/activity";
 import { nextDeadline } from "../lib/recurrence";
+import { useMarqueeSelection } from "../hooks/useMarqueeSelection";
 
 // --- Sotto-Componenti per le Viste ---
 
-const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
+const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask, selectedIds = undefined as ReadonlySet<string> | undefined }) => {
   const { t, tWith } = useLanguage();
   const [dragCol, setDragCol] = useState(statuses[0].id);
   const [overCol, setOverCol] = useState(null);
   const [draft, setDraft] = useState({});
+  const isSelected = (id: string): boolean => selectedIds?.has(id) ?? false;
 
   return (
     <div className="flex gap-6 overflow-x-auto pb-6 custom-scrollbar min-h-[500px]">
@@ -108,6 +110,9 @@ const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
                         setDragCol(item.status);
                         setOverCol(item.status);
                       }}
+                      data-selectable-id={item.id}
+                      data-marquee-selected={isSelected(item.id) || undefined}
+                      aria-selected={isSelected(item.id) || undefined}
                     >
                     <Card className="border-none hover:shadow-xl transition-all cursor-grab active:cursor-grabbing group">
                       <CardContent className="p-4">
@@ -211,8 +216,9 @@ const KanbanView = ({ items, updateTask, priorities, statuses, onAddTask }) => {
   );
 };
 
-const TimelineView = ({ items }) => {
+const TimelineView = ({ items, selectedIds = undefined as ReadonlySet<string> | undefined }) => {
   const { t, tWith } = useLanguage();
+  const isSelected = (id: string): boolean => selectedIds?.has(id) ?? false;
   return (
     <div className="bg-white dark:bg-gray-800/40 rounded-[2.5rem] p-8 border border-gray-100 dark:border-gray-800 shadow-2xl shadow-cyan-500/5">
       <div className="flex flex-col gap-6">
@@ -223,7 +229,13 @@ const TimelineView = ({ items }) => {
               new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
           )
           .map((item, idx) => (
-            <div key={item.id} className="flex items-center gap-6">
+            <div
+              key={item.id}
+              className="flex items-center gap-6"
+              data-selectable-id={item.id}
+              data-marquee-selected={isSelected(item.id) || undefined}
+              aria-selected={isSelected(item.id) || undefined}
+            >
               <div className="w-24 shrink-0 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                 {item.deadline}
               </div>
@@ -312,6 +324,8 @@ export default function ItemList({
   onCoverChange = undefined as ((cover: string | null) => void) | undefined,
   /** Vista incorporata nei blocchi: ritmo compatto. */
   compact = false,
+  /** Punto di aggancio: riceve gli id selezionati con il marquee a ogni cambio. */
+  onSelectionChange = undefined as ((ids: string[]) => void) | undefined,
 }) {
   const { t, tWith } = useLanguage();
 
@@ -347,6 +361,11 @@ export default function ItemList({
   const [newColType, setNewColType] = useState("text");
   const [showAddColPopup, setShowAddColPopup] = useState(false);
   const [statusMenuOpen, setStatusMenuOpen] = useState({});
+
+  // Selezione ad area stile Notion (lista, kanban, timeline condividono
+  // lo stesso contenitore e quindi la stessa selezione).
+  const viewsRef = useRef<HTMLDivElement | null>(null);
+  const marquee = useMarqueeSelection(viewsRef, { onSelectionChange });
 
   const addCustomColumn = () => {
     if (!newColName.trim()) return;
@@ -509,6 +528,39 @@ export default function ItemList({
   };
 
   const remove = (id) => setItems(items.filter((i) => i.id !== id));
+
+  // Azioni di gruppo sulla selezione marquee (punto di aggancio: anche
+  // `onSelectionChange` espone gli id al resto dell'app).
+  const bulkComplete = () => {
+    const ids = marquee.selectedIds;
+    if (ids.size === 0) return;
+    setItems(
+      items.map((i) => {
+        if (!ids.has(i.id)) return i;
+        // Stessa automazione di updateTask: done => priorità Bassa.
+        return { ...i, status: "done", priority: i.priority === "Bassa" ? i.priority : "Bassa" };
+      }),
+    );
+    track({
+      type: "task_completed",
+      title: "Task completati in blocco",
+      body: `${ids.size} task contrassegnati come completati.`,
+      payload: { event: "task" },
+    });
+  };
+
+  const bulkDelete = () => {
+    const ids = marquee.selectedIds;
+    if (ids.size === 0) return;
+    setItems(items.filter((i) => !ids.has(i.id)));
+    marquee.clearSelection();
+    track({
+      type: "task_deleted",
+      title: "Task eliminati in blocco",
+      body: `${ids.size} task eliminati dalla lista.`,
+      payload: { event: "task" },
+    });
+  };
 
   const addLink = (taskId, pageId) => {
     const task = items.find((i) => i.id === taskId);
@@ -792,8 +844,57 @@ export default function ItemList({
         </Card>
       )}
 
+      {/* Barra azioni di gruppo sulla selezione marquee */}
+      {marquee.selectedIds.size > 0 && (
+        <div
+          role="toolbar"
+          aria-label={`${marquee.selectedIds.size} task selezionati`}
+          className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--marquee-border)] bg-[var(--marquee-fill)] px-4 py-2.5 text-xs font-bold text-gray-700 dark:text-gray-200"
+        >
+          <span>{marquee.selectedIds.size} selezionati</span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={bulkComplete}
+              className="flex items-center gap-1.5 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 px-3 py-1.5 hover:border-cyan-500 transition-colors"
+            >
+              <CheckSquare size={14} />
+              Completa
+            </button>
+            <button
+              type="button"
+              onClick={bulkDelete}
+              className="flex items-center gap-1.5 rounded-xl bg-white/70 dark:bg-gray-900/70 border border-gray-200 dark:border-gray-700 px-3 py-1.5 hover:border-red-500 hover:text-red-600 transition-colors"
+            >
+              <Trash2 size={14} />
+              Elimina
+            </button>
+            <button
+              type="button"
+              onClick={marquee.clearSelection}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            >
+              <X size={14} />
+              Deseleziona
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Rendering Vista Dinamica */}
-      <div className="mt-6">
+      <div ref={viewsRef} onMouseDown={marquee.handleMouseDown} className="relative mt-6">
+        {marquee.rect && (
+          <div
+            aria-hidden="true"
+            className="marquee-rect"
+            style={{
+              left: marquee.rect.x,
+              top: marquee.rect.y,
+              width: marquee.rect.width,
+              height: marquee.rect.height,
+            }}
+          />
+        )}
         {view === "list" && (
           <div className="grid gap-3">
             <AnimatePresence mode="popLayout">
@@ -811,6 +912,9 @@ export default function ItemList({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
+                    data-selectable-id={item.id}
+                    data-marquee-selected={marquee.selectedIds.has(item.id) || undefined}
+                    aria-selected={marquee.selectedIds.has(item.id) || undefined}
                   >
                     <Card className="border-none group hover:shadow-2xl transition-all duration-300 overflow-visible">
                       <CardContent className="p-4">
@@ -1214,10 +1318,13 @@ export default function ItemList({
             priorities={priorities}
             statuses={statuses}
             onAddTask={quickAddTask}
+            selectedIds={marquee.selectedIds}
           />
         )}
 
-        {view === "timeline" && <TimelineView items={filteredItems} />}
+        {view === "timeline" && (
+          <TimelineView items={filteredItems} selectedIds={marquee.selectedIds} />
+        )}
       </div>
 
       {items.length === 0 && (
