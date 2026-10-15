@@ -25,6 +25,7 @@ export default function Footer() {
         { label: t("land.footerLinkTemplates"), href: "/templates" },
         { label: t("land.footerLinkIntegrations"), href: "/integrations" },
         { label: t("land.footerLinkTranscriptions"), href: "/transcription" },
+        { label: t("land.footerLinkApps"), href: "/download" },
       ],
     },
     {

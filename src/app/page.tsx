@@ -13,6 +13,7 @@ import UseCases from "../components/UseCases";
 import Comparison from "../components/Comparison";
 import HowItWorks from "../components/HowItWorks";
 import Pricing from "../components/Pricing";
+import AppsSection from "../components/AppsSection";
 import FAQ from "../components/FAQ";
 import CtaBanner from "../components/CtaBanner";
 import Footer from "../components/Footer";
@@ -114,6 +115,12 @@ export default function Home() {
       <ScrollReveal>
         <div>
           <FAQ />
+        </div>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <div>
+          <AppsSection />
         </div>
       </ScrollReveal>
 

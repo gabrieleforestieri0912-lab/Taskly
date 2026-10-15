@@ -65,6 +65,7 @@
   "build": {
     "appId": "com.taskly.desktop",
     "productName": "Taskly",
+    "artifactName": "Taskly-Setup-${version}.${ext}",
     "directories": {
       "output": "dist"
     },

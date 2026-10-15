@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# desktop build outputs (installer .exe, unpacked app)
+desktop/dist/
+
 # work (chrome profile, temp files)
 /work
 

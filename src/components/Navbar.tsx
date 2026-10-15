@@ -142,6 +142,7 @@ export default function Navbar({
     { name: t("demo"), href: "#demo" },
     { name: t("pricing"), href: "#pricing" },
     { name: t("faq"), href: "#faq" },
+    { name: t("land.navApps"), href: "/download" },
   ];
 
   // Gruppi con dropdown per la navbar delle pagine interne (stesse sezioni della landing)
@@ -369,6 +370,9 @@ export default function Navbar({
 
               <Link href="/docs" className={navButtonClass}>
                 {t("auth.docsTitle")}
+              </Link>
+              <Link href="/download" className={navButtonClass}>
+                {t("land.navApps")}
               </Link>
             </div>
 
@@ -732,6 +736,12 @@ export default function Navbar({
 
         {!isDashboard && (
           <div className="hidden items-center gap-1 lg:flex">
+            <Link
+              href="/download"
+              className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-[13px] font-semibold text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+            >
+              {t("land.navApps")}
+            </Link>
             {groupedNavLinks.map((group) => (
               <div
                 key={group.key}
