@@ -3,7 +3,13 @@ const jwt = require("jsonwebtoken");
 const { SUPABASE_JWT_SECRET, getSupabase } = require("../lib/supabase");
 
 function getSecret() {
-  return SUPABASE_JWT_SECRET || "dev-only-secret-change-me";
+  // Fail closed: never verify HMAC tokens with a public fallback secret.
+  // If the variable is missing, HS256 verification throws and verifyToken
+  // falls through to the Supabase (JWKS) verification path.
+  if (!SUPABASE_JWT_SECRET) {
+    throw new Error("SUPABASE_JWT_SECRET must be set to verify tokens");
+  }
+  return SUPABASE_JWT_SECRET;
 }
 
 // Verify a token. Two cases:

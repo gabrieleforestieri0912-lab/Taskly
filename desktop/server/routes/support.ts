@@ -2,6 +2,25 @@
 const express = require("express");
 const router = express.Router();
 
+// Encode untrusted values before they enter the HTML email body so a
+// submission cannot inject markup into the operator's inbox.
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      default:
+        return "&#39;";
+    }
+  });
+}
+
 // Support/feedback form — mirrors the web project. Sends an email via Resend
 // when RESEND_API_KEY is configured; otherwise reports a clear configuration error.
 router.post("/", async (req, res) => {
@@ -37,13 +56,13 @@ router.post("/", async (req, res) => {
       await resend.emails.send({
         from: "Taskly <noreply@taskly.app>",
         to: process.env.SUPPORT_EMAIL || "gabriele.forestieri0912@gmail.com",
-        subject: `Nuovo feedback${nomePulito ? ` da ${nomePulito}` : ""}`,
+        subject: `Nuovo feedback${nomePulito ? ` da ${nomePulito.replace(/[\r\n]+/g, " ")}` : ""}`,
         html: `
           <h2>Nuovo feedback</h2>
-          <p><strong>Nome:</strong> ${nomePulito || "Anonimo"}</p>
-          <p><strong>Email:</strong> ${emailPulita || "non fornita"}</p>
+          <p><strong>Nome:</strong> ${escapeHtml(nomePulito) || "Anonimo"}</p>
+          <p><strong>Email:</strong> ${escapeHtml(emailPulita) || "non fornita"}</p>
           <p><strong>Messaggio:</strong></p>
-          <p>${messaggioPulito}</p>
+          <p>${escapeHtml(messaggioPulito)}</p>
         `,
       });
     } catch (emailError) {

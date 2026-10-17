@@ -138,7 +138,11 @@ router.get("/google/result", (req, res) => {
 
 // Mint a Supabase-compatible JWT (HS256, same secret the middleware verifies).
 function signToken(userId, email) {
-  const secret = SUPABASE_JWT_SECRET || "dev-only-secret-change-me";
+  // Fail closed: never mint tokens with a public fallback secret.
+  const secret = SUPABASE_JWT_SECRET;
+  if (!secret) {
+    throw new Error("SUPABASE_JWT_SECRET must be set to mint tokens");
+  }
   return jwt.sign(
     { sub: userId, email, role: "authenticated", aud: "authenticated" },
     secret,

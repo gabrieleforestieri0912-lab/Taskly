@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { getSupabase } = require("../lib/supabase");
 const { toApiRows } = require("../lib/transform");
+const { authRequired } = require("../middleware/auth");
 
 router.post("/events", async (req, res) => {
   const { events } = req.body || {};
@@ -26,7 +27,7 @@ router.post("/events", async (req, res) => {
   }
 });
 
-router.get("/stats/recent", async (req, res) => {
+router.get("/stats/recent", authRequired, async (req, res) => {
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase

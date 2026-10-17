@@ -3,6 +3,25 @@ import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// Encode untrusted values before they enter the HTML email body so a
+// submission cannot inject markup into the operator's inbox.
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      default:
+        return '&#39;';
+    }
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const { message, email, name } = await request.json();
@@ -33,13 +52,13 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: 'Taskly <noreply@taskly.app>',
         to: process.env.SUPPORT_EMAIL || 'gabriele.forestieri0912@gmail.com',
-        subject: `Nuovo feedback${nomePulito ? ` da ${nomePulito}` : ''}`,
+        subject: `Nuovo feedback${nomePulito ? ` da ${nomePulito.replace(/[\r\n]+/g, ' ')}` : ''}`,
         html: `
           <h2>Nuovo feedback</h2>
-          <p><strong>Nome:</strong> ${nomePulito || 'Anonimo'}</p>
-          <p><strong>Email:</strong> ${emailPulita || 'non fornita'}</p>
+          <p><strong>Nome:</strong> ${escapeHtml(nomePulito) || 'Anonimo'}</p>
+          <p><strong>Email:</strong> ${escapeHtml(emailPulita) || 'non fornita'}</p>
           <p><strong>Messaggio:</strong></p>
-          <p>${messaggioPulito}</p>
+          <p>${escapeHtml(messaggioPulito)}</p>
         `,
       });
     } catch (emailError) {

@@ -598,13 +598,15 @@ create policy "integrations_update_own" on public.integrations
 create policy "integrations_delete_own" on public.integrations
   for delete using (auth.uid() = user_id);
 
--- Everyone may write analytics events (used by the public marketing pages)
+-- Everyone may write analytics events (used by the public marketing pages),
+-- but reads are reserved for the service role: the anon key is a public
+-- client credential, so a `using (true)` SELECT policy would expose every
+-- user's analytics rows (including the IP/path audit events in
+-- analytics_events) to anonymous clients.
 create policy "analytics_insert_all" on public.analytics
   for insert with check (true);
-create policy "analytics_select_all" on public.analytics
-  for select using (true);
+drop policy if exists "analytics_select_all" on public.analytics;
 
 create policy "analytics_events_insert_all" on public.analytics_events
   for insert with check (true);
-create policy "analytics_events_select_all" on public.analytics_events
-  for select using (true);
+drop policy if exists "analytics_events_select_all" on public.analytics_events;
