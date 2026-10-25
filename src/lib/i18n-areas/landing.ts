@@ -227,9 +227,10 @@ export const landingIt: Record<string, string> = {
   "land.psSolution1": "Un solo hub per task, note e obiettivi",
   "land.psSolution2": "Dashboard chiara con pagine annidate e AI",
   "land.psSolution3": "Flusso operativo continuo: idea to task to completamento",
-  "land.psMetric1Label": "risparmiate a settimana",
-  "land.psMetric2Label": "più chiarezza priorità",
-  "land.psMetric3Label": "per partire con un template",
+  // psMetric: no numeri d'uso inventati, affermazioni descrittive oneste
+  "land.psMetric1Label": "Un workspace unico per ogni progetto",
+  "land.psMetric2Label": "Priorità sempre chiare",
+  "land.psMetric3Label": "Parti subito con i template pronti",
   "land.psCta": "Inizia ora e misura i risultati",
 
   // ── ProductDemo ──
@@ -767,9 +768,9 @@ export const landingEn: Record<string, string> = {
   "land.psSolution1": "One hub for tasks, notes and goals",
   "land.psSolution2": "Clear dashboard with nested pages and AI",
   "land.psSolution3": "Continuous operating flow: idea to task to done",
-  "land.psMetric1Label": "saved per week",
-  "land.psMetric2Label": "more priority clarity",
-  "land.psMetric3Label": "to start with a template",
+  "land.psMetric1Label": "One workspace for every project",
+  "land.psMetric2Label": "Priorities always clear",
+  "land.psMetric3Label": "Start right away with ready templates",
   "land.psCta": "Start now and measure the results",
 
   // ── ProductDemo ──

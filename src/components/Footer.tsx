@@ -60,7 +60,7 @@ const SOCIALS = [
   return (
     <footer
       id="contact"
-      className="relative bg-[#f6f7f9] dark:bg-black text-gray-900 dark:text-gray-100 mt-auto border-t border-gray-200 dark:border-gray-800"
+      className="relative bg-landing-surface dark:bg-black text-gray-900 dark:text-gray-100 mt-auto border-t border-(--accent)/10 dark:border-white/10"
       role="contentinfo"
       aria-label={t("land.footerAria")}
     >

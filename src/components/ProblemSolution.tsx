@@ -31,9 +31,9 @@ export default function ProblemSolution() {
   ];
 
   const metrics = [
-    { value: "5h", label: t("land.psMetric1Label") },
-    { value: "2x", label: t("land.psMetric2Label") },
-    { value: "30s", label: t("land.psMetric3Label") },
+    { label: t("land.psMetric1Label") },
+    { label: t("land.psMetric2Label") },
+    { label: t("land.psMetric3Label") },
   ];
   return (
     <section className="landing-section-surface px-6 py-20">
@@ -75,11 +75,11 @@ export default function ProblemSolution() {
           })}
         </div>
 
+        {/* psMetric: nessun dato d'uso inventato, solo descrizioni */}
         <div className="mt-8 grid md:grid-cols-3 gap-4">
           {metrics.map((m) => (
-            <div key={m.value} className="landing-stat-card text-center">
-              <p className="text-2xl font-black text-(--accent)">{m.value}</p>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 font-medium">{m.label}</p>
+            <div key={m.label} className="landing-stat-card text-center">
+              <p className="text-sm font-bold text-(--accent) dark:text-(--accent-300)">{m.label}</p>
             </div>
           ))}
         </div>
