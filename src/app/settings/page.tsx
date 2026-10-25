@@ -63,15 +63,15 @@ type SettingsTab =
   | "billing";
 
 const TABS: { id: SettingsTab; label: string; icon: any; desc: string }[] = [
-  { id: "profile", label: "Profilo & Account", icon: User, desc: "Informazioni personali, avatar e dettagli utente" },
-  { id: "appearance", label: "Aspetto & Tema", icon: Palette, desc: "Tema chiaro/scuro, colori accento e font" },
-  { id: "language", label: "Lingua & Regione", icon: Globe, desc: "Lingua, formato orario e preferenze calendario" },
-  { id: "notifications", label: "Notifiche & Suoni", icon: Bell, desc: "Avvisi scadenze, digest email e suoni completamento" },
-  { id: "workflow", label: "Workflow & Produttività", icon: Sliders, desc: "Vista default, conferme e opzioni AI" },
-  { id: "integrations", label: "Integrazioni App", icon: Layers, desc: "Google Calendar, Slack, Zoom e Webhook" },
-  { id: "data", label: "Dati & Backup", icon: Download, desc: "Esportazione, importazione e gestione cache" },
-  { id: "security", label: "Sicurezza & Privacy", icon: Shield, desc: "Password, 2FA, sessioni attive e GDPR" },
-  { id: "billing", label: "Piano & Fatturazione", icon: CreditCard, desc: "Abbonamento Stripe, quote e ricevute" },
+  { id: "profile", label: "m.tabProfile", icon: User, desc: "m.tabProfileDesc" },
+  { id: "appearance", label: "m.tabAppearance", icon: Palette, desc: "m.tabAppearanceDesc" },
+  { id: "language", label: "m.tabLanguage", icon: Globe, desc: "m.tabLanguageDesc" },
+  { id: "notifications", label: "m.tabNotifications", icon: Bell, desc: "m.tabNotificationsDesc" },
+  { id: "workflow", label: "m.tabWorkflow", icon: Sliders, desc: "m.tabWorkflowDesc" },
+  { id: "integrations", label: "m.tabIntegrations", icon: Layers, desc: "m.tabIntegrationsDesc" },
+  { id: "data", label: "m.tabData", icon: Download, desc: "m.tabDataDesc" },
+  { id: "security", label: "m.tabSecurity", icon: Shield, desc: "m.tabSecurityDesc" },
+  { id: "billing", label: "m.tabBilling", icon: CreditCard, desc: "m.tabBillingDesc" },
 ];
 
 function SettingsContent() {
@@ -80,7 +80,7 @@ function SettingsContent() {
   const initialTab = (searchParams.get("tab") as SettingsTab) || "profile";
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
 
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, tWith } = useLanguage();
   const [theme, setTheme] = useState<Theme>("light");
   const [accentColor, setAccentColor] = useState<string>(DEFAULT_ACCENT);
   const [fontFamily, setFontFamily] = useState<string>("inter");
@@ -182,10 +182,34 @@ function SettingsContent() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // Nomi dei colori accento in lingua UI (dati lib/accent.ts restano come fallback).
+  const ACCENT_KEY: Record<string, string> = {
+    "#7b39fc": "m.accViolet",
+    "#06b6d4": "m.accCyan",
+    "#10b981": "m.accEmerald",
+    "#ec4899": "m.accPink",
+    "#f59e0b": "m.accAmber",
+    "#3b82f6": "m.accBlue",
+  };
+  // Codici errore API → chiavi i18n (le API non mandano più testi in italiano).
+  const API_ERR_KEY: Record<string, string> = {
+    name_empty: "m.errNameEmpty",
+    profile_save_failed: "m.errProfile",
+    password_missing: "m.errPassMissing",
+    password_too_short: "m.errPassLen",
+    wrong_current_password: "m.errWrongCurrent",
+    account_no_email: "m.errNoEmail",
+    password_update_failed: "m.errPassword",
+  };
+  const apiErr = (data: any, key: string) => {
+    const code = data?.code;
+    return code && API_ERR_KEY[code] ? t(API_ERR_KEY[code]) : t(key);
+  };
+
   const handleSaveProfile = async () => {
     const name = (user.name || "").trim();
     if (!name) {
-      showToast("Il nome non può essere vuoto.");
+      showToast(t("m.errNameEmpty"));
       return;
     }
     setSavingProfile(true);
@@ -196,15 +220,15 @@ function SettingsContent() {
         body: JSON.stringify({ name }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.message || "Errore nel salvataggio.");
+      if (!res.ok) throw new Error(apiErr(data, "m.errProfile"));
       const nextUser = { ...user, name: data?.profile?.name || name };
       setUser(nextUser);
       try {
         localStorage.setItem("user", JSON.stringify(nextUser));
       } catch {}
-      showToast("Profilo aggiornato con successo!");
+      showToast(t("m.okProfile"));
     } catch (e: any) {
-      showToast(e?.message || "Errore nel salvataggio del profilo.");
+      showToast(e?.message || t("m.errProfile"));
     } finally {
       setSavingProfile(false);
     }
@@ -212,11 +236,11 @@ function SettingsContent() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      showToast("Inserisci la password attuale e quella nuova.");
+      showToast(t("m.errPassMissing"));
       return;
     }
     if (newPassword.length < 8) {
-      showToast("La nuova password deve avere almeno 8 caratteri.");
+      showToast(t("m.errPassLen"));
       return;
     }
     setSavingPassword(true);
@@ -227,12 +251,12 @@ function SettingsContent() {
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.message || "Impossibile aggiornare la password.");
+      if (!res.ok) throw new Error(apiErr(data, "m.errPassword"));
       setCurrentPassword("");
       setNewPassword("");
-      showToast("Password aggiornata con successo!");
+      showToast(t("m.okPassword"));
     } catch (e: any) {
-      showToast(e?.message || "Errore nell'aggiornamento della password.");
+      showToast(e?.message || t("m.errPassword"));
     } finally {
       setSavingPassword(false);
     }
@@ -257,9 +281,9 @@ function SettingsContent() {
           firstDayMonday,
         }),
       );
-      showToast("Preferenze salvate!");
+      showToast(t("m.okPrefs"));
     } catch {
-      showToast("Errore nel salvataggio preferenze.");
+      showToast(t("m.errPrefs"));
     }
   };
 
@@ -273,30 +297,30 @@ function SettingsContent() {
     if (!val) {
       const ok = await ensureNotifPermission();
       if (!ok) {
-        showToast("Permesso notifiche negato dal browser.");
+        showToast(t("m.errNotifPerm"));
         return;
       }
     }
     set(!val);
-    showToast(`${title}: ${!val ? "Attivato" : "Disattivato"}`);
+    showToast(`${title}: ${!val ? t("m.on") : t("m.off")}`);
   };
 
   const changeAccent = (color: string, label: string) => {
     setAccentColor(color);
     applyAccent(color, true);
-    showToast(`Colore ${label} applicato a tutta l'app.`);
+    showToast(tWith("m.toastAccent", { name: label }));
   };
 
   const changeTheme = (next: Theme) => {
     setTheme(next);
     applyTheme(next, true);
-    showToast(`Tema ${next === "dark" ? "scuro" : "chiaro"} applicato.`);
+    showToast(next === "dark" ? t("m.toastThemeDark") : t("m.toastThemeLight"));
   };
 
   const changeFont = (next: AppFontId, label: string) => {
     setFontFamily(next);
     applyAppFont(next, true);
-    showToast(`Font ${label} salvato.`);
+    showToast(tWith("m.toastFont", { name: label }));
   };
 
   const openBillingPortal = async () => {
@@ -305,10 +329,10 @@ function SettingsContent() {
     try {
       const res = await apiFetch("/billing/portal", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Portale non disponibile.");
+      if (!res.ok) throw new Error(data.message || t("m.errPortal"));
       window.location.href = data.url;
     } catch (error: any) {
-      setBillingMessage(error.message || "Impossibile aprire il portale.");
+      setBillingMessage(error.message || t("m.errPortalOpen"));
     } finally {
       setLoadingPortal(false);
     }
@@ -364,9 +388,9 @@ function SettingsContent() {
       a.download = `taskly-backup-${new Date().toISOString().split("T")[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast(server ? "Backup completo scaricato con successo!" : "Backup locale scaricato (non sei connesso).");
+      showToast(server ? t("m.okBackupFull") : t("m.okBackupLocal"));
     } catch (e) {
-      showToast("Errore durante l'esportazione dei dati.");
+      showToast(t("m.errExport"));
     }
   };
 
@@ -375,9 +399,9 @@ function SettingsContent() {
       localStorage.removeItem("dashboardOpenTabs");
       localStorage.removeItem("taskly_dashboard_custom_widgets_v2");
       localStorage.removeItem("page_history");
-      showToast("Cache locale svuotata con successo.");
+      showToast(t("m.okCache"));
     } catch {
-      showToast("Errore nella pulizia della cache.");
+      showToast(t("m.errCache"));
     }
   };
 
@@ -389,9 +413,9 @@ function SettingsContent() {
         `taskly-${label}-${new Date().toISOString().split("T")[0]}.csv`,
         all[entity] || [],
       );
-      showToast(n > 0 ? `Esportati ${n} elementi in ${label}.csv` : `Niente da esportare in ${label}.`);
+      showToast(n > 0 ? tWith("m.okCsv", { n, file: label }) : tWith("m.okCsvEmpty", { file: label }));
     } catch {
-      showToast("Errore durante l'esportazione CSV.");
+      showToast(t("m.errCsv"));
     }
   };
 
@@ -438,7 +462,7 @@ function SettingsContent() {
               {t("settingsTitle", "Impostazioni Taskly")}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Personalizza il tuo spazio di lavoro, preferenze, account e integrazioni.
+              {t("m.settingsSubtitle")}
             </p>
           </div>
 
@@ -449,7 +473,7 @@ function SettingsContent() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white text-xs font-bold shadow-lg shadow-(--accent)/20 transition-all cursor-pointer"
             >
               <Check size={15} />
-              <span>Salva Modifiche</span>
+              <span>{t("m.saveChanges")}</span>
             </button>
           </div>
         </div>
@@ -475,7 +499,7 @@ function SettingsContent() {
                   >
                     <Icon size={16} className={isActive ? "text-(--accent) dark:text-(--accent-300)" : "text-gray-400"} />
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs truncate">{tab.label}</div>
+                      <div className="text-xs truncate">{t(tab.label)}</div>
                     </div>
                     {isActive && <ChevronRight size={14} className="text-(--accent) dark:text-(--accent-300)" />}
                   </button>
@@ -505,10 +529,10 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <User size={20} className="text-(--accent)" />
-                      <span>Profilo & Account</span>
+                      <span>{t("m.tabProfile")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Gestisci i dettagli visibili nel tuo spazio e nelle collaborazioni.
+                      {t("m.profileSub")}
                     </p>
                   </div>
 
@@ -521,17 +545,17 @@ function SettingsContent() {
                       </div>
                     )}
                     <div className="space-y-1 flex-1">
-                      <p className="font-extrabold text-sm text-gray-900 dark:text-white">{user.name || "Utente"}</p>
-                      <p className="text-xs text-gray-500">{user.email || "utente@esempio.it"}</p>
+                      <p className="font-extrabold text-sm text-gray-900 dark:text-white">{user.name || t("m.userFallback", "Utente")}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
                       <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                        Account Verificato
+                        {t("m.verified")}
                       </span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Nome Completo</label>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.fullName")}</label>
                       <input
                         type="text"
                         value={user.name || ""}
@@ -540,15 +564,15 @@ function SettingsContent() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Indirizzo Email</label>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.email")}</label>
                       <input
                         type="email"
                         value={user.email || ""}
                         readOnly
-                        title="L'email è gestita dal tuo provider di accesso e non si può cambiare da qui."
+                        title={t("m.emailManagedT")}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 text-xs font-medium text-gray-500 focus:outline-none cursor-not-allowed"
                       />
-                      <p className="text-[10px] text-gray-400">Gestita dal provider di accesso.</p>
+                      <p className="text-[10px] text-gray-400">{t("m.emailManagedD")}</p>
                     </div>
                   </div>
 
@@ -558,7 +582,7 @@ function SettingsContent() {
                     disabled={savingProfile}
                     className="px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-all shadow-md shadow-(--accent)/20 disabled:opacity-50"
                   >
-                    {savingProfile ? "Salvataggio..." : "Salva Profilo"}
+                    {savingProfile ? t("m.saving") : t("m.saveProfile")}
                   </button>
                 </div>
               )}
@@ -569,16 +593,16 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Palette size={20} className="text-purple-500" />
-                      <span>Aspetto & Personalizzazione</span>
+                      <span>{t("m.tabAppearance")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Scegli il tema visivo, i font e i colori accento della piattaforma.
+                      {t("m.appearanceSub")}
                     </p>
                   </div>
 
                   {/* Theme Mode */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Modalità Tema</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.themeMode")}</label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
@@ -592,7 +616,7 @@ function SettingsContent() {
                         <Sun size={18} />
                         <div className="text-left">
                           <div>{t("lightMode", "Tema Chiaro")}</div>
-                          <span className="text-[10px] text-gray-400 font-normal">Predefinito con contrasto morbido</span>
+                          <span className="text-[10px] text-gray-400 font-normal">{t("m.lightDesc")}</span>
                         </div>
                       </button>
 
@@ -608,7 +632,7 @@ function SettingsContent() {
                         <Moon size={18} />
                         <div className="text-left">
                           <div>{t("darkMode", "Tema Scuro")}</div>
-                          <span className="text-[10px] text-gray-400 font-normal">Nero OLED con riflessi viola</span>
+                          <span className="text-[10px] text-gray-400 font-normal">{t("m.darkDesc")}</span>
                         </div>
                       </button>
                     </div>
@@ -616,13 +640,13 @@ function SettingsContent() {
 
                   {/* Accent Color */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Colore d&apos;Accento</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.accentColor")}</label>
                     <div className="flex flex-wrap gap-3">
                       {ACCENTS.map((c) => (
                         <button
                           key={c.color}
                           type="button"
-                          onClick={() => changeAccent(c.color, c.name)}
+                          onClick={() => changeAccent(c.color, t(ACCENT_KEY[c.color] || "", c.name))}
                           aria-pressed={accentColor === c.color}
                           className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
                             accentColor === c.color
@@ -631,23 +655,23 @@ function SettingsContent() {
                           }`}
                         >
                           <span className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: c.color }} />
-                          <span>{c.name}</span>
+                          <span>{t(ACCENT_KEY[c.color] || "", c.name)}</span>
                         </button>
                       ))}
                     </div>
                     <p className="text-[11px] text-gray-400">
-                      Applicato subito a bottoni, link e selezioni in tutta l&apos;app.
+                      {t("m.accentApplied")}
                     </p>
                   </div>
 
                   {/* Typography Font */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Tipografia Interfaccia</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.typography")}</label>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { id: "inter", name: "Inter (Sans-serif)", preview: "Moderna e pulita" },
-                        { id: "serif", name: "Merriweather (Serif)", preview: "Elegante e classica" },
-                        { id: "mono", name: "Monospace", preview: "Codice & tecnica" },
+                        { id: "inter", name: "Inter (Sans-serif)", preview: "m.fontInterPrev" },
+                        { id: "serif", name: "Merriweather (Serif)", preview: "m.fontSerifPrev" },
+                        { id: "mono", name: "Monospace", preview: "m.fontMonoPrev" },
                       ].map((f) => (
                         <button
                           key={f.id}
@@ -660,7 +684,7 @@ function SettingsContent() {
                           }`}
                         >
                           <p className="text-xs font-bold">{f.name}</p>
-                          <p className="text-[10px] text-gray-400 mt-1">{f.preview}</p>
+                          <p className="text-[10px] text-gray-400 mt-1">{t(f.preview)}</p>
                         </button>
                       ))}
                     </div>
@@ -668,7 +692,7 @@ function SettingsContent() {
 
                   {/* Density */}
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Densità Interfaccia</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.density")}</label>
                     <div className="flex gap-3">
                       <button
                         type="button"
@@ -682,7 +706,7 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
-                        Spaziosa (Normale)
+                        {t("m.densityNormal")}
                       </button>
                       <button
                         type="button"
@@ -696,11 +720,11 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
-                        Compatta (Alta densità)
+                        {t("m.densityCompact")}
                       </button>
                     </div>
                     <p className="text-[11px] text-gray-400">
-                      La modalità compatta riduce le spaziature in tutta l&apos;app. Applicata subito.
+                      {t("m.densityDesc")}
                     </p>
                   </div>
                 </div>
@@ -712,15 +736,15 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Globe size={20} className="text-cyan-500" />
-                      <span>Lingua & Regione</span>
+                      <span>{t("m.tabLanguage")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Imposta la lingua dell&apos;interfaccia e il primo giorno della settimana.
+                      {t("m.languageSub")}
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Lingua dell&apos;Applicazione</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.appLanguage")}</label>
                     <div className="grid grid-cols-2 gap-3">
                       {[
                         { code: "it", name: "Italiano", flag: "🇮🇹" },
@@ -731,7 +755,7 @@ function SettingsContent() {
                           type="button"
                           onClick={() => {
                             setLanguage(lang.code);
-                            showToast(`Lingua impostata: ${lang.name}`);
+                            showToast(tWith("m.toastLanguage", { name: lang.name }));
                           }}
                           className={`flex items-center gap-2.5 p-3 rounded-2xl border text-xs font-bold transition-all ${
                             language === lang.code
@@ -747,7 +771,7 @@ function SettingsContent() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Inizio Settimana</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.weekStart")}</label>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -758,7 +782,7 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
                         }`}
                       >
-                        Lunedì
+                        {t("m.monday")}
                       </button>
                       <button
                         type="button"
@@ -769,11 +793,11 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300"
                         }`}
                       >
-                        Domenica
+                        {t("m.sunday")}
                       </button>
                     </div>
                     <p className="text-[11px] text-gray-400">
-                      Applicato al calendario e alla pianificazione settimanale.
+                      {t("m.weekStartDesc")}
                     </p>
                   </div>
                 </div>
@@ -785,10 +809,10 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Bell size={20} className="text-amber-500" />
-                      <span>Notifiche & Promemoria</span>
+                      <span>{t("m.tabNotifications")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Controlla quando e come Taskly ti avvisa su impegni e completamenti.
+                      {t("m.notifSub")}
                     </p>
                   </div>
 
@@ -796,24 +820,24 @@ function SettingsContent() {
                     {[
                       {
                         key: "notifTaskDue" as const,
-                        title: "Promemoria Scadenze Task",
-                        desc: "Notifica di sistema per i task ad alta priorità scaduti o in scadenza oggi.",
+                        title: "m.ntDue",
+                        desc: "m.ntDueDesc",
                         val: notifTaskDue,
                         set: setNotifTaskDue,
                         needsPermission: true,
                       },
                       {
                         key: "notifSound" as const,
-                        title: "Effetti Sonori di Completamento",
-                        desc: "Breve segnale acustico quando completi un task o una checklist.",
+                        title: "m.ntSound",
+                        desc: "m.ntSoundDesc",
                         val: notifSound,
                         set: setNotifSound,
                         needsPermission: false,
                       },
                       {
                         key: "notifMeetings" as const,
-                        title: "Promemoria Riunioni di Oggi",
-                        desc: "Notifica di sistema con le riunioni in programma nella giornata.",
+                        title: "m.ntMeet",
+                        desc: "m.ntMeetDesc",
                         val: notifMeetings,
                         set: setNotifMeetings,
                         needsPermission: true,
@@ -824,17 +848,17 @@ function SettingsContent() {
                         className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800"
                       >
                         <div className="space-y-0.5 pr-4">
-                          <p className="text-xs font-bold text-gray-900 dark:text-white">{item.title}</p>
-                          <p className="text-[11px] text-gray-500 dark:text-gray-400">{item.desc}</p>
+                          <p className="text-xs font-bold text-gray-900 dark:text-white">{t(item.title)}</p>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400">{t(item.desc)}</p>
                         </div>
                         <button
                           type="button"
                           onClick={() => {
                             if (item.needsPermission) {
-                              void handleNotifToggle(item.key, item.val, item.set, item.title);
+                              void handleNotifToggle(item.key, item.val, item.set, t(item.title));
                             } else {
                               item.set(!item.val);
-                              showToast(`${item.title}: ${!item.val ? "Attivato" : "Disattivato"}`);
+                              showToast(`${t(item.title)}: ${!item.val ? t("m.on") : t("m.off")}`);
                             }
                           }}
                           className={`w-12 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${
@@ -859,15 +883,15 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Sliders size={20} className="text-emerald-500" />
-                      <span>Workflow & Produttività</span>
+                      <span>{t("m.tabWorkflow")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Configura viste predefinite, conferme e suggerimenti AI.
+                      {t("m.workflowSub")}
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Vista Task Predefinita</label>
+                    <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.defaultTaskView")}</label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
@@ -878,7 +902,7 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
-                        Elenco Strutturato (List)
+                        {t("m.viewList")}
                       </button>
                       <button
                         type="button"
@@ -889,18 +913,18 @@ function SettingsContent() {
                             : "border-gray-200 dark:border-gray-800"
                         }`}
                       >
-                        Bacheca Kanban
+                        {t("m.viewKanban")}
                       </button>
                     </div>
                     <p className="text-[11px] text-gray-400">
-                      Applicata alle nuove pagine task (le roadmap restano in Kanban).
+                      {t("m.defaultTaskViewDesc")}
                     </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white">Conferma prima di cestinare</p>
-                      <p className="text-[11px] text-gray-500">Mostra il dialogo di conferma quando sposti una pagina nel cestino.</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{t("m.confirmTrash")}</p>
+                      <p className="text-[11px] text-gray-500">{t("m.confirmTrashDesc")}</p>
                     </div>
                     <button
                       type="button"
@@ -916,8 +940,8 @@ function SettingsContent() {
 
                   <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white">Suggerimenti Proattivi AI</p>
-                      <p className="text-[11px] text-gray-500">Mostra analisi e consigli di prioritizzazione nella dashboard.</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{t("m.aiSuggestions")}</p>
+                      <p className="text-[11px] text-gray-500">{t("m.aiSuggestionsDesc")}</p>
                     </div>
                     <button
                       type="button"
@@ -938,10 +962,10 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Layers size={20} className="text-cyan-500" />
-                      <span>Integrazioni App & Connettori</span>
+                      <span>{t("m.tabIntegrations")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Connetti i tuoi strumenti di lavoro preferiti direttamente a Taskly.
+                      {t("m.integrationsSub")}
                     </p>
                   </div>
 
@@ -950,19 +974,19 @@ function SettingsContent() {
                       {
                         provider: "google",
                         name: "Google Calendar",
-                        desc: "Sincronizza automaticamente le scadenze dei task con il tuo calendario personale o aziendale.",
+                        desc: "m.glCalDesc",
                         icon: <GoogleCalendarIcon className="w-7 h-7" />,
                       },
                       {
                         provider: "slack",
                         name: "Slack",
-                        desc: "Invia notifiche istantanee e riepiloghi giornalieri sui canali del tuo team.",
+                        desc: "m.slackDesc",
                         icon: "💬",
                       },
                       {
                         provider: "zoom",
                         name: "Zoom",
-                        desc: "Importa registrazioni cloud audio e video direttamente nella suite di trascrizione AI.",
+                        desc: "m.zoomDesc",
                         icon: "🎥",
                       },
                     ].map((item) => {
@@ -976,7 +1000,7 @@ function SettingsContent() {
                           <span className="text-2xl">{item.icon}</span>
                           <div>
                             <p className="text-xs font-bold text-gray-900 dark:text-white">{item.name}</p>
-                            <p className="text-[11px] text-gray-500">{item.desc}</p>
+                            <p className="text-[11px] text-gray-500">{t(item.desc)}</p>
                           </div>
                         </div>
                         <button
@@ -988,7 +1012,7 @@ function SettingsContent() {
                               : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-200"
                           }`}
                         >
-                          {connected ? "Connesso" : "Connetti"}
+                          {connected ? t("m.connected") : t("m.connect")}
                         </button>
                       </div>
                       );
@@ -997,14 +1021,14 @@ function SettingsContent() {
 
                   <div className="p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-900/10 border border-cyan-100 dark:border-cyan-800/40 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-cyan-900 dark:text-cyan-200">Hub Integrazioni Completo</p>
-                      <p className="text-[11px] text-cyan-700 dark:text-cyan-400">Esplora tutti i provider webhook e API dedicati.</p>
+                      <p className="text-xs font-bold text-cyan-900 dark:text-cyan-200">{t("m.hubT")}</p>
+                      <p className="text-[11px] text-cyan-700 dark:text-cyan-400">{t("m.hubD")}</p>
                     </div>
                     <Link
                       href="/integrations"
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 text-white text-xs font-bold"
                     >
-                      <span>Apri Hub</span>
+                      <span>{t("m.openHub")}</span>
                       <ExternalLink size={12} />
                     </Link>
                   </div>
@@ -1017,10 +1041,10 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Download size={20} className="text-rose-500" />
-                      <span>Dati, Backup & Esportazione</span>
+                      <span>{t("m.tabData")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      I tuoi dati ti appartengono sempre. Esporta, importa o pulisci la cache.
+                      {t("m.dataSub")}
                     </p>
                   </div>
 
@@ -1029,16 +1053,16 @@ function SettingsContent() {
                       <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 w-fit">
                         <Download size={18} />
                       </div>
-                      <h4 className="text-xs font-bold">Esporta Backup Completo</h4>
+                      <h4 className="text-xs font-bold">{t("m.exportBackupT")}</h4>
                       <p className="text-[11px] text-gray-500">
-                        Scarica tutte le pagine, task, note, impostazioni e preferenze in un unico file JSON.
+                        {t("m.exportBackupD")}
                       </p>
                       <button
                         type="button"
                         onClick={handleExportData}
                         className="w-full py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all"
                       >
-                        Scarica Backup JSON
+                        {t("m.downloadJSON")}
                       </button>
                     </div>
 
@@ -1046,26 +1070,26 @@ function SettingsContent() {
                       <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 w-fit">
                         <FileText size={18} />
                       </div>
-                      <h4 className="text-xs font-bold">Esporta CSV</h4>
+                      <h4 className="text-xs font-bold">{t("m.exportCsvT")}</h4>
                       <p className="text-[11px] text-gray-500">
-                        Tabelle compatibili con Excel e Fogli Google.
+                        {t("m.exportCsvD")}
                       </p>
                       <div className="grid grid-cols-2 gap-2">
                         {(
                           [
-                            ["tasks", "Task"],
-                            ["goals", "Obiettivi"],
-                            ["ideas", "Idee"],
-                            ["pages", "Pagine"],
+                            ["tasks", "m.lblTasks"],
+                            ["goals", "m.lblGoals"],
+                            ["ideas", "m.lblIdeas"],
+                            ["pages", "m.lblPages"],
                           ] as const
                         ).map(([entity, label]) => (
                           <button
                             key={entity}
                             type="button"
-                            onClick={() => handleExportCSV(entity, label.toLowerCase())}
+                            onClick={() => handleExportCSV(entity, entity)}
                             className="py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold transition-all"
                           >
-                            {label} CSV
+                            {t(label)} CSV
                           </button>
                         ))}
                       </div>
@@ -1075,16 +1099,16 @@ function SettingsContent() {
                       <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 w-fit">
                         <RefreshCw size={18} />
                       </div>
-                      <h4 className="text-xs font-bold">Pulisci Cache Locale</h4>
+                      <h4 className="text-xs font-bold">{t("m.clearCacheT")}</h4>
                       <p className="text-[11px] text-gray-500">
-                        Reimposta le schede aperte e svuota la cache temporanea del browser.
+                        {t("m.clearCacheD")}
                       </p>
                       <button
                         type="button"
                         onClick={handleClearCache}
                         className="w-full py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold transition-all"
                       >
-                        Svuota Cache
+                        {t("m.clearCache")}
                       </button>
                     </div>
                   </div>
@@ -1092,10 +1116,10 @@ function SettingsContent() {
                   <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40">
                     <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-bold text-xs">
                       <Shield size={16} />
-                      <span>Crittografia End-to-End Attiva</span>
+                      <span>{t("m.e2eT")}</span>
                     </div>
                     <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
-                      Le note protette da passcode sono cifrate con AES-GCM a 256 bit lato client.
+                      {t("m.e2eD")}
                     </p>
                   </div>
                 </div>
@@ -1107,16 +1131,16 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <Shield size={20} className="text-indigo-500" />
-                      <span>Sicurezza & Password</span>
+                      <span>{t("m.tabSecurity")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Cambia la password del tuo account. Ti verrà chiesto di accedere di nuovo.
+                      {t("m.securitySub")}
                     </p>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Password Attuale</label>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.currentPassword")}</label>
                       <input
                         type="password"
                         value={currentPassword}
@@ -1127,12 +1151,12 @@ function SettingsContent() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Nuova Password</label>
+                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">{t("m.newPassword")}</label>
                       <input
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Almeno 8 caratteri"
+                        placeholder={t("m.passPh")}
                         autoComplete="new-password"
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs"
                       />
@@ -1143,7 +1167,7 @@ function SettingsContent() {
                       disabled={savingPassword}
                       className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all disabled:opacity-50"
                     >
-                      {savingPassword ? "Aggiornamento..." : "Aggiorna Password"}
+                      {savingPassword ? t("m.updating") : t("m.updatePassword")}
                     </button>
                   </div>
                 </div>
@@ -1155,28 +1179,28 @@ function SettingsContent() {
                   <div>
                     <h2 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                       <CreditCard size={20} className="text-(--accent)" />
-                      <span>Abbonamento & Fatturazione</span>
+                      <span>{t("m.tabBilling")}</span>
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Gestisci il tuo piano, pagamenti Stripe e cronologia fatture.
+                      {t("m.billingSub")}
                     </p>
                   </div>
 
                   <div className="p-6 rounded-2xl bg-gradient-to-br from-(--accent)/10 to-(--accent-300)/5 border border-(--accent)/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-wider text-(--accent)">Piano Attivo</span>
+                        <span className="text-xs font-black uppercase tracking-wider text-(--accent)">{t("m.activePlan")}</span>
                         <span className="px-2 py-0.5 rounded-full bg-(--accent) text-white text-[9px] font-black uppercase">
                           {subscription?.plan || "Starter"}
                         </span>
                       </div>
                       <h3 className="text-xl font-black text-gray-900 dark:text-white">
-                        {subscription?.plan === "Pro" ? "Taskly Pro — €5.99 / mese" : "Taskly Starter — Gratuito"}
+                        {subscription?.plan === "Pro" ? t("m.planPro") : t("m.planStarter")}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {subscription?.plan === "Pro"
-                          ? "Accesso illimitato a pagine, IA generativa e trascrizione vocale."
-                          : "Piano base con pagine illimitate e strumenti essenziali."}
+                          ? t("m.planProDesc")
+                          : t("m.planStarterDesc")}
                       </p>
                     </div>
 
@@ -1186,7 +1210,7 @@ function SettingsContent() {
                       disabled={loadingPortal}
                       className="px-5 py-2.5 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white text-xs font-bold shadow-lg shadow-(--accent)/20 transition-all cursor-pointer shrink-0 disabled:opacity-50"
                     >
-                      {loadingPortal ? t("loading", "Caricamento...") : "Gestisci su Stripe"}
+                      {loadingPortal ? t("loading", "Caricamento...") : t("m.manageStripe")}
                     </button>
                   </div>
 
@@ -1196,14 +1220,14 @@ function SettingsContent() {
 
                   <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white">Confronta tutti i Piani</p>
-                      <p className="text-[11px] text-gray-500">Visualizza le opzioni Starter (€0), Pro (€5.99) e Team (€14.99).</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{t("m.comparePlans")}</p>
+                      <p className="text-[11px] text-gray-500">{t("m.comparePlansDesc")}</p>
                     </div>
                     <Link
                       href="/#pricing"
                       className="px-3.5 py-1.5 rounded-xl border border-gray-300 dark:border-gray-700 text-xs font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
-                      Vedi Tabella Prezzi
+                      {t("m.viewPricing")}
                     </Link>
                   </div>
                 </div>

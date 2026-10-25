@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLanguage } from "../../lib/LanguageContext";
 import {
   ArrowDown,
   ArrowUp,
@@ -65,8 +66,9 @@ export type WidgetId =
 
 export interface WidgetMeta {
   id: WidgetId;
+  /** chiave i18n (tradotta con t) — MAI testo inline: il nome widget deve
+      comparire nella lingua attiva, non solo in italiano. */
   label: string;
-  description: string;
   icon: any;
   category: "analytics" | "planning" | "tools";
 }
@@ -74,64 +76,55 @@ export interface WidgetMeta {
 export const ALL_WIDGET_DEFS: WidgetMeta[] = [
   {
     id: "quick_stats",
-    label: "Statistiche & Metriche Rapide",
-    description: "Panoramica a colpo d'occhio di task, obiettivi e idee attive.",
+    label: "dash.widQuickStats",
     icon: "ListTodo",
     category: "analytics",
   },
   {
     id: "today_focus",
-    label: "Focus di Oggi & Tasso Completamento",
-    description: "Obiettivo cardine giornaliero con indicatore circolare.",
+    label: "dash.widTodayFocus",
     icon: "Zap",
     category: "planning",
   },
   {
     id: "weekly_trend",
-    label: "Trend & Produttività Settimanale",
-    description: "Grafico dell'andamento e tasso di attività negli ultimi 7 giorni.",
+    label: "dash.widWeeklyTrend",
     icon: "TrendingUp",
     category: "analytics",
   },
   {
     id: "critical_tasks",
-    label: "Task ad Alta Priorità",
-    description: "Elenco dei task urgenti in attesa con scadenze evidenziate.",
+    label: "dash.widCriticalTasks",
     icon: "Flame",
     category: "planning",
   },
   {
     id: "recent_ideas",
-    label: "Brain Dump & Idee Recenti",
-    description: "Spunti creativi catturati di recente pronti per essere sviluppati.",
+    label: "dash.widRecentIdeas",
     icon: "Lightbulb",
     category: "planning",
   },
   {
     id: "goal_progress",
-    label: "Avanzamento Obiettivi",
-    description: "Barre di progressione verso i tuoi traguardi chiave.",
+    label: "dash.widGoalProgress",
     icon: "Target",
     category: "planning",
   },
   {
     id: "quick_nav",
-    label: "Azioni Rapide",
-    description: "Scorciatoie con un click per creare nuovi progetti e idee.",
+    label: "dash.widQuickNav",
     icon: "Plus",
     category: "tools",
   },
   {
     id: "ai_insights",
-    label: "Analisi Intelligente AI",
-    description: "Suggerimenti proattivi generati dall'assistente per ottimizzare il flusso.",
+    label: "dash.widAiInsights",
     icon: "Sparkles",
     category: "analytics",
   },
   {
     id: "tools_resources",
-    label: "Strumenti & Risorse",
-    description: "Caricamento file, galleria template e funzioni di import/export.",
+    label: "dash.widToolsResources",
     icon: "Wrench",
     category: "tools",
   },
@@ -332,6 +325,7 @@ export function WeeklyTrendWidget({
   totalLabel?: string;
   bestLabel?: string;
 }) {
+  const { t } = useLanguage();
   const hasData = data.some((d) => d.count > 0);
   const maxVal = Math.max(...data.map((d) => d.val), 1);
   const totalCount = data.reduce((sum, d) => sum + (d.count || 0), 0);
@@ -391,7 +385,7 @@ export function WeeklyTrendWidget({
         ) : (
           <EmptyState
             icon={BarChart3}
-            label="Nessuna attività registrata questa settimana. Completa i tuoi task per vedere il trend."
+            label={t("dash.wtEmptyTrend", "Nessuna attività registrata questa settimana. Completa i tuoi task per vedere il trend.")}
           />
         )}
         {/* Footer riepilogo: totale + giorno migliore */}
@@ -779,7 +773,7 @@ export function WidgetEditToolbar({
   onMoveDown,
   onToggle,
   hiddenLabel,
-  dragTitle = "Trascina per riordinare",
+  dragTitle = "dash.dragWidget",
   onDragStart,
   onDragEnd,
   isDragging = false,
@@ -805,6 +799,7 @@ export function WidgetEditToolbar({
   onTouchPointerMove?: (e: React.PointerEvent) => void;
   onTouchPointerUp?: (e: React.PointerEvent) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center justify-between gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-100 dark:border-gray-700/60 rounded-t-3xl text-xs font-bold text-gray-500 dark:text-gray-400">
       <div className="flex items-center gap-2">
@@ -818,7 +813,7 @@ export function WidgetEditToolbar({
             onPointerUp={onTouchPointerUp}
             onPointerCancel={onTouchPointerUp}
             onContextMenu={(e) => e.preventDefault()}
-            title={dragTitle}
+            title={t(dragTitle, dragTitle)}
             role="button"
             aria-label={`${dragTitle}: ${label}`}
             className={`touch-none select-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ${isDragging ? "opacity-50" : ""}`}
@@ -841,7 +836,7 @@ export function WidgetEditToolbar({
           onClick={onMoveUp}
           disabled={isFirst}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
-          title="Sposta su"
+          title={t("dash.wtbMoveUp", "Sposta su")}
         >
           <ArrowUp size={13} />
         </button>
@@ -850,7 +845,7 @@ export function WidgetEditToolbar({
           onClick={onMoveDown}
           disabled={isLast}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
-          title="Sposta giù"
+          title={t("dash.wtbMoveDown", "Sposta giù")}
         >
           <ArrowDown size={13} />
         </button>
@@ -862,12 +857,12 @@ export function WidgetEditToolbar({
               ? "bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400"
               : "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
           }`}
-          title={isVisible ? "Nascondi widget" : "Mostra widget"}
+          title={isVisible ? t("dash.wtbHideWidget", "Nascondi widget") : t("dash.wtbShowWidget", "Mostra widget")}
         >
           {isVisible ? (
-            <><EyeOff size={11} /> Nascondi</>
+            <><EyeOff size={11} /> {t("dash.wtbHide", "Nascondi")}</>
           ) : (
-            <><Eye size={11} /> Mostra</>
+            <><Eye size={11} /> {t("dash.wtbShow", "Mostra")}</>
           )}
         </button>
       </div>
@@ -895,6 +890,7 @@ export function WidgetManagerMenu({
     minimal: string;
   };
 }) {
+  const { t } = useLanguage();
   return (
     <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-xl z-50 space-y-2">
       <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
@@ -922,7 +918,7 @@ export function WidgetManagerMenu({
             >
               <span className="flex items-center gap-2 truncate">
                 <IconComp size={13} className="text-(--accent) dark:text-(--accent-300) shrink-0" />
-                <span className="truncate">{w.label}</span>
+                <span className="truncate">{t(w.label, w.label)}</span>
               </span>
               <span
                 className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${

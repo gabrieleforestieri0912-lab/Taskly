@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLanguage } from "../lib/LanguageContext";
 import {
   X,
   Link2,
@@ -119,6 +120,7 @@ export default function ShareDialog({
   onUpdatePage: (id: string, updates: any) => void;
   onClose: () => void;
 }) {
+  const { t, tWith } = useLanguage();
   const [tab, setTab] = useState<"share" | "publish">("share");
   const [emailInput, setEmailInput] = useState("");
   const [inviteRole, setInviteRole] = useState<ShareRole>("edit");
@@ -195,7 +197,7 @@ export default function ShareDialog({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={`Condividi ${page?.label || "pagina"}`}
+        aria-label={tWith("views.shareAria", { name: page?.label || t("views.mtUntitled") })}
         className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-2xl border border-gray-200/80 dark:border-white/10 overflow-hidden text-gray-900 dark:text-gray-100"
       >
         {/* ── Header: tab + help + chiudi ─────────────────────────────── */}

@@ -95,15 +95,47 @@ export const PRIORITY_COLORS: Record<
   },
 };
 
-/** Formatta una data YYYY-MM-DD in italiano leggibile */
+/** Lingua UI corrente (inline-use, fuori dal tree React): il LanguageContext
+ *  aggiorna document.documentElement.lang del documento. */
+function uiLang(): "it" | "en" {
+  return typeof document !== "undefined" && document.documentElement.lang === "en"
+    ? "en"
+    : "it";
+}
+
+const DL_FORMAT: Record<"it" | "en", Record<string, string>> = {
+  it: {
+    noDate: "Nessuna data",
+    yesterday: "Ieri",
+    daysAgo: "giorni fa",
+    today: "Oggi",
+    tomorrow: "Domani",
+  },
+  en: {
+    noDate: "No date",
+    yesterday: "Yesterday",
+    daysAgo: "days ago",
+    today: "Today",
+    tomorrow: "Tomorrow",
+  },
+};
+
+const DL_WEEKDAYS: Record<"it" | "en", string[]> = {
+  it: ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+};
+
+/** Formatta una data YYYY-MM-DD in lingua UI leggibile (IT/EN). */
 export function formatDeadlineItalian(deadlineStr?: string): {
   formatted: string;
   isOverdue: boolean;
   isToday: boolean;
   isTomorrow: boolean;
 } {
+  const lang = uiLang();
+  const labels = DL_FORMAT[lang];
   if (!deadlineStr) {
-    return { formatted: "Nessuna data", isOverdue: false, isToday: false, isTomorrow: false };
+    return { formatted: labels.noDate, isOverdue: false, isToday: false, isTomorrow: false };
   }
 
   const d = new Date(deadlineStr);
@@ -122,25 +154,24 @@ export function formatDeadlineItalian(deadlineStr?: string): {
 
   if (diffDays < 0) {
     return {
-      formatted: diffDays === -1 ? "Ieri" : `${Math.abs(diffDays)} giorni fa`,
+      formatted: diffDays === -1 ? labels.yesterday : `${Math.abs(diffDays)} ${labels.daysAgo}`,
       isOverdue: true,
       isToday: false,
       isTomorrow: false,
     };
   }
   if (diffDays === 0) {
-    return { formatted: "Oggi", isOverdue: false, isToday: true, isTomorrow: false };
+    return { formatted: labels.today, isOverdue: false, isToday: true, isTomorrow: false };
   }
   if (diffDays === 1) {
-    return { formatted: "Domani", isOverdue: false, isToday: false, isTomorrow: true };
+    return { formatted: labels.tomorrow, isOverdue: false, isToday: false, isTomorrow: true };
   }
   if (diffDays < 7) {
-    const days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
-    return { formatted: days[target.getDay()], isOverdue: false, isToday: false, isTomorrow: false };
+    return { formatted: DL_WEEKDAYS[lang][target.getDay()], isOverdue: false, isToday: false, isTomorrow: false };
   }
 
   return {
-    formatted: target.toLocaleDateString("it-IT", { day: "numeric", month: "short" }),
+    formatted: target.toLocaleDateString(lang === "en" ? "en-US" : "it-IT", { day: "numeric", month: "short" }),
     isOverdue: false,
     isToday: false,
     isTomorrow: false,
@@ -162,15 +193,15 @@ export function parseNaturalDate(rawTitle: string): { title: string; deadline?: 
 
   const lower = title.toLowerCase();
 
-  // "oggi"
-  const matchOggi = lower.match(/(?:\s|^)(?:per\s+|entro\s+)?oggi(?:\s|$)/);
+  // "oggi" / "today"
+  const matchOggi = lower.match(/(?:\s|^)(?:per\s+|entro\s+|by\s+)?(?:oggi|today)(?:\s|$)/);
   if (matchOggi && matchOggi.index !== undefined) {
     title = (title.slice(0, matchOggi.index) + " " + title.slice(matchOggi.index + matchOggi[0].length)).trim();
     return { title, deadline: toYMD(today) };
   }
 
-  // "dopodomani"
-  const matchDopodomani = lower.match(/(?:\s|^)(?:per\s+|entro\s+)?dopodomani(?:\s|$)/);
+  // "dopodomani" / "day after tomorrow"
+  const matchDopodomani = lower.match(/(?:\s|^)(?:per\s+|entro\s+)?(?:dopodomani|day after tomorrow)(?:\s|$)/);
   if (matchDopodomani && matchDopodomani.index !== undefined) {
     const d = new Date(today);
     d.setDate(d.getDate() + 2);
@@ -178,8 +209,8 @@ export function parseNaturalDate(rawTitle: string): { title: string; deadline?: 
     return { title, deadline: toYMD(d) };
   }
 
-  // "domani"
-  const matchDomani = lower.match(/(?:\s|^)(?:per\s+|entro\s+)?domani(?:\s|$)/);
+  // "domani" / "tomorrow"
+  const matchDomani = lower.match(/(?:\s|^)(?:per\s+|entro\s+|by\s+)?(?:domani|tomorrow)(?:\s|$)/);
   if (matchDomani && matchDomani.index !== undefined) {
     const d = new Date(today);
     d.setDate(d.getDate() + 1);
@@ -187,29 +218,33 @@ export function parseNaturalDate(rawTitle: string): { title: string; deadline?: 
     return { title, deadline: toYMD(d) };
   }
 
-  // "tra X giorni" / "in X giorni"
-  const matchTra = lower.match(/(?:\s|^)(?:tra|in)\s+(\d+)\s+giorn[io](?:\s|$)/);
+  // "tra X giorni" / "in X giorni" / "in X days"
+  const matchTra = lower.match(/(?:\s|^)(?:tra|in)\s+(\d+)\s+giorn[io](?:\s|$)|(?:\s|^)in\s+(\d+)\s+days(?:\s|$)/);
   if (matchTra && matchTra.index !== undefined) {
-    const daysToAdd = parseInt(matchTra[1], 10);
+    const daysToAdd = parseInt(matchTra[1] || matchTra[2], 10);
     const d = new Date(today);
     d.setDate(d.getDate() + daysToAdd);
     title = (title.slice(0, matchTra.index) + " " + title.slice(matchTra.index + matchTra[0].length)).trim();
     return { title, deadline: toYMD(d) };
   }
 
-  // Giorni della settimana: lunedì, martedì, ecc.
-  const weekDays = [
-    { name: "domenica", day: 0 },
-    { name: "lunedì", alt: "lunedi", day: 1 },
-    { name: "martedì", alt: "martedi", day: 2 },
-    { name: "mercoledì", alt: "mercoledi", day: 3 },
-    { name: "giovedì", alt: "giovedi", day: 4 },
-    { name: "venerdì", alt: "venerdi", day: 5 },
-    { name: "sabato", day: 6 },
+  // Giorni della settimana: lunedì/martedì/... e monday/tuesday/...
+  const weekDays: Array<{ names: string[]; day: number }> = [
+    { names: ["domenica", "", "sunday", "sun"], day: 0 },
+    { names: ["lunedì", "lunedi", "monday", "mon"], day: 1 },
+    { names: ["martedì", "martedi", "tuesday", "tue"], day: 2 },
+    { names: ["mercoledì", "mercoledi", "wednesday", "wed"], day: 3 },
+    { names: ["giovedì", "giovedi", "thursday", "thu"], day: 4 },
+    { names: ["venerdì", "venerdi", "friday", "fri"], day: 5 },
+    { names: ["sabato", "", "saturday", "sat"], day: 6 },
   ];
 
   for (const wd of weekDays) {
-    const pattern = new RegExp(`(?:\\s|^)(?:per\\s+|entro\\s+|questo\\s+|prossimo\\s+)?(${wd.name}|${wd.alt || ""})(?:\\s|$)`, "i");
+    const alternatives = wd.names.filter(Boolean);
+    const pattern = new RegExp(
+      `(?:\\s|^)(?:per\\s+|entro\\s+|questo\\s+|prossimo\\s+|next\\s+|this\\s+|on\\s+)?(${alternatives.join("|")})(?:\\s|$)`,
+      "i",
+    );
     const m = lower.match(pattern);
     if (m && m.index !== undefined) {
       const currentDay = today.getDay();
@@ -222,8 +257,8 @@ export function parseNaturalDate(rawTitle: string): { title: string; deadline?: 
     }
   }
 
-  // "settimana prossima"
-  const matchNextWeek = lower.match(/(?:\s|^)(?:per\s+|la\s+)?settimana prossima(?:\s|$)/);
+  // "settimana prossima" / "next week"
+  const matchNextWeek = lower.match(/(?:\s|^)(?:per\s+|la\s+|next\s+)?(?:settimana prossima|next week)(?:\s|$)/);
   if (matchNextWeek && matchNextWeek.index !== undefined) {
     const d = new Date(today);
     d.setDate(d.getDate() + 7);
@@ -238,108 +273,10 @@ export function parseNaturalDate(rawTitle: string): { title: string; deadline?: 
 export const TASKS_STORAGE_KEY = "taskly_tasks_v1";
 export const TASK_PREFS_STORAGE_KEY = "taskly_mytasks_prefs";
 
-/** Dati di esempio predefiniti per una prima esperienza ricca */
-export const INITIAL_SAMPLE_TASKS: Task[] = [
-  {
-    id: "sample-1",
-    title: "Completare la revisione del budget trimestrale",
-    description: "Analizzare i fogli di spesa e preparare il consuntivo per la riunione di giovedì con il team finanziario.",
-    status: "todo",
-    priority: "urgent",
-    deadline: new Date().toISOString().split("T")[0], // Oggi
-    project: "finanze",
-    projectName: "Finanze & Budget",
-    tags: ["Prioritario", "Q3"],
-    subtasks: [
-      { id: "s-1", title: "Verificare fatture fornitori", done: true },
-      { id: "s-2", title: "Aggiornare foglio di calcolo", done: true },
-      { id: "s-3", title: "Preparare slide riassuntiva", done: false },
-    ],
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: "sample-2",
-    title: "Aggiornare mockup landing page v2",
-    description: "Rifinire le animazioni hero e verificare il contrasto dei testi in dark mode.",
-    status: "in_progress",
-    priority: "high",
-    deadline: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      return d.toISOString().split("T")[0];
-    })(), // Domani
-    project: "design",
-    projectName: "Progetto Design UI",
-    tags: ["Figma", "Design"],
-    subtasks: [
-      { id: "s-4", title: "Rivedere palette colori", done: true },
-      { id: "s-5", title: "Esportare icone SVG", done: false },
-    ],
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-  },
-  {
-    id: "sample-3",
-    title: "Inviare feedback su proposta commerciale",
-    description: "Mandare email a Marco con i commenti sulle condizioni contrattuali.",
-    status: "todo",
-    priority: "medium",
-    deadline: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 3);
-      return d.toISOString().split("T")[0];
-    })(),
-    project: "commerciale",
-    projectName: "Sviluppo Commerciale",
-    tags: ["Email"],
-    subtasks: [],
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: "sample-4",
-    title: "Pianificare roadmap sprint successivo",
-    description: "Definire backlog e stime per i prossimi obiettivi di prodotto.",
-    status: "todo",
-    priority: "low",
-    deadline: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 7);
-      return d.toISOString().split("T")[0];
-    })(),
-    project: "prodotto",
-    projectName: "Roadmap Prodotto",
-    tags: ["Sprint", "Pianificazione"],
-    subtasks: [
-      { id: "s-6", title: "Raccogliere ticket aperti", done: false },
-      { id: "s-7", title: "Assegnare priorità", done: false },
-    ],
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: "sample-5",
-    title: "Configurare backup automatico database",
-    description: "Impostare snapshot giornaliero e verificare la procedura di ripristino.",
-    status: "done",
-    priority: "high",
-    deadline: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().split("T")[0];
-    })(),
-    project: "infrastruttura",
-    projectName: "DevOps & Cloud",
-    tags: ["Database", "Sicurezza"],
-    subtasks: [
-      { id: "s-8", title: "Script snapshot cron", done: true },
-      { id: "s-9", title: "Test ripristino su sandbox", done: true },
-    ],
-    completedAt: new Date().toISOString(),
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-  },
-];
-
-/** Carica tutti i task dal localStorage con fallback intelligente */
+/** Carica tutti i task dal localStorage — nessun dato finto: se lo storage
+ *  è vuoto partono da zero (prima esecuzione reale dell'utente). */
 export function loadTasksFromStorage(): Task[] {
-  if (typeof window === "undefined") return INITIAL_SAMPLE_TASKS;
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(TASKS_STORAGE_KEY);
     if (raw) {
@@ -357,7 +294,7 @@ export function loadTasksFromStorage(): Task[] {
         // Normalizza i task legacy al nuovo formato
         const normalized: Task[] = legacyParsed.map((item: any, idx: number) => ({
           id: item.id || `task-${Date.now()}-${idx}`,
-          title: item.title || item.text || "Attività senza titolo",
+          title: item.title || item.text || "Task senza titolo",
           description: item.description || "",
           status: item.status === "done" ? "done" : item.status === "in_progress" ? "in_progress" : "todo",
           priority: item.priority === "Alta" || item.priority === "urgent" ? "urgent" : item.priority === "high" ? "high" : item.priority === "low" ? "low" : "medium",
@@ -384,12 +321,11 @@ export function loadTasksFromStorage(): Task[] {
       }
     }
 
-    // Se non c'è nulla, inizializza con i sample tasks
-    saveTasksToStorage(INITIAL_SAMPLE_TASKS);
-    return INITIAL_SAMPLE_TASKS;
+    // Nessuna base: prima esecuzione reale, zero dati finti.
+    return [];
   } catch (err) {
     console.error("Errore nel caricamento dei task:", err);
-    return INITIAL_SAMPLE_TASKS;
+    return [];
   }
 }
 

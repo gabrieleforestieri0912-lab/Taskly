@@ -474,8 +474,8 @@ export default function ItemList({
       if (readPref("notifSound")) playCompletionSound();
       track({
         type: "task_completed",
-        title: "Task completato",
-        body: `"${items.find((i) => i.id === id)?.title}" contrassegnato come completato.`,
+        title: t("views.mtNotifDone"),
+        body: tWith("views.mtNotifDoneBody", { title: items.find((i) => i.id === id)?.title || "" }),
         payload: { event: "task" },
       });
     }
@@ -708,7 +708,7 @@ export default function ItemList({
             <div className="flex-1 w-full relative">
               <input
                 type="text"
-                placeholder={`Cosa devi fare oggi?`}
+                placeholder={t("views.ilPlaceholder")}
                 className="w-full text-base font-bold bg-transparent border-none focus:ring-0 placeholder-gray-300 dark:placeholder-gray-600 pl-4"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

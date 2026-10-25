@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -117,7 +116,7 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, tWith } = useLanguage();
 
   // Apri la scheda per la pagina di destinazione PRIMA di navigare, così la
   // tab esiste già quando cambia l'URL (nessun "buco" visivo nell'header).
@@ -687,7 +686,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-(--accent)/10 text-(--accent) dark:bg-(--accent)/20 dark:text-(--accent-300)">
                 <Settings size={13} />
               </div>
-              <span>Panoramica Impostazioni</span>
+              <span>{t("views.setOverview", "Panoramica Impostazioni")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -701,7 +700,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-blue-500/10 text-blue-500">
                 <User size={13} />
               </div>
-              <span>Profilo & Account</span>
+              <span>{t("views.setProfile", "Profilo & Account")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -715,7 +714,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-purple-500/10 text-purple-500">
                 <Palette size={13} />
               </div>
-              <span>Aspetto, Colori & Font</span>
+              <span>{t("views.setAppearance", "Aspetto, Colori & Font")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -729,7 +728,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-cyan-500/10 text-cyan-500">
                 <Inbox size={13} />
               </div>
-              <span>Inbox dello Spazio</span>
+              <span>{t("views.setInbox", "Inbox dello Spazio")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -743,7 +742,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-500">
                 <Sliders size={13} />
               </div>
-              <span>Workflow & Produttività</span>
+              <span>{t("views.setWorkflow", "Workflow & Produttività")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -757,7 +756,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-cyan-500/10 text-cyan-500">
                 <Layers size={13} />
               </div>
-              <span>Integrazioni App (Google, Slack)</span>
+              <span>{t("views.setIntegrations", "Integrazioni App (Google, Slack)")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -771,7 +770,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-rose-500/10 text-rose-500">
                 <Download size={13} />
               </div>
-              <span>Dati, Backup & Esportazione</span>
+              <span>{t("views.setData", "Dati, Backup & Esportazione")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -785,7 +784,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-indigo-500/10 text-indigo-500">
                 <Shield size={13} />
               </div>
-              <span>Sicurezza & Password</span>
+              <span>{t("views.setSecurity", "Sicurezza & Password")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -799,7 +798,7 @@ export default function Sidebar({
               <div className="p-1 rounded-lg bg-(--accent)/10 text-(--accent)">
                 <CreditCard size={13} />
               </div>
-              <span>Abbonamento & Fatturazione</span>
+              <span>{t("views.setBilling", "Abbonamento & Fatturazione")}</span>
             </div>
             <ChevronRight size={12} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </Link>
@@ -1026,8 +1025,12 @@ export default function Sidebar({
                               } catch {}
                             }
                           }}
-                          title={armed ? "Click di nuovo per eliminare definitivamente" : "Elimina definitivamente"}
-                          aria-label={armed ? `Conferma eliminazione definitiva di ${item.label || "Senza nome"}` : `Elimina definitivamente ${item.label || "Senza nome"}`}
+                          title={armed
+                            ? t("views.treeDelClickAgain", "Click di nuovo per eliminare definitivamente")
+                            : t("views.treeDelForever", "Elimina definitivamente")}
+                          aria-label={armed
+                            ? tWith("views.treeDelClickAgainName", { name: item.label || t("views.mtUntitled") })
+                            : tWith("views.treeDelForeverName", { name: item.label || t("views.mtUntitled") })}
                           className={`p-1.5 rounded-lg transition-colors ${
                             armed
                               ? "bg-red-600 text-white hover:bg-red-500 shadow-md shadow-red-600/30"

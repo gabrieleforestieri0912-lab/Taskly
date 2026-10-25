@@ -27,6 +27,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { apiFetch } from "../lib/api";
+import { useLanguage } from "../lib/LanguageContext";
 import {
   formatDeadlineItalian,
   TASKS_STORAGE_KEY,
@@ -124,6 +125,7 @@ export default function WorkspaceInbox({
   pages?: any[];
 }) {
   const router = useRouter();
+  const { t, tWith, language } = useLanguage();
   const [notifications, setNotifications] = useState<InboxNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -144,24 +146,22 @@ export default function WorkspaceInbox({
       }
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(
-          responseError(data, "Impossibile caricare le notifiche."),
-        );
+        throw new Error(responseError(data, t("views.inbLoadFail")));
       }
       if (!Array.isArray(data)) {
-        throw new Error("Il servizio ha restituito notifiche non valide.");
+        throw new Error(t("views.inbInvalidData"));
       }
       setNotifications(data);
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : "Impossibile caricare le notifiche.",
+          : t("views.inbLoadFail"),
       );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void load();
@@ -259,7 +259,7 @@ export default function WorkspaceInbox({
       );
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(responseError(data, "Impossibile aggiornare la notifica."));
+        throw new Error(responseError(data, t("views.inbUpdateFail")));
       }
       setNotifications((current) =>
         current.map((n) =>
@@ -271,7 +271,7 @@ export default function WorkspaceInbox({
       setError(
         cause instanceof Error
           ? cause.message
-          : "Impossibile aggiornare la notifica.",
+          : t("views.inbUpdateFail"),
       );
       return false;
     } finally {
@@ -351,10 +351,9 @@ export default function WorkspaceInbox({
           <Bell size={20} aria-hidden="true" />
         </span>
         <div>
-          <h1 className="text-2xl font-bold">Inbox</h1>
+          <h1 className="text-2xl font-bold">{t("nav.inbox", "Inbox")}</h1>
           <p className="text-sm text-gray-500">
-            Ciò che richiede attenzione: task in ritardo, scadenze, cestino e
-            menzioni ricevute nei workspace.
+            {t("views.inbSubtitle")}
           </p>
         </div>
       </header>
@@ -366,20 +365,19 @@ export default function WorkspaceInbox({
         >
           <p>{error}</p>
           <button type="button" onClick={() => void load()} className="font-semibold underline">
-            Riprova
+            {t("views.inbRetry")}
           </button>
         </div>
       )}
 
       {loading ? (
-        <p className="py-8 text-center text-sm text-gray-500">Caricamento Inbox…</p>
+        <p className="py-8 text-center text-sm text-gray-500">{t("views.inbLoading")}</p>
       ) : totallyEmpty ? (
         <div className="rounded-2xl border border-dashed border-gray-300 px-6 py-12 text-center dark:border-gray-800">
           <MailOpen className="mx-auto mb-3 text-gray-400" size={28} aria-hidden="true" />
-          <h2 className="font-semibold">Tutto a posto</h2>
+          <h2 className="font-semibold">{t("views.inbEmptyT")}</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Nessun task in ritardo o in scadenza, niente nel cestino, nessuna
-            menzione: qui compariranno appena servirà.
+            {t("views.inbEmptyD")}
           </p>
         </div>
       ) : (
@@ -389,14 +387,14 @@ export default function WorkspaceInbox({
             <div className="rounded-2xl border border-red-200 bg-red-50/50 p-4 dark:border-red-900/50 dark:bg-red-950/20">
               {sectionTitle(
                 <AlertTriangle size={13} aria-hidden="true" />,
-                `In ritardo · ${overdue.length}`,
+                tWith("views.inbOverdue", { n: overdue.length }),
                 "text-red-600 dark:text-red-400",
               )}
               <div className="mt-2">
                 {overdue.slice(0, 8).map(taskRow)}
                 {overdue.length > 8 && (
                   <p className="mt-1 px-2 text-xs text-gray-500">
-                    e altri {overdue.length - 8}…
+                    {tWith("views.inbMore", { n: overdue.length - 8 })}
                   </p>
                 )}
               </div>
@@ -408,7 +406,7 @@ export default function WorkspaceInbox({
             <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
               {sectionTitle(
                 <Clock3 size={13} aria-hidden="true" />,
-                `Scadono oggi · ${dueToday.length}`,
+                tWith("views.inbToday", { n: dueToday.length }),
                 "text-amber-600 dark:text-amber-400",
               )}
               <div className="mt-2">{dueToday.slice(0, 8).map(taskRow)}</div>
@@ -420,14 +418,14 @@ export default function WorkspaceInbox({
             <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
               {sectionTitle(
                 <ListTodo size={13} aria-hidden="true" />,
-                `Prossimi 7 giorni · ${upcoming.length}`,
+                tWith("views.inbNext7", { n: upcoming.length }),
                 "text-gray-500 dark:text-gray-300",
               )}
               <div className="mt-2">
                 {upNext.map(taskRow)}
                 {upNextExtra > 0 && (
                   <p className="mt-1 px-2 text-xs text-gray-500">
-                    e altri {upNextExtra} nella vista «I miei task»…
+                    {tWith("views.inbMoreMyTasks", { n: upNextExtra })}
                   </p>
                 )}
               </div>
@@ -447,24 +445,25 @@ export default function WorkspaceInbox({
             >
               {sectionTitle(
                 <Trash2 size={13} aria-hidden="true" />,
-                `Cestino · ${trashPages.length}`,
+                tWith("views.inbTrash", { n: trashPages.length }),
                 urgentTrash > 0
                   ? "text-red-600 dark:text-red-400"
                   : "text-gray-500 dark:text-gray-300",
               )}
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {trashPages.length} pagin{trashPages.length === 1 ? "a" : "e"} eliminat
-                {trashPages.length === 1 ? "a" : "e"} (rimozione definitiva dopo{" "}
-                {TRASH_RETENTION_DAYS} giorni)
+                {tWith(
+                  trashPages.length === 1 ? "views.inbTrashDesc1" : "views.inbTrashDescN",
+                  { n: trashPages.length, days: TRASH_RETENTION_DAYS },
+                )}
                 {urgentTrash > 0 && (
                   <strong className="text-red-600 dark:text-red-400">
                     {" "}
-                    · {urgentTrash} a rischio imminente
+                    · {tWith("views.inbAtRisk", { n: urgentTrash })}
                   </strong>
                 )}
               </p>
               <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-(--accent) dark:text-(--accent-300)">
-                Apri il cestino
+                {t("views.inbOpenTrash")}
                 <ArrowRight size={12} />
               </p>
             </button>
@@ -475,7 +474,7 @@ export default function WorkspaceInbox({
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
               <p className="flex items-center gap-2 border-b border-gray-100 px-4 py-3 text-xs font-black uppercase tracking-widest text-violet-600 dark:border-gray-800 dark:text-violet-300">
                 <Bell size={13} aria-hidden="true" />
-                Menzioni e comunicazioni
+                {t("views.inbMentions")}
               </p>
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {notifications.map((item) => {
@@ -491,12 +490,12 @@ export default function WorkspaceInbox({
                         <div className="flex items-center gap-2">
                           {!item.read && (
                             <span
-                              aria-label="Notifica non letta"
+                              aria-label={t("views.inbUnreadDot")}
                               className="h-2 w-2 shrink-0 rounded-full bg-violet-600"
                             />
                           )}
                           <h2 className="truncate text-sm font-semibold">
-                            {item.title || "Notifica"}
+                            {item.title || t("views.inbFallbackNotif")}
                           </h2>
                         </div>
                         {item.body && (
@@ -505,7 +504,7 @@ export default function WorkspaceInbox({
                           </p>
                         )}
                         <time dateTime={item.createdAt} className="mt-1 block text-xs text-gray-500">
-                          {new Date(item.createdAt).toLocaleString("it-IT")}
+                          {new Date(item.createdAt).toLocaleString(language === "en" ? "en-US" : "it-IT")}
                         </time>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
@@ -517,7 +516,7 @@ export default function WorkspaceInbox({
                             className="inline-flex items-center gap-1.5 rounded-lg bg-(--accent) px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                           >
                             <ExternalLink size={13} aria-hidden="true" />
-                            Apri
+                            {t("views.inbOpen")}
                           </button>
                         )}
                         {!item.read && (
@@ -525,7 +524,9 @@ export default function WorkspaceInbox({
                             type="button"
                             onClick={() => void markRead(item)}
                             disabled={busyId !== null}
-                            aria-label={`Segna come letta: ${item.title || "notifica"}`}
+                            aria-label={tWith("views.inbMarkReadAria", {
+                              title: item.title || t("views.inbFallbackNotif").toLowerCase(),
+                            })}
                             className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold hover:bg-gray-50 disabled:opacity-50 dark:border-gray-800 dark:hover:bg-gray-900"
                           >
                             {busyId === item._id ? (
@@ -533,7 +534,7 @@ export default function WorkspaceInbox({
                             ) : (
                               <Check size={13} aria-hidden="true" />
                             )}
-                            Segna come letta
+                            {t("views.inbMarkRead")}
                           </button>
                         )}
                       </div>

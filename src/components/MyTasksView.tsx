@@ -36,8 +36,6 @@ import {
   FilterStatus,
   TaskPreferences,
   DEFAULT_TASK_PREFERENCES,
-  STATUS_LABELS,
-  PRIORITY_LABELS,
   PRIORITY_COLORS,
   formatDeadlineItalian,
   parseNaturalDate,
@@ -49,6 +47,7 @@ import {
 } from "../lib/taskModel";
 import { track } from "../lib/activity";
 import { trackOnboardingEvent } from "../hooks/useOnboarding";
+import { useLanguage } from "../lib/LanguageContext";
 
 interface MyTasksViewProps {
   allPages?: any[];
@@ -56,6 +55,7 @@ interface MyTasksViewProps {
 }
 
 export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasksViewProps) {
+  const { t, tWith, language } = useLanguage();
   // Tasks state
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -139,8 +139,8 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
   const availableProjects = useMemo(() => {
     return (allPages || [])
       .filter((p) => p && !p.deleted && (p.type === "tasks" || p.type === "empty" || !p.type))
-      .map((p) => ({ id: p.id, label: p.label || "Senza titolo" }));
-  }, [allPages]);
+      .map((p) => ({ id: p.id, label: p.label || t("views.mtUntitled") }));
+  }, [allPages, t]);
 
   // Selected Task for side panel
   const activeDetailTask = useMemo(() => {
@@ -244,7 +244,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
       if (overdue.length > 0) {
         groups.push({
           id: "overdue",
-          label: "Scaduti",
+          label: t("views.mtGrpOverdue"),
           count: overdue.length,
           tasks: sortTasks(overdue),
           badgeClass: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
@@ -252,28 +252,28 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
       }
       groups.push({
         id: "today",
-        label: "Oggi",
+        label: t("views.mtGrpToday"),
         count: todayList.length,
         tasks: sortTasks(todayList),
         badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
       });
       groups.push({
         id: "this_week",
-        label: "Questa settimana",
+        label: t("views.mtGrpWeek"),
         count: thisWeek.length,
         tasks: sortTasks(thisWeek),
         badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
       });
       groups.push({
         id: "later",
-        label: "Più avanti",
+        label: t("views.mtGrpLater"),
         count: later.length,
         tasks: sortTasks(later),
         badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20",
       });
       groups.push({
         id: "no_date",
-        label: "Senza data",
+        label: t("views.mtGrpNoDate"),
         count: noDate.length,
         tasks: sortTasks(noDate),
         badgeClass: "bg-gray-500/10 text-gray-500 dark:text-gray-400 border border-gray-500/20",
@@ -291,10 +291,10 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
         else low.push(t);
       });
 
-      groups.push({ id: "urgent", label: "Urgente", count: urgent.length, tasks: sortTasks(urgent), badgeClass: "bg-red-500/10 text-red-600 border border-red-500/20" });
-      groups.push({ id: "high", label: "Alta", count: high.length, tasks: sortTasks(high), badgeClass: "bg-orange-500/10 text-orange-600 border border-orange-500/20" });
-      groups.push({ id: "medium", label: "Media", count: medium.length, tasks: sortTasks(medium), badgeClass: "bg-amber-500/10 text-amber-600 border border-amber-500/20" });
-      groups.push({ id: "low", label: "Bassa", count: low.length, tasks: sortTasks(low), badgeClass: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" });
+      groups.push({ id: "urgent", label: t("views.mtPrioUrgent"), count: urgent.length, tasks: sortTasks(urgent), badgeClass: "bg-red-500/10 text-red-600 border border-red-500/20" });
+      groups.push({ id: "high", label: t("views.mtPrioHigh"), count: high.length, tasks: sortTasks(high), badgeClass: "bg-orange-500/10 text-orange-600 border border-orange-500/20" });
+      groups.push({ id: "medium", label: t("views.mtPrioMedium"), count: medium.length, tasks: sortTasks(medium), badgeClass: "bg-amber-500/10 text-amber-600 border border-amber-500/20" });
+      groups.push({ id: "low", label: t("views.mtPrioLow"), count: low.length, tasks: sortTasks(low), badgeClass: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" });
     } else if (prefs.groupBy === "status") {
       const todo: Task[] = [];
       const inProgress: Task[] = [];
@@ -306,22 +306,22 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
         else todo.push(t);
       });
 
-      groups.push({ id: "todo", label: "Da fare", count: todo.length, tasks: sortTasks(todo), badgeClass: "bg-gray-500/10 text-gray-600 border border-gray-500/20" });
-      groups.push({ id: "in_progress", label: "In corso", count: inProgress.length, tasks: sortTasks(inProgress), badgeClass: "bg-cyan-500/10 text-cyan-600 border border-cyan-500/20" });
-      groups.push({ id: "done", label: "Completati", count: done.length, tasks: sortTasks(done), badgeClass: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" });
+      groups.push({ id: "todo", label: t("views.mtGrpTodo"), count: todo.length, tasks: sortTasks(todo), badgeClass: "bg-gray-500/10 text-gray-600 border border-gray-500/20" });
+      groups.push({ id: "in_progress", label: t("views.mtGrpProgress"), count: inProgress.length, tasks: sortTasks(inProgress), badgeClass: "bg-cyan-500/10 text-cyan-600 border border-cyan-500/20" });
+      groups.push({ id: "done", label: t("views.mtGrpDone"), count: done.length, tasks: sortTasks(done), badgeClass: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" });
     } else if (prefs.groupBy === "project") {
       const projectMap: Record<string, { label: string; tasks: Task[] }> = {};
       const noProject: Task[] = [];
 
-      filteredTasks.forEach((t) => {
-        if (t.project || t.projectName) {
-          const key = t.project || t.projectName || "other";
+      filteredTasks.forEach((task) => {
+        if (task.project || task.projectName) {
+          const key = task.project || task.projectName || "other";
           if (!projectMap[key]) {
-            projectMap[key] = { label: t.projectName || "Progetto", tasks: [] };
+            projectMap[key] = { label: task.projectName || t("views.mtGrpProject"), tasks: [] };
           }
-          projectMap[key].tasks.push(t);
+          projectMap[key].tasks.push(task);
         } else {
-          noProject.push(t);
+          noProject.push(task);
         }
       });
 
@@ -345,8 +345,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
     }
 
     return groups;
-  }, [filteredTasks, prefs.groupBy, sortTasks]);
-
+  }, [filteredTasks, prefs.groupBy, sortTasks, t]);
   // Flattened tasks in display order for keyboard navigation
   const flatDisplayTasks = useMemo(() => {
     return groupedTasks.flatMap((g) => (collapsedGroups[g.id] ? [] : g.tasks));
@@ -394,13 +393,13 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
 
       track({
         type: "task_created",
-        title: "Nuovo task",
-        body: `"${newTask.title}" aggiunto a I miei task.`,
+        title: t("views.mtNotifCreated"),
+        body: tWith("views.mtNotifCreatedBody", { title: newTask.title }),
       });
 
       setQuickTitle("");
     },
-    [availableProjects, prefs.filterProject, prefs.groupBy, updateTasks],
+    [availableProjects, prefs.filterProject, prefs.groupBy, updateTasks, t, tWith],
   );
 
   // Toggle task completion with animated undo toast
@@ -428,8 +427,8 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
         trackOnboardingEvent("task_completed");
         track({
           type: "task_completed",
-          title: "Task completato",
-          body: `"${task.title}" completato.`,
+          title: t("views.mtNotifDone"),
+          body: tWith("views.mtNotifDoneBody", { title: task.title }),
         });
 
         // Trigger undo toast
@@ -448,7 +447,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
         setUndoToast(null);
       }
     },
-    [updateTasks],
+    [updateTasks, t, tWith],
   );
 
   // Undo task completion
@@ -652,18 +651,19 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
-                  I miei task
+                  {t("views.mtTitle")}
                 </h1>
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-(--accent)/10 text-(--accent)">
-                  {activeTasksCount} attivi
+                  {activeTasksCount} {t("views.mtActiveChip")}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {completedTasksCount} di {totalTasksCount} completati • Premi{" "}
+                {completedTasksCount} {t("views.mtStatsOf")} {totalTasksCount} {t("views.mtStatsDone")} •{" "}
+                {t("views.mtStatsPress")}{" "}
                 <kbd className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-[10px] font-mono border border-gray-200 dark:border-gray-700">
                   N
                 </kbd>{" "}
-                per nuovo task
+                {t("views.mtStatsNew")}
               </p>
             </div>
           </div>
@@ -678,7 +678,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
               />
               <input
                 type="text"
-                placeholder="Cerca task o tag..."
+                placeholder={t("views.mtSearchPh")}
                 value={prefs.searchQuery}
                 onChange={(e) => updatePrefs({ searchQuery: e.target.value })}
                 className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-2 focus:ring-(--accent)/40 text-gray-800 dark:text-gray-200 placeholder-gray-400 transition-all"
@@ -695,13 +695,13 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
 
             {/* Group By selector */}
             <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-900 p-1 rounded-xl border border-gray-200 dark:border-gray-800 text-xs">
-              <span className="text-[11px] font-bold text-gray-400 px-2">Raggruppa:</span>
+              <span className="text-[11px] font-bold text-gray-400 px-2">{t("views.mtGroupBy")}</span>
               {(
                 [
-                  { id: "deadline", label: "Scadenza" },
-                  { id: "project", label: "Progetto" },
-                  { id: "priority", label: "Priorità" },
-                  { id: "status", label: "Stato" },
+                  { id: "deadline", label: t("views.mtGrpDeadline") },
+                  { id: "project", label: t("views.mtGrpProject") },
+                  { id: "priority", label: t("views.mtGrpPriority") },
+                  { id: "status", label: t("views.mtGrpStatus") },
                 ] as const
               ).map((mode) => (
                 <button
@@ -727,10 +727,10 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     ? "bg-(--accent)/10 border-(--accent)/30 text-(--accent)"
                     : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50"
                 }`}
-                title="Filtri e Ordinamento"
+                title={t("views.mtFiltersFull")}
               >
                 <SlidersHorizontal size={14} />
-                <span className="hidden sm:inline">Filtri</span>
+                <span className="hidden sm:inline">{t("views.mtFilters")}</span>
               </button>
 
               {/* Popup Dropdown */}
@@ -739,14 +739,14 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {/* Stato */}
                   <div>
                     <label className="font-bold text-gray-500 dark:text-gray-400 block mb-1.5">
-                      Stato
+                      {t("views.mtGrpStatus")}
                     </label>
                     <div className="grid grid-cols-3 gap-1">
                       {(
                         [
-                          { id: "all", label: "Tutti" },
-                          { id: "active", label: "Attivi" },
-                          { id: "completed", label: "Fatti" },
+                          { id: "all", label: t("views.mtFAll") },
+                          { id: "active", label: t("views.mtFActive") },
+                          { id: "completed", label: t("views.mtFDone") },
                         ] as const
                       ).map((st) => (
                         <button
@@ -767,32 +767,32 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {/* Priorità */}
                   <div>
                     <label className="font-bold text-gray-500 dark:text-gray-400 block mb-1.5">
-                      Priorità
+                      {t("views.mtGrpPriority")}
                     </label>
                     <select
                       value={prefs.filterPriority}
                       onChange={(e) => updatePrefs({ filterPriority: e.target.value as any })}
                       className="w-full p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200"
                     >
-                      <option value="all">Tutte le priorità</option>
-                      <option value="urgent">Urgente</option>
-                      <option value="high">Alta</option>
-                      <option value="medium">Media</option>
-                      <option value="low">Bassa</option>
+                      <option value="all">{t("views.mtPrioAll")}</option>
+                      <option value="urgent">{t("views.mtPrioUrgent")}</option>
+                      <option value="high">{t("views.mtPrioHigh")}</option>
+                      <option value="medium">{t("views.mtPrioMedium")}</option>
+                      <option value="low">{t("views.mtPrioLow")}</option>
                     </select>
                   </div>
 
                   {/* Progetto */}
                   <div>
                     <label className="font-bold text-gray-500 dark:text-gray-400 block mb-1.5">
-                      Progetto
+                      {t("views.mtGrpProject")}
                     </label>
                     <select
                       value={prefs.filterProject}
                       onChange={(e) => updatePrefs({ filterProject: e.target.value })}
                       className="w-full p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200"
                     >
-                      <option value="all">Tutti i progetti</option>
+                      <option value="all">{t("views.mtProjAll")}</option>
                       {availableProjects.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.label}
@@ -804,7 +804,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {/* Ordinamento */}
                   <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
                     <label className="font-bold text-gray-500 dark:text-gray-400 block mb-1.5">
-                      Ordina per
+                      {t("views.mtSortBy")}
                     </label>
                     <div className="flex gap-2">
                       <select
@@ -812,10 +812,10 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                         onChange={(e) => updatePrefs({ sortBy: e.target.value as any })}
                         className="flex-1 p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200"
                       >
-                        <option value="deadline">Scadenza</option>
-                        <option value="priority">Priorità</option>
-                        <option value="title">Titolo (A-Z)</option>
-                        <option value="createdAt">Data creazione</option>
+                        <option value="deadline">{t("views.mtGrpDeadline")}</option>
+                        <option value="priority">{t("views.mtGrpPriority")}</option>
+                        <option value="title">{t("views.mtSortTitle")}</option>
+                        <option value="createdAt">{t("views.mtSortCreated")}</option>
                       </select>
                       <button
                         onClick={() =>
@@ -824,7 +824,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                           })
                         }
                         className="p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100"
-                        title="Inverti ordine"
+                        title={t("views.mtSortReverse")}
                       >
                         <ArrowUpDown size={14} />
                       </button>
@@ -856,7 +856,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
               type="text"
               value={quickTitle}
               onChange={(e) => setQuickTitle(e.target.value)}
-              placeholder='Aggiungi un nuovo task... (es. "Revisione report domani", premi Invio)'
+              placeholder={t("views.mtQuickPh")}
               className="flex-1 bg-transparent border-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:outline-none py-1.5"
             />
             {quickTitle.trim() && (
@@ -877,7 +877,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   type="submit"
                   className="px-4 py-1.5 rounded-xl bg-(--accent) text-white text-xs font-bold hover:brightness-110 shadow-sm transition-all"
                 >
-                  Crea
+                  {t("views.mtCreate")}
                 </button>
               </div>
             )}
@@ -891,14 +891,14 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
               <ListTodo size={28} />
             </div>
             <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
-              Nessun task trovato
+              {t("views.mtEmptyTitle")}
             </h3>
             <p className="text-xs text-gray-500 max-w-sm mx-auto">
-              Non ci sono task corrispondenti ai filtri correnti. Prova a modificare i filtri o premi{" "}
+              {t("views.mtEmptyDesc1")}{" "}
               <kbd className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-[10px] font-mono border">
                 N
               </kbd>{" "}
-              per crearne uno nuovo.
+              {t("views.mtEmptyDesc2")}
             </p>
           </div>
         ) : (
@@ -969,7 +969,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                                     ? "bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-500/30"
                                     : "border-gray-300 dark:border-gray-600 hover:border-(--accent) bg-transparent"
                                 }`}
-                                title={task.status === "done" ? "Segna come da fare" : "Completa task"}
+                                title={task.status === "done" ? t("views.mtMarkTodo") : t("views.mtComplete")}
                               >
                                 {task.status === "done" && (
                                   <motion.div
@@ -1003,7 +1003,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                                           ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                           : "bg-gray-100 dark:bg-gray-800 text-gray-500"
                                       }`}
-                                      title={`${completedSubs} di ${totalSubs} sottotask completati`}
+                                      title={tWith("views.mtSubsDone", { done: completedSubs, total: totalSubs })}
                                     >
                                       <CheckCircle2 size={10} />
                                       {completedSubs}/{totalSubs}
@@ -1038,7 +1038,13 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                                 className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border shrink-0 flex items-center gap-1 ${priorityStyle.bg} ${priorityStyle.text} ${priorityStyle.border}`}
                               >
                                 <span className={`w-1.5 h-1.5 rounded-full ${priorityStyle.dot}`} />
-                                {PRIORITY_LABELS[task.priority]}
+                                {task.priority === "urgent"
+                                  ? t("views.mtPrioUrgent")
+                                  : task.priority === "high"
+                                    ? t("views.mtPrioHigh")
+                                    : task.priority === "medium"
+                                      ? t("views.mtPrioMedium")
+                                      : t("views.mtPrioLow")}
                               </span>
 
                               {/* Deadline pill */}
@@ -1102,7 +1108,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                               [group.id]: e.target.value,
                             }))
                           }
-                          placeholder={`Aggiungi a "${group.label}"...`}
+                          placeholder={tWith("views.mtAddToGroup", { group: group.label })}
                           className="w-full bg-transparent border-none text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none py-1"
                         />
                       </form>
@@ -1149,7 +1155,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     }`}
                   >
                     <Check size={14} />
-                    <span>{STATUS_LABELS[activeDetailTask.status]}</span>
+                    <span>{activeDetailTask.status === "done" ? t("views.mtDetailDone") : activeDetailTask.status === "in_progress" ? t("views.mtGrpProgress") : t("views.mtGrpTodo")}</span>
                   </button>
                 </div>
 
@@ -1157,14 +1163,14 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   <button
                     onClick={() => deleteTask(activeDetailTask.id)}
                     className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                    title="Elimina task"
+                    title={t("views.mtDeleteTask")}
                   >
                     <Trash2 size={16} />
                   </button>
                   <button
                     onClick={() => setSelectedTaskId(null)}
                     className="p-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    title="Chiudi pannello (Esc)"
+                    title={t("views.mtClosePanel")}
                   >
                     <X size={18} />
                   </button>
@@ -1179,7 +1185,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     type="text"
                     value={activeDetailTask.title}
                     onChange={(e) => updateDetailTask({ title: e.target.value })}
-                    placeholder="Titolo del task..."
+                    placeholder={t("views.mtTitlePh")}
                     className="w-full text-xl font-black text-gray-900 dark:text-white bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-300"
                   />
                 </div>
@@ -1189,7 +1195,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {/* Stato */}
                   <div>
                     <span className="text-[11px] font-bold text-gray-400 block mb-1">
-                      Stato
+                      {t("views.mtGrpStatus")}
                     </span>
                     <select
                       value={activeDetailTask.status}
@@ -1198,16 +1204,16 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                       }
                       className="w-full p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-medium"
                     >
-                      <option value="todo">Da fare</option>
-                      <option value="in_progress">In corso</option>
-                      <option value="done">Completato</option>
+                      <option value="todo">{t("views.mtGrpTodo")}</option>
+                      <option value="in_progress">{t("views.mtGrpProgress")}</option>
+                      <option value="done">{t("views.mtDetailDone")}</option>
                     </select>
                   </div>
 
                   {/* Priorità */}
                   <div>
                     <span className="text-[11px] font-bold text-gray-400 block mb-1">
-                      Priorità
+                      {t("views.mtGrpPriority")}
                     </span>
                     <select
                       value={activeDetailTask.priority}
@@ -1216,17 +1222,17 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                       }
                       className="w-full p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-medium"
                     >
-                      <option value="urgent">🔴 Urgente</option>
-                      <option value="high">🟠 Alta</option>
-                      <option value="medium">🟡 Media</option>
-                      <option value="low">🟢 Bassa</option>
+                      <option value="urgent">🔴 {t("views.mtPrioUrgent")}</option>
+                      <option value="high">🟠 {t("views.mtPrioHigh")}</option>
+                      <option value="medium">🟡 {t("views.mtPrioMedium")}</option>
+                      <option value="low">🟢 {t("views.mtPrioLow")}</option>
                     </select>
                   </div>
 
                   {/* Scadenza */}
                   <div>
                     <span className="text-[11px] font-bold text-gray-400 block mb-1">
-                      Scadenza
+                      {t("views.mtGrpDeadline")}
                     </span>
                     <input
                       type="date"
@@ -1239,7 +1245,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   {/* Progetto */}
                   <div>
                     <span className="text-[11px] font-bold text-gray-400 block mb-1">
-                      Progetto
+                      {t("views.mtGrpProject")}
                     </span>
                     <select
                       value={activeDetailTask.project || ""}
@@ -1253,7 +1259,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                       }}
                       className="w-full p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 font-medium"
                     >
-                      <option value="">Nessun progetto</option>
+                      <option value="">{t("views.mtProjNone")}</option>
                       {availableProjects.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.label}
@@ -1286,7 +1292,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                     <div className="flex items-center gap-1">
                       <input
                         type="text"
-                        placeholder="Aggiungi tag..."
+                        placeholder={t("views.mtTagAddPh")}
                         value={newTagInput}
                         onChange={(e) => setNewTagInput(e.target.value)}
                         onKeyDown={(e) => {
@@ -1313,12 +1319,13 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                      <CheckCircle2 size={14} /> Sottotask
+                      <CheckCircle2 size={14} /> {t("views.mtSubtasks")}
                     </label>
                     {activeDetailTask.subtasks && activeDetailTask.subtasks.length > 0 && (
                       <span className="text-[11px] font-bold text-gray-400">
-                        {activeDetailTask.subtasks.filter((s) => s.done).length} di{" "}
-                        {activeDetailTask.subtasks.length} fatti
+                        {activeDetailTask.subtasks.filter((s) => s.done).length}{" "}
+                        {t("views.mtStatsOf")}{" "}
+                        {activeDetailTask.subtasks.length} {t("views.mtFDone")}
                       </span>
                     )}
                   </div>
@@ -1378,7 +1385,7 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      placeholder="Aggiungi una sottotask..."
+                      placeholder={t("views.mtSubAddPh")}
                       value={newSubtaskTitle}
                       onChange={(e) => setNewSubtaskTitle(e.target.value)}
                       onKeyDown={(e) => {
@@ -1402,13 +1409,13 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
                 {/* Descrizione */}
                 <div>
                   <label className="text-xs font-bold text-gray-500 dark:text-gray-400 block mb-2">
-                    Descrizione
+                    {t("views.mtDesc")}
                   </label>
                   <textarea
                     rows={4}
                     value={activeDetailTask.description || ""}
                     onChange={(e) => updateDetailTask({ description: e.target.value })}
-                    placeholder="Aggiungi una descrizione dettagliata per questo task..."
+                    placeholder={t("views.mtDescPh")}
                     className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-xs text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-(--accent)/30 resize-y"
                   />
                 </div>
@@ -1431,14 +1438,14 @@ export default function MyTasksView({ allPages = [], onNavigateToPage }: MyTasks
               <Check size={12} strokeWidth={3} />
             </div>
             <span className="text-xs font-bold truncate max-w-xs">
-              Task completato: "{undoToast.taskTitle}"
+              {tWith("views.mtUndoDone", { title: undoToast.taskTitle })}
             </span>
             <button
               onClick={handleUndo}
               className="px-3 py-1 rounded-xl bg-white/20 dark:bg-black/10 hover:bg-white/30 text-xs font-black text-emerald-400 dark:text-emerald-700 flex items-center gap-1 transition-all"
             >
               <RotateCcw size={12} />
-              Annulla
+              {t("views.mtUndo")}
             </button>
             <button
               onClick={() => setUndoToast(null)}

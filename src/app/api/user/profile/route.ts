@@ -15,15 +15,15 @@ export async function PUT(request: NextRequest) {
     }
     const { name } = (body || {}) as { name?: string };
     if (!name || !String(name).trim()) {
-      return NextResponse.json({ message: "Il nome non può essere vuoto." }, { status: 400 });
+      return NextResponse.json({ message: "Name cannot be empty.", code: "name_empty" }, { status: 400 });
     }
     const profile = await updateProfileName(user.id, name);
     return NextResponse.json({ ok: true, profile });
   } catch (e: any) {
     if (e?.message === "empty_name") {
-      return NextResponse.json({ message: "Il nome non può essere vuoto." }, { status: 400 });
+      return NextResponse.json({ message: "Name cannot be empty.", code: "name_empty" }, { status: 400 });
     }
     console.error(e);
-    return NextResponse.json({ message: "Errore nel salvataggio del profilo." }, { status: 500 });
+    return NextResponse.json({ message: "Failed to save the profile.", code: "profile_save_failed" }, { status: 500 });
   }
 }

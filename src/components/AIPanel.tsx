@@ -589,7 +589,7 @@ export default function AIPanel({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsOpen(false)}
-                className="fixed inset-0 z-110 bg-black/20 dark:bg-black/40 backdrop-blur-sm"
+                className="fixed inset-0 z-110"
               />
             )}
             <motion.div
@@ -607,7 +607,7 @@ export default function AIPanel({
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{t("views.aiTitle")}</h3>
                   {typeof remaining === "number" && (
                     <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500">
-                      {remaining > 0 ? `${remaining} messaggi rimasti oggi` : "Limite giornaliero raggiunto"}
+                      {remaining > 0 ? tWith("views.aiMessagesLeft", { n: remaining }) : t("views.aiDailyLimit")}
                     </span>
                   )}
                 </div>

@@ -22,6 +22,7 @@ import {
   restoreTaskValue,
 } from "../lib/trashUtils";
 import { formatRelativeTime } from "../lib/formatRelative";
+import { useLanguage } from "../lib/LanguageContext";
 
 interface TrashViewProps {
   pages: any[];
@@ -38,6 +39,9 @@ export default function TrashView({
   onEmptyTrashPages,
   onPurgeExpiredPages,
 }: TrashViewProps) {
+  const { t, tWith, language } = useLanguage();
+  // Parola di conferma per "Svuota cestino", in lingua UI.
+  const EMPTY_WORD = language === "en" ? "EMPTY" : "SVUOTA";
   // Filter & Search & Sort states
   const [filterType, setFilterType] = useState<"all" | TrashItemType>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -129,7 +133,7 @@ export default function TrashView({
 
   // Empty all trash (pages and tasks)
   const handleEmptyAllTrash = () => {
-    if (emptyConfirmText.trim().toUpperCase() !== "SVUOTA") return;
+    if (emptyConfirmText.trim().toUpperCase() !== EMPTY_WORD) return;
     onEmptyTrashPages();
     const nextTasks = tasks.filter((t) => !t.deleted);
     setTasks(nextTasks);
@@ -140,7 +144,7 @@ export default function TrashView({
 
   // Helper for relative date
   const formatDeletedAt = (iso?: string) =>
-    formatRelativeTime(iso, "it", "Data non disponibile");
+    formatRelativeTime(iso, language, t("views.trNoDate"));
 
   const totalDeletedCount = counts.total;
 
@@ -155,10 +159,10 @@ export default function TrashView({
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white">
-                Cestino
+                {t("views.trTitle")}
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Gli elementi nel cestino verranno eliminati automaticamente dopo 30 giorni.
+                {t("views.trSubtitle")}
               </p>
             </div>
           </div>
@@ -170,7 +174,7 @@ export default function TrashView({
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all self-start sm:self-auto"
           >
             <Trash2 size={14} />
-            <span>Svuota cestino ({totalDeletedCount})</span>
+            <span>{tWith("views.trEmptyBtn", { n: totalDeletedCount })}</span>
           </button>
         )}
       </div>
@@ -181,10 +185,10 @@ export default function TrashView({
         <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800/60 p-1 rounded-xl border border-gray-200 dark:border-gray-700/60 text-xs w-full sm:w-auto">
           {(
             [
-              { id: "all", label: `Tutti (${counts.total})` },
-              { id: "page", label: `Pagine (${counts.page})` },
-              { id: "task", label: `Task (${counts.task})` },
-              { id: "project", label: `Progetti (${counts.project})` },
+              { id: "all", label: tWith("views.trPillAll", { n: counts.total }) },
+              { id: "page", label: tWith("views.trPillPage", { n: counts.page }) },
+              { id: "task", label: tWith("views.trPillTask", { n: counts.task }) },
+              { id: "project", label: tWith("views.trPillProject", { n: counts.project }) },
             ] as const
           ).map((tab) => (
             <button
@@ -210,7 +214,7 @@ export default function TrashView({
           />
           <input
             type="text"
-            placeholder="Cerca nel cestino..."
+            placeholder={t("views.trSearchPh")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-400/30"
@@ -226,10 +230,10 @@ export default function TrashView({
         </div>
         <button
           onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-          title={sortDir === "desc" ? "Più recenti prima" : "Meno recenti prima"}
+          title={sortDir === "desc" ? t("views.trSortNewT") : t("views.trSortOldT")}
           className="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 transition-all"
         >
-          {sortDir === "desc" ? "↓ Recenti" : "↑ Meno recenti"}
+          {sortDir === "desc" ? t("views.trSortNew") : t("views.trSortOld")}
         </button>
         </div>
       </div>
@@ -241,10 +245,10 @@ export default function TrashView({
             <Trash2 size={24} />
           </div>
           <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
-            Il cestino è vuoto
+            {t("views.trEmptyT")}
           </h3>
           <p className="text-xs text-gray-500 max-w-sm mx-auto">
-            Gli elementi che elimini dalle pagine o dai task appariranno qui prima di essere rimossi definitivamente.
+            {t("views.trEmptyD")}
           </p>
         </div>
       ) : (
@@ -279,20 +283,20 @@ export default function TrashView({
                       {item.title}
                     </span>
                     <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-500 shrink-0">
-                      {item.type === "page" ? "Pagina" : item.type === "project" ? "Progetto" : "Task"}
+                      {item.type === "page" ? t("views.trTypePage") : item.type === "project" ? t("views.trTypeProject") : t("views.trTypeTask")}
                     </span>
                     {item.hasParent && (
                       <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium text-gray-400">
-                        <Folder size={10} /> Sottopagina
+                        <Folder size={10} /> {t("views.trSubpage")}
                       </span>
                     )}
                   </div>
                   <div className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
                     <Clock size={11} />
-                    <span>Eliminato {formatDeletedAt(item.deletedAt)}</span>
+                    <span>{tWith("views.trDeletedAt", { time: formatDeletedAt(item.deletedAt) })}</span>
                     {typeof item.daysLeft === "number" && (
                       <span className="ml-1 px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 font-bold">
-                        {item.daysLeft}g rimasti
+                        {tWith("views.trDaysLeft", { n: item.daysLeft })}
                       </span>
                     )}
                   </div>
@@ -307,10 +311,10 @@ export default function TrashView({
                     else onRestorePage(item.id);
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors"
-                  title="Ripristina elemento"
+                  title={t("views.trRestoreT")}
                 >
                   <RotateCw size={13} />
-                  <span className="hidden sm:inline">Ripristina</span>
+                  <span className="hidden sm:inline">{t("views.trRestore")}</span>
                 </button>
                 <button
                   onClick={() =>
@@ -321,7 +325,7 @@ export default function TrashView({
                     })
                   }
                   className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                  title="Elimina definitivamente"
+                  title={t("views.treeDelForever")}
                 >
                   <Trash2 size={15} />
                 </button>
@@ -353,10 +357,10 @@ export default function TrashView({
               </div>
               <div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                  Eliminare definitivamente?
+                  {t("views.trDelConfirmT")}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Stai per eliminare definitivamente «{confirmDeleteId.title}». Questa azione non potrà essere annullata.
+                  {tWith("views.trDelConfirmD", { name: confirmDeleteId.title })}
                 </p>
               </div>
               <div className="flex items-center justify-end gap-2 pt-2">
@@ -364,7 +368,7 @@ export default function TrashView({
                   onClick={() => setConfirmDeleteId(null)}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  Annulla
+                  {t("cancel", "Annulla")}
                 </button>
                 <button
                   onClick={() => {
@@ -377,7 +381,7 @@ export default function TrashView({
                   }}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm"
                 >
-                  Elimina definitivamente
+                  {t("views.treeDelForever")}
                 </button>
               </div>
             </motion.div>
@@ -407,19 +411,19 @@ export default function TrashView({
               </div>
               <div>
                 <h3 className="text-base font-bold text-gray-900 dark:text-white">
-                  Svuotare tutto il cestino?
+                  {t("views.trEmptyConfirmT")}
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Tutti i {totalDeletedCount} elementi (pagine, progetti e task) nel cestino verranno rimossi permanentemente. Questa operazione è irreversibile.
+                  {tWith("views.trEmptyConfirmD", { n: totalDeletedCount })}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
-                  Per confermare digita <span className="font-black text-gray-800 dark:text-gray-100">SVUOTA</span> nel campo qui sotto.
+                  {tWith("views.trEmptyConfirmHint", { word: EMPTY_WORD })}
                 </p>
                 <input
                   type="text"
                   value={emptyConfirmText}
                   onChange={(e) => setEmptyConfirmText(e.target.value)}
-                  placeholder="SVUOTA"
+                  placeholder={EMPTY_WORD}
                   className="mt-2 w-full px-3 py-2 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-400/30"
                 />
               </div>
@@ -431,14 +435,14 @@ export default function TrashView({
                   }}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  Annulla
+                  {t("cancel", "Annulla")}
                 </button>
                 <button
                   onClick={handleEmptyAllTrash}
-                  disabled={emptyConfirmText.trim().toUpperCase() !== "SVUOTA"}
+                  disabled={emptyConfirmText.trim().toUpperCase() !== EMPTY_WORD}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Svuota cestino
+                  {t("views.trEmptyPlain")}
                 </button>
               </div>
             </motion.div>

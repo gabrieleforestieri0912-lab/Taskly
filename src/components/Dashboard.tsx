@@ -562,8 +562,8 @@ export default function Dashboard({
               focus: t("dash.focusToday", "Focus di Oggi"),
               critical: t("criticalTasks", "Task Critici"),
               activeGoals: t("activeGoalsLabel", "Obiettivi Attivi"),
-              done: t("done", "Completati"),
-              completed: t("done", "Completato"),
+              done: t("dash.lblDonePl", "Completati"),
+              completed: t("dash.lblDoneSg", "Completato"),
             }}
           />
         );
@@ -675,8 +675,8 @@ export default function Dashboard({
       <motion.div variants={itemAnim}>
         <DashboardHeader
           eyebrow={t("land.mockNavDashboard", "Dashboard & Analitiche")}
-          title={t("dashboardTitle", "Panoramica Analitiche")}
-          subtitle={t("dashboardSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
+          title={t("dash.analyticsTitle", "Panoramica Analitiche")}
+          subtitle={t("dash.analyticsSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
           customizeLabel={
             isEditMode
               ? t("dash.saveAndExit", "Salva ed Esci")

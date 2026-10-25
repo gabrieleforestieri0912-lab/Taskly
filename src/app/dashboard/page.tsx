@@ -74,7 +74,7 @@ import {
   restorePageCascade,
   softDeletePageCascade,
 } from "../../lib/trashUtils";
-import { parseNaturalDate, loadTasksFromStorage, saveTasksToStorage, INITIAL_SAMPLE_TASKS, purgeExpiredTasksLocal } from "../../lib/taskModel";
+import { parseNaturalDate, loadTasksFromStorage, saveTasksToStorage, purgeExpiredTasksLocal } from "../../lib/taskModel";
 import { trackOnboardingEvent } from "../../hooks/useOnboarding";
 import { notifyLocal, readPref, readUserPrefs } from "../../lib/prefs";
 
@@ -146,7 +146,7 @@ function CompactEditableTitle({
 }
 
 function DashboardContent() {
-  const { t } = useLanguage();
+  const { t, tWith } = useLanguage();
   const searchParams = useSearchParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSidebarPeekOpen, setIsSidebarPeekOpen] = useState(false); // kept for future use, not used by hover
@@ -1021,7 +1021,7 @@ function DashboardContent() {
 
   const handleAIAction = (action) => {
     if (!action?.type) {
-      return { ok: false, message: "Azione AI non valida." };
+      return { ok: false, message: t("d.actInvalid") };
     }
 
     const findTargetPage = (pageId, pageLabel, includeDeleted = false) => {
@@ -1165,36 +1165,36 @@ function DashboardContent() {
         parentId: action.payload?.parentId || null,
         ...(initialData ? { initialData } : {}),
       });
-      return { ok: true, message: `Pagina "${label}" creata nella dashboard.` };
+      return { ok: true, message: tWith("d.actPageCreated", { label }) };
     }
 
     if (action.type === "append_text") {
       const target = findTargetPage(action.payload?.pageId ?? action.payload?.id, action.payload?.pageLabel);
-      if (!target) return { ok: false, message: `Pagina "${action.payload?.pageLabel || action.payload?.pageId || "?"}" non trovata.` };
+      if (!target) return { ok: false, message: tWith("d.actPageNotFound", { name: action.payload?.pageLabel || action.payload?.pageId || "?" }) };
       const ok = appendTextToPage(target, action.payload?.text || "");
       return ok
-        ? { ok: true, message: `Testo aggiunto a "${target.label}".` }
-        : { ok: false, message: `Non sono riuscito a modificare "${target.label}".` };
+        ? { ok: true, message: tWith("d.actTextAdded", { name: target.label }) }
+        : { ok: false, message: tWith("d.actTextFailed", { name: target.label }) };
     }
 
     if (action.type === "add_task") {
       const target = findTargetPage(action.payload?.pageId, action.payload?.pageLabel)
         || (Array.isArray(pages) ? pages.find((p) => p && !p.deleted && (p.type === "tasks" || (p.data && p.data.blocks?.some?.((b) => b?.type === "tasks-embed")))) : null);
-      if (!target) return { ok: false, message: "Non trovo una pagina dove aggiungere il task." };
+      if (!target) return { ok: false, message: t("d.actNoTasksPage") };
       const ok = addTaskToPage(target, action.payload || {});
       return ok
-        ? { ok: true, message: `Task "${action.payload?.title}" aggiunto a "${target.label}".` }
-        : { ok: false, message: `Non sono riuscito ad aggiungere il task a "${target.label}".` };
+        ? { ok: true, message: tWith("d.actTaskAdded", { title: action.payload?.title, name: target.label }) }
+        : { ok: false, message: tWith("d.actTaskFailed", { name: target.label }) };
     }
 
     if (action.type === "add_goal") {
       const target = findTargetPage(action.payload?.pageId, action.payload?.pageLabel)
         || (Array.isArray(pages) ? pages.find((p) => p && !p.deleted && (p.type === "goals" || (p.data && p.data.blocks?.some?.((b) => b?.type === "goals-embed")))) : null);
-      if (!target) return { ok: false, message: "Non trovo una pagina dove aggiungere l'obiettivo." };
+      if (!target) return { ok: false, message: t("d.actNoGoalsPage") };
       const ok = addGoalToPage(target, action.payload || {});
       return ok
-        ? { ok: true, message: `Obiettivo "${action.payload?.title}" aggiunto a "${target.label}".` }
-        : { ok: false, message: `Non sono riuscito ad aggiungere l'obiettivo a "${target.label}".` };
+        ? { ok: true, message: tWith("d.actGoalAdded", { title: action.payload?.title, name: target.label }) }
+        : { ok: false, message: tWith("d.actGoalFailed", { name: target.label }) };
     }
 
     if (action.type === "update_page") {
@@ -1205,7 +1205,7 @@ function DashboardContent() {
       );
 
       if (!target) {
-        return { ok: false, message: "Pagina da aggiornare non trovata." };
+        return { ok: false, message: t("d.actUpdateNotFound") };
       }
 
       updatePage(targetId, updates);
@@ -1213,23 +1213,23 @@ function DashboardContent() {
       if (updates.label) {
         return {
           ok: true,
-          message: `Pagina "${target.label}" rinominata in "${updates.label}".`,
+          message: tWith("d.actPageRenamed", { name: target.label, new: updates.label }),
         };
       }
       if (updates.icon) {
         return {
           ok: true,
-          message: `Icona della pagina "${target.label}" aggiornata.`,
+          message: tWith("d.actIconUpdated", { name: target.label }),
         };
       }
       if (Object.prototype.hasOwnProperty.call(updates, "parentId")) {
         return {
           ok: true,
-          message: `Posizione della pagina "${target.label}" aggiornata.`,
+          message: tWith("d.actPosUpdated", { name: target.label }),
         };
       }
 
-      return { ok: true, message: `Pagina "${target.label}" aggiornata.` };
+      return { ok: true, message: tWith("d.actPageUpdated", { name: target.label }) };
     }
 
     if (action.type === "add_block") {
@@ -1240,7 +1240,7 @@ function DashboardContent() {
       if (!targetPage) {
         return {
           ok: false,
-          message: `Pagina "${targetPageLabel || targetPageId}" non trovata.`,
+          message: tWith("d.actPageNotFound", { name: targetPageLabel || targetPageId }),
         };
       }
 
@@ -1250,12 +1250,12 @@ function DashboardContent() {
         if (okFallback) {
           return {
             ok: true,
-            message: `Contenuto aggiunto alla pagina "${targetPage.label}".`,
+            message: tWith("d.actContentAdded", { name: targetPage.label }),
           };
         }
         return {
           ok: false,
-          message: `La pagina "${targetPage.label}" non supporta i blocchi di testo.`,
+          message: tWith("d.actNoTextBlocks", { name: targetPage.label }),
         };
       }
 
@@ -1283,7 +1283,7 @@ function DashboardContent() {
       );
       return {
         ok: true,
-        message: `Blocco "${blockType || "testo"}" aggiunto alla pagina "${targetPage.label}".`,
+        message: tWith("d.actBlockAdded", { type: blockType || t("d.actBlockText"), name: targetPage.label }),
       };
     }
 
@@ -1291,12 +1291,12 @@ function DashboardContent() {
       const { id, content } = action.payload || {};
       const targetPage = findTargetPage(id, (action.payload || {}).pageLabel);
       if (!targetPage) {
-        return { ok: false, message: "Pagina non trovata." };
+        return { ok: false, message: t("d.actPageNotFoundPlain") };
       }
       const ok = appendTextToPage(targetPage, content || "");
       return ok
         ? { ok: true, message: `Contenuto aggiunto alla pagina "${targetPage.label}".` }
-        : { ok: false, message: "Pagina non modificabile." };
+        : { ok: false, message: t("d.actNotEditable") };
     }
 
     if (action.type === "insert_page_text") {
@@ -1315,7 +1315,7 @@ function DashboardContent() {
     if (action.type === "move_page") {
       const { id, parentId, parentLabel } = action.payload || {};
       const target = findTargetPage(id ?? action.payload?.pageId, action.payload?.pageLabel);
-      if (!target) return { ok: false, message: "Pagina da spostare non trovata." };
+      if (!target) return { ok: false, message: t("d.actMoveNotFound") };
       let newParentId = parentId !== undefined ? parentId : null;
       if (parentLabel && (parentId === undefined || parentId === null)) {
         const dest = String(parentLabel).trim().toLowerCase();
@@ -1323,44 +1323,44 @@ function DashboardContent() {
           newParentId = null;
         } else {
           const parent = findTargetPage(null, parentLabel);
-          if (!parent) return { ok: false, message: `Pagina di destinazione "${parentLabel}" non trovata.` };
+          if (!parent) return { ok: false, message: tWith("d.actParentNotFound", { name: parentLabel }) };
           newParentId = parent.id;
         }
       }
       if (newParentId) {
         if (String(newParentId) === String(target.id)) {
-          return { ok: false, message: "Non posso spostare una pagina dentro se stessa." };
+          return { ok: false, message: t("d.actMoveIntoSelf") };
         }
         const parentExists = (Array.isArray(pages) ? pages : []).some(
           (p) => p && !p.deleted && String(p.id) === String(newParentId),
         );
-        if (!parentExists) return { ok: false, message: "Pagina di destinazione non trovata." };
+        if (!parentExists) return { ok: false, message: t("d.actDestNotFound") };
       }
       updatePage(target.id, { parentId: newParentId || null });
       return newParentId
-        ? { ok: true, message: `Pagina "${target.label}" spostata.` }
-        : { ok: true, message: `Pagina "${target.label}" spostata al livello principale.` };
+        ? { ok: true, message: tWith("d.actMoved", { name: target.label }) }
+        : { ok: true, message: tWith("d.actMovedTop", { name: target.label }) };
     }
 
     if (action.type === "delete_page") {
       const { id, pageLabel, permanent } = action.payload || {};
       const target = findTargetPage(id ?? action.payload?.pageId, pageLabel ?? action.payload?.pageLabel);
-      if (!target) return { ok: false, message: "Pagina da eliminare non trovata." };
+      if (!target) return { ok: false, message: t("d.actDelNotFound") };
       if (permanent) {
         permanentlyDelete(target.id);
-        return { ok: true, message: `Pagina "${target.label}" eliminata definitivamente.` };
+        return { ok: true, message: tWith("d.actDeletedForever", { name: target.label }) };
       }
       deletePage(target.id);
-      return { ok: true, message: `Pagina "${target.label}" spostata nel cestino.` };
+      return { ok: true, message: tWith("d.actMovedTrash", { name: target.label }) };
     }
 
     if (action.type === "restore_page") {
       const { id, pageLabel } = action.payload || {};
       const target = findTargetPage(id ?? action.payload?.pageId, pageLabel ?? action.payload?.pageLabel, true);
-      if (!target) return { ok: false, message: "Pagina da ripristinare non trovata." };
-      if (!target.deleted) return { ok: true, message: `La pagina "${target.label}" non è nel cestino.` };
+      if (!target) return { ok: false, message: t("d.actRestoreNotFound") };
+      if (!target.deleted) return { ok: true, message: tWith("d.actNotInTrash", { name: target.label }) };
       restorePage(target.id);
-      return { ok: true, message: `Pagina "${target.label}" ripristinata dal cestino.` };
+      return { ok: true, message: tWith("d.actRestored", { name: target.label }) };
     }
 
     if (action.type === "permanently_delete_page") {
@@ -1371,7 +1371,7 @@ function DashboardContent() {
       return { ok: true, message: `Pagina "${target.label}" eliminata definitivamente.` };
     }
 
-    return { ok: false, message: `Azione "${action.type}" non supportata.` };
+    return { ok: false, message: tWith("d.actUnsupported", { type: action.type }) };
   };
 
   const shouldShowSidebar = isSidebarOpen;

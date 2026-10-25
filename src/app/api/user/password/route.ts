@@ -21,13 +21,13 @@ export async function POST(request: NextRequest) {
     };
     if (!currentPassword || !newPassword) {
       return NextResponse.json(
-        { message: "Inserisci la password attuale e quella nuova." },
+        { message: "Enter the current and new password.", code: "password_missing" },
         { status: 400 },
       );
     }
     if (String(newPassword).length < 8) {
       return NextResponse.json(
-        { message: "La nuova password deve avere almeno 8 caratteri." },
+        { message: "The new password must be at least 8 characters.", code: "password_too_short" },
         { status: 400 },
       );
     }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const profile = await getProfile(user.id);
     const email = profile?.email || user.email;
     if (!email) {
-      return NextResponse.json({ message: "Account senza email." }, { status: 400 });
+      return NextResponse.json({ message: "Account without an email.", code: "account_no_email" }, { status: 400 });
     }
 
     // Verifica la password attuale con un login reale.
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
     if (signInError) {
       return NextResponse.json(
-        { message: "La password attuale non è corretta." },
+        { message: "The current password is incorrect.", code: "wrong_current_password" },
         { status: 401 },
       );
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     console.error(e);
     return NextResponse.json(
-      { message: "Errore nell'aggiornamento della password." },
+      { message: "Failed to update the password.", code: "password_update_failed" },
       { status: 500 },
     );
   }

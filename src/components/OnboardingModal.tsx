@@ -23,6 +23,7 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { BUILTIN_TEMPLATES, PageTemplate, loadAllTemplates } from "../lib/templates";
 import { trackOnboardingEvent, type UseCase } from "../hooks/useOnboarding";
+import { useLanguage } from "../lib/LanguageContext";
 
 /* ─── Types ────────────────────────────────────────────────────────────────── */
 
@@ -93,46 +94,69 @@ const USE_CASE_COLORS: Record<UseCase, { accent: string; bg: string; text: strin
   study:    { accent: "#10b981", bg: "#10b98115", text: "#10b981" },
 };
 
-const USE_CASE_STATS: Record<UseCase, { label: string; value: string; icon: React.ReactNode; color: string }[]> = {
+const USE_CASE_STATS: Record<UseCase, { labelKey: string; label: string; valueKey?: string; value: string; icon: React.ReactNode; color: string }[]> = {
   personal: [
-    { label: "Abitudini", value: "5/7",  icon: <Star size={14} />,     color: "#f59e0b" },
-    { label: "Task oggi", value: "3",    icon: <ListTodo size={14} />, color: "#7b39fc" },
-    { label: "Streak",    value: "12gg", icon: <Zap size={14} />,      color: "#ec4899" },
-    { label: "Obiettivi", value: "2",    icon: <Target size={14} />,   color: "#10b981" },
+    { labelKey: "onb.stHabits", label: "Abitudini", value: "5/7",  icon: <Star size={14} />,     color: "#f59e0b" },
+    { labelKey: "onb.stTasksToday", label: "Task oggi", value: "3",    icon: <ListTodo size={14} />, color: "#7b39fc" },
+    { labelKey: "onb.stStreak", label: "Streak", value: "12gg", valueKey: "onb.v12d", icon: <Zap size={14} />,      color: "#ec4899" },
+    { labelKey: "onb.stGoals", label: "Obiettivi", value: "2",    icon: <Target size={14} />,   color: "#10b981" },
   ],
   work: [
-    { label: "Sprint",    value: "Attivo", icon: <Rocket size={14} />,    color: "#3b82f6" },
-    { label: "Task team", value: "8",      icon: <ListTodo size={14} />,  color: "#7b39fc" },
-    { label: "Meeting",   value: "2 oggi", icon: <Calendar size={14} />,  color: "#f59e0b" },
-    { label: "Progetto",  value: "67%",    icon: <BarChart3 size={14} />, color: "#10b981" },
+    { labelKey: "onb.stSprint", label: "Sprint", value: "Attivo", valueKey: "onb.vActive", icon: <Rocket size={14} />,    color: "#3b82f6" },
+    { labelKey: "onb.stTeamTasks", label: "Task team", value: "8",      icon: <ListTodo size={14} />,  color: "#7b39fc" },
+    { labelKey: "onb.stMeetings", label: "Meeting", value: "2 oggi", valueKey: "onb.v2today", icon: <Calendar size={14} />,  color: "#f59e0b" },
+    { labelKey: "onb.stProject", label: "Progetto", value: "67%",    icon: <BarChart3 size={14} />, color: "#10b981" },
   ],
   study: [
-    { label: "Esami",    value: "3",     icon: <GraduationCap size={14} />, color: "#10b981" },
-    { label: "Letture",  value: "12",    icon: <FileText size={14} />,     color: "#7b39fc" },
-    { label: "Studio",   value: "2h",    icon: <Clock size={14} />,        color: "#f59e0b" },
-    { label: "Note",     value: "47",    icon: <Lightbulb size={14} />,    color: "#ec4899" },
+    { labelKey: "onb.stExams", label: "Esami", value: "3",     icon: <GraduationCap size={14} />, color: "#10b981" },
+    { labelKey: "onb.stReadings", label: "Letture", value: "12",    icon: <FileText size={14} />,     color: "#7b39fc" },
+    { labelKey: "onb.stStudy", label: "Studio", value: "2h",    icon: <Clock size={14} />,        color: "#f59e0b" },
+    { labelKey: "onb.stNotes", label: "Note", value: "47",    icon: <Lightbulb size={14} />,    color: "#ec4899" },
   ],
 };
 
-const USE_CASE_TASKS: Record<UseCase, { title: string; done: boolean; priority: string }[]> = {
-  personal: [
-    { title: "Revisione settimanale",      done: true,  priority: "Alta" },
-    { title: "Meditazione mattina",        done: true,  priority: "Alta" },
-    { title: "Lettura 30 minuti",          done: false, priority: "Media" },
-    { title: "Pianifica weekend",          done: false, priority: "Bassa" },
-  ],
-  work: [
-    { title: "Review PR #142",             done: true,  priority: "Alta" },
-    { title: "Standup meeting ore 10",     done: true,  priority: "Alta" },
-    { title: "Aggiornare roadmap Q4",      done: false, priority: "Alta" },
-    { title: "Feedback cliente ABC",       done: false, priority: "Media" },
-  ],
-  study: [
-    { title: "Lezione Algoritmi cap. 5",   done: true,  priority: "Alta" },
-    { title: "Esercizi Analisi",           done: true,  priority: "Alta" },
-    { title: "Tesina introduzione",        done: false, priority: "Alta" },
-    { title: "Rivedere appunti 22/10",     done: false, priority: "Media" },
-  ],
+/** Task demo del pannello preview, in lingua UI (priorità = codice interno). */
+const DEMO_TASKS_BY_LANG: Record<"it" | "en", Record<UseCase, { title: string; done: boolean; pr: "high" | "medium" | "low" }[]>> = {
+  it: {
+    personal: [
+      { title: "Revisione settimanale",      done: true,  pr: "high" },
+      { title: "Meditazione mattina",        done: true,  pr: "high" },
+      { title: "Lettura 30 minuti",          done: false, pr: "medium" },
+      { title: "Pianifica weekend",          done: false, pr: "low" },
+    ],
+    work: [
+      { title: "Review PR #142",             done: true,  pr: "high" },
+      { title: "Standup meeting ore 10",     done: true,  pr: "high" },
+      { title: "Aggiornare roadmap Q4",      done: false, pr: "high" },
+      { title: "Feedback cliente ABC",       done: false, pr: "medium" },
+    ],
+    study: [
+      { title: "Lezione Algoritmi cap. 5",   done: true,  pr: "high" },
+      { title: "Esercizi Analisi",           done: true,  pr: "high" },
+      { title: "Tesina introduzione",        done: false, pr: "high" },
+      { title: "Rivedere appunti 22/10",     done: false, pr: "medium" },
+    ],
+  },
+  en: {
+    personal: [
+      { title: "Weekly review",              done: true,  pr: "high" },
+      { title: "Morning meditation",         done: true,  pr: "high" },
+      { title: "Reading 30 minutes",         done: false, pr: "medium" },
+      { title: "Plan the weekend",           done: false, pr: "low" },
+    ],
+    work: [
+      { title: "Review PR #142",             done: true,  pr: "high" },
+      { title: "Standup meeting at 10am",    done: true,  pr: "high" },
+      { title: "Update Q4 roadmap",          done: false, pr: "high" },
+      { title: "Feedback for ABC client",    done: false, pr: "medium" },
+    ],
+    study: [
+      { title: "Algorithms lecture ch. 5",   done: true,  pr: "high" },
+      { title: "Calculus exercises",         done: true,  pr: "high" },
+      { title: "Thesis introduction",        done: false, pr: "high" },
+      { title: "Review notes 22/10",         done: false, pr: "medium" },
+    ],
+  },
 };
 
 function LivePreviewPanel({
@@ -147,10 +171,11 @@ function LivePreviewPanel({
   step: number;
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const { t, tWith, language } = useLanguage();
   const colors = USE_CASE_COLORS[useCase];
   const stats  = USE_CASE_STATS[useCase];
-  const tasks  = USE_CASE_TASKS[useCase];
-  const greeting = name.trim() ? `Ciao, ${name.trim()} 👋` : "La tua Dashboard";
+  const tasks  = DEMO_TASKS_BY_LANG[language][useCase];
+  const greeting = name.trim() ? tWith("onb.greetName", { name: name.trim() }) : t("onb.greetDash");
 
   return (
     <div
@@ -205,7 +230,7 @@ function LivePreviewPanel({
           >
             <div className="text-white font-black text-base leading-tight">{greeting}</div>
             <div className="text-white/40 text-[10px] mt-0.5">
-              {useCase === "personal" ? "Spazio personale" : useCase === "work" ? "Workspace Team" : "Studio & Esami"}
+              {t(useCase === "personal" ? "onb.spacePersonal" : useCase === "work" ? "onb.spaceTeam" : "onb.spaceStudy")}
             </div>
           </motion.div>
         </AnimatePresence>
@@ -235,8 +260,8 @@ function LivePreviewPanel({
                   {s.icon}
                 </div>
                 <div>
-                  <div className="text-white font-black text-xs">{s.value}</div>
-                  <div className="text-white/40 text-[9px]">{s.label}</div>
+                  <div className="text-white font-black text-xs">{s.valueKey ? t(s.valueKey, s.value) : s.value}</div>
+                  <div className="text-white/40 text-[9px]">{t(s.labelKey, s.label)}</div>
                 </div>
               </motion.div>
             ))}
@@ -251,7 +276,7 @@ function LivePreviewPanel({
           style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
         >
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-white/70 text-[10px] font-bold uppercase tracking-wider">Task di oggi</span>
+            <span className="text-white/70 text-[10px] font-bold uppercase tracking-wider">{t("onb.demoTasksToday")}</span>
             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: colors.bg, color: colors.text }}>
               {tasks.filter(t => t.done).length}/{tasks.length}
             </span>
@@ -291,11 +316,11 @@ function LivePreviewPanel({
                   <span
                     className="text-[8px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
                     style={{
-                      background: task.priority === "Alta" ? "#ef444415" : task.priority === "Media" ? "#f59e0b15" : "#6b728015",
-                      color: task.priority === "Alta" ? "#ef4444" : task.priority === "Media" ? "#f59e0b" : "#9ca3af",
+                      background: task.pr === "high" ? "#ef444415" : task.pr === "medium" ? "#f59e0b15" : "#6b728015",
+                      color: task.pr === "high" ? "#ef4444" : task.pr === "medium" ? "#f59e0b" : "#9ca3af",
                     }}
                   >
-                    {task.priority}
+                    {t(task.pr === "high" ? "onb.prHigh" : task.pr === "medium" ? "onb.prMedium" : "onb.prLow")}
                   </span>
                 </motion.div>
               ))}
@@ -307,7 +332,7 @@ function LivePreviewPanel({
       {/* Progress bar at bottom */}
       <div className="relative z-10 px-4 pb-4">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-white/40 text-[9px] font-bold uppercase tracking-wider">Produttività oggi</span>
+          <span className="text-white/40 text-[9px] font-bold uppercase tracking-wider">{t("onb.demoProductivity")}</span>
           <span className="text-white/60 text-[9px] font-bold">
             {Math.round((tasks.filter(t => t.done).length / tasks.length) * 100)}%
           </span>
@@ -339,8 +364,8 @@ function LivePreviewPanel({
               <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center" style={{ background: colors.accent }}>
                 <FileText size={22} className="text-white" />
               </div>
-              <div className="text-white font-black text-sm">Scegli il template</div>
-              <div className="text-white/50 text-xs mt-1">Il tuo workspace si configurerà automaticamente</div>
+              <div className="text-white font-black text-sm">{t("onb.demoPickTemplate")}</div>
+              <div className="text-white/50 text-xs mt-1">{t("onb.demoAutoSetup")}</div>
             </div>
           </motion.div>
         )}
@@ -363,8 +388,8 @@ function LivePreviewPanel({
               >
                 <CheckCircle2 size={28} className="text-white" />
               </motion.div>
-              <div className="text-white font-black text-sm">Quasi pronto!</div>
-              <div className="text-white/50 text-xs mt-1">Il tuo workspace è configurato</div>
+              <div className="text-white font-black text-sm">{t("onb.demoAlmostReady")}</div>
+              <div className="text-white/50 text-xs mt-1">{t("onb.demoConfigured")}</div>
             </div>
           </motion.div>
         )}
@@ -377,6 +402,7 @@ function LivePreviewPanel({
 
 export default function OnboardingModal({ userName = "", liveStats, onComplete }: OnboardingModalProps) {
   const shouldReduceMotion = useReducedMotion();
+  const { t, tWith, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState(1);
@@ -386,7 +412,9 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
   const [name, setName] = useState(userName || "");
   const [useCase, setUseCase] = useState<UseCase>("personal");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("weekly-planner");
-  const [firstTaskTitle, setFirstTaskTitle] = useState("Esplorare le funzionalità di Taskly");
+  const [firstTaskTitle, setFirstTaskTitle] = useState(() =>
+    t("onb.firstTaskDefault", "Esplorare le funzionalità di Taskly"),
+  );
 
   /* ── Show only on first ever visit ──────────────────────────────────────── */
   useEffect(() => {
@@ -425,7 +453,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
 
   /* ── Skip / Finish ───────────────────────────────────────────────────────── */
   const handleSkip = () => {
-    markCompleted(useCase, name || "Utente");
+    markCompleted(useCase, name || t("onb.userFallback", "Utente"));
     trackOnboardingEvent("wizard_skipped");
     setIsOpen(false);
   };
@@ -437,12 +465,12 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
     const skippedSteps: string[] = [];
     if (alreadyHasPage) skippedSteps.push("create_page");
     if (alreadyHasTask) skippedSteps.push("create_task");
-    markCompleted(useCase, name || "Utente");
+    markCompleted(useCase, name || t("onb.userFallback", "Utente"));
     trackOnboardingEvent("wizard_completed");
     setIsOpen(false);
     onComplete({
       useCase,
-      name: name || "Utente",
+      name: name || t("onb.userFallback", "Utente"),
       selectedTemplate: tmpl,
       firstTaskTitle: alreadyHasTask ? undefined : firstTaskTitle,
       skippedSteps,
@@ -524,7 +552,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                 onClick={handleSkip}
                 className="text-[11px] font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               >
-                Salta
+                {t("onb.skip")}
               </button>
             </div>
 
@@ -558,7 +586,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         transition={{ delay: 0.08, duration: 0.3 }}
                         className="text-[1.35rem] font-black text-gray-900 dark:text-white leading-tight"
                       >
-                        {name.trim() ? `Ciao, ${name.trim()}!` : "Benvenuto in Taskly!"}
+                        {name.trim() ? tWith("onb.helloName", { name: name.trim() }) : t("onb.welcome")}
                       </motion.h2>
                       <motion.p
                         initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
@@ -566,7 +594,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         transition={{ delay: 0.12, duration: 0.3 }}
                         className="text-xs text-gray-500 dark:text-gray-400 mt-1"
                       >
-                        Personalizziamo il tuo workspace in meno di un minuto.
+                        {t("onb.welcomeSub")}
                       </motion.p>
                     </div>
 
@@ -578,26 +606,26 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                     >
                       <div>
                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                          Come ti chiami?
+                          {t("onb.askName")}
                         </label>
                         <input
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Il tuo nome o nickname"
+                          placeholder={t("onb.namePh")}
                           className="w-full px-4 py-2.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-(--accent)/40 transition-all"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">
-                          Come intendi usare Taskly?
+                          {t("onb.askUseCase")}
                         </label>
                         <div className="grid grid-cols-3 gap-2">
                           {([
-                            { id: "personal" as const, label: "Personale", desc: "Abitudini, diario", icon: User },
-                            { id: "work"     as const, label: "Lavoro",    desc: "Progetti, sprint",  icon: Briefcase },
-                            { id: "study"    as const, label: "Studio",    desc: "Esami, appunti",   icon: GraduationCap },
+                            { id: "personal" as const, label: t("onb.ucPersonal"), desc: t("onb.ucPersonalDesc"), icon: User },
+                            { id: "work"     as const, label: t("onb.ucWork"),    desc: t("onb.ucWorkDesc"),  icon: Briefcase },
+                            { id: "study"    as const, label: t("onb.ucStudy"),    desc: t("onb.ucStudyDesc"),   icon: GraduationCap },
                           ] as const).map(({ id, label, desc, icon: Icon }) => {
                             const isSelected = useCase === id;
                             return (
@@ -635,7 +663,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md shadow-(--accent)/25 transition-all hover:brightness-110"
                       >
-                        <span>Continua</span>
+                        <span>{t("onb.continue")}</span>
                         <ArrowRight size={14} />
                       </motion.button>
                     </div>
@@ -664,11 +692,10 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         <FileText size={20} />
                       </motion.div>
                       <h2 className="text-[1.35rem] font-black text-gray-900 dark:text-white leading-tight">
-                        Scegli il tuo punto di partenza
+                        {t("onb.step2Title")}
                       </h2>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Template perfetti per l&apos;uso{" "}
-                        {useCase === "personal" ? "personale" : useCase === "work" ? "lavorativo" : "di studio"}.
+                        {t(useCase === "personal" ? "onb.step2SubPersonal" : useCase === "work" ? "onb.step2SubWork" : "onb.step2SubStudy")}
                       </p>
                     </div>
 
@@ -721,7 +748,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         onClick={() => navigateToStep(1)}
                         className="px-4 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
                       >
-                        Indietro
+                        {t("onb.back")}
                       </button>
                       <motion.button
                         type="button"
@@ -730,7 +757,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md shadow-(--accent)/25 transition-all hover:brightness-110"
                       >
-                        <span>Continua</span>
+                        <span>{t("onb.continue")}</span>
                         <ArrowRight size={14} />
                       </motion.button>
                     </div>
@@ -759,14 +786,17 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         <CheckCircle2 size={20} />
                       </motion.div>
                       <h2 className="text-[1.35rem] font-black text-gray-900 dark:text-white leading-tight">
-                        {alreadyHasTask ? "Ottimo, hai già iniziato!" : "Pronto a iniziare!"}
+                        {alreadyHasTask ? t("onb.step3TitleStarted") : t("onb.step3TitleReady")}
                       </h2>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {alreadyHasTask
-                          ? `Hai già ${liveStats.tasksCount} task (${liveStats.completedTasks} completati). Entriamo subito.`
+                          ? tWith("onb.step3SubStarted", {
+                              n: liveStats.tasksCount,
+                              m: liveStats.completedTasks,
+                            })
                           : alreadyHasPage
-                          ? "Hai già una pagina: aggiungiamo la prima attività chiave."
-                          : "Aggiungi la tua prima attività per inaugurare il workspace."}
+                          ? t("onb.step3SubHasPage")
+                          : t("onb.step3SubFresh")}
                       </p>
                     </div>
 
@@ -778,17 +808,17 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700/60 space-y-3"
                       >
                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-                          La tua prima attività
+                          {t("onb.firstTaskLabel")}
                         </label>
                         <input
                           type="text"
                           value={firstTaskTitle}
                           onChange={(e) => setFirstTaskTitle(e.target.value)}
-                          placeholder="Es. Completare la revisione del progetto venerdì"
+                          placeholder={t("onb.firstTaskPh")}
                           className="w-full px-4 py-2 text-xs rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-(--accent)/40 transition-all"
                         />
                         <p className="text-[11px] text-gray-400">
-                          💡 Taskly riconosce date naturali come &quot;domani&quot; o &quot;venerdì&quot;!
+                          💡 {t("onb.naturalDatesHint")}
                         </p>
                       </motion.div>
                     )}
@@ -801,14 +831,14 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                       className="flex flex-wrap gap-2"
                     >
                       {[
-                        { icon: <User size={11} />, label: name.trim() || "Utente" },
+                        { icon: <User size={11} />, label: name.trim() || t("onb.userFallback", "Utente") },
                         {
                           icon: useCase === "personal" ? <User size={11} /> : useCase === "work" ? <Briefcase size={11} /> : <GraduationCap size={11} />,
-                          label: useCase === "personal" ? "Personale" : useCase === "work" ? "Lavoro" : "Studio",
+                          label: useCase === "personal" ? t("onb.ucPersonal") : useCase === "work" ? t("onb.ucWork") : t("onb.ucStudy"),
                         },
                         {
                           icon: <FileText size={11} />,
-                          label: recommendedTemplates.find((t) => t.id === selectedTemplateId)?.title || "Template",
+                          label: recommendedTemplates.find((tm) => tm.id === selectedTemplateId)?.title || t("onb.pillTemplate"),
                         },
                       ].map((pill, i) => (
                         <span
@@ -828,7 +858,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         onClick={() => navigateToStep(2)}
                         className="px-4 py-2 rounded-xl text-xs font-bold text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
                       >
-                        Indietro
+                        {t("onb.back")}
                       </button>
                       <motion.button
                         type="button"
@@ -838,7 +868,7 @@ export default function OnboardingModal({ userName = "", liveStats, onComplete }
                         className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg shadow-(--accent)/25 transition-all hover:brightness-110"
                         style={{ background: "linear-gradient(135deg, #7b39fc 0%, #10b981 100%)" }}
                       >
-                        <span>Entra in Taskly</span>
+                        <span>{t("onb.enterTaskly")}</span>
                         <Sparkles size={13} />
                       </motion.button>
                     </div>

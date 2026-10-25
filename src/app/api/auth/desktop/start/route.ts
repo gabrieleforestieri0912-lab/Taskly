@@ -31,10 +31,10 @@ export async function GET(request: NextRequest) {
   // Lo state viene generato e verificato dall'Express locale: qui lo
   // ripassiamo a Google tale e quale (min 16 char, come app-client).
   if (state.length < 16 || state.length > 128) {
-    return NextResponse.json({ message: "state invalido" }, { status: 400 });
+    return NextResponse.json({ message: "state invalid" }, { status: 400 });
   }
   if (!isLoopbackRedirect(redirectUri)) {
-    return NextResponse.json({ message: "redirect_uri non è un loopback" }, { status: 400 });
+    return NextResponse.json({ message: "redirect_uri is not a loopback" }, { status: 400 });
   }
 
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");

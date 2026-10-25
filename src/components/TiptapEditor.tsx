@@ -1,5 +1,6 @@
 "use client";
 import { useLanguage } from "../lib/LanguageContext";
+import { translate, type LangCode } from "../lib/i18n";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
@@ -337,21 +338,36 @@ const TaskItemWithBackspace = TaskItem.extend({
 /* =========================================================================
  * Slash command menu (/)
  * ====================================================================== */
+/* Il titolo/descrizione sono CHIAVI i18n, tradotte al volo con `tl()`:
+   il menu slash vive fuori da React (plugin TipTap), quindi non può usare
+   l'hook useLanguage — legge la lingua corrente da documentElement.lang. */
 const SLASH_ITEMS = [
-  { id: "paragraph", title: "Testo", description: "Paragrafo normale", icon: "📝", keywords: "paragrafo testo text normal" },
-  { id: "h1", title: "Titolo 1", description: "Sezione principale", icon: "🔠", keywords: "heading titolo h1" },
-  { id: "h2", title: "Titolo 2", description: "Sottosezione", icon: "🔡", keywords: "heading titolo h2" },
-  { id: "h3", title: "Titolo 3", description: "Sottosottosezione", icon: "🔤", keywords: "heading titolo h3" },
-  { id: "toggle", title: "Toggle", description: "Blocco comprimibile", icon: "🔽", keywords: "toggle details nascondi expand" },
-  { id: "inlineToggle", title: "Spoiler", description: "Testo nascosto da mostrare al clic", icon: "👁", keywords: "spoiler nascondi mostra hide show inline toggle segreto testo nascosto" },
-  { id: "callout", title: "Callout", description: "Nota evidenziata", icon: "💡", keywords: "callout nota highlight" },
-  { id: "taskList", title: "To-do list", description: "Lista con checkbox", icon: "☑", keywords: "todo task checkbox to-do lista attività" },
-  { id: "bulletList", title: "Elenco puntato", description: "Lista con pallini", icon: "•", keywords: "list elenco bullet ul" },
-  { id: "orderedList", title: "Elenco numerato", description: "Lista con numeri", icon: "1.", keywords: "list elenco numerato ol" },
-  { id: "blockquote", title: "Citazione", description: "Testo citato", icon: "❝", keywords: "quote citazione blockquote" },
-  { id: "codeBlock", title: "Codice", description: "Blocco di codice", icon: "`", keywords: "code codice" },
-  { id: "horizontalRule", title: "Divisore", description: "Separatore orizzontale", icon: "—", keywords: "divider divisore hr" },
+  { id: "paragraph", title: "views.blockText", description: "views.ttdParagraph", icon: "📝", keywords: "paragrafo testo text normal paragraph" },
+  { id: "h1", title: "views.blockH1", description: "views.ttdH1", icon: "🔠", keywords: "heading titolo h1" },
+  { id: "h2", title: "views.blockH2", description: "views.ttdH2", icon: "🔡", keywords: "heading titolo h2" },
+  { id: "h3", title: "views.blockH3", description: "views.ttdH3", icon: "🔤", keywords: "heading titolo h3" },
+  { id: "toggle", title: "views.blockToggle", description: "views.ttdToggle", icon: "🔽", keywords: "toggle details nascondi expand" },
+  { id: "inlineToggle", title: "views.ttSpoiler", description: "views.ttdSpoiler", icon: "👁", keywords: "spoiler nascondi mostra hide show inline toggle segreto testo nascosto" },
+  { id: "callout", title: "views.ttCallout", description: "views.ttdCallout", icon: "💡", keywords: "callout nota highlight" },
+  { id: "taskList", title: "views.ttTaskList", description: "views.ttdTaskList", icon: "☑", keywords: "todo task checkbox to-do lista attività" },
+  { id: "bulletList", title: "views.blockBullet", description: "views.ttdBullet", icon: "•", keywords: "list elenco bullet ul" },
+  { id: "orderedList", title: "views.blockNumbered", description: "views.ttdOrdered", icon: "1.", keywords: "list elenco numerato ol" },
+  { id: "blockquote", title: "views.ttQuote", description: "views.ttdQuote", icon: "❝", keywords: "quote citazione blockquote" },
+  { id: "codeBlock", title: "views.blockCode", description: "views.ttdCode", icon: "`", keywords: "code codice" },
+  { id: "horizontalRule", title: "views.blockDivider", description: "views.ttdHr", icon: "—", keywords: "divider divisore hr" },
 ];
+
+function currentLang(): LangCode {
+  return typeof document !== "undefined" && document.documentElement.lang === "en"
+    ? "en"
+    : "it";
+}
+
+/** Traduzione fuori dal tree React (plugin TipTap): fallback alla chiave. */
+function tl(key: string): string {
+  const value = translate(currentLang(), key);
+  return value === key ? key : value;
+}
 
 function runSlashCommand(editor, id) {
   if (!editor) return;
@@ -389,7 +405,7 @@ const SlashCommand = Extension.create({
           const q = (query || "").toLowerCase();
           return SLASH_ITEMS.filter(
             (i) =>
-              i.title.toLowerCase().includes(q) ||
+              tl(i.title).toLowerCase().includes(q) ||
               i.keywords.includes(q),
           );
         },
@@ -423,7 +439,7 @@ const SlashCommand = Extension.create({
             if (items.length === 0) {
               const empty = document.createElement("div");
               empty.className = "tl-suggestion-empty";
-              empty.textContent = "Nessun risultato";
+              empty.textContent = tl("views.ttNoResults");
               el.appendChild(empty);
               return;
             }
@@ -433,8 +449,8 @@ const SlashCommand = Extension.create({
               row.className = "tl-suggestion-item" + (idx === selected ? " active" : "");
               row.innerHTML =
                 `<span class="tl-suggestion-icon">${item.icon}</span>` +
-                `<span class="tl-suggestion-meta"><span class="tl-suggestion-title">${item.title}</span>` +
-                `<span class="tl-suggestion-desc">${item.description}</span></span>`;
+                `<span class="tl-suggestion-meta"><span class="tl-suggestion-title">${tl(item.title)}</span>` +
+                `<span class="tl-suggestion-desc">${tl(item.description)}</span></span>`;
               row.onmousedown = (e) => {
                 e.preventDefault();
                 props.command(item);
@@ -1139,7 +1155,7 @@ export default function TiptapEditor({ workspaceId, slug }) {
         </button>
       </div>
       ) : (
-        <p className="px-3 py-2 text-sm text-gray-500">Modalità di sola lettura</p>
+        <p className="px-3 py-2 text-sm text-gray-500">{t("views.ttReadOnly", "Modalità di sola lettura")}</p>
       )}
 
       <div className="tl-editor">

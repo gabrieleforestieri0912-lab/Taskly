@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { Badge } from "./UIComponents";
 import { useLanguage } from "../lib/LanguageContext";
+import type { LangCode } from "../lib/i18n";
 import {
   CriticalTasksWidget,
   DashboardHeader,
@@ -35,66 +36,133 @@ import {
   RecentIdeasWidget,
   TodayFocusWidget,
   WeeklyTrendWidget,
+  type TrendPoint,
 } from "./dashboard/widgets";
 import { formatRelativeTime } from "../lib/formatRelative";
 
 /* ── Dati di esempio ──────────────────────────────────────────────────── */
 
-const DEMO_TASKS = [
-  {
-    id: "d1",
-    title: "Rivedere proposta commerciale Alpha",
-    priority: "Alta",
-    status: "in_progress",
-    deadline: "Oggi",
-  },
-  {
-    id: "d2",
-    title: "Invio preventivo a Beta Srl",
-    priority: "Alta",
-    status: "todo",
-    deadline: "Domani",
-  },
-  {
-    id: "d3",
-    title: "Aggiornare landing v3.2",
-    priority: "Alta",
-    status: "todo",
-    deadline: "12 Mar",
-  },
-  {
-    id: "d4",
-    title: "Refactor auth middleware",
-    priority: "Media",
-    status: "in_progress",
-    deadline: "14 Mar",
-  },
-  {
-    id: "d5",
-    title: "Script snapshot DB",
-    priority: "Bassa",
-    status: "todo",
-    deadline: "18 Mar",
-  },
-  {
-    id: "d6",
-    title: "Setup schema Supabase",
-    priority: "Media",
-    status: "done",
-  },
-  {
-    id: "d7",
-    title: "Test vitest core",
-    priority: "Media",
-    status: "done",
-  },
-  {
-    id: "d8",
-    title: "Briefing team lunedì",
-    priority: "Bassa",
-    status: "done",
-  },
-];
+/* Task demo: i titoli e le deadline compaiono nei widget (Critici), quindi
+   dipendono dalla lingua attiva. `priority` è un codice interno, mai
+   renderizzato (il filtro critici usa direttamente "high"). */
+const DEMO_TASKS_BY_LANG: Record<LangCode, Array<{
+  id: string;
+  title: string;
+  priority: "high" | "medium" | "low";
+  status: "todo" | "in_progress" | "done";
+  deadline?: string;
+}>> = {
+  it: [
+    {
+      id: "d1",
+      title: "Rivedere proposta commerciale Alpha",
+      priority: "high",
+      status: "in_progress",
+      deadline: "Oggi",
+    },
+    {
+      id: "d2",
+      title: "Invio preventivo a Beta Srl",
+      priority: "high",
+      status: "todo",
+      deadline: "Domani",
+    },
+    {
+      id: "d3",
+      title: "Aggiornare landing v3.2",
+      priority: "high",
+      status: "todo",
+      deadline: "12 Mar",
+    },
+    {
+      id: "d4",
+      title: "Refactor auth middleware",
+      priority: "medium",
+      status: "in_progress",
+      deadline: "14 Mar",
+    },
+    {
+      id: "d5",
+      title: "Script snapshot DB",
+      priority: "low",
+      status: "todo",
+      deadline: "18 Mar",
+    },
+    {
+      id: "d6",
+      title: "Setup schema Supabase",
+      priority: "medium",
+      status: "done",
+    },
+    {
+      id: "d7",
+      title: "Test vitest core",
+      priority: "medium",
+      status: "done",
+    },
+    {
+      id: "d8",
+      title: "Briefing team lunedì",
+      priority: "low",
+      status: "done",
+    },
+  ],
+  en: [
+    {
+      id: "d1",
+      title: "Revise the Alpha sales proposal",
+      priority: "high",
+      status: "in_progress",
+      deadline: "Today",
+    },
+    {
+      id: "d2",
+      title: "Send quote to Beta Ltd",
+      priority: "high",
+      status: "todo",
+      deadline: "Tomorrow",
+    },
+    {
+      id: "d3",
+      title: "Update landing v3.2",
+      priority: "high",
+      status: "todo",
+      deadline: "Mar 12",
+    },
+    {
+      id: "d4",
+      title: "Refactor auth middleware",
+      priority: "medium",
+      status: "in_progress",
+      deadline: "Mar 14",
+    },
+    {
+      id: "d5",
+      title: "DB snapshot script",
+      priority: "low",
+      status: "todo",
+      deadline: "Mar 18",
+    },
+    {
+      id: "d6",
+      title: "Set up Supabase schema",
+      priority: "medium",
+      status: "done",
+    },
+    {
+      id: "d7",
+      title: "Core vitest tests",
+      priority: "medium",
+      status: "done",
+    },
+    {
+      id: "d8",
+      title: "Monday team briefing",
+      priority: "low",
+      status: "done",
+    },
+  ],
+};
 
 const DEMO_GOALS = [
   {
@@ -122,11 +190,19 @@ const DEMO_GOALS = [
   },
 ];
 
-const DEMO_IDEAS = [
-  { id: "i1", title: "Template per sprint retro", category: "Produttività" },
-  { id: "i2", title: "Sincronizza Google Calendar", category: "Integrazione" },
-  { id: "i3", title: "Weekly digest via email", category: "Comunicazione" },
-];
+/* Idee demo: titolo e categoria sono renderizzati nel widget Brain Dump. */
+const DEMO_IDEAS_BY_LANG: Record<LangCode, Array<{ id: string; title: string; category: string }>> = {
+  it: [
+    { id: "i1", title: "Template per sprint retro", category: "Produttività" },
+    { id: "i2", title: "Sincronizza Google Calendar", category: "Integrazione" },
+    { id: "i3", title: "Weekly digest via email", category: "Comunicazione" },
+  ],
+  en: [
+    { id: "i1", title: "Sprint retro template", category: "Productivity" },
+    { id: "i2", title: "Sync Google Calendar", category: "Integration" },
+    { id: "i3", title: "Weekly digest via email", category: "Communication" },
+  ],
+};
 
 // `demoUpdatedAt` is a fixed ISO instant chosen so the relative labels read
 // naturally ("4 min fa", "26 h fa", "6 g fa"). It is passed through the same
@@ -170,15 +246,26 @@ const DEMO_PAGES = [
   },
 ];
 
-const TREND = [
-  { day: "Lun", val: 80, count: 4 },
-  { day: "Mar", val: 100, count: 6 },
-  { day: "Mer", val: 45, count: 2 },
-  { day: "Gio", val: 90, count: 5 },
-  { day: "Ven", val: 63, count: 3 },
-  { day: "Sab", val: 30, count: 1 },
-  { day: "Dom", val: 60, count: 2 },
-];
+const TREND: Record<LangCode, TrendPoint[]> = {
+  it: [
+    { day: "Lun", val: 80, count: 4 },
+    { day: "Mar", val: 100, count: 6 },
+    { day: "Mer", val: 45, count: 2 },
+    { day: "Gio", val: 90, count: 5 },
+    { day: "Ven", val: 63, count: 3 },
+    { day: "Sab", val: 30, count: 1 },
+    { day: "Dom", val: 60, count: 2 },
+  ],
+  en: [
+    { day: "Mon", val: 80, count: 4 },
+    { day: "Tue", val: 100, count: 6 },
+    { day: "Wed", val: 45, count: 2 },
+    { day: "Thu", val: 90, count: 5 },
+    { day: "Fri", val: 63, count: 3 },
+    { day: "Sat", val: 30, count: 1 },
+    { day: "Sun", val: 60, count: 2 },
+  ],
+};
 
 /* ── Sidebar ──────────────────────────────────────────────────────────── */
 
@@ -267,8 +354,8 @@ function PreviewSidebar({
   language: string;
 }) {
   // Counts are derived from the DEMO_* arrays so the sidebar badges and the
-  // stat cards can never drift apart.
-  const activeTasks = DEMO_TASKS.filter((task) => task.status !== "done").length;
+  // stat cards can never drift apart. (Solo conteggi: una lingua basta.)
+  const activeTasks = DEMO_TASKS_BY_LANG.it.filter((task) => task.status !== "done").length;
   const inbox = 3;
 
   // Mirrors SidebarQuickBar in the real sidebar (Sidebar.tsx).
@@ -310,16 +397,16 @@ function PreviewSidebar({
       <nav
         className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden px-2 pb-2"
         style={{ scrollbarWidth: "thin" }}
-        aria-label="Navigazione principale"
+        aria-label={t("dash.sbMainNav", "Navigazione principale")}
       >
-        <div role="list" aria-label="Azioni rapide">
+        <div role="list" aria-label={t("dash.sbQuickActions", "Azioni rapide")}>
           {/* Search row */}
           <div className="group flex items-center gap-2.5 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600">
             <Search size={16} aria-hidden="true" className="shrink-0" />
             <span className="flex-1 truncate">{t("search")}</span>
           </div>
 
-          <div className="mt-2 grid grid-cols-3 gap-1" role="list" aria-label="Azioni rapide">
+          <div className="mt-2 grid grid-cols-3 gap-1" role="list" aria-label={t("dash.sbQuickActions", "Azioni rapide")}>
             {quickItems.map((item) => {
               const Icon = item.icon;
               const inner = (
@@ -367,12 +454,11 @@ function PreviewSidebar({
             </div>
             <div className="mt-2.5 pt-2 border-t border-blue-500/10 space-y-2">
               <p className="text-[11px] leading-relaxed text-gray-600 font-medium">
-                Collega il tuo Google Calendar per sincronizzare scadenze, riunioni ed
-                eventi direttamente nel tuo spazio di lavoro.
+                {t("dash.sbGcalDesc", "Collega il tuo Google Calendar per sincronizzare scadenze, riunioni ed eventi direttamente nel tuo spazio di lavoro.")}
               </p>
               <div className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-sm">
                 <Calendar size={13} />
-                <span>Collega Google Calendar</span>
+                <span>{t("dash.sbGcalConnect", "Collega Google Calendar")}</span>
               </div>
             </div>
           </div>
@@ -407,7 +493,7 @@ function PreviewSidebar({
               <Plus size={14} aria-hidden="true" />
             </span>
           </div>
-          <ul className="space-y-0.5" role="tree" aria-label="Pagine private">
+          <ul className="space-y-0.5" role="tree" aria-label={t("dash.sbPrivatePages", "Pagine private")}>
             {DEMO_PAGES.map((page) => (
               <li key={page.id}>
                 <PreviewPageRow page={page} language={language} />
@@ -442,6 +528,7 @@ function PreviewSidebar({
 /* ── Topbar ───────────────────────────────────────────────────────────── */
 
 function PreviewTopbar() {
+  const { t } = useLanguage();
   return (
     <div className="sticky top-0 z-50 h-14 border-b border-gray-200/60 bg-white/80 backdrop-blur-xl px-3 flex items-center gap-3">
       <span className="shrink-0 p-2 text-gray-500 rounded-lg">
@@ -450,7 +537,7 @@ function PreviewTopbar() {
       <div className="flex-1 flex items-center gap-2 overflow-x-auto min-w-0">
         <span className="inline-flex shrink-0 items-center gap-1.5 px-3 h-9 rounded-lg text-xs font-bold border border-cyan-200 bg-cyan-50 text-cyan-600">
           <LayoutDashboard size={14} className="shrink-0" />
-          <span>Analitiche</span>
+          <span>{t("dash.tabAnalytics", "Analitiche")}</span>
         </span>
         <span className="inline-flex shrink-0 items-center gap-2 px-3 h-9 rounded-lg text-xs font-bold border border-gray-200 bg-white text-gray-600">
           <span>Roadmap Q4</span>
@@ -474,13 +561,15 @@ export default function DashboardShowcase() {
 
   // Every number below is derived from the DEMO_* arrays, so the sidebar
   // badges, the stat cards and the widget lists can never drift apart.
-  const activeTasks = DEMO_TASKS.filter((task) => task.status !== "done");
-  const doneTasks = DEMO_TASKS.length - activeTasks.length;
-  const criticalTasks = DEMO_TASKS.filter(
-    (task) => task.priority === "Alta" && task.status !== "done",
+  const demoTasks = DEMO_TASKS_BY_LANG[language as LangCode] ?? DEMO_TASKS_BY_LANG.it;
+  const activeTasks = demoTasks.filter((task) => task.status !== "done");
+  const doneTasks = demoTasks.length - activeTasks.length;
+  const criticalTasks = demoTasks.filter(
+    (task) => task.priority === "high" && task.status !== "done",
   );
   const activeGoals = DEMO_GOALS.filter((goal) => !goal.completed);
   const doneGoals = DEMO_GOALS.length - activeGoals.length;
+  const demoIdeas = DEMO_IDEAS_BY_LANG[language as LangCode] ?? DEMO_IDEAS_BY_LANG.it;
 
   const quickStats = [
     {
@@ -499,14 +588,14 @@ export default function DashboardShowcase() {
     },
     {
       label: t("statIdeas", "Idee / Spunti"),
-      value: DEMO_IDEAS.length,
+      value: demoIdeas.length,
       icon: <Lightbulb className="text-amber-500" />,
       bgClass: "bg-amber-500/10",
       sub: t("statIdeasAwaiting", "Nel Brain Dump"),
     },
     {
       label: t("statFocus", "Focus di Oggi"),
-      value: "Chiudere la...",
+      value: t("dash.demoFocusShort", "Chiudere la..."),
       icon: <Sparkles className="text-(--accent-300)" />,
       bgClass: "bg-(--accent-300)/10",
       sub: t("statFocusSub", "Priorità chiave"),
@@ -577,8 +666,8 @@ export default function DashboardShowcase() {
                   <div className="max-w-7xl mx-auto space-y-6 pb-12">
                     <DashboardHeader
                       eyebrow={t("land.mockNavDashboard", "Dashboard & Analitiche")}
-                      title={t("dashboardTitle", "Panoramica Analitiche")}
-                      subtitle={t("dashboardSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
+                      title={t("dash.analyticsTitle", "Panoramica Analitiche")}
+                      subtitle={t("dash.analyticsSubtitle", "Monitora produttività, scadenze e obiettivi in un unico spazio.")}
                       customizeLabel={t("dash.customizeAnalytics", "Personalizza Analitiche")}
                       showCustomize={false}
                     />
@@ -589,7 +678,7 @@ export default function DashboardShowcase() {
                       <TodayFocusWidget
                         focus={t("dash.demoFocus", "Chiudere la proposta Alpha entro venerdì")}
                         completionRate={Math.round(
-                          (doneTasks / DEMO_TASKS.length) * 100,
+                          (doneTasks / demoTasks.length) * 100,
                         )}
                         criticalCount={criticalTasks.length}
                         activeGoalsCount={activeGoals.length}
@@ -599,13 +688,13 @@ export default function DashboardShowcase() {
                           focus: t("dash.focusToday", "Focus di Oggi"),
                           critical: t("criticalTasks", "Task Critici"),
                           activeGoals: t("activeGoalsLabel", "Obiettivi Attivi"),
-                          done: t("done", "Completati"),
-                          completed: t("done", "Completato"),
+                          done: t("dash.lblDonePl", "Completati"),
+                          completed: t("dash.lblDoneSg", "Completato"),
                         }}
                       />
 
                       <WeeklyTrendWidget
-                        data={TREND}
+                        data={TREND[language as LangCode] ?? TREND.it}
                         title={t("dash.trendTitle", "Trend & Produttività Settimanale")}
                         subtitle={t("dash.trendSub", "Attività e tasso di completamento ultimi 7 giorni")}
                         statusLabel={t("dash.trendActive", "Attivo")}
@@ -619,7 +708,7 @@ export default function DashboardShowcase() {
                           emptyLabel={t("noCriticalTasks", "Nessun task ad alta priorità in sospeso. Ottimo lavoro!")}
                         />
                         <RecentIdeasWidget
-                          ideas={DEMO_IDEAS}
+                          ideas={demoIdeas}
                           title={t("recentIdeas", "Brain Dump & Idee")}
                           linkLabel={t("dash.brainDump", "Brain Dump")}
                           emptyLabel={t("noIdeas", "Nessuna idea salvata di recente. Annota i tuoi pensieri liberi!")}

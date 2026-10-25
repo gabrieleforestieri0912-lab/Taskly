@@ -66,49 +66,51 @@ function getYouTubeEmbedUrl(url) {
     : "";
 }
 
+/* Blocchi: `label` è una CHIAVE i18n (tradotta con t) — mai testo inline,
+   altrimenti il menu slash resta in italiano anche in inglese. */
 const BLOCK_TYPES = [
-  { type: "text", label: "Testo", icon: Type, cmd: "/text" },
-  { type: "h1", label: "Titolo 1", icon: Heading1, cmd: "/h1" },
-  { type: "h2", label: "Titolo 2", icon: Heading2, cmd: "/h2" },
-  { type: "h3", label: "Titolo 3", icon: Heading3, cmd: "/h3" },
-  { type: "checkbox", label: "Checkbox", icon: CheckSquare, cmd: "/todo" },
-  { type: "bullet", label: "Lista puntata", icon: List, cmd: "/bullet" },
-  { type: "numbered", label: "Lista numerata", icon: ListOrdered, cmd: "/num" },
-  { type: "toggle", label: "Toggle list", icon: ChevronRight, cmd: "/toggle" },
-  { type: "calendar", label: "Task Calendar", icon: Calendar, cmd: "/cal" },
-  { type: "tasks-embed", label: "Lista task", icon: ListTodo, cmd: "/tasks" },
-  { type: "goals-embed", label: "Tracker obiettivi", icon: Target, cmd: "/goals" },
-  { type: "planner-embed", label: "Planner", icon: Calendar, cmd: "/planner" },
-  { type: "habit", label: "Habit Tracker", icon: Activity, cmd: "/habit" },
-  { type: "code", label: "Codice", icon: FileText, cmd: "/code" },
-  { type: "youtube", label: "Video YouTube", icon: Video, cmd: "/yt" },
-  { type: "document", label: "Documento / File", icon: FileText, cmd: "/doc" },
-  { type: "divider", label: "Divisore", icon: Minus, cmd: "/div" },
-  { type: "columns", label: "Colonne", icon: Columns2, cmd: "/col" },
+  { type: "text", label: "views.blockText", icon: Type, cmd: "/text" },
+  { type: "h1", label: "views.blockH1", icon: Heading1, cmd: "/h1" },
+  { type: "h2", label: "views.blockH2", icon: Heading2, cmd: "/h2" },
+  { type: "h3", label: "views.blockH3", icon: Heading3, cmd: "/h3" },
+  { type: "checkbox", label: "views.blockCheckbox", icon: CheckSquare, cmd: "/todo" },
+  { type: "bullet", label: "views.blockBullet", icon: List, cmd: "/bullet" },
+  { type: "numbered", label: "views.blockNumbered", icon: ListOrdered, cmd: "/num" },
+  { type: "toggle", label: "views.blockToggle", icon: ChevronRight, cmd: "/toggle" },
+  { type: "calendar", label: "views.blockCalendar", icon: Calendar, cmd: "/cal" },
+  { type: "tasks-embed", label: "views.blockTasksEmbed", icon: ListTodo, cmd: "/tasks" },
+  { type: "goals-embed", label: "views.blockGoalsEmbed", icon: Target, cmd: "/goals" },
+  { type: "planner-embed", label: "views.blockPlanner", icon: Calendar, cmd: "/planner" },
+  { type: "habit", label: "views.blockHabit", icon: Activity, cmd: "/habit" },
+  { type: "code", label: "views.blockCode", icon: FileText, cmd: "/code" },
+  { type: "youtube", label: "views.blockYoutube", icon: Video, cmd: "/yt" },
+  { type: "document", label: "views.blockDocument", icon: FileText, cmd: "/doc" },
+  { type: "divider", label: "views.blockDivider", icon: Minus, cmd: "/div" },
+  { type: "columns", label: "views.blockColumns", icon: Columns2, cmd: "/col" },
   {
     type: "empty",
-    label: "Nuova Pagina",
+    label: "views.blockEmpty",
     icon: FileText,
     cmd: "/page",
     isPage: true,
   },
   {
     type: "tasks",
-    label: "Nuova Lista Task",
+    label: "views.blockTasks",
     icon: ListTodo,
     cmd: "/list",
     isPage: true,
   },
   {
     type: "goals",
-    label: "Nuovo Tracker Obiettivi",
+    label: "views.blockGoals",
     icon: Target,
     cmd: "/goal",
     isPage: true,
   },
   {
     type: "notes",
-    label: "Nuovo Smart Notes",
+    label: "views.blockNotes",
     icon: Sparkles,
     cmd: "/notes",
     isPage: true,
@@ -124,55 +126,55 @@ const TEXT_COLORS = [
   },
   {
     value: "gray",
-    label: "Grigio",
+    label: "views.colorGray",
     class: "text-gray-500 dark:text-gray-400",
     bgHex: "#94a3b8",
   },
   {
     value: "red",
-    label: "Rosso",
+    label: "views.colorRed",
     class: "text-red-500 dark:text-red-400",
     bgHex: "#ef4444",
   },
   {
     value: "orange",
-    label: "Arancione",
+    label: "views.colorOrange",
     class: "text-orange-500 dark:text-orange-400",
     bgHex: "#f97316",
   },
   {
     value: "yellow",
-    label: "Giallo",
+    label: "views.colorYellow",
     class: "text-amber-500 dark:text-amber-400",
     bgHex: "#f59e0b",
   },
   {
     value: "green",
-    label: "Verde",
+    label: "views.colorGreen",
     class: "text-emerald-500 dark:text-emerald-400",
     bgHex: "#10b981",
   },
   {
     value: "blue",
-    label: "Blu",
+    label: "views.colorBlue",
     class: "text-blue-500 dark:text-blue-400",
     bgHex: "#3b82f6",
   },
   {
     value: "purple",
-    label: "Viola",
+    label: "views.colorPurple",
     class: "text-(--accent) dark:text-(--accent-300)",
     bgHex: "#7b39fc",
   },
   {
     value: "cyan",
-    label: "Ciano",
+    label: "views.colorCyan",
     class: "text-cyan-500 dark:text-cyan-400",
     bgHex: "#06b6d4",
   },
   {
     value: "pink",
-    label: "Rosa",
+    label: "views.colorPink",
     class: "text-pink-500 dark:text-pink-400",
     bgHex: "#ec4899",
   },
@@ -302,6 +304,7 @@ function createBlock(type) {
 /* ─── Cella di colonna (textarea auto-growing + rimozione) ─────────── */
 
 function ColumnCell({ col, colorClass, onChange, onRemove, canRemove }) {
+  const { t } = useLanguage();
   const ref = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
     const el = ref.current;
@@ -317,7 +320,7 @@ function ColumnCell({ col, colorClass, onChange, onRemove, canRemove }) {
         rows={1}
         value={col.content || ""}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Scrivi…"
+        placeholder={t("views.notesWriteShort", "Scrivi…")}
         className={`w-full resize-none overflow-hidden bg-transparent border-none outline-none text-sm leading-relaxed placeholder-gray-300 dark:placeholder-gray-700 ${colorClass}`}
       />
       {canRemove && (
@@ -439,7 +442,7 @@ function BlockItem({
       onContextMenu={(e) => e.preventDefault()}
       title="Trascina per spostare la riga"
       role="button"
-      aria-label="Trascina per spostare la riga"
+      aria-label={t("views.notesDragRow", "Trascina per spostare la riga")}
       className="touch-none select-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500"
     >
       <GripVertical size={14} className="text-gray-300 dark:text-gray-600" aria-hidden="true" />
@@ -451,7 +454,7 @@ function BlockItem({
 
   const filteredBlocks = BLOCK_TYPES.filter(
     (bt) =>
-      (bt.label?.toLowerCase() || "").includes(slashQuery.toLowerCase()) ||
+      (t(bt.label, bt.label).toLowerCase() || "").includes(slashQuery.toLowerCase()) ||
       (bt.cmd?.toLowerCase() || "").includes(slashQuery.toLowerCase()),
   );
 
@@ -713,7 +716,7 @@ function BlockItem({
                     </div>
                     <div>
                       <p className="text-sm font-bold leading-tight">
-                        {bt.label}
+                        {t(bt.label, bt.label)}
                       </p>
                       <p className="text-[10px] opacity-60 font-medium">
                         {bt.cmd}
@@ -765,7 +768,7 @@ function BlockItem({
                       <IconComp size={16} className={page.iconColor || "text-gray-400"} />
                     </div>
                     <p className="text-sm font-bold leading-tight truncate">
-                      {page.label || "(senza titolo)"}
+                      {page.label || t("views.notesUntitled", "(senza titolo)")}
                     </p>
                   </button>
                 );
@@ -799,18 +802,18 @@ function BlockItem({
                   className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 transition-colors"
                 >
                   <Icon size={16} className="text-gray-400" />
-                  {bt.label}
+                  {t(bt.label, bt.label)}
                 </button>
               );
             })}
             <hr className="my-1 border-gray-200 dark:border-gray-800" />
-            <p className="px-2 pt-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Colore Testo</p>
+            <p className="px-2 pt-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t("views.notesTextColor", "Colore Testo")}</p>
             <div className="grid grid-cols-5 gap-1.5 px-2 pb-1">
               {TEXT_COLORS.map((tc) => (
                 <button
                   key={tc.value}
                   type="button"
-                  title={tc.label}
+                  title={t(tc.label, tc.label)}
                   onClick={() => {
                     onUpdate(block.id, { color: tc.value });
                     setShowMenu(false);
@@ -990,8 +993,7 @@ function BlockItem({
                 <div className="space-y-1">
                   <h4 className="text-xs font-black uppercase tracking-widest text-gray-800 dark:text-gray-200">{t("views.notesEmbedYoutube")}</h4>
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    Inserisci l&apos;URL di un video per incorporarlo nel tuo
-                    foglio
+                    {t("views.notesEmbedYoutubeDesc")}
                   </p>
                 </div>
                 <div className="flex gap-2 w-full max-w-md">
@@ -1279,7 +1281,7 @@ function BlockItem({
                 }}
                 className="mt-1.5 inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <Plus size={12} /> Aggiungi colonna
+                <Plus size={12} /> {t("views.notesAddColumn", "Aggiungi colonna")}
               </button>
             )}
           </div>
@@ -1423,16 +1425,16 @@ function BlockItem({
               !isFocused
                 ? ""
                 : block.type === "checkbox"
-                  ? "Checkbox..."
+                  ? t("views.notesCheckboxPh", "Checkbox...")
                 : block.type === "toggle"
-                  ? "Toggle..."
+                  ? t("views.notesTogglePh", "Toggle...")
                   : block.type === "h1"
-                    ? "Titolo 1..."
+                    ? t("views.notesH1Ph", "Titolo 1...")
                     : block.type === "h2"
-                      ? "Titolo 2..."
+                      ? t("views.notesH2Ph", "Titolo 2...")
                       : block.type === "h3"
-                        ? "Titolo 3..."
-                        : "Scrivi qualcosa... (digita / per i comandi)"
+                        ? t("views.notesH3Ph", "Titolo 3...")
+                        : t("views.notesWritePh", "Scrivi qualcosa... (digita / per i comandi)")
             }
             className={`flex-1 min-w-0 w-full resize-none overflow-hidden bg-transparent border-none outline-none leading-relaxed placeholder-gray-300 dark:placeholder-gray-700 ${getColorClass(block.color)} ${
               block.type === "checkbox" && block.checked
@@ -1907,7 +1909,7 @@ export default function NotesView({
             }`}
           >
             <LucideIcons.Globe size={12} />
-            {published ? "Pubblicata" : "Pubblica"}
+            {published ? t("views.notesPublished") : t("views.notesPublish")}
           </button>
           {published && (
             <button
@@ -1915,7 +1917,7 @@ export default function NotesView({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 border border-cyan-200 dark:border-cyan-800 transition-all hover:brightness-95"
             >
               <LucideIcons.Link2 size={12} />
-              {pubCopied ? "Copiato!" : "Copia link"}
+              {pubCopied ? t("views.notesCopied") : t("views.notesCopyLink")}
             </button>
           )}
 
@@ -1976,7 +1978,7 @@ export default function NotesView({
             <div className="flex flex-col gap-2 max-h-72 overflow-y-auto custom-scrollbar">
               {versions.length === 0 && (
                 <p className="text-xs text-gray-400 px-2 py-4">
-                  Nessuna versione salvata. Usa &quot;Salva versione&quot; per creare uno snapshot.
+                  {t("views.notesNoVersions")}
                 </p>
               )}
               {versions.map((v) => (
@@ -2119,8 +2121,8 @@ export default function NotesView({
                   aggiungere una nuova riga in coda. */}
               <div
                 onClick={appendTrailingBlock}
-                title="Continua a scrivere"
-                aria-label="Continua a scrivere"
+                title={t("views.notesKeepWriting", "Continua a scrivere")}
+                aria-label={t("views.notesKeepWriting", "Continua a scrivere")}
                 className="min-h-[32vh] cursor-text"
               />
 
