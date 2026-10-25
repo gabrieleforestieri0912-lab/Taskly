@@ -11,6 +11,18 @@
 - `/mobile`, `/supabase` — altri target, stesso database Supabase del web.
 - `.env*` ovunque sono **gitignored**: mai committare segreti, mai stamparli nei log.
 
+## Landing — regole contenuto (non regredire)
+- ZERO dati d'uso inventati (né "5h risparmiate", né numeri utenti, né loghi finti):
+  i contenuti devono essere descrittivi/qualitativi o tracciabili pubblicamente.
+- `land.cmpHeaderTaskly` è una chiave di BRANDING ("Taskly", usata da
+  Navbar/Footer/Sidebar/WelcomeDashboard/DemoDashboard/landing-Footer): NON è
+  una chiave della tabella di confronto, non eliminare mai.
+- Sezione `#comparison` (`src/components/Comparison.tsx`, chiavi i18n
+  `land.cx*`): tre card Notion/ClickUp/Trello (punto di forza dichiarato +
+  dolori concreti documentati pubblicamente + risposta Taskly con SOLO
+  funzioni reali) + matrice qualitativa 5 righe con legenda ●◐○ e nota di
+  onestà. L'utente la considera un punto cardine: niente superficialità.
+
 ## Decisioni prese (non regredire)
 1. **Template/progetti come Pagina Vuota**: template e progetti nascono come pagine
    libere modificabili (`type: "empty"`, blocchi), non come viste strutturate.
