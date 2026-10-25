@@ -24,8 +24,9 @@ La modalità si sceglie con `"remoteApi"` in `desktop/appconfig.json`
 
 ## Verifica post-push (deployment online)
 
-Da eseguire DOPO commit/push **e** riattivazione del deployment Vercel
-(oggi risponde `402 DEPLOYMENT_DISABLED`). Comandi in PowerShell
+Da eseguire DOPO ogni nuovo commit/push. Stato attuale (2026-10-25):
+**tutti i passi 0–2 già verificati e passati** (health 200, start 200 con
+url Google, negative 400, exchange FAKE → 401). Comandi per ri-verifica
 (`node` inline, niente segreti in gioco):
 
 ```powershell

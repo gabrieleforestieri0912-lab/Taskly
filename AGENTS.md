@@ -86,10 +86,17 @@
      - `desktop/appconfig.json`: `remoteApi` (default l'URL Vercel; `""` =
        self-contained privato).
      - `desktop/package.cjs`: `npm run package` legge l'appconfig e imposta
-       la env del build root. Build pubbliche NON runtime-testabili finché
-       il deployment Vercel è `DEPLOYMENT_DISABLED` (riattivazione sul
-       dashboard Vercel + commit/push delle rotte desktop) e finché
-       GOOGLE_CLIENT_SECRET non è nelle env Vercel.
+       la env del build root.
+     - Stato RAGGIUNTO (2026-10-25): deployment riattivato + commit/push.
+       Il build Vercel falliva con `output: "standalone"` (ENOENT
+       next-server.js.nft.json) → fix: standalone solo fuori da Vercel
+       (`VERCEL=1` → output default; commit 117d3ac). Verifica post-push
+       REMOTA passata: health 200, start 200 con url Google, negative 400,
+       exchange FAKE → 401 (segni Google env ok su Vercel). Push 16 env
+       fatto. Installer pubblico ricostruito: `dist/Taskly-Setup-0.1.0.exe`
+       (appconfig nello asar, 0 file .env, server pacchettizzato /dashboard
+       200). Manca SOLO il test completo Taskly.exe (login Google + badge)
+       da parte dell'utente.
      - Istruzioni per i tester: `desktop/DISTRIBUZIONE.md`.
      - Un'app desktop con l'URL remoto funziona per qualsiasi utente senza
        .env; serve il push delle rotte desktop + la riattivazione Vercel.
