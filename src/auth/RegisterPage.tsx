@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "../lib/LanguageContext";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock, User } from "lucide-react";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import GoogleWebLoginButton from "../components/GoogleWebLoginButton";
 
 export default function RegisterPage() {
   const { t } = useLanguage();
@@ -19,6 +20,12 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // null = SSR/primo paint, poi: Electron → OAuth via browser esterno, browser → GIS.
+  const [electron, setElectron] = useState<boolean | null>(null);
+  useEffect(() => {
+    setElectron(Boolean((window as any)?.electronAPI?.isElectron));
+  }, []);
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
@@ -163,7 +170,15 @@ export default function RegisterPage() {
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
-              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+              {electron === null ? (
+                // Primo paint/SSR: evita mismatch idratazione
+                <div className="h-10" />
+              ) : electron ? (
+                // Electron: GIS incorporato bloccato da Google → flusso via browser esterno
+                <div className="flex justify-center">
+                  <GoogleWebLoginButton text="signup_with" onError={setError} />
+                </div>
+              ) : process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleRegister}

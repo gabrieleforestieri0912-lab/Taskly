@@ -52,6 +52,15 @@ export default function OnboardingChecklist(props: Props) {
   const { state, doneCount, totalCount, progress, suggestion, track, update } = useOnboarding();
   const shouldReduceMotion = useReducedMotion();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  // Il label useCase arriva da localStorage: leggibile solo lato client.
+  // "mounted" è false durante la prima render SSR/client e true dopo:
+  // mantiene identica la prima render (evita hydration mismatch su
+  // "Inizia da qui · Personale").
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (liveStats.pagesCount > 0 && !state.stepsDone.create_page) track("page_created");
@@ -111,7 +120,7 @@ export default function OnboardingChecklist(props: Props) {
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-bold text-gray-900 dark:text-white">
-                {done ? "Tutto fatto — grande!" : `Inizia da qui${useCaseLabel ? ` · ${useCaseLabel}` : ""}`}
+                {done ? "Tutto fatto — grande!" : `Inizia da qui${mounted && useCaseLabel ? ` · ${useCaseLabel}` : ""}`}
               </h3>
               <motion.span
                 key={doneCount}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "../lib/LanguageContext";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,7 @@ import { Button, Card, CardContent, Input } from "../components/UIComponents";
 import { Rocket, ArrowLeft, Mail, Lock } from "lucide-react";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import GoogleWebLoginButton from "../components/GoogleWebLoginButton";
 
 export default function LoginPage() {
   const { t } = useLanguage();
@@ -17,6 +18,13 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // null = SSR/primo paint (nessun bottone Google), poi si sceglie il metodo:
+  // Electron → flusso OAuth via browser esterno, browser → GIS incorporato.
+  const [electron, setElectron] = useState<boolean | null>(null);
+  useEffect(() => {
+    setElectron(Boolean((window as any)?.electronAPI?.isElectron));
+  }, []);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -145,7 +153,15 @@ export default function LoginPage() {
                 <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
               </div>
 
-              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+              {electron === null ? (
+                // Primo paint/SSR: evita mismatch idratazione (bottone Google dopo il mount)
+                <div className="h-10" />
+              ) : electron ? (
+                // Electron: GIS incorporato è bloccato da Google (403) → flusso via browser esterno
+                <div className="flex justify-center">
+                  <GoogleWebLoginButton text="continue_with" onError={setError} />
+                </div>
+              ) : process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
                 <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleLogin}

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "../../lib/api";
 import { useLanguage } from "../../lib/LanguageContext";
+import { pushBadge, showBadge, hideBadge } from "../../lib/badge";
 import MeetingImportPanel from "../../components/meetings/MeetingImportPanel";
 
 declare global {
@@ -37,6 +38,7 @@ export default function TranscriptionPage() {
   const [sttSupported, setSttSupported] = useState(true);
   const [title, setTitle] = useState("");
   const [sourceTab, setSourceTab] = useState<"mic" | "import">("mic");
+  const [pageAudio, setPageAudio] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -52,6 +54,21 @@ export default function TranscriptionPage() {
     ) {
       setSttSupported(false);
     }
+    // Stato audio pagina dal processo main (badge + banner). No-op nel browser.
+    const off = window.electronAPI?.onAudioState?.((audible: boolean) => {
+      setPageAudio(audible);
+      if (audible) {
+        pushBadge({
+          status: "audio",
+          label: "Una pagina sta riproducendo audio",
+          pageAudio: true,
+        });
+      }
+    });
+    return () => {
+      off?.();
+      hideBadge();
+    };
   }, []);
 
   const handleSttResult = (event: any) => {
@@ -69,6 +86,11 @@ export default function TranscriptionPage() {
       setTranscript(finalTranscriptRef.current);
     }
     setInterim(interimText);
+    pushBadge({
+      status: "transcribing",
+      label: (finalTranscriptRef.current + interimText).slice(-80),
+      pageAudio,
+    });
   };
 
   const startTranscription = (stream: MediaStream) => {
@@ -107,8 +129,24 @@ export default function TranscriptionPage() {
       setIsPaused(false);
       setRecordingTime(0);
       if (sttSupported) startTranscription(stream);
+      showBadge();
+      pushBadge({
+        status: "listening",
+        label: "In ascolto dal microfono…",
+        pageAudio,
+      });
       timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
+        setRecordingTime((prev) => {
+          const next = prev + 1;
+          if (next % 3 === 0) {
+            pushBadge({
+              status: sttSupported ? "transcribing" : "listening",
+              label: `${formatTime(next)} • ${(finalTranscriptRef.current || "").slice(-60)}`,
+              pageAudio,
+            });
+          }
+          return next;
+        });
       }, 1000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
@@ -158,6 +196,7 @@ export default function TranscriptionPage() {
       setIsRecording(false);
       setIsPaused(false);
       clearInterval(timerRef.current ?? undefined);
+      pushBadge({ status: "done", label: "Registrazione completata", pageAudio });
     }
   };
 
@@ -474,6 +513,7 @@ export default function TranscriptionPage() {
                     setTitle("");
                     transcriptRef.current = "";
                     finalTranscriptRef.current = "";
+                    pushBadge({ status: "idle", pageAudio });
                   }}
                   className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium"
                 >

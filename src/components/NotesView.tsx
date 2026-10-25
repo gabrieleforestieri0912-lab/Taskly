@@ -39,6 +39,7 @@ import {
   Video,
   Activity,
   Columns2,
+  ExternalLink,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +48,13 @@ import ItemList from "./ItemList";
 import GoalsView from "./GoalsView";
 import CalendarView from "./CalendarView";
 import { track } from "../lib/activity";
+import {
+  isUrl,
+  normalizeUrl,
+  getDomain,
+  getFaviconUrl,
+  openExternalUrl,
+} from "../lib/linkBlocks";
 
 function getYouTubeEmbedUrl(url) {
   if (!url) return "";
@@ -492,10 +500,11 @@ function BlockItem({
         e.preventDefault();
         const selected = filteredBlocks[selectedIndex];
         if (selected.isPage) {
+          // Sottopagina: titolo vuoto, l'header mostra il placeholder
+          // "Nuova pagina" con autofocus (niente titoli precompilati).
           onAddPage &&
             onAddPage({
               type: selected.type,
-              label: `Sotto-pagina ${selected.label}`,
               parentId: activePageId,
             });
           onDelete(block.id);
@@ -677,10 +686,11 @@ function BlockItem({
                     key={bt.type}
                     onClick={() => {
                       if (bt.isPage) {
+                        // Sottopagina: titolo vuoto, l'header mostra il
+                        // placeholder "Nuova pagina" con autofocus.
                         onAddPage &&
                           onAddPage({
                             type: bt.type,
-                            label: `Sotto-pagina ${bt.label}`,
                             parentId: activePageId,
                           });
                         onDelete(block.id);
@@ -1322,6 +1332,36 @@ function BlockItem({
               </button>
             </div>
           </div>
+        ) : block.type === "link" ? (
+          <div className="flex-1 min-w-0">
+            <a
+              href={normalizeUrl(block.url || block.content)}
+              onClick={(e) => {
+                e.preventDefault();
+                openExternalUrl(block.url || block.content);
+              }}
+              className="group/link flex items-center gap-2.5 w-full px-3 py-2 rounded-xl bg-purple-50/60 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/40 hover:border-purple-300 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+            >
+              <img
+                src={getFaviconUrl(block.url || block.content)}
+                alt=""
+                onError={(e) => {
+                  e.currentTarget.style.visibility = "hidden";
+                }}
+                className="w-4 h-4 rounded-sm shrink-0"
+              />
+              <span className="truncate text-sm font-semibold text-purple-700 dark:text-purple-300">
+                {block.title || getDomain(block.url || block.content)}
+              </span>
+              <span className="truncate text-xs text-purple-500/70 dark:text-purple-400/60 hidden sm:inline">
+                {getDomain(block.url || block.content)}
+              </span>
+              <ExternalLink
+                size={14}
+                className="ml-auto shrink-0 text-purple-400 group-hover/link:text-purple-600 dark:group-hover/link:text-purple-300"
+              />
+            </a>
+          </div>
         ) : (
           <textarea
             ref={inputRef}
@@ -1361,6 +1401,22 @@ function BlockItem({
               }
             }}
             onKeyDown={handleKeyDown}
+            onPaste={(e) => {
+              // Se l'incolla è un URL e il blocco è (quasi) vuoto, trasforma
+              // il blocco in un blocco link dedicato (favicon + dominio).
+              const pasted = e.clipboardData?.getData("text") || "";
+              if (!isUrl(pasted)) return;
+              const current = (block.content || "").trim();
+              if (current !== "" && !/^https?:\/\//i.test(current)) return;
+              e.preventDefault();
+              const url = normalizeUrl(pasted);
+              onUpdate(block.id, {
+                type: "link",
+                content: url,
+                url,
+                title: getDomain(url),
+              });
+            }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={

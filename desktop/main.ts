@@ -1,14 +1,23 @@
 // main.ts
 import { app, BrowserWindow, ipcMain, screen, shell } from "electron";
+import { spawn, type ChildProcess } from "child_process";
 import * as path from "path";
+import * as fs from "fs";
 import * as http from "http";
 
 // Determine if we are in development mode
 const isDev = !app.isPackaged && process.env.NODE_ENV !== "production";
 
+// Il frontend è il progetto WEB (src/), non un fork parallelo. In dev è il
+// server di sviluppo Next della root; in prod Electron serve il build della
+// root (`startNextJSProductionServer`). Stessa porta in entrambi i casi così
+// l'URL di caricamento è unico.
+const FRONTEND_PORT = 3000;
+const FRONTEND_URL = `http://localhost:${FRONTEND_PORT}`;
+
 let mainWindow: BrowserWindow | null = null;
 let badgeWindow: BrowserWindow | null = null;
-let nextServer: http.Server | null = null;
+let webServerProc: ChildProcess | null = null;
 let lastAudible = false;
 
 // ---------------------------------------------------------------------------
@@ -51,8 +60,7 @@ function createBadgeWindow(): void {
   badgeWindow.setAlwaysOnTop(true, "screen-saver");
   badgeWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 
-  const badgeURL =
-    (isDev ? "http://localhost:3333" : "http://localhost:3333") + "/badge";
+  const badgeURL = `${FRONTEND_URL}/badge`;
   badgeWindow.loadURL(badgeURL).catch((err) => {
     console.error("[Electron Main] Failed to load badge URL:", err);
   });
@@ -162,7 +170,7 @@ function setupAuthIPC(): void {
 function startBackendServer(): void {
   try {
     console.log("[Electron Main] Starting integrated Express backend server...");
-    // By requiring the index.js, it executes and starts the HTTP + Socket.io server
+    // Requiring index.ts executes it and starts the minimal Express server
     require("./server/index.ts");
     console.log("[Electron Main] Express backend server initialized.");
   } catch (error) {
@@ -170,36 +178,87 @@ function startBackendServer(): void {
   }
 }
 
-// Function to start the Next.js production server (port 3333) programmatically
-function startNextJSProductionServer(): Promise<void> {
-  return new Promise((resolve, reject) => {
+// Prod: il frontend web è il build Next "standalone" in resources/web
+// (extraResources di electron-builder), avviato come child process Node via
+// `ELECTRON_RUN_AS_NODE`. In dev non si usa: il dev server Next della root
+// già gira via `npm run dev` in desktop (wait-on :3000).
+function webRoot(): string {
+  if (app.isPackaged) return path.join(process.resourcesPath, "web");
+  return path.join(__dirname, "..");
+}
+
+// Le variabili d'ambiente NON vengono pacchettizzate (il filtro extraResources
+// esclude .env*: niente segreti nel pacchetto distribuito). Caricamento a
+// runtime, in ordine: 1) %APPDATA%/Taskly/.env (modificabile dopo
+// l'installazione), 2) resources/web/.env. Il process.env di sistema resta
+// comunque ereditato dal child process.
+function loadRuntimeEnv(): void {
+  const dotenv = require("dotenv") as { config(options: { path: string }): void };
+  for (const p of [
+    path.join(app.getPath("userData"), ".env"),
+    path.join(webRoot(), ".env"),
+  ]) {
     try {
-      console.log("[Electron Main] Initializing Next.js production server...");
-      const next = require("next");
-
-      const nextApp = next({
-        dev: false,
-        dir: path.join(__dirname), // Point to the directory containing .next folder
-      });
-      const handle = nextApp.getRequestHandler();
-
-      nextApp.prepare().then(() => {
-        nextServer = http.createServer((req, res) => {
-          handle(req, res);
-        });
-
-        const PORT = 3333;
-        nextServer.listen(PORT, () => {
-          console.log(`[Electron Main] Next.js production server running on http://localhost:${PORT}`);
-          resolve();
-        });
-      }).catch((err: unknown) => {
-        reject(err);
-      });
-    } catch (error) {
-      reject(error);
+      if (fs.existsSync(p)) dotenv.config({ path: p });
+    } catch (e) {
+      console.error("[Electron Main] Env load failed:", p, e);
     }
+  }
+}
+
+// Attende che il frontend risponda qualunque cosa (anche 404/500 la socket è viva).
+function waitForHttp(url: string, timeoutMs = 30000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const started = Date.now();
+    const tryOnce = () => {
+      const req = http.get(url, (res) => {
+        res.resume();
+        resolve();
+      });
+      req.on("error", () => {
+        if (Date.now() - started > timeoutMs) {
+          reject(new Error(`Frontend non raggiungibile entro ${timeoutMs}ms: ${url}`));
+          return;
+        }
+        setTimeout(tryOnce, 500);
+      });
+    };
+    tryOnce();
   });
+}
+
+async function startWebServer(): Promise<void> {
+  const root = webRoot();
+  const serverJs = path.join(root, "server.js");
+  if (!fs.existsSync(serverJs)) {
+    throw new Error(
+      `server.js non trovato in ${root} — manca il build standalone: esegui` +
+        " `npm run build` alla root (produce .next/standalone, dalla" +
+        " next.config output: \"standalone\")",
+    );
+  }
+
+  console.log("[Electron Main] Starting Next standalone web server...");
+  webServerProc = spawn(process.execPath, [serverJs], {
+    cwd: root,
+    env: {
+      ...process.env,
+      NODE_OPTIONS: "",
+      NODE_ENV: "production",
+      PORT: String(FRONTEND_PORT),
+      HOSTNAME: "127.0.0.1",
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  webServerProc.stdout?.on("data", (chunk: Buffer) => process.stdout.write(`[web] ${chunk}`));
+  webServerProc.stderr?.on("data", (chunk: Buffer) => process.stderr.write(`[web] ${chunk}`));
+  webServerProc.on("exit", (code) => {
+    console.log(`[Electron Main] Web server exited (code=${code}).`);
+    webServerProc = null;
+  });
+
+  await waitForHttp(FRONTEND_URL);
+  console.log(`[Electron Main] Web server ready on ${FRONTEND_URL}`);
 }
 
 function createWindow(): void {
@@ -225,7 +284,7 @@ function createWindow(): void {
     mainWindow?.show();
   });
 
-  const loadURL = isDev ? "http://localhost:3333" : "http://localhost:3333";
+  const loadURL = FRONTEND_URL;
 
   console.log(`[Electron Main] Loading frontend URL: ${loadURL}`);
 
@@ -235,13 +294,12 @@ function createWindow(): void {
     // Open DevTools in dev mode
     mainWindow.webContents.openDevTools();
   } else {
-    // In production, wait 500ms for Next.js server to be fully ready before loading
-    setTimeout(() => {
-      mainWindow?.loadURL(loadURL).catch((err) => {
-        console.error("[Electron Main] Failed to load URL, retrying...", err);
-        setTimeout(() => mainWindow?.loadURL(loadURL), 1000);
-      });
-    }, 500);
+    // In produzione startWebServer() è già awaitato nel whenReady prima di
+    // createWindow: il frontend su FRONTEND_URL è pronto a rispondere.
+    mainWindow.loadURL(loadURL).catch((err) => {
+      console.error("[Electron Main] Failed to load URL, retrying...", err);
+      setTimeout(() => mainWindow?.loadURL(loadURL), 1000);
+    });
   }
 
   mainWindow.on("closed", () => {
@@ -261,14 +319,17 @@ app.whenReady().then(async () => {
 
   // In production, start the servers from Electron itself
   if (!isDev) {
-    // 1. Start Express backend
+    // 1. Env runtime (prima di qualsiasi server)
+    loadRuntimeEnv();
+
+    // 2. Express backend (flusso login Google esterno)
     startBackendServer();
 
-    // 2. Start NextJS production server
+    // 3. Web server Next standalone
     try {
-      await startNextJSProductionServer();
+      await startWebServer();
     } catch (error) {
-      console.error("[Electron Main] Failed to start Next.js server:", error);
+      console.error("[Electron Main] Failed to start web server:", error);
       app.quit();
       return;
     }
@@ -287,11 +348,12 @@ app.whenReady().then(async () => {
 app.on("window-all-closed", () => {
   console.log("[Electron Main] All windows closed. Cleaning up servers and exiting...");
 
-  // Close Next.js production server if running
-  if (nextServer) {
-    nextServer.close(() => {
-      console.log("[Electron Main] Next.js server closed.");
-    });
+  // Termina il child process del web server standalone
+  if (webServerProc) {
+    try {
+      webServerProc.kill();
+      console.log("[Electron Main] Web server process terminated.");
+    } catch {}
   }
 
   if (process.platform !== "darwin") {

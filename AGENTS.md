@@ -2,8 +2,10 @@
 
 ## Struttura repo
 - `/src` — app web Next.js (root, porta 3000 in dev).
-- `/desktop` — app Electron: frontend Next.js su `:3333` + backend Express su `:5000`.
-  Rewrite Next `/api/:path*` → `http://localhost:5000/api/:path*` (`desktop/next.config.mjs`).
+- `/desktop` — app Electron: **carica direttamente il progetto web** (frontend = `/src`,
+  Next su `:3000`, stesso dev server della root via `npm run dev` in desktop).
+  Backend Express locale **minimo** su `:5000`, solo per il flusso login Google
+  (`desktop/server/routes/auth.ts` + middleware/supabase lib; niente realtime).
   Electron main/preload: `desktop/main.ts`, `desktop/preload.ts` (compilati in
   `main.js`/`preload.js` via `npm run build:electron`, `tsconfig.electron.json`).
 - `/mobile`, `/supabase` — altri target, stesso database Supabase del web.
@@ -25,13 +27,80 @@
      redirect), `GET /google/callback` (scambia il code, pagina HTML di conferma senza
      token), `GET /google/result?state=` (polling renderer, one-shot, TTL 10 min).
      Vecchio `POST /google` (GIS) tenuto per compatibilità.
-   - Renderer `desktop/src/components/GoogleWebLoginButton.tsx` usato da Login/Register;
+   - Renderer `src/components/GoogleWebLoginButton.tsx` usato da Login/Register;
      apre il browser via `electronAPI.openExternal` (fallback `window.open` in dev).
    - IPC `auth:open-external` in `main.ts`/`preload.ts` (solo URL `https://`).
    - Env server: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
      `GOOGLE_DESKTOP_REDIRECT_URI=http://127.0.0.1:5000/api/auth/google/callback`
      (da registrare nei redirect URI del client OAuth, o client tipo "Desktop app").
    - Dopo modifiche a `main.ts`/`preload.ts`, ricompilare (`npm run build:electron`).
+3. **Il fork desktop/src è stato eliminato**: l'app desktop esegue direttamente il
+   progetto web. Profitto:
+   - Realtime socket.io rimosso ovunque (backend loopback same-machine-only,
+     frontend già polling-only): nessun file socket né evento socket client/server.
+   - `desktop/server` ridotto a index.ts + routes/auth + lib/supabase + 4 middleware;
+     tutte le altre route Express (tasks/workspaces/billing/…) sono orfane e rimosse
+     (le API Next del web le sostituiscono; il `meta` pagine è persistito da
+     `src/lib/server/db.ts` `PAGE_META_KEYS`).
+   - Lo script `desktop npm run server` deve restare `ts-node -T -P tsconfig.electron.json`
+     (`-P` = project, NON `--tsconfig`); senza `-P`, dopo la rimozione di
+     `desktop/tsconfig.json`, ts-node risale all' tsconfig root (bundler/esnext) e
+     l'avvio muore con TS5011 (rootDir).
+   - Dep desktop potate a: express/cors/dotenv/express-rate-limit/jsonwebtoken/
+     google-auth-library/@supabase/supabase-js — niente più next/react nel
+     desktop dopo il passaggio a standalone (il web c'è già nel bundle).
+4. **Packaging prod (`npm run package`)**: il frontend è il build Next
+   `output: "standalone"` della root (`next.config.mjs`), avviato come child
+   process in prod:
+   - `next.config.mjs`: `output: "standalone"` produce `.next/standalone`
+     (server.js + node_modules minimi, self-contained).
+   - `desktop/package.json` `build.extraResources`: copia
+     `../.next/standalone` → `resources/web` (con `filter: ["**/*", "!.env*"]`,
+     niente segreti nel pacchetto), `../.next/static` → `web/.next/static`,
+     `../public` → `web/public`.
+   - `desktop/main.ts` prod: `loadRuntimeEnv()` (env runtime da
+     `%APPDATA%/Taskly/.env` o `resources/web/.env`), poi spawn
+     `node resources/web/server.js` (via `process.execPath`+
+     `ELECTRON_RUN_AS_NODE`, `PORT=3000 HOSTNAME=127.0.0.1`), poi
+     `waitForHttp` prima di creare la finestra (niente setTimeout arbitrari).
+   - Ordine `npm run package`: build:electron → root `npm run build` (serve il
+     build standalone, richiesto) → electron-builder. Non lanciare
+     electron-builder senza il build root aggiornato.
+   - Runtime non testabile qui: provato `electron-builder --dir` (win-unpacked
+     ok, resources/web completo e senza .env) e `node server.js` dalla
+     directory pacchettizzata (/dashboard 200). Manca solo il test completo
+     Taskly.exe (finestra + login Google + badge) da parte dell'utente.
+   - Distribuzione scelta: **"pubblica + backend remoto"** (variante "privata
+     controllata" resta possibile):
+     - `next.config.mjs`: rewrite `beforeFiles` `/api/*` →
+       `DESKTOP_REMOTE_API_URL` (build-time; assente = self-contained).
+       ATTENZIONE il default `afterFiles` NON basta: le route /api locali
+       farebbero ombra al rewrite.
+     - Nuovi endpoint remoti: `src/app/api/auth/desktop/start` (costruisce
+       l'URL Google con redirect loopback) e `.../exchange` (scambia il code
+       con GOOGLE_CLIENT_SECRET → signInWithIdToken → buildSessionResponse).
+     - `desktop/server/routes/auth.ts`: `IS_REMOTE` da `DESKTOP_REMOTE_API_URL`
+       env > `appconfig.json` (NB: path `../../appconfig.json` da
+       server/routes); in remoto lo scambio delega tutto al deployment,
+       in locale resta il flusso con le chiavi.
+     - `desktop/appconfig.json`: `remoteApi` (default l'URL Vercel; `""` =
+       self-contained privato).
+     - `desktop/package.cjs`: `npm run package` legge l'appconfig e imposta
+       la env del build root. Build pubbliche NON runtime-testabili finché
+       il deployment Vercel è `DEPLOYMENT_DISABLED` (riattivazione sul
+       dashboard Vercel + commit/push delle rotte desktop) e finché
+       GOOGLE_CLIENT_SECRET non è nelle env Vercel.
+     - Istruzioni per i tester: `desktop/DISTRIBUZIONE.md`.
+     - Un'app desktop con l'URL remoto funziona per qualsiasi utente senza
+       .env; serve il push delle rotte desktop + la riattivazione Vercel.
+     - Push env su Vercel ESEGUITO (2026-10-25): 16 variabili dal `.env` root
+       (solo le 2 vuote RESEND_API_KEY/SUPPORT_EMAIL saltate) su
+       production+preview+development del progetto `vertex-782b/taskly`.
+       Ostacoli incontrati: (1) npx.ps1 si rompe se si passa il valore via
+       stdin → usare `node <percorso>/vercel/dist/index.js` diretto; (2) la
+       CLI ≥65 vuole `--environment ...` ripetuto, NON i positional
+       `production preview development`. Token CLI usato poi rimosso dal
+       disco: COMUNQUE RUOTARE il token (era transitato in chat).
 
 ## Convenzioni di lavoro
 - Risposte in italiano, brevi e concise; riferimenti al codice come `path:riga`.

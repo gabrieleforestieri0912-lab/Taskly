@@ -6,16 +6,18 @@ import { checkAiQuota, quotaExceededMessage } from "@/lib/server/aiQuota";
 const SYSTEM = `Sei Taskly AI, assistente di produttività. Rispondi in italiano, conciso e utile.
 Usa la sintassi markdown: **grassetto**, *corsivo*, \`codice\`, elenchi con - o 1.
 
-VEDI le pagine dell'utente (titoli, id, tipo e contenuto) nel contesto. Puoi riassumerle, cercare task/obiettivi, e PROPORRE MODIFICHE.
+VEDI le pagine dell'utente (titoli, id, tipo e contenuto) nel contesto. Hai ACCESSO COMPLETO alle pagine: puoi leggerle, modificarle, spostarle, eliminarle (cestino), ripristinarle. Puoi riassumerle, cercare task/obiettivi, e PROPORRE MODIFICHE.
 
 Per modificare le pagine, termina la risposta con UN blocco JSON in code fence:
 \`\`\`json
-{"actions": [{"type": "append_text", "payload": {"pageLabel": "Nome pagina", "text": "testo da aggiungere"}}, {"type": "add_task", "payload": {"pageLabel": "Nome", "title": "Nuovo task"}}, {"type": "add_goal", "payload": {"pageLabel": "Nome", "title": "Nuovo obiettivo"}}, {"type": "create_page", "payload": {"label": "Titolo", "contentText": "contenuto iniziale"}}, {"type": "update_page", "payload": {"id": "page-id", "updates": {"label": "Nuovo titolo"}}}]}
+{"actions": [{"type": "append_text", "payload": {"pageLabel": "Nome pagina", "text": "testo da aggiungere"}}, {"type": "add_task", "payload": {"pageLabel": "Nome", "title": "Nuovo task"}}, {"type": "add_goal", "payload": {"pageLabel": "Nome", "title": "Nuovo obiettivo"}}, {"type": "create_page", "payload": {"label": "Titolo", "contentText": "contenuto iniziale"}}, {"type": "update_page", "payload": {"id": "page-id", "updates": {"label": "Nuovo titolo"}}}, {"type": "move_page", "payload": {"id": "page-id", "parentId": "parent-id"}}, {"type": "delete_page", "payload": {"id": "page-id"}}, {"type": "restore_page", "payload": {"id": "page-id"}}]}
 \`\`\`
 Regole azioni:
-- Usa "actions" SOLO se l'utente chiede di creare/modificare/aggiungere qualcosa. Per riassunti e domande, niente JSON.
+- Usa "actions" SOLO se l'utente chiede di creare/modificare/spostare/eliminare qualcosa. Per riassunti e domande, niente JSON.
 - Max 5 azioni. pageLabel o pageId devono corrispondere a una pagina del contesto (l'id è preferibile).
 - "append_text" aggiunge un paragrafo; "add_task"/"add_goal" aggiungono elementi veri (non solo testo).
+- "update_page" modifica titolo/icona/tipo; "move_page" sposta la pagina sotto un'altra (parentId=null per il livello principale, parentLabel accettato in alternativa); "delete_page" sposta nel cestino (reversibile); "restore_page" ripristina dal cestino; "permanently_delete_page" elimina per sempre (usala SOLO se l'utente lo chiede esplicitamente).
+- Prima di eliminare chiedi conferma se la richiesta è ambigua; se l'utente ha detto chiaramente "elimina", esegui subito.
 - Scrivi SEMPRE prima un testo leggibile per l'utente, poi il blocco JSON.`;
 
 function extractActions(raw: string): { clean: string; actions: any[] } {
@@ -36,7 +38,7 @@ function extractActions(raw: string): { clean: string; actions: any[] } {
     if (start === -1 || end === -1) return { clean: raw.replace(/```json[\s\S]*?```/gi, "").trim(), actions: [] };
     const parsed = JSON.parse(candidate.slice(start, end));
     const list = Array.isArray(parsed.actions) ? parsed.actions : parsed.action ? [parsed.action] : [];
-    const allowed = new Set(["append_text", "add_task", "add_goal", "create_page", "update_page", "insert_page_text", "update_page_content", "add_block"]);
+    const allowed = new Set(["append_text", "add_task", "add_goal", "create_page", "update_page", "move_page", "delete_page", "restore_page", "permanently_delete_page", "insert_page_text", "update_page_content", "add_block"]);
     const actions = list
       .filter((a: any) => a && allowed.has(a.type) && a.payload && typeof a.payload === "object")
       .slice(0, 5);

@@ -38,6 +38,7 @@ import {
   LayoutTemplate,
   Move,
   Type,
+  Code,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { EditableTitle } from "../../components/UIComponents";
@@ -498,9 +499,11 @@ function DashboardContent() {
     // Pagine di testo (documenti liberi empty/notes): titolo e icona li
     // sceglie l'utente. Senza label/icona espliciti restano vuoti così
     // l'header mostra il placeholder "Nuova Pagina" e il selettore neutro.
+    // Stessa regola per le sottopagine (parentId): titolo vuoto così
+    // l'header mostra il placeholder "Nuova pagina" da compilare.
     const isTextPage = pageType === "empty" || pageType === "notes";
     const pageLabel =
-      pageConfig.label || (isTextPage ? "" : "Nuova Pagina");
+      pageConfig.label || (isTextPage || pageConfig.parentId ? "" : "Nuova Pagina");
     const newPageId =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -593,9 +596,10 @@ function DashboardContent() {
     });
     trackOnboardingEvent("page_created");
     if (pageConfig.parentId) trackOnboardingEvent("page_nested");
-    // Pagine di testo appena create: autofocus sul titolo (l'header ha
-    // autoEdit quando il titolo è vuoto, il parametro pulisce solo l'URL).
-    if (pageType === "empty" || pageType === "notes") {
+    // Titolo vuoto (sottopagine o pagine di testo): autofocus sul titolo
+    // (l'header ha autoEdit quando il titolo è vuoto, il parametro pulisce
+    // solo l'URL).
+    if (pageType === "empty" || pageType === "notes" || pageConfig.parentId) {
       router.push(`/dashboard?page=${newPageId}&focusTitle=1`);
     } else {
       router.push(`/dashboard?page=${newPageId}`);
@@ -812,16 +816,43 @@ function DashboardContent() {
 
   const exportPageAsHTML = (page) => {
     const content = generatePageExportContent(page);
+    const title = page.label || "Senza titolo";
+    const created = page.createdAt ? new Date(page.createdAt).toLocaleDateString() : "-";
     const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>${escapeHtml(page.label || "Pagina")}</title></head>
-<body style="font-family:system-ui,sans-serif;max-width:800px;margin:40px auto;padding:20px">
-  <h1>${escapeHtml(page.label || "Senza titolo")}</h1>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(title)}</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.6; }
+  h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.5rem; margin-top: 1.5em; }
+  h3 { font-size: 1.2rem; margin-top: 1.2em; }
+  .meta { color: #666; font-size: 0.875rem; margin-bottom: 2rem; }
+  ul, ol { padding-left: 1.5em; }
+  li { margin: 0.25em 0; }
+  pre { background: #f4f4f5; padding: 12px 16px; border-radius: 8px; overflow-x: auto; }
+  code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+  blockquote { border-left: 3px solid #06b6d4; margin: 1em 0; padding: 0.5em 1em; background: #f8fafc; border-radius: 0 8px 8px 0; }
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 1.5em 0; }
+  .done { color: #059669; }
+  .page-ref { color: #0891b2; }
+</style>
+</head>
+<body>
+  <h1>${escapeHtml(title)}</h1>
+  <div class="meta">Tipo: ${escapeHtml(page.type || "-")} | Creato: ${escapeHtml(created)}</div>
   <div class="content">${content}</div>
 </body>
 </html>`;
-    downloadFile(html, `${page.label || "pagina"}.html`, "text/html");
+    downloadFile(html, `${sanitizeFilename(title)}.html`, "text/html;charset=utf-8");
   };
+
+  function sanitizeFilename(name) {
+    const clean = String(name || "pagina").replace(/[\\/:*?"<>|]/g, "-").trim();
+    return clean || "pagina";
+  }
 
   const exportPageAsCSV = (page) => {
     const rows = [["Campo", "Valore"]];
@@ -835,7 +866,7 @@ function DashboardContent() {
       });
     }
     const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-    downloadFile(csv, `${page.label || "pagina"}.csv`, "text/csv;charset=utf-8");
+    downloadFile(csv, `${sanitizeFilename(page.label || "pagina")}.csv`, "text/csv;charset=utf-8");
   };
 
   const exportPageAsMarkdown = (page) => {
@@ -854,31 +885,116 @@ function DashboardContent() {
         });
       }
     }
-    downloadFile(md, `${page.label || "pagina"}.md`, "text/markdown;charset=utf-8");
+    downloadFile(md, `${sanitizeFilename(page.label || "pagina")}.md`, "text/markdown;charset=utf-8");
   };
 
   function generatePageExportContent(page) {
     if (Array.isArray(page.data)) {
-      return page.data
+      const items = page.data
         .map((item) => {
           const title = item.title || item.text || "";
-          const checked = item.checked ? "Ô£ô " : "";
-          return `<p>${escapeHtml(checked + title)}</p>`;
+          const done = item.status === "done" || item.completed || item.checked;
+          const extra = [
+            item.status ? ` [${escapeHtml(item.status)}]` : "",
+            item.priority ? ` (${escapeHtml(item.priority)})` : "",
+            item.deadline ? ` — ${escapeHtml(item.deadline)}` : "",
+          ].join("");
+          return `<li${done ? ' class="done"' : ""}>${done ? "☑ " : "☐ "}${escapeHtml(title)}${extra}</li>`;
         })
         .join("");
+      return `<ul>${items}</ul>`;
     }
     if (page.data && page.data.blocks && Array.isArray(page.data.blocks)) {
-      return page.data.blocks
-        .map((block) => {
-          if (block.type === "text") return `<p>${escapeHtml(block.content || "")}</p>`;
-          if (block.type === "heading") return `<h2>${escapeHtml(block.content || "")}</h2>`;
-          if (block.type === "checkbox") {
-            const checked = block.checked ? "Ôÿæ " : "ÔÿÉ ";
-            return `<p>${checked}${escapeHtml(block.content || "")}</p>`;
+      const out: string[] = [];
+      let openList: "ul" | "ol" | null = null;
+      const closeList = () => {
+        if (openList) {
+          out.push(openList === "ul" ? "</ul>" : "</ol>");
+          openList = null;
+        }
+      };
+      const pushListItem = (list, html) => {
+        if (openList !== list) {
+          closeList();
+          out.push(list === "ul" ? "<ul>" : "<ol>");
+          openList = list;
+        }
+        out.push(`<li>${html}</li>`);
+      };
+      for (const block of page.data.blocks) {
+        if (!block) continue;
+        const text = escapeHtml(block.content || block.title || "");
+        switch (block.type) {
+          case "h1": closeList(); out.push(`<h1>${text}</h1>`); break;
+          case "h2": closeList(); out.push(`<h2>${text}</h2>`); break;
+          case "h3": closeList(); out.push(`<h3>${text}</h3>`); break;
+          case "heading": closeList(); out.push(`<h2>${text}</h2>`); break;
+          case "bullet": pushListItem("ul", text); break;
+          case "numbered": pushListItem("ol", text); break;
+          case "checkbox":
+            pushListItem("ul", `${block.checked ? "☑ " : "☐ "}${text}`);
+            break;
+          case "toggle": {
+            closeList();
+            const kids = Array.isArray(block.children)
+              ? block.children.map((c) => `<li>${escapeHtml(c.content || c.title || "")}</li>`).join("")
+              : "";
+            out.push(`<details><summary>${text}</summary>${kids ? `<ul>${kids}</ul>` : ""}</details>`);
+            break;
           }
-          return `<p>${escapeHtml(block.content || "")}</p>`;
-        })
-        .join("");
+          case "divider": closeList(); out.push("<hr>"); break;
+          case "code": closeList(); out.push(`<pre><code>${text}</code></pre>`); break;
+          case "quote":
+          case "callout":
+            closeList();
+            out.push(`<blockquote>${block.icon ? `${escapeHtml(block.icon)} ` : ""}${text}</blockquote>`);
+            break;
+          case "tasks-embed": {
+            closeList();
+            const items = Array.isArray(block.items) ? block.items : [];
+            out.push("<h3>Task</h3><ul>" + items.map((it) => {
+              const done = it.status === "done" || it.completed || it.checked;
+              return `<li${done ? ' class="done"' : ""}>${done ? "☑ " : "☐ "}${escapeHtml(it.title || it.text || "")}</li>`;
+            }).join("") + "</ul>");
+            break;
+          }
+          case "goals-embed": {
+            closeList();
+            const goals = Array.isArray(block.goals) ? block.goals : [];
+            out.push("<h3>Obiettivi</h3><ul>" + goals.map((g) =>
+              `<li${g.completed ? ' class="done"' : ""}>${g.completed ? "☑ " : "☐ "}${escapeHtml(g.title || "")}</li>`,
+            ).join("") + "</ul>");
+            break;
+          }
+          case "planner-embed": {
+            closeList();
+            const tasks = block.schedule && Array.isArray(block.schedule.tasks) ? block.schedule.tasks : [];
+            out.push("<h3>Planner</h3><ul>" + tasks.map((x) =>
+              `<li>${escapeHtml(x.title || x.text || "")}</li>`,
+            ).join("") + "</ul>");
+            break;
+          }
+          case "page-ref":
+            closeList();
+            out.push(`<p class="page-ref">→ ${escapeHtml(block.label || "Sottopagina")}</p>`);
+            break;
+          case "image":
+            closeList();
+            out.push(block.url || block.src
+              ? `<p><img src="${escapeHtml(block.url || block.src)}" alt="${text}" style="max-width:100%"></p>`
+              : (text ? `<p>${text}</p>` : ""));
+            break;
+          default:
+            closeList();
+            if (text) out.push(`<p>${text}</p>`);
+            break;
+        }
+      }
+      closeList();
+      return out.join("") || `<p>${escapeHtml(t("pg.noContent"))}</p>`;
+    }
+    if (page.data && typeof page.data === "object" && typeof page.data.text === "string" && page.data.text.trim()) {
+      return `<p>${escapeHtml(page.data.text)}</p>`;
     }
     return `<p>${escapeHtml(t("pg.noContent"))}</p>`;
   }
@@ -908,15 +1024,16 @@ function DashboardContent() {
       return { ok: false, message: "Azione AI non valida." };
     }
 
-    const findTargetPage = (pageId, pageLabel) => {
+    const findTargetPage = (pageId, pageLabel, includeDeleted = false) => {
       const list = Array.isArray(pages) ? pages : [];
+      const visible = (p) => p && (includeDeleted || !p.deleted);
       if (pageId) {
-        const byId = list.find((p) => p && !p.deleted && String(p.id) === String(pageId));
+        const byId = list.find((p) => visible(p) && String(p.id) === String(pageId));
         if (byId) return byId;
       }
       if (pageLabel) {
         const needle = String(pageLabel).trim().toLowerCase();
-        return list.find((p) => p && !p.deleted && String(p.label || "").toLowerCase().includes(needle)) || null;
+        return list.find((p) => visible(p) && String(p.label || "").toLowerCase().includes(needle)) || null;
       }
       return null;
     };
@@ -1192,6 +1309,66 @@ function DashboardContent() {
       return ok
         ? { ok: true, message: `Testo aggiunto alla pagina "${targetPage.label}".` }
         : { ok: false, message: "Pagina non modificabile." };
+    }
+
+    // ── Accesso completo AI: sposta / elimina / ripristina ──
+    if (action.type === "move_page") {
+      const { id, parentId, parentLabel } = action.payload || {};
+      const target = findTargetPage(id ?? action.payload?.pageId, action.payload?.pageLabel);
+      if (!target) return { ok: false, message: "Pagina da spostare non trovata." };
+      let newParentId = parentId !== undefined ? parentId : null;
+      if (parentLabel && (parentId === undefined || parentId === null)) {
+        const dest = String(parentLabel).trim().toLowerCase();
+        if (/^(principale|radice|root|livello principale)$/.test(dest)) {
+          newParentId = null;
+        } else {
+          const parent = findTargetPage(null, parentLabel);
+          if (!parent) return { ok: false, message: `Pagina di destinazione "${parentLabel}" non trovata.` };
+          newParentId = parent.id;
+        }
+      }
+      if (newParentId) {
+        if (String(newParentId) === String(target.id)) {
+          return { ok: false, message: "Non posso spostare una pagina dentro se stessa." };
+        }
+        const parentExists = (Array.isArray(pages) ? pages : []).some(
+          (p) => p && !p.deleted && String(p.id) === String(newParentId),
+        );
+        if (!parentExists) return { ok: false, message: "Pagina di destinazione non trovata." };
+      }
+      updatePage(target.id, { parentId: newParentId || null });
+      return newParentId
+        ? { ok: true, message: `Pagina "${target.label}" spostata.` }
+        : { ok: true, message: `Pagina "${target.label}" spostata al livello principale.` };
+    }
+
+    if (action.type === "delete_page") {
+      const { id, pageLabel, permanent } = action.payload || {};
+      const target = findTargetPage(id ?? action.payload?.pageId, pageLabel ?? action.payload?.pageLabel);
+      if (!target) return { ok: false, message: "Pagina da eliminare non trovata." };
+      if (permanent) {
+        permanentlyDelete(target.id);
+        return { ok: true, message: `Pagina "${target.label}" eliminata definitivamente.` };
+      }
+      deletePage(target.id);
+      return { ok: true, message: `Pagina "${target.label}" spostata nel cestino.` };
+    }
+
+    if (action.type === "restore_page") {
+      const { id, pageLabel } = action.payload || {};
+      const target = findTargetPage(id ?? action.payload?.pageId, pageLabel ?? action.payload?.pageLabel, true);
+      if (!target) return { ok: false, message: "Pagina da ripristinare non trovata." };
+      if (!target.deleted) return { ok: true, message: `La pagina "${target.label}" non è nel cestino.` };
+      restorePage(target.id);
+      return { ok: true, message: `Pagina "${target.label}" ripristinata dal cestino.` };
+    }
+
+    if (action.type === "permanently_delete_page") {
+      const { id, pageLabel } = action.payload || {};
+      const target = findTargetPage(id ?? action.payload?.pageId, pageLabel ?? action.payload?.pageLabel, true);
+      if (!target) return { ok: false, message: "Pagina da eliminare non trovata." };
+      permanentlyDelete(target.id);
+      return { ok: true, message: `Pagina "${target.label}" eliminata definitivamente.` };
     }
 
     return { ok: false, message: `Azione "${action.type}" non supportata.` };
@@ -2504,6 +2681,19 @@ const ensureTab = React.useCallback((page: any) => {
                           >
                             <FileText size={14} className="text-gray-400" />
                             <span>Esporta come PDF / Stampa</span>
+                          </button>
+
+                          {/* Esporta HTML */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsPageMenuOpen(false);
+                              exportPageAsHTML(activePage);
+                            }}
+                            className="flex items-center gap-2 w-full px-2.5 py-2 rounded-xl font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
+                          >
+                            <Code size={14} className="text-gray-400" />
+                            <span>Esporta come HTML</span>
                           </button>
 
                           <div className="my-1 border-t border-gray-100 dark:border-gray-800" />

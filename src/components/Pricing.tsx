@@ -43,8 +43,13 @@ const PricingCard = ({
       </div>
 
       <div className="mb-5 flex items-baseline gap-1">
-        <span className="text-4xl font-black dark:text-white tracking-tighter">€{price}</span>
-        <span className="text-gray-500 dark:text-gray-400 font-bold text-sm uppercase tracking-widest">/{period}</span>
+        <span className="text-4xl font-black dark:text-white tracking-tighter">
+          {price}
+          {period ? "€" : ""}
+        </span>
+        {period ? (
+          <span className="text-gray-500 dark:text-gray-400 font-bold text-sm uppercase tracking-widest">/{period}</span>
+        ) : null}
       </div>
 
       <div className="flex-1 space-y-3 mb-6">
@@ -221,20 +226,38 @@ function Pricing() {
         <h2 className="landing-heading-lg mb-5">{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
         </h2>
 
-        {/* Toggle Switch */}
+        {/* Toggle Switch — cliccabile anche sulle etichette Mensile/Annuale,
+            track colorato quando l'annuale è attivo per feedback immediato. */}
         <div className="flex items-center justify-center gap-4 mt-12">
-          <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("views.tasksMonthly")}</span>
-          <button 
-            onClick={() => setIsAnnual(!isAnnual)}
-            className="w-14 h-8 rounded-full bg-gray-200 dark:bg-gray-800 p-1 relative transition-colors border border-gray-200 dark:border-gray-700"
+          <button
+            type="button"
+            onClick={() => setIsAnnual(false)}
+            aria-pressed={!isAnnual}
+            className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`}
           >
-            <div 
-              style={{ transform: `translateX(${isAnnual ? '28px' : '0'})` }}
-              className="w-6 h-6 bg-white dark:bg-(--accent) rounded-full shadow-lg transition-transform duration-200"
+            {t("views.tasksMonthly")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAnnual(!isAnnual)}
+            aria-pressed={isAnnual}
+            aria-label={t("land.prSave20")}
+            className={`w-14 h-8 rounded-full p-1 relative transition-colors border ${isAnnual ? "bg-(--accent) border-(--accent)" : "bg-gray-200 dark:bg-gray-800 border-gray-200 dark:border-gray-700"}`}
+          >
+            <div
+              style={{ transform: `translateX(${isAnnual ? '24px' : '0'})` }}
+              className="w-6 h-6 bg-white rounded-full shadow-lg transition-transform duration-200"
             />
           </button>
           <div className="flex flex-col items-start leading-none">
-            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{t("views.goalsAnnual")}</span>
+            <button
+              type="button"
+              onClick={() => setIsAnnual(true)}
+              aria-pressed={isAnnual}
+              className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`}
+            >
+              {t("views.goalsAnnual")}
+            </button>
             <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">{t("land.prSave20")}</span>
           </div>
         </div>

@@ -18,6 +18,10 @@ export type AIAction =
   | { type: "add_goal"; payload: { pageId?: number | string; pageLabel?: string; title: string; deadline?: string } }
   | { type: "create_page"; payload: { label: string; parentId?: number | string | null; type?: string; contentText?: string } }
   | { type: "update_page"; payload: { id: number | string; updates: Record<string, any> } }
+  | { type: "move_page"; payload: { id?: number | string; pageLabel?: string; parentId?: number | string | null; parentLabel?: string } }
+  | { type: "delete_page"; payload: { id?: number | string; pageLabel?: string; permanent?: boolean } }
+  | { type: "restore_page"; payload: { id?: number | string; pageLabel?: string } }
+  | { type: "permanently_delete_page"; payload: { id?: number | string; pageLabel?: string } }
   | { type: "error"; payload: { message: string } };
 
 export type OnAction = (action: AIAction) => any;
@@ -250,6 +254,43 @@ function detectAction(text: string, pages: any[]): AIAction | null {
     return { type: "update_page", payload: { id: page.id, updates: { icon } } };
   }
 
+  // L'AI ha accesso completo: può anche spostare ed eliminare le pagine.
+  const deleteMatch = value.match(
+    /(?:elimina|cancella|sposta nel cestino|butta)\s+(?:la\s+)?pagina\s+["']?([^"'\n]+)["']?/i,
+  );
+  if (deleteMatch) {
+    const label = deleteMatch[1].trim().replace(/\s+(per favore|grazie)\.?$/i, "");
+    const page = findPageByLabel(label);
+    if (!page)
+      return { type: "error", payload: { message: `Non trovo la pagina "${label}".` } };
+    return { type: "delete_page", payload: { id: page.id } };
+  }
+
+  const restoreMatch = value.match(
+    /(?:ripristina|recupera|ritira fuori dal cestino)\s+(?:la\s+)?pagina\s+["']?([^"'\n]+)["']?/i,
+  );
+  if (restoreMatch) {
+    const label = restoreMatch[1].trim();
+    return { type: "restore_page", payload: { pageLabel: label } };
+  }
+
+  const moveMatch = value.match(
+    /sposta\s+(?:la\s+)?pagina\s+["']?([^"']+)["']?\s+(?:in|sotto|dentro)\s+["']?([^"'\n]+)["']?/i,
+  );
+  if (moveMatch) {
+    const page = findPageByLabel(moveMatch[1]);
+    if (!page)
+      return { type: "error", payload: { message: `Non trovo la pagina "${moveMatch[1].trim()}".` } };
+    const dest = moveMatch[2].trim();
+    if (/^(principale|radice|root|livello principale)$/i.test(dest)) {
+      return { type: "move_page", payload: { id: page.id, parentId: null } };
+    }
+    const parent = findPageByLabel(dest);
+    if (!parent)
+      return { type: "error", payload: { message: `Non trovo la pagina di destinazione "${dest}".` } };
+    return { type: "move_page", payload: { id: page.id, parentId: parent.id } };
+  }
+
   return null;
 }
 
@@ -387,8 +428,10 @@ export function createAIChatController(opts: {
   }
 
   function buildContext() {
-    const list = (Array.isArray(pages) ? pages : []).filter((p) => p && !p.deleted);
-    if (!list.length) return "";
+    const all = Array.isArray(pages) ? pages : [];
+    const list = all.filter((p) => p && !p.deleted);
+    const trashed = all.filter((p) => p && p.deleted);
+    if (!list.length && !trashed.length) return "";
     const activeId = getActivePageId();
     const lines: string[] = [];
     let budget = 12000;
@@ -403,7 +446,11 @@ export function createAIChatController(opts: {
       budget -= perPage;
       if (budget <= 0) break;
     }
-    return `Pagine utente (l'AI le VEDE e può modificarle con azioni):\n${lines.join("\n\n")}`;
+    // Pagine nel cestino: l'AI le vede e può ripristinarle o eliminarle per sempre.
+    for (const p of trashed.slice(0, 10)) {
+      lines.push(`### "${p.label || "(senza titolo)"}" [id:${p.id}] tipo:${p.type || "?"} [NEL CESTINO]`);
+    }
+    return `Pagine utente (l'AI le VEDE e ha accesso COMPLETO: può modificarle, spostarle, eliminarle nel cestino, ripristinarle):\n${lines.join("\n\n")}`;
   }
 
   let abortController: AbortController | null = null;

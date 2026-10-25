@@ -1,8 +1,30 @@
 
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 const { OAuth2Client } = require("google-auth-library");
 const { getSupabase, ensureProfile, getProfile, SUPABASE_JWT_SECRET } = require("../lib/supabase");
+
+// ── Modalità "backend remoto" (app distribuita senza chiavi) ───────────────
+// `DESKTOP_REMOTE_API_URL` (env, prima scelta) oppure `appconfig.json`
+// (accanto a package.json, incluso nel pacchetto). Se impostato, il login
+// Google gira così: Express locale genera lo state e riceve il `code` di
+// loopback ma delega TUTTO lo scambio (segreti Google + Supabase) al
+// deployment remoto; le API Next del frontend attraversano il rewrite
+// locale /api/* → remoto. Vedi desktop/DISTRIBUZIONE.md.
+const appConfig = (() => {
+  try {
+    // appconfig.json sta alla root desktop/: da server/routes salire di 2.
+    return require(path.join(__dirname, "..", "..", "appconfig.json"));
+  } catch {
+    return {};
+  }
+})();
+const REMOTE_API = (process.env.DESKTOP_REMOTE_API_URL || appConfig.remoteApi || "")
+  .toString()
+  .trim()
+  .replace(/\/+$/, "");
+const IS_REMOTE = REMOTE_API.length > 0;
 
 const router = express.Router();
 
@@ -42,16 +64,35 @@ setInterval(() => {
 
 const crypto = require("crypto");
 
-router.get("/google/start", (req, res) => {
+router.get("/google/start", async (req, res) => {
+  const state = typeof req.query.state === "string" && req.query.state.length >= 16
+    ? String(req.query.state).slice(0, 128)
+    : crypto.randomBytes(24).toString("hex");
+
+  // Modalità remota: l'URL di auth si costruisce sul deployment (che detiene
+  // il GOOGLE_CLIENT_ID); qui basta registrare lo state e delegare.
+  if (IS_REMOTE) {
+    googlePending.set(state, { createdAt: Date.now() });
+    try {
+      const r = await fetch(
+        `${REMOTE_API}/api/auth/desktop/start?state=${encodeURIComponent(state)}&redirect_uri=${encodeURIComponent(googleRedirectUri())}`,
+      );
+      const j = await r.json();
+      if (!r.ok || !j.url) throw new Error(j.message || `HTTP ${r.status}`);
+      if (req.query.format === "json") return res.json({ url: j.url, state });
+      return res.redirect(j.url);
+    } catch (err) {
+      console.error("Google remote start error:", err?.message || err);
+      return res.status(500).json({ message: `Login Google non disponibile (${err?.message || "errore"})` });
+    }
+  }
+
   const client = googleCodeClient();
   if (!client) {
     return res.status(500).json({
       message: "Google auth non configurato sul server: impostare GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET",
     });
   }
-  const state = typeof req.query.state === "string" && req.query.state.length >= 16
-    ? String(req.query.state).slice(0, 128)
-    : crypto.randomBytes(24).toString("hex");
   googlePending.set(state, { createdAt: Date.now() });
   const url = client.generateAuthUrl({
     access_type: "online",
@@ -78,6 +119,30 @@ router.get("/google/callback", async (req, res) => {
   if (!code || !state || !googlePending.has(String(state))) {
     return res.status(400).send(googleResultPage(false, "Sessione non valida", "Riprova il login dall'app Taskly."));
   }
+
+  // Modalità remota: lo scambio del code (segreto Google + Supabase) avviene
+  // sul deployment; l'Express locale registra solo l'esito del polling.
+  if (IS_REMOTE) {
+    try {
+      const r = await fetch(`${REMOTE_API}/api/auth/desktop/exchange`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, redirect_uri: googleRedirectUri() }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.token) throw new Error(j.message || `HTTP ${r.status}`);
+      googlePending.set(String(state), {
+        createdAt: Date.now(),
+        token: j.token,
+        user: j.user,
+      });
+      return res.send(googleResultPage(true, "Accesso completato", "Hai effettuato l'accesso con Google."));
+    } catch (err) {
+      console.error("Google remote exchange error:", err?.message || err);
+      return res.status(401).send(googleResultPage(false, "Autenticazione fallita", "Riprova il login dall'app Taskly."));
+    }
+  }
+
   const client = googleCodeClient();
   if (!client) {
     return res.status(500).send(googleResultPage(false, "Server non configurato", "Manca la configurazione Google sul server."));
