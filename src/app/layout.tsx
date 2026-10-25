@@ -13,6 +13,7 @@ import { accentBootstrapScript } from "../lib/accent";
 import { densityBootstrapScript } from "../lib/prefs";
 import { FAQ_ITEMS } from "../lib/faq";
 import { cn } from "@/lib/utils";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -175,6 +176,7 @@ export default function RootLayout({ children }) {
               <AppMiniChat />
             </Suspense>
             {children}
+            <Analytics />
           </LanguageProvider>
         </GoogleAuthProvider>
       </body>
