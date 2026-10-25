@@ -22,8 +22,12 @@ export default function AppsSection() {
         </div>
 
         <div className="mt-9 grid gap-4 md:grid-cols-2">
-          {/* Desktop Windows */}
-          <div className="rounded-2xl border border-(--accent)/15 dark:border-white/10 bg-white dark:bg-white/5 p-6 sm:p-8">
+          {/* Desktop Windows — prossimamente: niente download pubblico
+              finché l'installer non è validato; si invita alla versione web. */}
+          <div className="relative rounded-2xl border border-(--accent)/15 dark:border-white/10 bg-white dark:bg-white/5 p-6 sm:p-8">
+            <span className="absolute top-6 right-6 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
+              {t("land.dlComingSoon")}
+            </span>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--accent)/10 text-(--accent)">
               <MonitorDown size={22} />
             </div>
@@ -43,11 +47,11 @@ export default function AppsSection() {
             </ul>
             <div className="mt-6 flex flex-wrap gap-2">
               <Link
-                href="/api/download/windows"
+                href="/register"
                 className="inline-flex items-center gap-2 rounded-full bg-(--accent) px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-(--accent-hover)"
               >
-                <MonitorDown size={16} />
-                {t("land.appsDownloadWin")}
+                {t("land.appsTryWeb")}
+                <ArrowRight size={15} />
               </Link>
               <Link
                 href="/download"
@@ -60,7 +64,10 @@ export default function AppsSection() {
           </div>
 
           {/* Mobile */}
-          <div className="rounded-2xl border border-(--accent)/15 dark:border-white/10 bg-white dark:bg-white/5 p-6 sm:p-8">
+          <div className="relative rounded-2xl border border-(--accent)/15 dark:border-white/10 bg-white dark:bg-white/5 p-6 sm:p-8">
+            <span className="absolute top-6 right-6 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
+              {t("land.dlComingSoon")}
+            </span>
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--accent)/10 text-(--accent)">
               <Smartphone size={22} />
             </div>

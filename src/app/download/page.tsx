@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
-import { MonitorDown, Smartphone, Globe, Check, Download, Apple, Play } from "lucide-react";
-import { DESKTOP_VERSION, DESKTOP_REQUIREMENTS, windowsAssetName } from "../../lib/apps";
+import { MonitorDown, Smartphone, Globe, Check, Apple, Play } from "lucide-react";
+import { DESKTOP_REQUIREMENTS } from "../../lib/apps";
 
 export default function DownloadPage() {
   const { t } = useLanguage();
@@ -28,8 +28,10 @@ export default function DownloadPage() {
           </p>
         </div>
 
-        {/* Desktop Windows */}
-        <section className="mt-10 rounded-3xl border border-(--accent)/15 dark:border-white/10 bg-[#f6f7f9] dark:bg-white/5 p-6 sm:p-10">
+          {/* Desktop Windows — prossimamente: il download pubblico torna
+              quando l'installer è validato (la route /api/download/windows
+              resta disponibile per i tester con il link diretto). */}
+          <section className="mt-10 rounded-3xl border border-(--accent)/15 dark:border-white/10 bg-[#f6f7f9] dark:bg-white/5 p-6 sm:p-10">
           <div className="flex flex-col gap-8 md:flex-row">
             <div className="flex-1">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--accent)/10 text-(--accent)">
@@ -38,19 +40,18 @@ export default function DownloadPage() {
               <h2 className="mt-4 text-2xl font-extrabold text-gray-900 dark:text-white">
                 {t("land.dlDesktopTitle")}
               </h2>
+              <span className="mt-3 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-4 py-2 text-xs font-bold text-amber-700 dark:text-amber-300">
+                {t("land.dlComingSoon")}
+              </span>
               <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
                 {t("land.dlDesktopDesc")}
               </p>
               <Link
-                href="/api/download/windows"
+                href="/register"
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-(--accent) px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-(--accent-hover)"
               >
-                <Download size={16} />
-                {t("land.dlDownloadWin")}
+                {t("land.appsTryWeb")}
               </Link>
-              <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                {windowsAssetName()} · v{DESKTOP_VERSION} · 64 bit
-              </p>
               <div className="mt-6">
                 <h3 className="text-xs font-black uppercase tracking-[0.15em] text-gray-400">
                   {t("land.dlInstallTitle")}
