@@ -9,14 +9,15 @@
 const remoteApi =
   process.env.DESKTOP_REMOTE_API_URL?.trim().replace(/\/+$/, "") || "";
 
+// output: "standalone" produce .next/standalone (server.js + node_modules
+// minimi): l'app desktop lo impacchetta via extraResources e lo avvia come
+// child process ("node server.js"). Su VERCEL il runtime Next NON funziona
+// con standalone (cerca .next/next-server.js.nft.json, ENOENT in build):
+// lì serve l'output default, quindi disattivo standalone se VERCEL=1.
+const isVercelBuild = process.env.VERCEL === "1";
 const nextConfig = {
   reactCompiler: true,
-  // No rewrites needed: /api requests are served directly by the Next.js
-  // API routes under src/app/api (the standalone Express server was removed).
-  // output: "standalone" produce .next/standalone (server.js + node_modules
-  // minimi): l'app desktop lo impacchetta via extraResources e lo avvia come
-  // child process ("node server.js"). Il deploy normale (next start) non cambia.
-  output: "standalone",
+  output: isVercelBuild ? undefined : "standalone",
   async rewrites() {
     if (!remoteApi) return [];
     // beforeFiles: il rewrite deve avere la priorità sulle route locali
