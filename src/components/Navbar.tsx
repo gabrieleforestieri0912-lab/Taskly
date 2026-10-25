@@ -61,17 +61,8 @@ export default function Navbar({
   const isLanding = pathname === "/";
   const isDashboard = pathname.startsWith("/dashboard");
 
-  // Navbar "floating": l'ombra si rinforza appena si scrolla, così la pillola
-  // si stacca dal contenuto che passa dietro. `false` iniziale = stesso valore
-  // in SSR, niente mismatch di idratazione.
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    if (!isLanding) return;
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isLanding]);
+  // Navbar "floating" STATICA: niente rilevamento dello scroll. La superficie
+  // ha sempre bordo + ombra, così stacca dal contenuto in ogni posizione.
 
   const landingNavLinks = [
     { name: t("land.navHome"), href: "#", key: "home" },
@@ -253,9 +244,8 @@ export default function Navbar({
 
   /* ── Landing navbar ──────────────────────────────────────────── */
   if (isLanding && !isDashboard) {
-    const barSurface = scrolled
-      ? "border-gray-200 bg-white/95 shadow-md dark:border-gray-800 dark:bg-black/95"
-      : "border-transparent bg-white dark:border-transparent dark:bg-black";
+    const barSurface =
+      "border-gray-200 bg-white/95 shadow-md dark:border-gray-800 dark:bg-black/95";
 
     const menuItem =
       "group inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-white/60 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white";
@@ -280,9 +270,7 @@ export default function Navbar({
           className={`sticky top-0 z-50 w-full border-b transition-[background-color,border-color,box-shadow] duration-300 ${barSurface}`}
         >
           <nav
-            className={`mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 transition-[height] duration-300 sm:px-6 lg:px-10 ${
-              scrolled ? "h-12 sm:h-14" : "h-14 sm:h-16"
-            }`}
+            className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-10 h-14 sm:h-16"
           >
             {/* Logo */}
             <Link

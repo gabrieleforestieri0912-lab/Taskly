@@ -659,10 +659,12 @@ export default function DashboardShowcase() {
             </div>
 
             {/* App body: sidebar + main, esattamente come /dashboard.
-                È puramente rappresentativo: nessun puntatore, nessun focus,
+                Nessun max-h: la preview mostra la dashboard INTERA
+                (era max-h-[620px] e tagliava la metà bassa). È
+                puramente rappresentativo: nessun puntatore, nessun focus,
                 nessuna semantica per gli screen reader. */}
             <div
-              className="flex min-h-[560px] max-h-[620px] text-left select-none pointer-events-none"
+              className="flex min-h-[560px] text-left select-none pointer-events-none"
               aria-hidden="true"
               inert
             >

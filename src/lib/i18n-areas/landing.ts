@@ -13,7 +13,7 @@ export const landingIt: Record<string, string> = {
   "land.heroBadge1": "Setup in 2 minuti",
   "land.heroBadge2": "AI integrata",
   "land.heroBadge3": "Collaborazione in tempo reale",
-  "land.heroProof": "Usato da oltre 2.000 team in Europa",
+  "land.heroProof": "Un solo spazio per task, obiettivi, appunti e idee",
 
   // ── DashboardShowcase ──
   "land.showcaseEyebrow": "Una dashboard, tutto il tuo lavoro",
@@ -179,10 +179,11 @@ export const landingIt: Record<string, string> = {
   "land.baAfterTitle": "Sistema operativo personale",
   "land.baAfter1": "- Tutto in uno spazio unico: task, note, obiettivi",
   "land.baAfter2": "- Pianificazione chiara per giornata e settimana",
-  "land.baAfter3": "- Fino a 5 ore/settimana risparmiate in gestione operativa",
-  "land.baStat1Label": "risparmiate a settimana",
-  "land.baStat2Label": "più chiarezza sulle priorità",
-  "land.baStat3Label": "per iniziare con template pronti",
+  "land.baAfter3": "- Meno tempo perso a decidere cosa fare: il focus è sempre davanti",
+  // ── baStat: no numeri inventati, solo affermazioni oneste ──
+  "land.baStat1Label": "Un workspace unico per ogni progetto",
+  "land.baStat2Label": "Priorità sempre chiare",
+  "land.baStat3Label": "Parti subito con i template pronti",
   "land.baCta": "Inizia ora e misura i risultati",
 
   // ── ValueProposition ──
@@ -245,10 +246,10 @@ export const landingIt: Record<string, string> = {
   "land.pdCaption": "Video dimostrativo - Metti il tuo file in /public/demo.mp4",
 
   // ── SocialProof ──
-  "land.spEyebrow": "Gia scelto da professionisti e team",
-  "land.spStat1Label": "utenti attivi mensili",
-  "land.spStat2Label": "media recensioni utenti",
-  "land.spStat3Label": "task completati ogni settimana",
+  "land.spEyebrow": "Cosa trovi dentro Taskly",
+  "land.spStat1Label": "Task, obiettivi e idee nello stesso spazio",
+  "land.spStat2Label": "Pagine libere: appunti e planner come li vuoi tu",
+  "land.spStat3Label": "AI integrata che ti aiuta a organizzare",
 
   // ── UseCases ──
   "land.ucEyebrow": "Use cases",
@@ -554,7 +555,7 @@ export const landingEn: Record<string, string> = {
   "land.heroBadge1": "Set up in 2 minutes",
   "land.heroBadge2": "Built-in AI",
   "land.heroBadge3": "Real-time collaboration",
-  "land.heroProof": "Trusted by 2,000+ teams across Europe",
+  "land.heroProof": "One place for tasks, goals, notes and ideas",
 
   // ── DashboardShowcase ──
   "land.showcaseEyebrow": "One dashboard, all your work",
@@ -720,10 +721,10 @@ export const landingEn: Record<string, string> = {
   "land.baAfterTitle": "Personal operating system",
   "land.baAfter1": "- Everything in one space: tasks, notes, goals",
   "land.baAfter2": "- Clear planning for day and week",
-  "land.baAfter3": "- Up to 5 hours/week saved on operational management",
-  "land.baStat1Label": "saved per week",
-  "land.baStat2Label": "more clarity on priorities",
-  "land.baStat3Label": "to start with ready templates",
+  "land.baAfter3": "- Less time wondering what to do next: your focus is always visible",
+  "land.baStat1Label": "One workspace for every project",
+  "land.baStat2Label": "Priorities always clear",
+  "land.baStat3Label": "Start right away with ready templates",
   "land.baCta": "Start now and measure the results",
 
   // ── ValueProposition ──
@@ -784,10 +785,10 @@ export const landingEn: Record<string, string> = {
   "land.pdCaption": "Demo video - Place your file in /public/demo.mp4",
 
   // ── SocialProof ──
-  "land.spEyebrow": "Already chosen by professionals and teams",
-  "land.spStat1Label": "monthly active users",
-  "land.spStat2Label": "average user rating",
-  "land.spStat3Label": "tasks completed every week",
+  "land.spEyebrow": "What you get with Taskly",
+  "land.spStat1Label": "Tasks, goals and ideas in one place",
+  "land.spStat2Label": "Free-form pages: notes and planners your way",
+  "land.spStat3Label": "Built-in AI that helps you organize",
 
   // ── UseCases ──
   "land.ucEyebrow": "Use cases",

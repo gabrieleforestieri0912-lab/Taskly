@@ -3,34 +3,27 @@
 import { useLanguage } from "../lib/LanguageContext";
 import React from "react";
 
-const logos = ["Studio Nova", "BrightOps", "Creative Lab", "Focus Team", "Nord Agency"];
-
+/**
+ * Sezione "social-proof" della landing (ancora #social-proof nel menu).
+ * NO metriche inventate (utenti attivi, rating, task/week): carte puramente
+ * descrittive di cosa offre il prodotto. Nessun logo di azienda finto.
+ */
 export default function SocialProof() {
   const { t } = useLanguage();
+  const cards = [
+    t("land.spStat1Label"),
+    t("land.spStat2Label"),
+    t("land.spStat3Label"),
+  ];
   return (
     <section className="landing-section-surface px-6 py-20">
       <div className="max-w-6xl mx-auto text-center">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">{t("land.spEyebrow")}</p>
-        <div className="mt-5 grid md:grid-cols-3 gap-4">
-          <div className="landing-stat-card">
-            <p className="text-2xl font-black text-(--accent) dark:text-(--accent-300)">10.000+</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.spStat1Label")}</p>
-          </div>
-          <div className="landing-stat-card">
-            <p className="text-2xl font-black text-(--accent) dark:text-(--accent-300)">4.8/5</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.spStat2Label")}</p>
-          </div>
-          <div className="landing-stat-card">
-            <p className="text-2xl font-black text-(--accent) dark:text-(--accent-300)">+120k</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.spStat3Label")}</p>
-          </div>
-        </div>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          {logos.map((logo) => (
-            <span key={logo} className="px-4 py-2 rounded-lg border border-(--accent)/15 dark:border-white/10 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-white dark:bg-white/5">
-              {logo}
-            </span>
+        <div className="mt-8 grid md:grid-cols-3 gap-4">
+          {cards.map((text) => (
+            <div key={text} className="landing-stat-card">
+              <p className="text-base font-bold text-gray-900 dark:text-white">{text}</p>
+            </div>
           ))}
         </div>
       </div>

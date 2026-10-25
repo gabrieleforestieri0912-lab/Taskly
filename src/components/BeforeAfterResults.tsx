@@ -36,19 +36,13 @@ export default function BeforeAfterResults() {
           </div>
         </div>
 
+        {/* baStat: puramente descrittive, nessun dato d'uso inventato */}
         <div className="mt-8 grid md:grid-cols-3 gap-4">
-          <div className="rounded-xl bg-cyan-50 dark:bg-cyan-900/20 p-4 text-center">
-            <p className="text-2xl font-black text-cyan-700 dark:text-cyan-300">5h</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.baStat1Label")}</p>
-          </div>
-          <div className="rounded-xl bg-cyan-50 dark:bg-cyan-900/20 p-4 text-center">
-            <p className="text-2xl font-black text-cyan-700 dark:text-cyan-300">2x</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.baStat2Label")}</p>
-          </div>
-          <div className="rounded-xl bg-orange-50 dark:bg-orange-900/20 p-4 text-center">
-            <p className="text-2xl font-black text-orange-700 dark:text-orange-300">30s</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t("land.baStat3Label")}</p>
-          </div>
+          {["land.baStat1Label", "land.baStat2Label", "land.baStat3Label"].map((key) => (
+            <div key={key} className="rounded-xl bg-cyan-50 dark:bg-cyan-900/20 p-4 text-center">
+              <p className="text-sm font-black text-cyan-700 dark:text-cyan-300">{t(key)}</p>
+            </div>
+          ))}
         </div>
 
         <div className="mt-10 text-center">
