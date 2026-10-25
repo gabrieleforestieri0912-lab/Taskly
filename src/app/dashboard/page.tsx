@@ -1395,7 +1395,7 @@ function DashboardContent() {
 
   const renderActiveView = () => {
     if (searchParams.get("view") === "inbox") {
-      return <WorkspaceInbox />;
+      return <WorkspaceInbox pages={Array.isArray(pages) ? pages : []} />;
     }
     // If view query param is mytasks, show MyTasksView
     if (searchParams.get("view") === "mytasks") {
@@ -1437,25 +1437,47 @@ function DashboardContent() {
           p && !p.deleted && String(p.parentId) === String(effectivePage.id),
       );
 
-      const withChildren = (view) => (
-        <>
-          {childPages && childPages.length > 0 && (
-            <div className="mb-4 space-y-2">
-              {childPages.map((c) => (
-                <PageCard
-                  key={c.id}
-                  pageId={String(c.id)}
-                  label={c.label}
-                  iconName={c.icon}
-                  iconColor={c.iconColor}
-                  preview={getPagePreviewText(c)}
-                />
-              ))}
-            </div>
-          )}
-          {view}
-        </>
-      );
+      const withChildren = (view) => {
+        // Le sottopagine già linkate nel corpo (blocco page-ref: aggiunto in
+        // automatico alla creazione della sottopagina o inserito con [[...]])
+        // NON vengono ripetute qui sopra: un solo link per sottopagina.
+        // L'elenco qui resta utile per le viste strutturate (tasks/goals/
+        // planner: lì niente blocco page-ref nel corpo) e per le sottopagine
+        // "orfane" (create via sidebar o con link rimosso dal corpo).
+        const referenced = new Set(
+          (effectivePage?.data &&
+          typeof effectivePage.data === "object" &&
+          !Array.isArray(effectivePage.data) &&
+          Array.isArray(effectivePage.data.blocks)
+            ? effectivePage.data.blocks
+            : []
+          )
+            .filter((b) => b && b.type === "page-ref" && b.pageId)
+            .map((b) => String(b.pageId)),
+        );
+        const visibleChildren = (childPages || []).filter(
+          (c) => !referenced.has(String(c.id)),
+        );
+        return (
+          <>
+            {visibleChildren.length > 0 && (
+              <div className="mb-4 space-y-2">
+                {visibleChildren.map((c) => (
+                  <PageCard
+                    key={c.id}
+                    pageId={String(c.id)}
+                    label={c.label}
+                    iconName={c.icon}
+                    iconColor={c.iconColor}
+                    preview={getPagePreviewText(c)}
+                  />
+                ))}
+              </div>
+            )}
+            {view}
+          </>
+        );
+      };
       const title = effectivePage.label || "Caricamento...";
 
       if (pageType === "tasks") {
