@@ -23,24 +23,17 @@ import {
   Calendar,
   Search,
   Sparkles,
-  Upload,
   ArrowUpRight,
-  Download,
   Globe,
 } from "lucide-react";
 import { Badge } from "./UIComponents";
 import { useLanguage } from "../lib/LanguageContext";
 import {
-  AiInsightsWidget,
   CriticalTasksWidget,
   DashboardHeader,
-  GoalProgressWidget,
-  QuickNavWidget,
   QuickStatsWidget,
   RecentIdeasWidget,
   TodayFocusWidget,
-  ToolsPanel,
-  ToolsResourcesWidget,
   WeeklyTrendWidget,
 } from "./dashboard/widgets";
 import { formatRelativeTime } from "../lib/formatRelative";
@@ -474,97 +467,6 @@ function PreviewTopbar() {
   );
 }
 
-/* ── Pannelli strumenti (versioni statiche, non interattive) ───────────── */
-
-function StaticFileUploader() {
-  return (
-    <div className="flex flex-col h-full min-h-80">
-      <div className="p-5 border-b border-gray-100">
-        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
-          <Upload size={16} className="text-cyan-500" />
-          Cloud File
-        </h3>
-      </div>
-      <div className="flex-1 p-5 overflow-hidden space-y-3">
-        <div className="h-full flex flex-col items-center justify-center text-center opacity-40 py-10">
-          <Upload size={32} className="mb-2" />
-          <p className="text-xs font-bold uppercase tracking-widest">Trascina qui i file</p>
-          <p className="text-[10px] mt-1">oppure seleziona da computer</p>
-        </div>
-      </div>
-      <div className="p-4 bg-gray-50/50 border-t border-gray-100">
-        <div className="w-full py-2.5 px-4 bg-white border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center gap-2">
-          <Upload size={14} className="text-gray-400" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-            Seleziona file
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StaticTemplateGallery() {
-  const templates = ["Meeting Notes", "Project Plan", "Daily Journal"];
-  return (
-    <div className="flex flex-col h-full min-h-80">
-      <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
-          <LayoutDashboard size={16} className="text-gray-400" />
-          Template
-        </h3>
-        <Badge
-          variant="default"
-          className="bg-gray-100 text-gray-600 border-none"
-        >
-          4 disponibili
-        </Badge>
-      </div>
-      <div className="flex-1 p-4 space-y-2 overflow-hidden">
-        {templates.map((name) => (
-          <div
-            key={name}
-            className="p-3 bg-gray-50/50 border border-gray-100 rounded-2xl"
-          >
-            <div className="text-[11px] font-black text-gray-700 truncate">{name}</div>
-            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">
-              Usa template
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StaticImportExport() {
-  return (
-    <div className="flex flex-col h-full min-h-80">
-      <div className="p-5 border-b border-gray-100">
-        <h3 className="text-sm font-black uppercase tracking-widest text-gray-800 flex items-center gap-2">
-          <FileText size={16} className="text-emerald-500" />
-          Importa / Esporta
-        </h3>
-      </div>
-      <div className="flex-1 p-5 flex flex-col gap-4">
-        <div className="flex-1 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl text-xs font-mono text-gray-400">
-          Incolla qui il contenuto Markdown…
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center justify-center gap-2 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">
-            <Download size={14} />
-            Esporta
-          </div>
-          <div className="flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest">
-            <Upload size={14} />
-            Importa
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Sezione landing ──────────────────────────────────────────────────── */
 
 export default function DashboardShowcase() {
@@ -725,38 +627,10 @@ export default function DashboardShowcase() {
                         />
                       </div>
 
-                      <div className="grid lg:grid-cols-2 gap-8">
-                        <GoalProgressWidget
-                          goals={activeGoals.slice(0, 2)}
-                          title={t("goalProgress", "Progresso Obiettivi")}
-                          emptyLabel={t("noActiveGoals", "Nessun obiettivo attivo. Impostane uno per monitorare i tuoi traguardi!")}
-                        />
-                        <div className="space-y-8">
-                          <QuickNavWidget
-                            labels={{
-                              title: t("quickNav", "Azioni Rapide"),
-                              newProject: t("newProject", "Nuovo Progetto"),
-                              newIdea: t("newIdea", "Nuova Idea"),
-                            }}
-                          />
-                          <AiInsightsWidget
-                            text={t("aiAnalysis", "L'intelligenza artificiale può analizzare i tuoi impegni e suggerire la pianificazione ideale.")}
-                            actionLabel={t("aiAction", "Genera Piano Ottimale")}
-                          />
-                        </div>
-                      </div>
-
-                      <ToolsResourcesWidget title={t("resourcesTools", "Strumenti & Risorse")}>
-                        <ToolsPanel>
-                          <StaticFileUploader />
-                        </ToolsPanel>
-                        <ToolsPanel>
-                          <StaticTemplateGallery />
-                        </ToolsPanel>
-                        <ToolsPanel>
-                          <StaticImportExport />
-                        </ToolsPanel>
-                      </ToolsResourcesWidget>
+                      {/* Ridotto rispetto alla dashboard reale: la preview
+                          mostra le sezioni principali (stats, focus, trend,
+                          critici/idee) e si ferma qui — più sotto restano
+                          obiettivi/azioni rapide/insights AI di /dashboard. */}
                     </div>
                   </div>
                 </div>
