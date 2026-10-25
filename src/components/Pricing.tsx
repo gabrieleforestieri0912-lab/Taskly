@@ -226,40 +226,55 @@ function Pricing() {
         <h2 className="landing-heading-lg mb-5">{t("land.prTitlePrefix")}<br />{t("land.prTitleMiddle")}<span className="landing-display-accent">{t("land.prTitleAccent")}</span>
         </h2>
 
-        {/* Toggle Switch — cliccabile anche sulle etichette Mensile/Annuale,
-            track colorato quando l'annuale è attivo per feedback immediato. */}
-        <div className="flex items-center justify-center gap-4 mt-12">
+        {/* Toggle Switch — doppio trigger (etichette + track), layout che
+            non si rompe su mobile, pill di risparmio integrata accanto
+            all'etichetta Annuale. */}
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 mt-12">
           <button
             type="button"
             onClick={() => setIsAnnual(false)}
             aria-pressed={!isAnnual}
-            className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`}
+            className={`text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors cursor-pointer ${
+              !isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            }`}
           >
             {t("views.tasksMonthly")}
           </button>
           <button
             type="button"
+            role="switch"
+            aria-checked={isAnnual}
             onClick={() => setIsAnnual(!isAnnual)}
-            aria-pressed={isAnnual}
-            aria-label={t("land.prSave20")}
-            className={`w-14 h-8 rounded-full p-1 relative transition-colors border ${isAnnual ? "bg-(--accent) border-(--accent)" : "bg-gray-200 dark:bg-gray-800 border-gray-200 dark:border-gray-700"}`}
+            className={`group relative w-16 h-9 rounded-full p-1 cursor-pointer shrink-0 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-(--accent) focus-visible:outline-offset-2 ${
+              isAnnual
+                ? "bg-(--accent) ring-4 ring-(--accent)/20"
+                : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             <div
-              style={{ transform: `translateX(${isAnnual ? '24px' : '0'})` }}
-              className="w-6 h-6 bg-white rounded-full shadow-lg transition-transform duration-200"
+              style={{ transform: `translateX(${isAnnual ? "32px" : "0"})` }}
+              className={`w-7 h-7 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                isAnnual ? "scale-[1.06]" : "group-hover:scale-[1.06]"
+              }`}
             />
           </button>
-          <div className="flex flex-col items-start leading-none">
-            <button
-              type="button"
-              onClick={() => setIsAnnual(true)}
-              aria-pressed={isAnnual}
-              className={`text-sm font-bold uppercase tracking-widest transition-colors ${isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`}
+          <button
+            type="button"
+            onClick={() => setIsAnnual(true)}
+            aria-pressed={isAnnual}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <span
+              className={`text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors ${
+                isAnnual ? "text-gray-900 dark:text-white" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              }`}
             >
               {t("views.goalsAnnual")}
-            </button>
-            <span className="text-[10px] font-black text-green-500 uppercase tracking-tight mt-0.5">{t("land.prSave20")}</span>
-          </div>
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-tight">
+              {t("land.prSave20")}
+            </span>
+          </button>
         </div>
       </div>
 
@@ -275,7 +290,14 @@ function Pricing() {
         ))}
       </div>
 
-      <p className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium">{t("land.prCustomPrefix")}<button className="text-(--accent) dark:text-(--accent-300) font-bold hover:underline">{t("land.prCustomLink")}</button>
+      <p className="mt-20 text-gray-500 dark:text-gray-400 text-sm font-medium">
+        {t("land.prCustomPrefix")}{" "}
+        <a
+          href="mailto:gabriele.forestieri0912@gmail.com?subject=Piano%20personalizzato%20Taskly"
+          className="text-(--accent) dark:text-(--accent-300) font-bold hover:underline"
+        >
+          {t("land.prCustomLink")}
+        </a>
       </p>
     </section>
   );
