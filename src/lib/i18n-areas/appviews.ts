@@ -771,6 +771,7 @@ export const appviewsIt: Record<string, string> = {
   "views.aiQsAnalyze": "Analizza per approfondimenti",
   "views.aiQsTracker": "Crea un tracker di task",
   "views.aiInputPh": "Chiedi a Taskly AI",
+  "views.aiAutoModel": "Modello: Auto",
 
   // ── NotificationBell ──
   "views.notifTitle": "Notifiche",
@@ -1707,6 +1708,7 @@ export const appviewsEn: Record<string, string> = {
   "views.aiQsAnalyze": "Analyze for insights",
   "views.aiQsTracker": "Create a task tracker",
   "views.aiInputPh": "Ask Taskly AI",
+  "views.aiAutoModel": "Model: Auto",
 
   // ── NotificationBell ──
   "views.notifTitle": "Notifications",

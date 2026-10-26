@@ -6,7 +6,7 @@ import { useLanguage } from "../lib/LanguageContext";
 import React, { useEffect, useRef } from "react";
 import {
   Sparkles,
-  Send,
+  ArrowUp,
   X,
   AlignLeft,
   Languages,
@@ -220,7 +220,7 @@ const ChatInput = ({
   t,
   inputRef,
 }: ChatInputProps) => {
-  const [textareaHeight, setTextareaHeight] = React.useState(44);
+  const [textareaHeight, setTextareaHeight] = React.useState(30);
   const [composing, setComposing] = React.useState(false);
 
   const adjustHeight = React.useCallback(() => {
@@ -282,34 +282,23 @@ const ChatInput = ({
 
   return (
     <div className="relative">
+      {/* Card stile Notion: textarea sopra (tutta larghezza), barra controlli
+          sotto (＋ a sinistra, Auto + invia a destra). */}
       <div
         className={`
-          relative flex items-end gap-1.5
-          bg-white dark:bg-gray-900
+          rounded-2xl
+          bg-gray-50 dark:bg-gray-800/60
           border border-gray-200 dark:border-gray-700/80
           transition-all duration-200 ease-out
-          focus-within:border-(--accent)/60 focus-within:ring-4 focus-within:ring-(--accent)/15
-          focus-within:shadow-lg focus-within:shadow-(--accent)/10
-          shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]
-          dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.35)]
+          focus-within:border-gray-300 dark:focus-within:border-gray-600
+          focus-within:shadow-lg focus-within:shadow-black/5
+          shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.05)]
+          dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_16px_rgba(0,0,0,0.3)]
           max-w-[720px] mx-auto
-          pl-2 pr-2 py-2
         `}
-        style={{
-          borderRadius: textareaHeight > 48 ? "24px" : "9999px",
-        }}
         role="group"
         aria-label={t("views.aiInputLabel", "Input chat")}
       >
-        <button
-          type="button"
-          className="shrink-0 self-end mb-0.5 flex items-center justify-center w-9 h-9 rounded-full text-gray-400 hover:text-(--accent) dark:hover:text-(--accent-300) hover:bg-(--accent)/10 transition-colors"
-          aria-label={t("views.aiAttachLabel", "Allega file")}
-          disabled={isStreaming}
-        >
-          <Plus size={18} />
-        </button>
-
         <textarea
           ref={inputRef}
           value={input}
@@ -319,15 +308,7 @@ const ChatInput = ({
           onCompositionEnd={onCompositionEnd}
           placeholder={t("views.aiInputPh")}
           rows={1}
-          className={`
-            flex-1 min-h-[40px] max-h-[180px] w-full
-            bg-transparent border-0 resize-none
-            text-[15px] leading-[1.55] text-gray-900 dark:text-gray-100
-            placeholder:text-gray-400 dark:placeholder:text-gray-500
-            focus:outline-none
-            py-2 px-1.5
-            scrollbar-thin
-          `}
+          className="w-full min-h-[28px] max-h-[180px] bg-transparent border-0 resize-none text-[15px] leading-[1.55] text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none pb-0.5 px-3.5 pt-3 scrollbar-thin"
           style={{
             height: `${textareaHeight}px`,
             overflowY: textareaHeight >= 22 * 6 + 16 ? "auto" : "hidden",
@@ -336,49 +317,67 @@ const ChatInput = ({
           aria-label={t("views.aiInputPh")}
         />
 
-        <div className="shrink-0 self-end mb-0.5 flex items-center justify-center">
-          {isStreaming ? (
+        <div className="flex items-center justify-between px-2 pb-2 pt-1">
+          <div className="flex items-center gap-0.5">
             <button
               type="button"
-              onClick={controller.stop}
-              className="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
-              aria-label={t("views.aiStopLabel", "Ferma generazione")}
+              className="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors"
+              aria-label={t("views.aiAttachLabel", "Allega file")}
+              disabled={isStreaming}
             >
-              <Square size={16} />
+              <Plus size={16} />
             </button>
-          ) : hasText ? (
-            <motion.button
+            <button
               type="button"
-              onClick={wrappedHandleSend}
-              initial={{ scale: 0.8, opacity: 0, rotate: -90 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              exit={{ scale: 0.8, opacity: 0, rotate: 90 }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              className="w-10 h-10 rounded-full bg-(--accent) text-white flex items-center justify-center hover:bg-(--accent-hover) active:scale-95 transition-all shadow-lg shadow-(--accent)/25 hover:shadow-xl hover:shadow-(--accent)/30"
-              aria-label={t("views.aiSendLabel", "Invia messaggio")}
-            >
-              <Send size={17} />
-            </motion.button>
-          ) : (
-            <motion.button
-              type="button"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              className="w-9 h-9 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+              className="flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors"
               aria-label={t("views.aiVoiceLabel", "Input vocale")}
               disabled
             >
-              <Mic size={18} />
-            </motion.button>
-          )}
+              <Mic size={16} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Selettore modello come su Notion (qui non interattivo:
+                un'unica modalità, niente finte scelte). */}
+            <span
+              className="text-sm font-semibold text-gray-400 dark:text-gray-400 select-none"
+              title={t("views.aiAutoModel", "Modello: Auto")}
+            >
+              Auto
+            </span>
+            {isStreaming ? (
+              <button
+                type="button"
+                onClick={controller.stop}
+                className="w-8 h-8 rounded-lg bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+                aria-label={t("views.aiStopLabel", "Ferma generazione")}
+              >
+                <Square size={14} />
+              </button>
+            ) : (
+              <motion.button
+                type="button"
+                onClick={hasText ? wrappedHandleSend : undefined}
+                whileTap={hasText ? { scale: 0.92 } : undefined}
+                className={
+                  hasText
+                    ? "w-8 h-8 rounded-lg bg-(--accent) text-white flex items-center justify-center hover:bg-(--accent-hover) active:scale-95 transition-all shadow-sm"
+                    : "w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700/80 text-gray-400 flex items-center justify-center cursor-default transition-all"
+                }
+                aria-label={t("views.aiSendLabel", "Invia messaggio")}
+                disabled={!hasText}
+              >
+                <ArrowUp size={16} />
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 
       {textareaHeight > 80 && (
         <div
-          className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80 pointer-events-none"
+          className="absolute bottom-0 left-0 right-0 h-8 rounded-b-2xl bg-gradient-to-t from-gray-50/90 to-transparent dark:from-gray-800/80 pointer-events-none"
           aria-hidden="true"
         />
       )}
