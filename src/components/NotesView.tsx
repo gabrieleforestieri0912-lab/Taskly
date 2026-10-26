@@ -4,14 +4,12 @@
 import { useLanguage } from "../lib/LanguageContext";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Card,
-  CardContent,
   Button,
   EditableTitle,
   Skeleton,
 } from "./UIComponents";
 import PageHeader from "./PageHeader";
-import PageCard, { getPagePreviewText } from "./PageCard";
+import PageCard from "./PageCard";
 import { encryptText, decryptText } from "../lib/crypto";
 import {
   Trash2,
@@ -1303,7 +1301,6 @@ function BlockItem({
                   label={(target && target.label) || block.label}
                   iconName={(target && target.icon) || block.icon}
                   iconColor={(target && target.iconColor) || block.iconColor}
-                  preview={getPagePreviewText(target)}
                 />
               );
             })()}
@@ -1886,7 +1883,7 @@ export default function NotesView({
   // cambiare tra un render e l'altro (Rules of Hooks).
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-8 pb-12">
+      <div className="w-full space-y-8 pb-12">
         <div className="space-y-2">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
@@ -2041,9 +2038,10 @@ export default function NotesView({
         </AnimatePresence>
       </div>
 
-      {/* Blocks editor */}
-      <Card className="flex-1 min-h-96 border-none bg-white/60 dark:bg-gray-900/90 shadow-xl shadow-gray-200/50 dark:shadow-none overflow-visible">
-        <CardContent className="h-full p-4 md:p-5">
+      {/* Blocks editor — tutta la larghezza del contenuto, stile Notion:
+          nessuna "card", il testo corre a piena pagina (esclusa la sidebar). */}
+      <div className="w-full flex-1 overflow-visible">
+        <div className="w-full">
           {isNoteLocked ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-6">
               <div className="w-16 h-16 rounded-3xl bg-cyan-50 dark:bg-cyan-950/30 flex items-center justify-center text-cyan-500 shadow-xl shadow-cyan-500/5">
@@ -2135,8 +2133,8 @@ export default function NotesView({
               {/* Block picker removed: blocks can be added via "/" in the editor */}
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }
