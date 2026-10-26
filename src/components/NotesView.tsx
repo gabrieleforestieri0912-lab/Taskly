@@ -672,41 +672,8 @@ function BlockItem({
         >
           <Plus size={14} />
         </button>
-        {/* page-ref: eliminazione e riordino nella barra hover a sinistra
-            (le icone sotto il card del link nascondevano il contenuto). */}
-        {block.type === "page-ref" && (
-          <>
-            <button
-              type="button"
-              onClick={() => onDelete(block.id)}
-              aria-label="Elimina blocco"
-              title="Elimina blocco"
-              className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500"
-            >
-              <Trash2 size={14} />
-            </button>
-            <button
-              type="button"
-              onClick={() => onMoveUp && onMoveUp(block.id)}
-              disabled={index === 0}
-              aria-label="Sposta su"
-              title="Sposta su"
-              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
-            >
-              <ArrowUp size={14} />
-            </button>
-            <button
-              type="button"
-              onClick={() => onMoveDown && onMoveDown(block.id)}
-              disabled={index >= totalCount - 1}
-              aria-label="Sposta giù"
-              title="Sposta giù"
-              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
-            >
-              <ArrowDown size={14} />
-            </button>
-          </>
-        )}
+        {/* Nient'altro a vista: eliminazione e riordino dei blocchi page-ref
+            (e di tutti gli altri) stanno nel menu del ＋. */}
       </div>
 
       <AnimatePresence>
