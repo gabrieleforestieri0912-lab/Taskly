@@ -765,7 +765,12 @@ export const appviewsIt: Record<string, string> = {
   "views.aiDailyLimit": "Limite giornaliero raggiunto",
   "views.aiHelp": "Come posso aiutarti?",
   "views.aiHelpDesc": "Chiedimi di riassumere note, creare task o piani.",
-  "views.aiInputPh": "Scrivi un messaggio...",
+  "views.aiHelpToday": "Come posso aiutarti oggi?",
+  "views.aiQsSummarize": "Riassumi questa pagina",
+  "views.aiQsTranslate": "Traduci questa pagina",
+  "views.aiQsAnalyze": "Analizza per approfondimenti",
+  "views.aiQsTracker": "Crea un tracker di task",
+  "views.aiInputPh": "Chiedi a Taskly AI",
 
   // ── NotificationBell ──
   "views.notifTitle": "Notifiche",
@@ -1696,7 +1701,12 @@ export const appviewsEn: Record<string, string> = {
   "views.aiDailyLimit": "Daily limit reached",
   "views.aiHelp": "How can I help?",
   "views.aiHelpDesc": "Ask me to summarize notes, create tasks or plans.",
-  "views.aiInputPh": "Write a message...",
+  "views.aiHelpToday": "How can I help you today?",
+  "views.aiQsSummarize": "Summarize this page",
+  "views.aiQsTranslate": "Translate this page",
+  "views.aiQsAnalyze": "Analyze for insights",
+  "views.aiQsTracker": "Create a task tracker",
+  "views.aiInputPh": "Ask Taskly AI",
 
   // ── NotificationBell ──
   "views.notifTitle": "Notifications",

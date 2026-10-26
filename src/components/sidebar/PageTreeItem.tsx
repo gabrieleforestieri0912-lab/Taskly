@@ -20,6 +20,37 @@ import { isEmojiIcon } from "../../lib/pageTree";
 import { formatRelativeTime } from "../../lib/formatRelative";
 import { useLanguage } from "../../lib/LanguageContext";
 
+/** Icona (o emoji) di pagina, definita a livello modulo: viene renderizzata
+    land identica sia in editing sia nel link. Evita react-hooks/static-components
+    (componente icona risolto via React.createElement, non creazione al render). */
+function PageIcon({
+  page,
+  size = 15,
+  className = "",
+}: {
+  page: any;
+  size?: number;
+  className?: string;
+}) {
+  if (isEmojiIcon(page.icon)) {
+    return (
+      <span className="text-sm shrink-0 leading-none select-none">
+        {page.icon}
+      </span>
+    );
+  }
+  const icon = resolvePageIcon(page);
+  return icon
+    ? React.createElement(icon, {
+        size,
+        "aria-hidden": true,
+        className,
+      })
+    : (
+      <FileText size={size} aria-hidden="true" className="text-gray-400 shrink-0" />
+    );
+}
+
 export interface PageTreeItemProps {
   page: any;
   depth?: number;
@@ -83,6 +114,7 @@ export function PageTreeItem({
   // Sync internal editLabel if external page.label changes while not editing
   useEffect(() => {
     if (!isEditing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditLabel(page.label || "");
     }
   }, [page.label, isEditing]);
@@ -109,8 +141,6 @@ export function PageTreeItem({
   const isExpanded = expandedPages[page.id] === true;
   const isActive = String(activePageId) === String(page.id);
   const iconColor = page.iconColor || "text-gray-400";
-  const isEmoji = isEmojiIcon(page.icon);
-  const Icon = !isEmoji ? resolvePageIcon(page) : null;
 
   // ── Drag & drop stile Notion ─────────────────────────────────────────
   // Una sola zona per riga: in base alla posizione verticale del cursore
@@ -375,23 +405,10 @@ export function PageTreeItem({
         {/* Page link or inline rename input */}
         {isEditing ? (
           <div className="flex-1 flex items-center gap-2 py-0.5 pr-1 min-w-0 h-full overflow-hidden">
-            {isEmoji ? (
-              <span className="text-sm shrink-0 leading-none select-none">
-                {page.icon}
-              </span>
-            ) : Icon ? (
-              <Icon
-                size={15}
-                aria-hidden="true"
-                className={`${iconColor} shrink-0 transition-colors`}
-              />
-            ) : (
-              <FileText
-                size={15}
-                aria-hidden="true"
-                className="text-gray-400 shrink-0"
-              />
-            )}
+            <PageIcon
+              page={page}
+              className={`${iconColor} shrink-0 transition-colors`}
+            />
             <input
               ref={inputRef}
               type="text"
@@ -440,24 +457,10 @@ export function PageTreeItem({
             }}
             className="flex-1 flex items-center gap-2 py-1 pr-1 min-w-0 h-full overflow-hidden"
           >
-            {/* Icon or emoji */}
-            {isEmoji ? (
-              <span className="text-sm shrink-0 leading-none select-none">
-                {page.icon}
-              </span>
-            ) : Icon ? (
-              <Icon
-                size={15}
-                aria-hidden="true"
-                className={`${iconColor} shrink-0 transition-colors`}
-              />
-            ) : (
-              <FileText
-                size={15}
-                aria-hidden="true"
-                className="text-gray-400 shrink-0"
-              />
-            )}
+            <PageIcon
+              page={page}
+              className={`${iconColor} shrink-0 transition-colors`}
+            />
 
             {/* Label */}
             <span className="truncate text-xs">
@@ -616,15 +619,17 @@ export function PageTreeItem({
           document.body,
         )}
 
-      {/* ── Children subtree (Framer Motion: opacity & transform only) ─── */}
+      {/* ── Children subtree (Framer Motion: altezza + opacity, apertura
+              e chiusura fluide stile Notion) ───────────────────────────── */}
       <AnimatePresence initial={false}>
         {isExpanded && (
           <motion.div
             key={`children-${page.id}`}
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { height: 0, opacity: 0 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="overflow-hidden"
           >
             {hasChildren ? (
               <ul role="group" className="space-y-0.5 mt-0.5">

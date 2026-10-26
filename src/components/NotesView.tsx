@@ -672,6 +672,41 @@ function BlockItem({
         >
           <Plus size={14} />
         </button>
+        {/* page-ref: eliminazione e riordino nella barra hover a sinistra
+            (le icone sotto il card del link nascondevano il contenuto). */}
+        {block.type === "page-ref" && (
+          <>
+            <button
+              type="button"
+              onClick={() => onDelete(block.id)}
+              aria-label="Elimina blocco"
+              title="Elimina blocco"
+              className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500"
+            >
+              <Trash2 size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onMoveUp && onMoveUp(block.id)}
+              disabled={index === 0}
+              aria-label="Sposta su"
+              title="Sposta su"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
+            >
+              <ArrowUp size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onMoveDown && onMoveDown(block.id)}
+              disabled={index >= totalCount - 1}
+              aria-label="Sposta giù"
+              title="Sposta giù"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
+            >
+              <ArrowDown size={14} />
+            </button>
+          </>
+        )}
       </div>
 
       <AnimatePresence>
@@ -1304,38 +1339,6 @@ function BlockItem({
                 />
               );
             })()}
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity mt-1">
-              <button
-                onClick={() => {
-                  if (block.content === undefined) {
-                    onUpdate(block.id, { content: "" });
-                  }
-                }}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400"
-              >
-                <Plus size={14} />
-              </button>
-              <button
-                onClick={() => onDelete(block.id)}
-                className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500"
-              >
-                <Trash2 size={14} />
-              </button>
-              <button
-                onClick={() => onMoveUp && onMoveUp(block.id)}
-                disabled={index === 0}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
-              >
-                <ArrowUp size={14} />
-              </button>
-              <button
-                onClick={() => onMoveDown && onMoveDown(block.id)}
-                disabled={index >= totalCount - 1}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 disabled:opacity-30"
-              >
-                <ArrowDown size={14} />
-              </button>
-            </div>
           </div>
         ) : block.type === "link" ? (
           <div className="flex-1 min-w-0">
@@ -1897,7 +1900,7 @@ export default function NotesView({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full h-full flex flex-col gap-4 pb-8"
+      className="w-full flex flex-col gap-4 pb-8 flex-1 min-h-0"
     >
       {/* Header: icona + titolo inline (Notion-style). Cromature nascoste in minimal. */}
       {!minimalChrome && (
@@ -2040,8 +2043,8 @@ export default function NotesView({
 
       {/* Blocks editor — tutta la larghezza del contenuto, stile Notion:
           nessuna "card", il testo corre a piena pagina (esclusa la sidebar). */}
-      <div className="w-full flex-1 overflow-visible">
-        <div className="w-full">
+      <div className="w-full flex-1 overflow-visible flex flex-col">
+        <div className="w-full flex-1 flex flex-col">
           {isNoteLocked ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center space-y-6">
               <div className="w-16 h-16 rounded-3xl bg-cyan-50 dark:bg-cyan-950/30 flex items-center justify-center text-cyan-500 shadow-xl shadow-cyan-500/5">
@@ -2127,7 +2130,7 @@ export default function NotesView({
                 onClick={appendTrailingBlock}
                 title={t("views.notesKeepWriting", "Continua a scrivere")}
                 aria-label={t("views.notesKeepWriting", "Continua a scrivere")}
-                className="min-h-[32vh] cursor-text"
+                className="flex-1 min-h-24 cursor-text"
               />
 
               {/* Block picker removed: blocks can be added via "/" in the editor */}

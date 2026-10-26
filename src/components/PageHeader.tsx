@@ -229,11 +229,18 @@ export default function PageHeader({
   useEffect(() => {
     if (!pickerOpen && !coverOpen) return;
     const onDown = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement;
+      if (pickerRef.current && !pickerRef.current.contains(target)) {
         setPickerOpen(false);
         setQuery("");
       }
-      if (coverRef.current && !coverRef.current.contains(e.target as Node)) {
+      // Il pulsante toggle della copertina non deve chiudere il popup
+      // (altrimenti il click successivo lo riapre subito).
+      if (
+        coverRef.current &&
+        !coverRef.current.contains(target) &&
+        !target.closest?.("[data-cover-toggle]")
+      ) {
         setCoverOpen(false);
       }
     };
@@ -291,112 +298,39 @@ export default function PageHeader({
   };
 
   return (
-    <div className="relative">
+    <div className="group/header relative">
       {/* ── Copertina stile Notion ─────────────────────────────────── */}
-      {(cover || canEditCover) && (
+      {cover && (
         <div className="group/cover relative mb-2">
-          {cover ? (
-            <div
-              className="h-36 md:h-44 rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-800"
-              style={coverStyle(cover)}
-              role="img"
-              aria-label="Copertina pagina"
-            />
-          ) : (
-            <div className="h-10" aria-hidden="true" />
-          )}
+          <div
+            className="h-36 md:h-44 rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-800"
+            style={coverStyle(cover)}
+            role="img"
+            aria-label="Copertina pagina"
+          />
           {canEditCover && !locked && (
             <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover/cover:opacity-100 [@media(hover:none)]:opacity-100 focus-within:opacity-100 transition-opacity">
               <button
                 type="button"
                 onClick={openCoverEditor}
+                data-cover-toggle=""
                 className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/90 dark:bg-gray-950/90 backdrop-blur text-[11px] font-bold text-gray-700 dark:text-gray-200 shadow-md hover:bg-white dark:hover:bg-gray-900 transition-colors"
               >
                 <ImagePlus size={13} aria-hidden="true" />
-                {cover ? "Cambia copertina" : "Aggiungi copertina"}
+                Cambia copertina
               </button>
-              {cover && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onCoverChange && onCoverChange(null);
-                    setCoverOpen(false);
-                  }}
-                  title="Rimuovi copertina"
-                  aria-label="Rimuovi copertina"
-                  className="p-1.5 rounded-xl bg-white/90 dark:bg-gray-950/90 backdrop-blur text-gray-500 hover:text-red-500 shadow-md transition-colors"
-                >
-                  <X size={13} aria-hidden="true" />
-                </button>
-              )}
-            </div>
-          )}
-          {coverOpen && canEditCover && !locked && (
-            <div
-              ref={coverRef}
-              className="absolute left-0 right-0 sm:right-auto top-full mt-2 z-50 w-full sm:w-80 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl p-3 space-y-3"
-            >
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
-                  Sfumature
-                </p>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {COVER_GRADIENTS.map((g, i) => {
-                    const selected = cover === `gradient:${i}`;
-                    return (
-                      <button
-                        key={g.label}
-                        type="button"
-                        title={g.label}
-                        aria-label={`Copertina ${g.label}`}
-                        aria-pressed={selected}
-                        onClick={() => {
-                          onCoverChange && onCoverChange(`gradient:${i}`);
-                          setCoverOpen(false);
-                        }}
-                        className={`h-10 rounded-lg transition-all hover:scale-105 ${
-                          selected ? "ring-2 ring-(--accent) ring-offset-2 dark:ring-offset-gray-950" : ""
-                        }`}
-                        style={{ background: g.css }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
-                  Immagine (URL)
-                </p>
-                <div className="flex gap-1.5">
-                  <input
-                    type="url"
-                    value={coverUrl}
-                    onChange={(e) => setCoverUrl(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && coverUrl.trim()) {
-                        onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
-                        setCoverOpen(false);
-                      }
-                    }}
-                    placeholder="https://…"
-                    className="flex-1 min-w-0 px-2.5 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-(--accent)/40"
-                  />
-                  <button
-                    type="button"
-                    disabled={!coverUrl.trim()}
-                    onClick={() => {
-                      if (!coverUrl.trim()) return;
-                      onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
-                      setCoverOpen(false);
-                    }}
-                    title="Applica immagine"
-                    aria-label="Applica immagine di copertina"
-                    className="p-2 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) disabled:opacity-40 transition-colors shrink-0"
-                  >
-                    <Check size={14} aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onCoverChange && onCoverChange(null);
+                  setCoverOpen(false);
+                }}
+                title="Rimuovi copertina"
+                aria-label="Rimuovi copertina"
+                className="p-1.5 rounded-xl bg-white/90 dark:bg-gray-950/90 backdrop-blur text-gray-500 hover:text-red-500 shadow-md transition-colors"
+              >
+                <X size={13} aria-hidden="true" />
+              </button>
             </div>
           )}
         </div>
@@ -540,12 +474,15 @@ export default function PageHeader({
             </div>
           )}
         </div>
-        <div className="group/title mt-2 flex items-start gap-1">
-          <div className="flex-1 min-w-0">
-            <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
-          </div>
-          {/* Azioni titolo all'hover: commenti pagina + copertina */}
-          <div className="flex items-center gap-1 pt-2 shrink-0 opacity-0 group-hover/title:opacity-100 [@media(hover:none)]:opacity-100 focus-within:opacity-100 transition-opacity">
+        {/* ── Azioni pagina tra icona e titolo: appaiono solo all'hover sull'intestazione ── */}
+        {(canComment || (canEditCover && !locked)) && (
+          <div
+            className={`relative mt-1 flex items-center gap-1 transition-opacity ${
+              commentsOpen || coverOpen
+                ? "opacity-100"
+                : "opacity-0 group-hover/header:opacity-100 [@media(hover:none)]:opacity-100 focus-within:opacity-100"
+            }`}
+          >
             {canComment && (
               <button
                 type="button"
@@ -567,6 +504,7 @@ export default function PageHeader({
               <button
                 type="button"
                 onClick={openCoverEditor}
+                data-cover-toggle=""
                 title={cover ? "Cambia copertina" : "Aggiungi copertina"}
                 aria-label={cover ? "Cambia copertina" : "Aggiungi copertina alla pagina"}
                 className="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
@@ -574,7 +512,78 @@ export default function PageHeader({
                 <ImagePlus size={16} aria-hidden="true" />
               </button>
             )}
+            {coverOpen && canEditCover && !locked && (
+              <div
+                ref={coverRef}
+                className="absolute left-0 right-0 sm:right-auto top-full mt-2 z-50 w-full sm:w-80 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl p-3 space-y-3"
+              >
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+                    Sfumature
+                  </p>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {COVER_GRADIENTS.map((g, i) => {
+                      const selected = cover === `gradient:${i}`;
+                      return (
+                        <button
+                          key={g.label}
+                          type="button"
+                          title={g.label}
+                          aria-label={`Copertina ${g.label}`}
+                          aria-pressed={selected}
+                          onClick={() => {
+                            onCoverChange && onCoverChange(`gradient:${i}`);
+                            setCoverOpen(false);
+                          }}
+                          className={`h-10 rounded-lg transition-all hover:scale-105 ${
+                            selected ? "ring-2 ring-(--accent) ring-offset-2 dark:ring-offset-gray-950" : ""
+                          }`}
+                          style={{ background: g.css }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+                    Immagine (URL)
+                  </p>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="url"
+                      value={coverUrl}
+                      onChange={(e) => setCoverUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && coverUrl.trim()) {
+                          onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
+                          setCoverOpen(false);
+                        }
+                      }}
+                      placeholder="https://…"
+                      className="flex-1 min-w-0 px-2.5 py-1.5 text-xs rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-(--accent)/40"
+                    />
+                    <button
+                      type="button"
+                      disabled={!coverUrl.trim()}
+                      onClick={() => {
+                        if (!coverUrl.trim()) return;
+                        onCoverChange && onCoverChange(`img:${coverUrl.trim()}`);
+                        setCoverOpen(false);
+                      }}
+                      title="Applica immagine"
+                      aria-label="Applica immagine di copertina"
+                      className="p-2 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) disabled:opacity-40 transition-colors shrink-0"
+                    >
+                      <Check size={14} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+        )}
+        <div className="mt-2">
+          <EditableTitle title={title} onSave={onRename} locked={locked} autoEdit={!title} placeholder="Nuova Pagina" className="w-full" />
         </div>
         {commentsOpen && canComment && (
           <div className="mt-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-white/[0.03] p-3 space-y-2.5">

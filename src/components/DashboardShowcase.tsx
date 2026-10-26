@@ -27,6 +27,7 @@ import {
   Globe,
 } from "lucide-react";
 import { Badge } from "./UIComponents";
+import GoogleCalendarIcon from "./GoogleCalendarIcon";
 import { useLanguage } from "../lib/LanguageContext";
 import type { LangCode } from "../lib/i18n";
 import {
@@ -439,7 +440,7 @@ function PreviewSidebar({
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-7 h-7 rounded-lg bg-white shadow-xs flex items-center justify-center shrink-0 border border-black/5">
-                  <Calendar size={14} className="text-[#4285F4]" aria-hidden="true" />
+                  <GoogleCalendarIcon className="w-[18px] h-[18px]" />
                 </div>
                 <div className="flex items-center gap-1.5 min-w-0">
                   <span className="text-xs font-bold text-gray-900 truncate">Google Calendar</span>

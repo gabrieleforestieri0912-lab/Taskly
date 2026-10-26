@@ -8,14 +8,13 @@ import {
   Sparkles,
   Send,
   X,
-  Loader2,
-  FileText,
-  CheckSquare,
-  Target,
+  AlignLeft,
+  Languages,
+  ScanSearch,
+  CheckCircle2,
   Trash2,
   Copy,
   Check,
-  MessageSquare,
   Maximize2,
   Mic,
   Plus,
@@ -41,10 +40,12 @@ t: (key: string, fallback?: string) => string;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
 };
 
+/** Azioni rapide Notion-style: etichette da dizionario (IT/EN), click = invia. */
 const QUICK_ACTIONS = [
-  { id: "sum", icon: FileText, label: "Riassumi" },
-  { id: "task", icon: CheckSquare, label: "Crea task" },
-  { id: "plan", icon: Target, label: "Crea piano" },
+  { id: "summarize", icon: AlignLeft, keyName: "views.aiQsSummarize" },
+  { id: "translate", icon: Languages, keyName: "views.aiQsTranslate" },
+  { id: "analyze", icon: ScanSearch, keyName: "views.aiQsAnalyze" },
+  { id: "tracker", icon: CheckCircle2, keyName: "views.aiQsTracker" },
 ];
 
 /** Mini-renderer markdown (zero dipendenze) per i messaggi AI.
@@ -220,28 +221,7 @@ const ChatInput = ({
   inputRef,
 }: ChatInputProps) => {
   const [textareaHeight, setTextareaHeight] = React.useState(44);
-  const [showSuggestions, setShowSuggestions] = React.useState(true);
-  // Preferenza impostazioni: i suggerimenti proattivi si possono spegnere.
-  const [aiSuggestionsOn, setAiSuggestionsOn] = React.useState(() => readPref("aiSuggestions"));
-  React.useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (!e.key || e.key === PREFS_KEY) setAiSuggestionsOn(readPref("aiSuggestions"));
-    };
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
   const [composing, setComposing] = React.useState(false);
-  const suggestionsRef = React.useRef<HTMLDivElement>(null);
-
-  const suggestedPrompts = React.useMemo(
-    () => [
-      t("views.aiSuggest1", "Riassumi le mie note"),
-      t("views.aiSuggest2", "Crea un piano settimanale"),
-      t("views.aiSuggest3", "Trova task scaduti"),
-      t("views.aiSuggest4", "Organizza i miei progetti"),
-    ],
-    [t]
-  );
 
   const adjustHeight = React.useCallback(() => {
     const ta = inputRef.current;
@@ -259,22 +239,12 @@ const ChatInput = ({
     adjustHeight();
   }, [input, adjustHeight]);
 
-  React.useEffect(() => {
-    if (!isEmptyState) setShowSuggestions(false);
-  }, [isEmptyState]);
-
   const onCompositionStart = () => setComposing(true);
   const onCompositionEnd = (e: React.CompositionEvent<HTMLTextAreaElement>) => {
     setComposing(false);
     if (e.nativeEvent.data) {
       setInput((prev) => prev + e.nativeEvent.data);
     }
-  };
-
-  const insertSuggestion = (text: string) => {
-    setInput((prev) => (prev ? `${prev} ${text}` : text));
-    setShowSuggestions(false);
-    inputRef.current?.focus();
   };
 
   const handleSubmit = (e?: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -406,33 +376,6 @@ const ChatInput = ({
         </div>
       </div>
 
-      <AnimatePresence>
-        {showSuggestions && isEmptyState && aiSuggestionsOn && (
-          <motion.div
-            ref={suggestionsRef}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15, staggerChildren: 0.03 }}
-            className="mt-3.5 flex flex-wrap items-center justify-center gap-2 max-w-[720px] mx-auto px-2 text-center"
-            role="list"
-            aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}
-          >
-            {suggestedPrompts.map((prompt) => (
-              <motion.button
-                key={prompt}
-                onClick={() => insertSuggestion(prompt)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-[13px] font-medium rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:bg-(--accent)/5 dark:hover:bg-(--accent)/10 hover:border-(--accent)/30 hover:text-gray-900 dark:hover:text-gray-100 hover:shadow transition-all"
-                role="listitem"
-              >
-                <Sparkles size={12} className="text-(--accent) shrink-0" />
-                {prompt}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {textareaHeight > 80 && (
         <div
           className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80 pointer-events-none"
@@ -463,6 +406,17 @@ export default function AIPanel({
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const { messages, isStreaming, error, upgradeRequired, remaining } = useAIChat();
+
+  // Preferenza impostazioni: la lista di azioni rapide (stile Notion) si può
+  // spegnere con lo stesso toggle "Suggerimenti proattivi AI".
+  const [aiActionsOn, setAiActionsOn] = React.useState(() => readPref("aiSuggestions"));
+  React.useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === PREFS_KEY) setAiActionsOn(readPref("aiSuggestions"));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const controller = createAIChatController({ pages, onAction });
 
@@ -639,35 +593,61 @@ export default function AIPanel({
                 </div>
               </div>
 
-              {/* Stato vuoto: contenuto e input sono centrati insieme,
-                  come in Google AI Mode. Dopo il primo messaggio l'input
-                  torna in fondo al pannello ( ramo else ). */}
+              {/* Stato vuoto stile Notion: avatar + titolo + azioni rapide
+                  a sinistra, avvisi/limite sopra l'input e textarea in fondo.
+                  Dopo il primo messaggio l'input resta in fondo al pannello
+                  sopra la conversazione ( ramo else ). */}
               {isEmptyState ? (
-                <div className="flex-1 flex flex-col items-center justify-center overflow-y-hidden px-6 pb-10">
-                  <div className="w-full max-w-[720px]">
-                    <div className="flex flex-col items-center text-center mb-7">
-                      <div className="w-12 h-12 rounded-2xl bg-(--accent)/10 flex items-center justify-center mb-4">
-                        <Sparkles size={20} className="text-(--accent)" />
-                      </div>
-                      <p className="text-base font-bold text-gray-700 dark:text-gray-300 mb-1">
-                        {t("views.aiHelp")}
-                      </p>
-                      <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
-                        {t("views.aiHelpDesc")}
-                      </p>
+                <div className="flex-1 flex flex-col min-h-0 px-5 pt-5 pb-4">
+                  <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4 shrink-0">
+                      <Sparkles size={20} className="text-(--accent)" />
                     </div>
-
-                    <ChatInput
-                      input={input}
-                      setInput={setInput}
-                      isStreaming={isStreaming}
-                      isEmptyState={isEmptyState}
-                      handleSend={handleSend}
-                      controller={controller}
-                      t={t}
-                      inputRef={inputRef}
-                    />
+                    <h2 className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-4">
+                      {t("views.aiHelpToday", "Come posso aiutarti oggi?")}
+                    </h2>
+                    {aiActionsOn && (
+                      <div role="list" aria-label={t("views.aiSuggestionsLabel", "Suggerimenti")}>
+                        {QUICK_ACTIONS.map((a) => (
+                          <button
+                            key={a.id}
+                            onClick={() => handleSend(t(a.keyName, a.keyName))}
+                            disabled={isStreaming}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-left text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors disabled:opacity-50"
+                          >
+                            <a.icon size={17} className="text-gray-400 dark:text-gray-500 shrink-0" />
+                            <span className="truncate">{t(a.keyName, a.keyName)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
+                  {error && (
+                    <div className="mb-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-xs text-red-600 dark:text-red-400 space-y-2 shrink-0">
+                      <p>{error}</p>
+                      {upgradeRequired && (
+                        <Link
+                          href="/#pricing"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-(--accent) text-white text-xs font-bold hover:bg-(--accent-hover) transition-colors"
+                        >
+                          <Sparkles size={12} />
+                          Fai l&apos;upgrade del piano
+                        </Link>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="shrink-0"><ChatInput
+                    input={input}
+                    setInput={setInput}
+                    isStreaming={isStreaming}
+                    isEmptyState={isEmptyState}
+                    handleSend={handleSend}
+                    controller={controller}
+                    t={t}
+                    inputRef={inputRef}
+                  /></div>
                 </div>
               ) : (
                 <>

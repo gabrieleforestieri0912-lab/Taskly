@@ -33,7 +33,7 @@ export default function EmptyPageView({
         };
 
   return (
-    <div className="w-full space-y-6 pb-16">
+    <div className="w-full flex flex-col flex-1">
       {/* Empty placeholder removed as requested */}
 
       <NotesView

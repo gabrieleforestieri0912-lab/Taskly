@@ -122,6 +122,9 @@
        disco: COMUNQUE RUOTARE il token (era transitato in chat).
 
 ## Convenzioni di lavoro
+- **Salvare sempre su GitHub**: a fine lavoro e a ogni checkpoint, committare e fare
+  push su GitHub senza aspettare richiesta dell'utente. Regola da ricordare in
+  ogni sessione prima di chiudere.
 - Risposte in italiano, brevi e concise; riferimenti al codice come `path:riga`.
 - Verifica sempre con `tsc --noEmit` ed `eslint` sui file toccati prima di chiudere.
 - Preferisci `edit` su file esistenti; nuovi file solo se necessario.

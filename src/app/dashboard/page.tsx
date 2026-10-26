@@ -2743,8 +2743,16 @@ const ensureTab = React.useCallback((page: any) => {
           </div>
         </div>
 
-        {/* Contenuto principale pagina */}
-        <div className={`p-3 md:p-6 ${activePage?.font === "serif" ? "font-serif" : activePage?.font === "monospace" ? "font-mono" : ""}`}>
+        {/* Contenuto principale pagina. Colonna flex alta quanto la view: una
+            pagina senza contenuto riempie esattamente lo spazio disponibile
+            (nessuno scroll); appena il contenuto cresce oltre, la pagina
+            torna a scorrere a livello body. */}
+        <div
+          className={`
+            p-3 md:p-6 flex flex-col min-h-[calc(100dvh-3.25rem)]
+            ${activePage?.font === "serif" ? "font-serif" : activePage?.font === "monospace" ? "font-mono" : ""}
+          `}
+        >
           {/* Nest modal */}
           <AnimatePresence>
             {isNestModalOpen && (
