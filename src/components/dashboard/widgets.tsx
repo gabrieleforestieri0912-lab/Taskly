@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLanguage } from "../../lib/LanguageContext";
+import { setGhostDrag } from "../../lib/dragGhost";
 import {
   ArrowDown,
   ArrowUp,
@@ -806,7 +807,11 @@ export function WidgetEditToolbar({
         {onDragStart ? (
           <span
             draggable
-            onDragStart={onDragStart}
+            onDragStart={(e) => {
+              // Anteprima drag con il nome reale del widget.
+              setGhostDrag(e, label);
+              onDragStart?.(e);
+            }}
             onDragEnd={onDragEnd}
             onPointerDown={onTouchPointerDown}
             onPointerMove={onTouchPointerMove}

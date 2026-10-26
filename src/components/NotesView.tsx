@@ -48,6 +48,7 @@ import ItemList from "./ItemList";
 import GoalsView from "./GoalsView";
 import CalendarView from "./CalendarView";
 import { track } from "../lib/activity";
+import { setGhostDrag } from "../lib/dragGhost";
 import {
   isUrl,
   normalizeUrl,
@@ -436,11 +437,16 @@ function BlockItem({
           e.dataTransfer.setData("text/plain", String(block.id));
         } catch {}
         e.dataTransfer.effectAllowed = "move";
+        // Anteprima drag con il contenuto reale della riga (fallback: tipo blocco).
+        const dragText =
+          (typeof block.content === "string" ? block.content : "").trim() ||
+          t(BLOCK_TYPES.find((bt) => bt.type === block.type)?.label || "", block.type);
+        setGhostDrag(e, dragText);
         setIsDragging(true);
       }}
       onDragEnd={() => setIsDragging(false)}
       onContextMenu={(e) => e.preventDefault()}
-      title="Trascina per spostare la riga"
+      title={t("views.notesDragRow", "Trascina per spostare la riga")}
       role="button"
       aria-label={t("views.notesDragRow", "Trascina per spostare la riga")}
       className="touch-none select-none p-1 -m-1 rounded-md cursor-grab active:cursor-grabbing hover:bg-gray-200/70 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500"
