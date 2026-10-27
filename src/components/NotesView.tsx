@@ -338,6 +338,11 @@ function ColumnCell({ col, colorClass, onChange, onRemove, canRemove }) {
 
 /* ─── Block component ─────────────────────────────────────────── */
 
+// Indentazione dei blocchi: quanto sposta "di fianco" un trascinamento nella
+// zona destra di una riga. Applicata anche al rendering (margin-left + guida).
+const INDENT_STEP_PX = 20;
+const MAX_INDENT = 5;
+
 function BlockItem({
   block,
   index,
@@ -392,19 +397,36 @@ function BlockItem({
   }, [block.content, block.type]);
 
   // ── Drag & drop righe stile Notion (HTML5 nativo, funziona con blocchi
-  // di qualsiasi altezza: la metà sopra/sotto decide prima/dopo) ──
+  // di qualsiasi altezza) ──
+  // Due zone per riga: sinistra = posizionamento prima/dopo (linea orizzontale);
+  // destra (linea verticale a gradini di 20px) = "di fianco": il blocco
+  // atterra indentato SOTTO la riga, con guida verticale grigia persistente.
   const showBefore = dropTarget?.id === block.id && dropTarget.pos === "before";
   const showAfter = dropTarget?.id === block.id && dropTarget.pos === "after";
+  const showChild = dropTarget?.id === block.id && dropTarget.pos === "child";
+  const childIndentAbs = (block.indent || 0) + Math.min(
+    Math.max(dropTarget?.depth || 1, 1),
+    MAX_INDENT - (block.indent || 0),
+  );
   const posFromEvent = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    return e.clientY - rect.top < rect.height / 2 ? "before" : "after";
+    const relX = e.clientX - rect.left;
+    const steps = Math.floor((relX + 6) / INDENT_STEP_PX);
+    if (steps >= 1 && (block.indent || 0) < MAX_INDENT) {
+      return { pos: "child", depth: Math.min(steps, MAX_INDENT - (block.indent || 0)) };
+    }
+    return {
+      pos: e.clientY - rect.top < rect.height / 2 ? "before" : "after",
+      depth: 0,
+    };
   };
   const rowDragHandlers = {
     onDragOver: (e) => {
       e.preventDefault();
       e.stopPropagation();
       e.dataTransfer.dropEffect = "move";
-      if (onHoverBlock) onHoverBlock({ id: block.id, pos: posFromEvent(e) });
+      const target = posFromEvent(e);
+      onHoverBlock({ id: block.id, ...target });
     },
     onDragLeave: (e) => {
       if (e.currentTarget.contains(e.relatedTarget)) return;
@@ -413,7 +435,7 @@ function BlockItem({
     onDrop: (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const pos = posFromEvent(e);
+      const { pos, depth } = posFromEvent(e);
       if (onHoverBlock) onHoverBlock(null);
       let draggedId = "";
       try {
@@ -422,7 +444,7 @@ function BlockItem({
           e.dataTransfer.getData("text/plain");
       } catch {}
       if (draggedId && draggedId !== block.id && onDropBlock) {
-        onDropBlock(draggedId, index, pos);
+        onDropBlock(draggedId, index, pos, depth);
       }
     },
   };
@@ -453,8 +475,11 @@ function BlockItem({
     </span>
   );
   const dropLine = (
-    <div className="h-0.5 rounded-full bg-(--accent) mx-8" aria-hidden="true" />
+    <div className="h-0.5 rounded-full bg-gray-400/60 dark:bg-gray-500/50 mx-8" aria-hidden="true" />
   );
+  // Guida verticale dell'indentazione: segmento grigio semitrasparente sul
+  // bordo sinistro della riga (si connette visivamente tra righe sorelle).
+  const indentLevel = block.indent || 0;
 
   const filteredBlocks = BLOCK_TYPES.filter(
     (bt) =>
@@ -624,8 +649,16 @@ function BlockItem({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           {...rowDragHandlers}
-          className={`group flex items-center gap-2 py-2 ${isDragging ? "opacity-50" : ""}`}
+          style={indentLevel ? { marginLeft: indentLevel * INDENT_STEP_PX } : undefined}
+          className={`group flex items-center gap-2 py-2 relative ${isDragging ? "opacity-50" : ""}`}
         >
+        {showChild && (
+          <span
+            aria-hidden="true"
+            className="absolute top-0.5 bottom-0.5 w-0.5 rounded-full bg-gray-400/60 dark:bg-gray-500/50 pointer-events-none"
+            style={{ left: childIndentAbs * INDENT_STEP_PX - 6 }}
+          />
+        )}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
           {dragHandle}
           <button
@@ -657,9 +690,26 @@ function BlockItem({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -8 }}
         {...rowDragHandlers}
+        style={indentLevel ? { marginLeft: indentLevel * INDENT_STEP_PX } : undefined}
         className={`group flex items-start gap-1 py-1 relative ${isDragging ? "opacity-50" : ""}`}
         ref={menuRef}
       >
+      {/* Guida verticale dell'indent: si collega tra le righe sorelle. */}
+      {indentLevel > 0 && (
+        <span
+          aria-hidden="true"
+          className="absolute top-0 bottom-0 w-px bg-gray-300/70 dark:bg-gray-700/70 pointer-events-none"
+          style={{ left: -8 }}
+        />
+      )}
+      {/* Indicatore drop "di fianco": barra verticale sul gradino destro. */}
+      {showChild && (
+        <span
+          aria-hidden="true"
+          className="absolute top-0.5 bottom-0.5 w-0.5 rounded-full bg-gray-400/60 dark:bg-gray-500/50 pointer-events-none"
+          style={{ left: childIndentAbs * INDENT_STEP_PX - 6 }}
+        />
+      )}
       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity pt-0.5">
         {dragHandle}
         <button
@@ -1778,19 +1828,38 @@ export default function NotesView({
   // di qualsiasi altezza (testo o componenti incorporati).
   const [blockDropTarget, setBlockDropTarget] = useState<{
     id: string;
-    pos: "before" | "after";
+    pos: "before" | "after" | "child";
+    depth?: number;
   } | null>(null);
-  const moveBlockTo = useCallback((draggedId, targetIndex, pos) => {
+  const moveBlockTo = useCallback((draggedId, targetIndex, pos, depth = 0) => {
     setBlocks((prev) => {
       const from = prev.findIndex((b) => b.id === draggedId);
       if (from === -1) return prev;
-      let at = pos === "before" ? targetIndex : targetIndex + 1;
+      const target = prev[targetIndex];
+      if (!target || target.id === draggedId) return prev;
+      let at;
+      let indent;
+      if (pos === "child") {
+        // Zona destra della riga: atterra indentato "di fianco" al target.
+        at = targetIndex + 1;
+        indent = Math.min(
+          Math.max(1, (target.indent || 0) + Math.max(1, depth)),
+          MAX_INDENT,
+        );
+      } else {
+        at = pos === "before" ? targetIndex : targetIndex + 1;
+        indent = target.indent || 0;
+      }
       if (from < at) at -= 1;
-      if (from === at) return prev;
+      if (from === at && (prev[from].indent || 0) === indent) return prev;
       const arr = [...prev];
       const [item] = arr.splice(from, 1);
+      item.indent = indent;
       arr.splice(at, 0, item);
-      return arr;
+      // Normalizza: nessuna riga oltre il massimo di indentazione.
+      return arr.map((b) =>
+        b.indent && b.indent > MAX_INDENT ? { ...b, indent: MAX_INDENT } : b,
+      );
     });
     setBlockDropTarget(null);
   }, []);
